@@ -5,8 +5,9 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { spawnSync } from 'node:child_process'
 import assert from 'node:assert/strict'
-import { buildRequestGraph, buildPath, pathLog, agentsOf, mergeParts, partBase, codexChips, groupTools, toolEventsOf, cleanPrompt, linkContext, loadSummary, summaryId, promptsOf, PAIRS, notY, layoutTree, termPos, matePos, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, writeSlotMd, writeRequestMd, harnessTouched, loadAgentHarness, HARNESS_RE, serial, agentRounds, splitAgentRounds, nodeAlerts, engTxt, codexNo, loadWorkflowAgents, ALERT, SLOTS, SLOT_MAP, ENG_SLOTS, STATUS_STYLE, PAGE_BG, CODEX_STYLE } from '../scripts/request-graph.mjs'
+import { buildRequestGraph, buildPath, pathLog, agentsOf, mergeParts, partBase, codexChips, groupTools, toolEventsOf, cleanPrompt, linkContext, loadSummary, summaryId, promptsOf, PAIRS, notY, layoutTree, termPos, matePos, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, writeSlotMd, writeRequestMd, harnessTouched, loadAgentHarness, HARNESS_RE, serial, agentRounds, splitAgentRounds, nodeAlerts, engTxt, codexNo, loadWorkflowAgents, ALERT, SLOTS, SLOT_MAP, isLoopLedger, TURN_ID_RE, loadLoops, ENG_SLOTS, STATUS_STYLE, PAGE_BG, CODEX_STYLE } from '../scripts/request-graph.mjs'
 
 const T0 = '2026-11-08T10:00:00+09:00', T1 = '2026-11-08T10:30:00+09:00', P = Date.parse
 const turn = (extra = {}) => ({ ts_req: T0, ts_res: T1, req_head: '요청', ...extra })
@@ -26,6 +27,9 @@ const rec = {
   hook: ts => ({ type: 'attachment', timestamp: ts, attachment: { type: 'hook_success', hookEvent: 'PostToolUse' } }),
 }
 const Z = s => `2026-11-08T${s}:00Z`
+const spawnSyncGit = (cwd, a) => spawnSync('git', a, { cwd, encoding: 'utf8' })
+// codex-gate 상태 루트 격리(귀속 기록·기준선) — 이 파일의 시험이 실제 .omc/state 를 쓰지 않게(codex-gate 는 시험 안에서 동적 import)
+process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'rg-state-'))
 
 test('결함 ①② agentRounds : 전달마다 1회차(알림·도구 결과 제외), 회차 끝 = end_turn, 회차별 도구 오류, 끝 뒤 훅 기록은 진행으로 안 봄', () => {
   const rs = [rec.give(Z('01:00')), rec.meta(Z('01:00')), rec.err(Z('01:05')), rec.ok(Z('01:06')), rec.end(Z('01:10')), rec.give(Z('01:20')), rec.err(Z('01:21')), rec.err(Z('01:22')), rec.end(Z('01:30')), rec.hook(Z('01:30'))]
@@ -179,7 +183,7 @@ test('Codex 칸 분홍 2단계 : 미완료 연분홍·완료(추정 포함) 진�
   const html = renderHtml({ design: true, outDir: '.', requests: [], meta: '' })
   assert.ok(html.includes(`.k-codex{--cf:${CODEX_STYLE.pending.fill};--ci:${CODEX_STYLE.pending.ink};--cs:${CODEX_STYLE.pending.strip}}`) && html.includes('.k-codex .strip{fill:var(--cs)}') && html.includes('.k-codex.st-notrun .box,.k-codex.st-missing .box{stroke:var(--cs);stroke-dasharray:5 3') && html.includes('Codex 미수행(점선)') && html.includes(`.k-codex.st-done,.k-codex.st-estimated{--cf:${CODEX_STYLE.done.fill}`))
   assert.ok(html.includes("SL[n.slot]?.kind === 'codex' ? ' k-codex'") && html.includes('Codex 미완료') && html.includes('Codex 완료'))
-  assert.deepEqual(SLOTS.filter(s => s.kind === 'codex').map(s => s.id), ['1.1.1.1', '1.1.2.1', '1.1.3.1', '1.1.4.1', '1.1.5.1', '1.1.5.2.1'])
+  assert.deepEqual(SLOTS.filter(s => s.kind === 'codex').map(s => s.id), ['1.1.4.1'])   // 2026-11-10 개정 : CDX-루프 하나
 })
 
 test('설계도 경로 : 표준 처리 순서 + Codex FAIL 회송 예시 되돌이(결정적)', () => {
@@ -192,13 +196,15 @@ test('설계도 경로 : 표준 처리 순서 + Codex FAIL 회송 예시 되돌�
   assert.deepEqual(buildPath(designGraph(), { design: true }), p)
 })
 
-test('설계도 노드·Obsidian 안전 파일명', () => {
+test('설계도 노드·Obsidian 안전 파일명 — 2026-11-10 개정 : 설계도 9칸(CDX = CDX-루프 하나, 1.1.5.2 총괄승인 칸 삭제)', () => {
   const d = designGraph()
-  assert.equal(d.length, SLOTS.length)
+  assert.equal(d.length, SLOTS.length); assert.equal(SLOTS.length, 9)
+  assert.deepEqual(SLOTS.map(s => s.id), ['1', '1.1', '1.1.1', '1.1.2', '1.1.3', '1.1.4', '1.1.4.1', '1.1.5', '1.2'])   // SA 5칸 + CDX-루프 + 승인
   assert.ok(d.every(n => n.status === 'unassigned' && !n.lines.length && n.t0 === null))
-  assert.ok(SLOTS.some(s => s.id === '1.1.5.2.1'))
+  for (const id of ['1.1.1.1', '1.1.2.1', '1.1.3.1', '1.1.5.1', '1.1.5.2', '1.1.5.2.1']) assert.ok(!SLOTS.some(s => s.id === id), id)   // 폐지 칸(1.1.5.2 총괄승인 = 2026-11-10 마스터 '총괄승인 칸 삭제')
+  assert.equal(SLOT_MAP['1.1.5.2'], undefined); assert.ok(!SLOTS.some(s => s.label === '총괄승인'))
   assert.equal(safeName('1.1.1 SA : 프롬프트'), '1.1.1 SA 프롬프트')
-  assert.equal(safeName('1.1.1.1 CDX-프롬프트 검수'), '1.1.1.1 CDX-프롬프트 검수')
+  assert.equal(safeName('1.1.4.1 CDX-루프 검수'), '1.1.4.1 CDX-루프 검수')
   assert.equal(safeName('a[b]#c|d?'), 'a b c d')
 })
 
@@ -210,12 +216,15 @@ test('일련번호 표시 : 화면 제목·풍선·상세 = n.no + ". " + 이름
   assert.ok(html.includes("'data-id': n.id"))
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-md-'))
   try {
-    assert.equal(writeSlotMd(dir), 15)
+    assert.equal(writeSlotMd(dir), 9)
     const md = f => fs.readFileSync(path.join(dir, f), 'utf8')
     assert.match(md('1.1.1 SA-프롬프트.md'), /^# 3\. SA-프롬프트\n/)
-    assert.match(md('1.1.5.2.1 CDX-총괄 검수.md'), /^# 8-1\. CDX-총괄 검수\n/)
-    assert.match(md('1.2 파다완 아소카 승인.md'), /^# 9\. 파다완 아소카 승인\n/)
-    assert.ok(md('1.1.1 SA-프롬프트.md').includes('[[1.1.1.1 CDX-프롬프트 검수|3-1. CDX-프롬프트 검수]]'))
+    assert.ok(!fs.readdirSync(dir).some(x => x.startsWith('1.1.5.2')))   // 2026-11-10 마스터 '총괄승인 칸 삭제'
+    assert.match(md('1.1.4.1 CDX-루프 검수.md'), /^# 6-1\. CDX-루프 검수\n/)
+    assert.ok(md('1.1.4 SA-루프.md').includes('[[1.1.4.1 CDX-루프 검수|6-1. CDX-루프 검수]]'))
+    assert.match(md('1.2 파다완 아소카 승인.md'), /^# 8\. 파다완 아소카 승인\n/)
+    assert.ok(!md('1.1.5 SA-그래프.md').includes('1.1.5.2'))   // SA-그래프 카드의 하위 링크 정리
+    assert.deepEqual(fs.readdirSync(dir).filter(f => /CDX-(프롬프트|컨텍스트|하네스|그래프|총괄)/.test(f)), [])   // 폐지 칸 md 없음
     for (const f of fs.readdirSync(dir)) assert.doesNotMatch(md(f).split('\n')[0], /^# 1(\.\d)+ /, f)
   } finally { fs.rmSync(dir, { recursive: true, force: true }) }
 })
@@ -246,27 +255,27 @@ const pairOK = ns => ns.filter(n => codexIds.includes(n.id)).every(c => ns.some(
 
 test('빈 매핑 : 4쌍(프롬프트·컨텍스트·하네스·루프) 증거 없음 = 숨김, 1·1.1 완료, 1.2 미실행', () => {
   const ns = buildRequestGraph(turn(), [], { slotMap: NONE })
-  assert.deepEqual(ids(ns), ['1', '1.1', '1.1.5', '1.1.5.2', '1.2'])
+  assert.deepEqual(ids(ns), ['1', '1.1', '1.1.5', '1.2'])
   assert.equal(node(ns, '1').status, 'done'); assert.equal(node(ns, '1.2').status, 'notrun'); assert.equal(node(ns, '1').eng, 0)
 })
 
-test('C-8 (b) 프롬프트·컨텍스트·그래프 쌍은 모든 요청에 표시 — 에이전트·도구 0건 턴도, graph 미실행 = 생성기 자동 갱신(Stop 훅), 판정 없음 = ⚠ 검증 누락', () => {
+test('C-8 (b) 프롬프트·컨텍스트·그래프 SA 는 모든 요청에 표시(짝 CDX 칸은 2026-11-10 개정으로 폐지) — 에이전트·도구 0건 턴도, graph 미실행 = 생성기 자동 갱신(Stop 훅)', () => {
   const ns = buildRequestGraph(turn(), [])
-  for (const id of ['1.1.1', '1.1.1.1', '1.1.2', '1.1.2.1', '1.1.5', '1.1.5.1']) assert.ok(node(ns, id), id)
+  for (const id of ['1.1.1', '1.1.2', '1.1.5']) assert.ok(node(ns, id), id)
+  for (const id of ['1.1.1.1', '1.1.2.1', '1.1.5.1']) assert.equal(node(ns, id), undefined, id)
   assert.equal(node(ns, '1.1.5').statusLabel, '생성기 자동 갱신(Stop 훅)'); assert.equal(fmtSpan(node(ns, '1.1.5'), 0), '생성기 자동 갱신(Stop 훅)')
-  for (const id of ['1.1.1.1', '1.1.2.1', '1.1.5.1']) { assert.equal(node(ns, id).statusLabel, '검증 누락'); assert.deepEqual(node(ns, id).alerts, ['검증 누락']) }
+  assert.equal(ns[0].check.viol, 0); assert.equal(ns[0].alertN, 0)
   assert.equal(node(ns, '1').eng, 3); assert.equal(node(ns, '1').engEst, 1)
   assert.deepEqual(SLOT_MAP['1.1.2'].agents, ['anakin_phase-collect']); assert.deepEqual(SLOT_MAP['1.1.5'].agents, ['anakin_phase-graph'])
   const g = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-graph', '2026-11-08T10:20:00+09:00')] }), [])
   assert.equal(node(g, '1.1.5').status, 'done'); assert.equal(AL(g).find(n => n.label === 'anakin_phase-graph').parent, '1.1.5')
 })
 
-test('C-8 (a)·C-9 (a) 하네스 쌍 = tool_use·훅 주입 1건 이상일 때만 — 0건 요청에서만 숨김', () => {
+test('C-8 (a)·C-9 (a) 하네스 SA = tool_use·훅 주입 1건 이상일 때만 — 0건 요청에서만 숨김, CDX-하네스 칸 없음(루프에 흡수)', () => {
   assert.equal(node(buildRequestGraph(turn(), []), '1.1.3'), undefined)
-  assert.equal(node(buildRequestGraph(turn(), []), '1.1.3.1'), undefined)
   for (const extra of [{ tools: { Read: 1 } }, { resources: { hooks: [{ name: 'UserPromptSubmit', event: 'UserPromptSubmit', n: 1 }] } }, { agents_detail: [ag('general-purpose', '2026-11-08T10:01:00+09:00')] }, { toolEvents: [{ t: P('2026-11-08T10:00:05+09:00'), name: 'Bash', who: 'main' }] }]) {
     const ns = buildRequestGraph(turn(extra), [])
-    assert.equal(node(ns, '1.1.3').status, 'done', JSON.stringify(extra)); assert.ok(node(ns, '1.1.3.1'))
+    assert.equal(node(ns, '1.1.3').status, 'done', JSON.stringify(extra)); assert.equal(node(ns, '1.1.3.1'), undefined)
   }
 })
 
@@ -289,7 +298,7 @@ test('C-9 (b)(c) 하네스 칸 = 종류별 합계 머리 + 시각순 사용 목�
   assert.equal(h.t0, T('00:05')); assert.equal(h.t1, T('00:50'))
   // 하네스 파일 변경 표식 유지
   const hz = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { harness: true })] }), [])
-  assert.ok(node(hz, '1.1.3').chips.some(c => c.txt === '⚙ 하네스 파일 변경 1건'))
+  assert.ok(node(hz, '1.1.3').chips.some(c => c.txt === '⚙ 하네스 파일 변경 1건 → CDX-루프 판정'))
   // html·md 에 입력값 없음
   const html = renderHtml({ design: false, outDir: '.', requests: [{ key: 'k', when: 'w', head: 'h', nodes: ns, path: buildPath(ns) }], meta: '' })
   assert.ok(!html.includes('SECRET') && html.includes('hlist') && html.includes('10:00:10~10:00:30 Read ×3 [collect]'))
@@ -301,53 +310,66 @@ test('C-9 (b)(c) 하네스 칸 = 종류별 합계 머리 + 시각순 사용 목�
   } finally { fs.rmSync(dir, { recursive: true, force: true }) }
 })
 
-test('C-8 (c)(d) 루프 쌍 = 반복(같은 에이전트 종류 2회+ · 같은 원장 판정 2회+) 또는 되돌림(N 1회+, C-13)일 때만, build 없이도', () => {
-  // (d) 반복 0건·되돌림 0건 = 루프 쌍 없음(build 1회·c4 판정 1회 PASS 도) → build 는 2 접수 칸
+test('C-8 (c)(d) 루프 쌍(2026-11-10 개정) = c4 판정 1회 이상 · 파일 변경 실행 · 반복 · 되돌림 중 하나 — 과거 c2 원장은 무시', () => {
+  // c4 판정 1회 PASS 만으로도 루프 쌍 표시(유일한 CDX 칸), build = SA-루프 칸
   let ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00'), ag('teamanakin-admin', '2026-11-08T10:20:00+09:00')] }), [KL('c4-x', '2026-11-08T01:05:00Z', 'PASS')])
+  assert.equal(node(ns, '1.1.4').status, 'done'); assert.equal(node(ns, '1.1.4.1').statusLabel, '검증 Y · 1회 만에 완료'); assert.equal(AL(ns).find(n => n.label === 'anakin_phase-build').parent, '1.1.4')
+  assert.deepEqual(node(ns, '1.1.4').chips[0], { txt: 'Codex 판정 1건 — 되돌림 0', tone: '' })
+  // 판정·파일 변경·반복·되돌림 0건 = 루프 쌍 없음 → build 는 2 접수 칸
+  ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00'), ag('teamanakin-admin', '2026-11-08T10:20:00+09:00')] }), [])
   assert.equal(node(ns, '1.1.4'), undefined); assert.equal(node(ns, '1.1.4.1'), undefined); assert.equal(AL(ns).find(n => n.label === 'anakin_phase-build').parent, '1.1')
-  // (c) admin ×2 → 루프 쌍, 반복 목록
+  // 파일 변경 실행(wrote) + 판정 전 → SA-루프 '판정 전' 줄
+  ns = buildRequestGraph(turn({ agents_detail: [ag('general-purpose', '2026-11-08T10:01:00+09:00', { wrote: true })] }), [])
+  assert.deepEqual(node(ns, '1.1.4').chips, [{ txt: '파일 변경 실행 — 판정 전', tone: '' }])
+  // admin ×2 → 루프 쌍(반복), 판정 대상 없음 = CDX-루프 숨김
   ns = buildRequestGraph(turn({ agents_detail: [ag('teamanakin-admin', '2026-11-08T10:10:00+09:00'), ag('teamanakin-admin', '2026-11-08T10:20:00+09:00')] }), [])
-  assert.equal(node(ns, '1.1.4').status, 'done'); assert.deepEqual(node(ns, '1.1.4').chips, [{ txt: 'admin ×2', tone: '' }]); assert.ok(node(ns, '1.1.4.1'))
-  // (c) CDX 2회 판정(c2 N → Y) · build 없음 → 루프 쌍 + CDX-루프 = 루프 최종 판정
+  assert.equal(node(ns, '1.1.4').status, 'done'); assert.deepEqual(node(ns, '1.1.4').chips, [{ txt: 'admin ×2', tone: '' }]); assert.equal(node(ns, '1.1.4.1'), undefined)
+  // 과거 c2 원장(N → Y) = 집계 제외 → 루프 쌍 없음
   ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:01:00+09:00')] }), [loop('c2-a', [ev2(1, 'FAIL', '05'), ev2(2, 'PASS', '15')], { startedAt: '2026-11-08T01:02:00Z' })])
-  assert.deepEqual(node(ns, '1.1.4').chips, [{ txt: 'CDX-컨텍스트 N 1회(1회차 결함 2) → 2회차 Y', tone: 'bad' }, { txt: 'CDX-컨텍스트 2회', tone: '' }])   // C-13 : 되돌림 줄 먼저
-  const cx = node(ns, '1.1.4.1'); assert.equal(cx.statusLabel, '루프 최종 판정 Y'); assert.equal(cx.status, 'done'); assert.deepEqual(cx.chips, [{ txt: 'CDX-컨텍스트 2회 → Y', tone: 'ok' }])
+  assert.equal(node(ns, '1.1.4'), undefined); assert.equal(node(ns, '1.1.4.1'), undefined)
   // build ×2(회송) → SA-루프 칸 안 'build ×2 (회송 1)', 반복 목록에 build
   ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:03:00+09:00' }), ag('anakin_phase-build', '2026-11-08T10:08:00+09:00', { ts_end: '2026-11-08T10:09:00+09:00' })] }), [])
   assert.deepEqual(node(ns, '1.1.4').chips.map(c => c.txt), ['build ×2', 'build ×2 (회송 1) · 3m'])   // 칸 요약(반복 목록) 먼저, 실행 줄 뒤
   assert.ok(AL(ns).filter(n => n.label === 'anakin_phase-build').every(n => n.parent === '1.1.4'))
 })
 
-test('C-13 루프 = 되돌림 기준 : N 1회 이상 OR 반복 2회 이상이면 루프 쌍, SA-루프 = 칸·회차·결함 수, CDX-루프 = 최종 판정(진행 = 진행 중 요청·마지막 기록 진행만, 끝난 요청 판정 없음 = 검증 누락)', () => {
+test('C-13 루프 = 되돌림 기준(2026-11-10 개정 — CDX-루프 하나) : N 1회 이상 = 루프 쌍, SA-루프 = 칸·회차·결함 수, CDX-루프 = 원장 판정(파일 변경이 있는데 끝난 요청에 판정 없음 = 검증 누락)', () => {
   const tools = { tools: { Read: 1, Edit: 2 } }
-  // CDX-하네스 1회 N · 반복 없음 → 루프 쌍 있음(마스터 지적 5-1 사례), 끝난 요청
-  let ns = buildRequestGraph(turn(tools), [loop('c3-h', [{ ...ev2(1, 'FAIL', '10'), open: 5 }], { startedAt: '2026-11-08T01:05:00Z' })])
+  let ns = buildRequestGraph(turn(tools), [loop('c4-h', [{ ...ev2(1, 'FAIL', '10'), open: 5 }], { startedAt: '2026-11-08T01:05:00Z' })])
   assert.ok(node(ns, '1.1.4') && node(ns, '1.1.4.1'), 'N 1회 = 루프 쌍')
-  assert.deepEqual(node(ns, '1.1.4').chips, [{ txt: 'CDX-하네스 N 1회(1회차 결함 5) → 재작업 대기', tone: 'bad' }])
-  let cx = node(ns, '1.1.4.1'); assert.equal(cx.statusLabel, '루프 최종 판정 N'); assert.deepEqual(cx.chips, [{ txt: 'CDX-하네스 → N', tone: 'bad' }])
-  // 되돌림 화살표 = CDX-하네스 → 짝 SA-하네스(직접, 루프 노드 경유 아님)
-  assert.deepEqual(buildPath(ns).verdicts.map(e => [e.from, e.to, e.label]), [['1.1.3.1', '1.1.3', '되돌림 1회']])
-  // 진행 중 요청 : N 즉시 루프 쌍, 재판정 진행 중 = CDX-루프 '진행'
+  assert.deepEqual(node(ns, '1.1.4').chips, [{ txt: 'CDX-루프 N 1회(1회차 결함 5) → 재작업 대기', tone: 'bad' }])
+  let cx = node(ns, '1.1.4.1'); assert.equal(cx.statusLabel, '검증 N · 1회차 진행 (1/5)'); assert.equal(cx.verdict.yn, 'N')
+  assert.deepEqual(buildPath(ns).verdicts.map(e => [e.from, e.to, e.label]), [['1.1.4.1', '1.1.4', '되돌림 1회']])
+  // 진행 중 요청 : 재판정 진행 중 = CDX-루프 진행
   const now = P('2026-11-08T10:20:00+09:00')
-  ns = buildRequestGraph(turn({ ...tools, ts_res: null }), [loop('c3-h', [ev2(1, 'FAIL', '10')], { startedAt: '2026-11-08T01:05:00Z', running: true })], { now })
-  assert.match(node(ns, '1.1.4').chips[0].txt, /^CDX-하네스 N 1회\(1회차 결함 2\) → 재판정 진행$/); cx = node(ns, '1.1.4.1'); assert.equal(cx.statusLabel, '루프 최종 판정 진행'); assert.equal(cx.chips[0].txt, 'CDX-하네스 → 진행')
-  // 끝난 요청 · 반복만(admin ×2) · 루프 원장 없음 → CDX-루프 = ⚠ 검증 누락('진행' 아님, 메인 확정 c4-build-ab3cb5 D-001) / 같은 입력이 진행 중 요청이면 '진행'
-  const adm2 = [ag('teamanakin-admin', '2026-11-08T10:10:00+09:00'), ag('teamanakin-admin', '2026-11-08T10:20:00+09:00')]
-  cx = node(buildRequestGraph(turn({ agents_detail: adm2 }), []), '1.1.4.1'); assert.equal(cx.statusLabel, '검증 누락'); assert.deepEqual(cx.alerts, ['검증 누락'])
-  cx = node(buildRequestGraph(turn({ ts_res: null, agents_detail: adm2 }), [], { now: P('2026-11-08T10:25:00+09:00') }), '1.1.4.1'); assert.equal(cx.statusLabel, '루프 최종 판정 진행'); assert.deepEqual(cx.chips, [{ txt: '진행', tone: 'run' }])
-  // N 0회 · 반복 0회 → 루프 쌍 없음
+  ns = buildRequestGraph(turn({ ...tools, ts_res: null }), [loop('c4-h', [ev2(1, 'FAIL', '10')], { startedAt: '2026-11-08T01:05:00Z', running: true })], { now })
+  assert.match(node(ns, '1.1.4').chips[0].txt, /^CDX-루프 N 1회\(1회차 결함 2\) → 재판정 진행$/); cx = node(ns, '1.1.4.1'); assert.match(cx.statusLabel, /^검증 진행 · 2회차/)
+  // 파일 변경 실행 + 원장 없음 : 끝난 요청 = ⚠ 검증 누락(경보 1건, CDX-루프에만) / 진행 중 요청 = 검증 대기
+  const w = [ag('anakin_phase-build', '2026-11-08T10:10:00+09:00', { wrote: true })]
+  ns = buildRequestGraph(turn({ agents_detail: w }), []); cx = node(ns, '1.1.4.1')
+  assert.equal(cx.statusLabel, '검증 누락'); assert.deepEqual(cx.alerts, ['검증 누락']); assert.equal(ns[0].alertN, 1); assert.ok(!agentsOf(ns).some(n => (n.alerts || []).includes('검증 누락')))
+  cx = node(buildRequestGraph(turn({ ts_res: null, agents_detail: [{ ...w[0], ts_end: null, live: true }] }), [], { now: P('2026-11-08T10:25:00+09:00') }), '1.1.4.1'); assert.equal(cx.statusLabel, '검증 대기 — 판정 전')
+  // wrote 없음 + 원장 없음 = CDX-루프 숨김·위반 0
+  ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:10:00+09:00'), ag('anakin_phase-build', '2026-11-08T10:15:00+09:00')] }), [])
+  assert.ok(node(ns, '1.1.4')); assert.equal(node(ns, '1.1.4.1'), undefined); assert.equal(ns[0].check.viol, 0)
+  // 원장 2개 중 1개 FAIL = N(원장별 마지막 판정 AND), 전부 PASS = '원장 n개 전부 Y'
+  ns = buildRequestGraph(turn(tools), [KL('c4-a-a11111', '2026-11-08T01:05:00Z', 'PASS'), KL('c4-b-a22222', '2026-11-08T01:04:00Z', 'FAIL')])
+  assert.equal(node(ns, '1.1.4.1').statusLabel, '검증 N · 원장 1/2 N'); assert.equal(node(ns, '1.1.4.1').verdict.yn, 'N')
+  ns = buildRequestGraph(turn(tools), [KL('c4-a-a11111', '2026-11-08T01:05:00Z', 'PASS'), KL('c4-b-a22222', '2026-11-08T01:04:00Z', 'PASS')])
+  assert.equal(node(ns, '1.1.4.1').statusLabel, '검증 Y · 원장 2개 전부 Y')
+  // 과거 c3 원장 PASS = 무시 → 루프 쌍 없음
   ns = buildRequestGraph(turn(tools), [KL('c3-h', '2026-11-08T01:10:00Z', 'PASS')])
   assert.equal(node(ns, '1.1.4'), undefined); assert.equal(node(ns, '1.1.4.1'), undefined)
 })
 
-test('C-7 ①·C-8 (e) SA 가 없으면 CDX 도 없다 — 원장이 있어도 짝 SA 증거가 없으면 숨김(여러 사례 불변식)', () => {
-  const c3 = buildRequestGraph(turn(), [KL('c3-x', '2026-11-08T01:05:00Z', 'PASS')])   // 하네스 사용 0건 + c3 원장
-  assert.equal(node(c3, '1.1.3'), undefined); assert.equal(node(c3, '1.1.3.1'), undefined)
-  const c4 = buildRequestGraph(turn(), [KL('c4-x', '2026-11-08T01:05:00Z', 'PASS')])   // 반복 없음 + c4 판정 1회
-  assert.equal(node(c4, '1.1.4.1'), undefined)
+test('C-7 ①·C-8 (e) SA 가 없으면 CDX 도 없다 — 과거 c1·c3·c6 원장은 무시, c4 원장은 SA-루프와 쌍(여러 사례 불변식)', () => {
+  const c3 = buildRequestGraph(turn(), [KL('c3-x', '2026-11-08T01:05:00Z', 'PASS')])   // 과거 c3 원장 = 무시
+  assert.equal(node(c3, '1.1.3'), undefined); assert.equal(node(c3, '1.1.3.1'), undefined); assert.equal(node(c3, '1.1.4.1'), undefined)
+  const c4 = buildRequestGraph(turn(), [KL('c4-x', '2026-11-08T01:05:00Z', 'PASS')])   // c4 판정 1회 = 루프 쌍
+  assert.ok(node(c4, '1.1.4') && node(c4, '1.1.4.1'))
   const cases = [turn(), turn({ tools: { Read: 1 } }), turn({ agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:02:00+09:00'), ag('anakin_phase-build', '2026-11-08T10:05:00+09:00')] })]
   for (const t of cases) for (const loops of [[], [KL('c1-a', '2026-11-08T01:01:00Z', 'PASS')], [KL('c3-a', '2026-11-08T01:03:00Z', 'FAIL'), KL('c6-a', '2026-11-08T01:06:00Z', 'PASS')]]) {
-    const ns = buildRequestGraph(structuredClone(t), loops); assert.ok(pairOK(ns), loops.map(l => l.id).join(','))
+    const ns = buildRequestGraph(structuredClone(t), loops); assert.ok(pairOK(ns), loops.map(l => l.id).join(',')); assert.ok(!ns.some(n => codexIds.includes(n.id)), '과거 원장만 = CDX 칸 없음')
   }
   assert.deepEqual(PAIRS, ['1.1.1', '1.1.2', '1.1.3', '1.1.4'])
 })
@@ -373,8 +395,8 @@ test('C-5 에이전트 = 칸 안 줄(독립 노드 0) : collect·build·graph·a
 })
 
 test('C-6 CDX 칸 안 판정 회차 : 회차마다 줄(N 빨강·BLOCKED 주황·사유·시각) + 끝 줄(k회 만에 완료 · 되돌림 n회), 원장 2개 이상 = 원장별 머리', () => {
-  const L = loop('c2-a', [ev2(1, 'FAIL', '10'), { ...ev2(2, 'BLOCKED', '20'), reason: 'device' }, ev2(2, 'PASS', '30')], { startedAt: '2026-11-08T01:05:00Z' })
-  const ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:01:00+09:00')] }), [L]), c = node(ns, '1.1.2.1')
+  const L = loop('c4-a', [ev2(1, 'FAIL', '10'), { ...ev2(2, 'BLOCKED', '20'), reason: 'device' }, ev2(2, 'PASS', '30')], { startedAt: '2026-11-08T01:05:00Z' })
+  const ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00')] }), [L]), c = node(ns, '1.1.4.1')
   assert.deepEqual(c.chips, [{ txt: '✖ 1회 N 10:10 · 결함 2', tone: 'bad' }, { txt: '⚠ 2회 BLOCKED 10:20 · device', tone: 'warn' }, { txt: '2회 Y 10:30', tone: 'ok' }, { txt: '→ 2회 만에 완료 · 되돌림 1회', tone: '' }])
   assert.equal(c.statusLabel, '검증 Y · 2회 만에 완료')
   const two = codexChips([{ id: 'c4-a', rows: [{ iter: 1, verdict: 'PASS', t1: P(Z('01:00')) }] }, { id: 'c4-b', rows: [{ iter: 1, verdict: 'FAIL', open: 1, t1: P(Z('01:10')) }] }])
@@ -382,58 +404,61 @@ test('C-6 CDX 칸 안 판정 회차 : 회차마다 줄(N 빨강·BLOCKED 주황�
 })
 
 test('C-3 순차 경로 : 실행된 칸을 표준 순서로 끝까지 — CDX 가 Y 아니어도 선은 이어 감(⚠ 표시만), 정지·차단 배지 없음, 위반 = Y 아닌 CDX 칸 수', () => {
-  const ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:02:00+09:00'), ag('general-purpose', '2026-11-08T10:06:00+09:00')] }), [KL('c2-a', '2026-11-08T01:04:00Z', 'PASS')])
+  const agents = [ag('anakin_phase-collect', '2026-11-08T10:02:00+09:00'), ag('general-purpose', '2026-11-08T10:06:00+09:00', { wrote: true })]
+  const ns = buildRequestGraph(turn({ agents_detail: agents }), [KL('c4-a', '2026-11-08T01:08:00Z', 'PASS')])
   const p = buildPath(ns)
-  assert.deepEqual(route(p), ['1', '1.1', '1.1.1', '1.1.1.1', '1.1.2', '1.1.2.1', '1.1.3', '1.1.3.1', '1.1.5', '1.1.5.1', '1.2', 'E'])   // 승인 칸은 미실행이어도 경로에(D-002)
+  assert.deepEqual(route(p), ['1', '1.1', '1.1.1', '1.1.2', '1.1.3', '1.1.4', '1.1.4.1', '1.1.5', '1.2', 'E'])   // 승인 칸은 미실행이어도 경로에(D-002)
   assert.equal(p.edges[0].from, 'S'); assert.deepEqual(p.edges.map(e => e.seq), p.edges.map((_, i) => i + 1))
   assert.ok(p.edges.filter(e => e.to !== '1.2').every(e => e.pass && !e.loop)); assert.equal(p.stop, undefined)
-  assert.deepEqual(p.edges.filter(e => e.to === '1.2').map(e => [e.from, e.label, e.state, e.pass]), [['1.1.5.1', '⚠ 승인 미실행', 'planned', false]])
-  // c5-turn-f7dc16-1110112110 D-001 : 요약 집계 = 보이는 CDX 칸 상태(cdxCheck) — 머리 '누락' = 상세 '검증 누락' 칸 수
-  assert.equal(ns[0].check.miss, ns.filter(n => n.statusLabel === '검증 누락').length); assert.equal(ns[0].check.miss, 3); assert.equal(ns[0].check.y, 1)
-  assert.deepEqual(p.edges.filter(e => e.label === 'Y').map(e => [e.from, e.to, e.state]), [['1.1.2.1', '1.1.3', 'yes']])
-  assert.equal(node(ns, '1.1.1.1').statusLabel, '검증 누락')   // Y 아님 = 칸에 ⚠ 표시(경보)
-  assert.equal(ns[0].check.viol, 3); assert.equal(ns[0].check.viol, ns.filter(notY).length)   // 프롬프트·하네스·그래프 CDX
-  const html = renderHtml({ design: false, outDir: '.', requests: [{ key: 'k', when: 'w', head: 'h', nodes: ns, path: p }], meta: '' })
+  assert.deepEqual(p.edges.filter(e => e.to === '1.2').map(e => [e.from, e.label, e.state, e.pass]), [['1.1.5', '⚠ 승인 미실행', 'planned', false]])
+  assert.equal(ns[0].check.miss, 0); assert.equal(ns[0].check.y, 1); assert.equal(ns[0].check.viol, 0)
+  assert.deepEqual(p.edges.filter(e => e.label === 'Y').map(e => [e.from, e.to, e.state]), [['1.1.4.1', '1.1.5', 'yes']])
+  // Y 아님(FAIL) : 선은 그대로 이어 가고 위반 1
+  const nf = buildRequestGraph(turn({ agents_detail: agents }), [KL('c4-a', '2026-11-08T01:08:00Z', 'FAIL')]), pf = buildPath(nf)
+  assert.deepEqual(route(pf), route(p)); assert.equal(nf[0].check.viol, 1); assert.equal(nf[0].check.viol, nf.filter(notY).length)
+  const html = renderHtml({ design: false, outDir: '.', requests: [{ key: 'k', when: 'w', head: 'h', nodes: nf, path: pf }], meta: '' })
   assert.ok(!html.includes('게이트 위반') && !html.includes('진행 불가') && !html.includes('gateViol') && !html.includes('path.stop'))
   // md : 실행 경로 = 화면과 같은 순서, Y 아닌 CDX 목록
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-req-'))
   try {
     writeRequestMd(dir, [{ when: '2026-11-08 10:00', sid: 's-1', head: '요청', catLabel: '', statusLabel: '완료', nodes: ns, path: p }], P(T1))
     const md = fs.readFileSync(path.join(dir, fs.readdirSync(dir)[0]), 'utf8'), r = md.split('## 실행 경로\n\n')[1].split('\n')[0]
-    assert.equal(r, '(1) 1. 마스터 아나킨 요청 → (2) 2. 파다완 아소카 접수 → (3) 3. SA-프롬프트 → (4) 3-1. CDX-프롬프트 검수 → (5) 4. SA-컨텍스트 → (6) 4-1. CDX-컨텍스트 검수 → (7) 5. SA-하네스 [Y] → (8) 5-1. CDX-하네스 검수 → (9) 6. SA-그래프 → (10) 6-1. CDX-그래프 검수 → (11) 8. 파다완 아소카 승인 [⚠ 승인 미실행] (예정) → (12) 종료')
-    assert.ok(md.includes('- ⚠ Y 아닌 CDX 칸 3 : ') && !md.includes('⛔'))
+    assert.equal(r, '(1) 1. 마스터 아나킨 요청 → (2) 2. 파다완 아소카 접수 → (3) 3. SA-프롬프트 → (4) 4. SA-컨텍스트 → (5) 5. SA-하네스 → (6) 6. SA-루프 → (7) 6-1. CDX-루프 검수 → (8) 7. SA-그래프 [Y] → (9) 8. 파다완 아소카 승인 [⚠ 승인 미실행] (예정) → (10) 종료')
+    fs.rmSync(path.join(dir, fs.readdirSync(dir)[0]))
+    writeRequestMd(dir, [{ when: '2026-11-08 10:00', sid: 's-1', head: '요청', catLabel: '', statusLabel: '완료', nodes: nf, path: pf }], P(T1))
+    const mf = fs.readFileSync(path.join(dir, fs.readdirSync(dir)[0]), 'utf8'); assert.ok(mf.includes('- ⚠ Y 아닌 CDX 칸 1 : ') && !mf.includes('⛔'))
   } finally { fs.rmSync(dir, { recursive: true, force: true }) }
 })
 
 test('C-3 진행 중·중단 : 마지막 실제 실행 칸까지 실선, 판정 대기 CDX 부터 예정 점선, 진행 중 판정 = 진입 노랑, 중단 = 첫 예정 중단', () => {
   const now = P('2026-11-08T10:05:00+09:00')
-  let ns = buildRequestGraph(turn({ ts_res: null, agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:02:00+09:00', { ts_end: null, live: true })] }), [], { now }), p = buildPath(ns)
-  assert.equal(node(ns, '1.1.2.1').statusLabel, '검증 대기 — 판정 전'); assert.equal(ns[0].check.viol, 0)
-  assert.deepEqual(route(p).slice(0, 5), ['1', '1.1', '1.1.1', '1.1.1.1', '1.1.2']); assert.deepEqual(p.edges.map(e => e.seq), p.edges.map((_, i) => i + 1))   // 순차 연결 유지
+  let ns = buildRequestGraph(turn({ ts_res: null, agents_detail: [ag('anakin_phase-build', '2026-11-08T10:02:00+09:00', { ts_end: null, live: true, wrote: true })] }), [], { now }), p = buildPath(ns)
+  assert.equal(node(ns, '1.1.4.1').statusLabel, '검증 대기 — 판정 전'); assert.equal(ns[0].check.viol, 0)
+  assert.deepEqual(route(p).slice(0, 6), ['1', '1.1', '1.1.1', '1.1.2', '1.1.3', '1.1.4']); assert.deepEqual(p.edges.map(e => e.seq), p.edges.map((_, i) => i + 1))   // 순차 연결 유지
   assert.ok(p.edges.filter(e => codexIds.includes(e.to) && !node(ns, e.to).rounds).every(e => e.state === 'planned' && !e.pass))   // 판정 대기 CDX 로 들어가는 선 = 예정
-  assert.equal(p.edges.find(e => e.to === '1.1.2').state, 'running'); assert.equal(p.edges.at(-1).to, 'E'); assert.equal(p.edges.at(-1).state, 'planned'); assert.equal(new Set(route(p)).size, route(p).length)
-  const L = loop('c2-L', [ev2(1, 'FAIL', '01')], { startedAt: '2026-11-08T01:00:30Z', running: true })
-  ns = buildRequestGraph(turn({ ts_res: null, agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:00:10+09:00', { ts_end: '2026-11-08T10:00:50+09:00' })] }), [L], { now }); p = buildPath(ns)
-  assert.deepEqual(p.edges.find(e => e.to === '1.1.2.1').state, 'running'); assert.equal(p.edges.at(-1).state, 'planned')   // 진행 중 판정 칸 진입 = 노랑, 종료 = 예정
+  assert.equal(p.edges.find(e => e.to === '1.1.4').state, 'running'); assert.equal(p.edges.at(-1).to, 'E'); assert.equal(p.edges.at(-1).state, 'planned'); assert.equal(new Set(route(p)).size, route(p).length)
+  const L = loop('c4-L', [ev2(1, 'FAIL', '01')], { startedAt: '2026-11-08T01:00:30Z', running: true })
+  ns = buildRequestGraph(turn({ ts_res: null, agents_detail: [ag('anakin_phase-build', '2026-11-08T10:00:10+09:00', { ts_end: '2026-11-08T10:00:50+09:00' })] }), [L], { now }); p = buildPath(ns)
+  assert.deepEqual(p.edges.find(e => e.to === '1.1.4.1').state, 'running'); assert.equal(p.edges.at(-1).state, 'planned')   // 진행 중 판정 칸 진입 = 노랑, 종료 = 예정
   const cut = buildPath(buildRequestGraph(turn({ ts_res: null, interrupted: true, incomplete: true }), [], { now: P('2026-11-08T23:00:00+09:00') }))
   assert.equal(cut.edges.find(e => !e.pass).label, '중단'); assert.equal(cut.term.E.stopped, true); assert.equal(cut.edges.at(-1).to, 'E')
 })
 
 test('N 되돌림 화살표 유지 : FAIL 2회 → CDX→SA 되돌림 2회(경로는 이어 감), FAIL 후 PASS → 흐림 noold, BLOCKED → 없음', () => {
-  const run = events => { const ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:01:00+09:00')] }), [loop('c2-a', events, { startedAt: '2026-11-08T01:02:00Z' })]); return { ns, p: buildPath(ns) } }
+  const run = events => { const ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00')] }), [loop('c4-a', events, { startedAt: '2026-11-08T01:02:00Z' })]); return { ns, p: buildPath(ns) } }
   let { ns, p } = run([ev2(1, 'FAIL', '10'), ev2(2, 'FAIL', '20')])
-  assert.deepEqual(p.verdicts.map(e => [e.from, e.to, e.seq, e.state, e.label, e.loop]), [['1.1.2.1', '1.1.2', 'N', 'no', '되돌림 2회', true]])
-  assert.equal(node(ns, '1.1.2.1').statusLabel, '검증 N · 2회차 진행 (2/5)'); assert.ok(route(p).includes('1.1.5') && route(p).at(-1) === 'E')
-  ;({ p } = run([ev2(1, 'FAIL', '10'), ev2(2, 'PASS', '20')])); assert.deepEqual(p.verdicts.map(e => e.state), ['noold']); assert.equal(p.edges.find(e => e.from === '1.1.2.1').label, 'Y')
+  assert.deepEqual(p.verdicts.map(e => [e.from, e.to, e.seq, e.state, e.label, e.loop]), [['1.1.4.1', '1.1.4', 'N', 'no', '되돌림 2회', true]])
+  assert.equal(node(ns, '1.1.4.1').statusLabel, '검증 N · 2회차 진행 (2/5)'); assert.ok(route(p).includes('1.1.5') && route(p).at(-1) === 'E')
+  ;({ p } = run([ev2(1, 'FAIL', '10'), ev2(2, 'PASS', '20')])); assert.deepEqual(p.verdicts.map(e => e.state), ['noold']); assert.equal(p.edges.find(e => e.from === '1.1.4.1').label, 'Y')
   ;({ p } = run([ev2(1, 'FAIL', '10'), { ...ev2(2, 'BLOCKED', '20'), reason: 'device' }])); assert.equal(p.verdicts.length, 0)
 })
 
 test('C-11 쌍 배치 : CDX = SA 자식(depth + 1, parent = SA) — 세로 흐름 = SA 바로 아래 + 들여쓰기 상수, 가로 흐름 = 바로 오른쪽 다음 열, 사이에 다른 노드 없음·겹침 없음', () => {
   const LZ2 = { boxW: 158, colGap: 26, pairGap: 28, pairIndent: 18, wrapW: 1800, rowGap: 34, gapY: 8 }
-  const ns = buildRequestGraph(turn({ tools: { Read: 1 }, agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00'), ag('anakin_phase-build', '2026-11-08T10:05:00+09:00')] }), [], { runs: [{ ts: '2026-11-08T09:00:00+09:00', mode: 'live', trigger: 'stop' }, { ts: '2026-11-08T10:10:00+09:00', mode: 'live', trigger: 'stop' }] })
+  const ns = buildRequestGraph(turn({ tools: { Read: 1 }, agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { wrote: true }), ag('anakin_phase-build', '2026-11-08T10:05:00+09:00', { wrote: true })] }), [])
   const isP = n => codexIds.includes(n.id), sz = n => ({ w: isP(n) ? LZ2.boxW - LZ2.pairIndent : LZ2.boxW, h: 60 + (n.chips || []).length * 13 + (n.id === '1.1.3' ? 120 : 0) })
   const hit = (p, q) => p.x < q.x + q.w && q.x < p.x + p.w && p.y < q.y + q.h && q.y < p.y + p.h
-  assert.ok(ns.filter(isP).length >= 5)
+  assert.equal(ns.filter(isP).length, 1)   // 2026-11-10 개정 : CDX = CDX-루프 하나
   for (const dir of ['v', 'h']) {
     const { pos } = layoutTree(ns, dir, LZ2, sz, isP)
     for (const c of ns.filter(isP)) {
@@ -490,8 +515,8 @@ test('세로 트리(짝 없이) : 깊이 증가 → y 증가, 형제 폭이 wrap
 
 test('일련번호 : 보이는 칸 중 CDX 아닌 칸만 1부터 연속(숨긴 쌍 건너뜀), CDX = SA 번호-1, id 불변', () => {
   const ns = buildRequestGraph(turn(), [])
-  assert.deepEqual(ns.map(n => n.no), [1, 2, 3, '3-1', 4, '4-1', 5, '5-1', 6, 7])   // C-11 : CDX = 짝 SA 번호 + '-1', 연속 번호는 CDX 아닌 칸끼리
-  assert.deepEqual(designGraph().map(n => n.no), [1, 2, 3, '3-1', 4, '4-1', 5, '5-1', 6, '6-1', 7, '7-1', 8, '8-1', 9])
+  assert.deepEqual(ns.map(n => n.no), [1, 2, 3, 4, 5, 6])   // 하네스·루프 쌍 숨김, CDX 칸 없음(1.1.5.2 삭제)
+  assert.deepEqual(designGraph().map(n => n.no), [1, 2, 3, 4, 5, 6, '6-1', 7, 8])   // C-11 : CDX = 짝 SA 번호 + '-1'(CDX-루프 하나)
   assert.deepEqual(serial([{ slot: 'a' }, { slot: null }, { slot: 'b' }]).map(n => n.no), [1, undefined, 2])
 })
 
@@ -507,7 +532,7 @@ test('회차 번호 = 시작 시각순(+09:00·Z 혼용), 1.2 승인 2회 이상
 test('verify(2026-11-10 폐지) 과거 기록 : 칸·집계에서 숨김, 그 원장 판정은 CDX 칸에 계속 매칭, 재전달 상한 제외(묶음)', () => {
   const ns = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-collect', '2026-11-08T10:01:00+09:00'), ag('anakin_phase-verify', '2026-11-08T10:03:00+09:00', { ts_end: null })] }), [KL('c2-x', '2026-11-08T01:04:00Z', 'PASS'), loop('loop-docs', [ev2(1, 'FAIL', '05'), ev2(2, 'PASS', '06')], { startedAt: '2026-11-08T01:04:30Z' })])
   assert.ok(!AL(ns).some(n => n.label === 'anakin_phase-verify')); assert.equal(ns[0].agentN, 1); assert.equal(node(ns, '1').status, 'done')
-  assert.equal(node(ns, '1.1.2.1').statusLabel, '검증 Y · 1회 만에 완료')
+  assert.equal(node(ns, '1.1.2.1'), undefined)   // 과거 c2 원장 = 집계 제외(CDX-컨텍스트 칸 폐지)
   const c4 = node(ns, '1.1.4.1'); assert.equal(c4.badge, '시간 기준 연결(추정)'); assert.equal(c4.statusLabel, '검증 Y · 2회 만에 완료')   // 접두 없는 과거 원장 = CDX-루프(추정)
   assert.ok(!fs.readFileSync(new URL('../scripts/request-graph.mjs', import.meta.url), 'utf8').match(/GATE_FREE|VERIFY_TYPE|STAND\b/))
   const Z2 = h => `2026-11-08T${h}:00Z`, A = { key: 'A', session_id: 's', ts_req: Z2('01:00'), ts_res: Z2('01:50'), agents_detail: [ag('anakin_phase-verify', Z2('01:10'), { agent_id: 'v1', ts_end: Z2('02:30'), rounds: [{ t0: P(Z2('01:10')), t1: P(Z2('01:20')), run: false, errors: 0 }, { t0: P(Z2('02:10')), t1: P(Z2('02:20')), run: false, errors: 0 }] })] }
@@ -515,70 +540,64 @@ test('verify(2026-11-10 폐지) 과거 기록 : 칸·집계에서 숨김, 그 �
   splitAgentRounds([A, B]); assert.equal(A.bundle.n, 0)
 })
 
-test('서브에이전트 실행별 Codex 판정(상세 글자) : 판정 창 [종료, 다음 시작) · 칸별 AND · 병렬 대상 접미 · admin -admin 접미 우선 — 경로는 막지 않음', () => {
+test('서브에이전트 실행별 Codex 판정(상세 글자, 2026-11-10 개정) : 파일 변경 실행만 c4 판정 대상(그 밖 = 판정 대상 아님) · 판정 창 [종료, 다음 시작) · 병렬 대상 접미 — 경로는 막지 않음', () => {
   const collect = ag('anakin_phase-collect', '2026-11-08T10:05:00+09:00', { ts_end: '2026-11-08T10:06:00+09:00' }), gp = ag('general-purpose', '2026-11-08T10:10:00+09:00')
   const C = loops => AL(buildRequestGraph(turn({ agents_detail: [collect, gp] }), loops)).find(x => x.label === 'anakin_phase-collect').cdx
-  assert.equal(C([KL('c2-a', '2026-11-08T01:03:00Z', 'PASS')]), '검증 누락')   // 실행 전
-  assert.equal(C([KL('c5-a', '2026-11-08T01:07:00Z', 'PASS')]), '검증 누락')   // 무관 칸
-  assert.equal(C([KL('c2-a', '2026-11-08T01:07:00Z', 'PASS')]), '검증 Y')
-  assert.equal(C([KL('c2-a', '2026-11-08T01:11:00Z', 'PASS')]), '검증 누락')   // 다음 실행 뒤
-  // build = c4 + (하네스면) c3 AND
-  const b = h => ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:03:00+09:00', harness: h }), adm = ag('teamanakin-admin', '2026-11-08T10:20:00+09:00', { ts_end: '2026-11-08T10:21:00+09:00' })
-  const Bd = (h, loops) => AL(buildRequestGraph(turn({ agents_detail: [b(h), adm] }), loops)).find(x => x.label === 'anakin_phase-build')
-  assert.match(Bd(true, [KL('c4-x', '2026-11-08T01:05:00Z', 'PASS')]).lines.join(' '), /Codex 판정 : 검증 누락 \(c4 Y · c3 누락\)/)
-  assert.equal(Bd(true, [KL('c4-x', '2026-11-08T01:05:00Z', 'PASS'), KL('c3-x', '2026-11-08T01:06:00Z', 'PASS')]).cdx, '검증 Y')
-  assert.match(Bd(undefined, [KL('c4-x', '2026-11-08T01:05:00Z', 'FAIL'), KL('c3-x', '2026-11-08T01:06:00Z', 'PASS')]).lines.join(' '), /검증 N \(c4 N · c3 Y\)/)
+  for (const ls of [[], [KL('c4-a', '2026-11-08T01:07:00Z', 'PASS')], [KL('c2-a', '2026-11-08T01:07:00Z', 'PASS')]]) assert.equal(C(ls), '판정 대상 아님')   // 조회 에이전트 = 판정 없음
+  // 파일 변경 build : 창 안 c4 판정
+  const b = (extra = {}) => ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:03:00+09:00', wrote: true, ...extra }), adm = ag('teamanakin-admin', '2026-11-08T10:20:00+09:00', { ts_end: '2026-11-08T10:21:00+09:00' })
+  const Bd = (loops, extra) => AL(buildRequestGraph(turn({ agents_detail: [b(extra), adm] }), loops)).find(x => x.label === 'anakin_phase-build')
+  assert.equal(Bd([KL('c4-x', '2026-11-08T01:05:00Z', 'PASS')]).cdx, '검증 Y')
+  assert.equal(Bd([KL('c4-x', '2026-11-08T01:02:00Z', 'PASS')]).cdx, '검증 누락')   // 실행 종료 전
+  assert.match(Bd([KL('c4-x', '2026-11-08T01:05:00Z', 'FAIL')]).lines.join(' '), /Codex 판정 : 검증 N/)
+  assert.equal(Bd([KL('c3-x', '2026-11-08T01:06:00Z', 'PASS')], { harness: true }).cdx, '검증 누락')   // 과거 c3 원장 = 무시(하네스도 c4 하나)
+  assert.ok(!(Bd([]).alerts || []).includes('검증 누락'))   // 실행 단위 누락 경보 없음(CDX-루프에만)
   // 병렬 = 대상 접미만 인정
-  const at = '2026-11-08T10:02:00+09:00', A = ag('general-purpose', at, { agent_id: 'a11111f00d' }), B2 = ag('general-purpose', at, { agent_id: 'a22222f00d' })
+  const at = '2026-11-08T10:02:00+09:00', A = ag('general-purpose', at, { agent_id: 'a11111f00d', wrote: true }), B2 = ag('general-purpose', at, { agent_id: 'a22222f00d', wrote: true })
   const par = loops => AL(buildRequestGraph(turn({ agents_detail: [A, B2, ag('anakin_phase-build', '2026-11-08T10:10:00+09:00')] }), loops)).filter(x => x.label === 'general-purpose').map(x => x.cdx)
-  assert.deepEqual(par([KL('c2-a', '2026-11-08T01:04:00Z', 'PASS')]), ['검증 보류(대상 불명)', '검증 보류(대상 불명)'])
-  assert.deepEqual(par([KL('c2-x-a11111', '2026-11-08T01:04:00Z', 'PASS'), KL('c2-x-a22222', '2026-11-08T01:05:00Z', 'FAIL')]), ['검증 Y', '검증 N'])
-  // admin = c6-…-admin 접미 우선
-  const Ad = loops => AL(buildRequestGraph(turn({ agents_detail: [adm] }), loops)).find(x => x.label === 'teamanakin-admin').cdx
-  assert.equal(Ad([KL('c6-x-admin', '2026-11-08T01:22:00Z', 'PASS'), KL('c6-x', '2026-11-08T01:23:00Z', 'FAIL')]), '검증 Y'); assert.equal(Ad([]), '검증 누락')
-  // 대행 하네스 변경 : c2·c4 본 칸 + c3
-  const gh = ag('general-purpose', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:03:00+09:00', harness: true })
-  const G = loops => AL(buildRequestGraph(turn({ agents_detail: [gh, adm] }), loops)).find(n => n.label === 'general-purpose')
-  assert.equal(G([KL('c3-x', '2026-11-08T01:05:00Z', 'PASS')]).cdx, '검증 누락'); assert.equal(G([KL('c2-x', '2026-11-08T01:04:00Z', 'PASS'), KL('c3-x', '2026-11-08T01:05:00Z', 'PASS')]).cdx, '검증 Y')
+  assert.deepEqual(par([KL('c4-a', '2026-11-08T01:04:00Z', 'PASS')]), ['검증 보류(대상 불명)', '검증 보류(대상 불명)'])
+  assert.deepEqual(par([KL('c4-x-a11111', '2026-11-08T01:04:00Z', 'PASS'), KL('c4-x-a22222', '2026-11-08T01:05:00Z', 'FAIL')]), ['검증 Y', '검증 N'])
+  // wrote 미기록이어도 자기 접미 c4 원장이 창 안에 있으면 판정 대상
+  const g3 = ag('general-purpose', '2026-11-08T10:01:00+09:00', { agent_id: 'a33333f00d', ts_end: '2026-11-08T10:03:00+09:00' })
+  assert.equal(AL(buildRequestGraph(turn({ agents_detail: [g3] }), [KL('c4-x-a33333', '2026-11-08T01:04:00Z', 'PASS')])).find(n => n.aid === 'a33333f00d').cdx, '검증 Y')
+  assert.equal(AL(buildRequestGraph(turn({ agents_detail: [adm] }), [KL('c6-x-admin', '2026-11-08T01:22:00Z', 'PASS')])).find(x => x.label === 'teamanakin-admin').cdx, '판정 대상 아님')
   // 불변식 : 모든 실행 = 판정 상태 하나
-  const states = new Set(['검증 Y', '검증 N', '검증 보류', '검증 보류(대상 불명)', '검증 진행', '검증 대기', '검증 누락'])
+  const states = new Set(['검증 Y', '검증 N', '검증 보류', '검증 보류(대상 불명)', '검증 진행', '검증 대기', '검증 누락', '판정 대상 아님'])
   assert.ok(AL(buildRequestGraph(turn({ agents_detail: [A, B2, ag('anakin_phase-collect', null, { ts_end: null }), adm] }), [])).filter(x => !x.slot).every(x => states.has(x.cdx)))
 })
 
-test('경보 : 장시간·오류 다발·검증 누락은 에이전트 상세와 요청 경보에 남음(칸 안 표식)', () => {
+test('경보 : 장시간·오류 다발은 에이전트 상세와 요청 경보에, 검증 누락은 CDX-루프 칸에만(2026-11-10 개정)', () => {
   const long = ag('general-purpose', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T11:19:00+09:00', errors: 5 })
   const ns = buildRequestGraph(turn({ agents_detail: [long] }), []), a = AL(ns).find(n => !n.slot)
-  assert.deepEqual(a.alerts, ['장시간', '오류 다발', '검증 누락']); assert.match(node(ns, '1').lines.at(-1), /general-purpose 장시간 · general-purpose 오류 다발 · general-purpose 검증 누락/)
+  assert.deepEqual(a.alerts, ['장시간', '오류 다발']); assert.match(node(ns, '1').lines.at(-1), /general-purpose 장시간 · general-purpose 오류 다발$/)
   assert.ok(node(ns, '1.1').chips.some(c => c.txt === '✖ 도구 오류 5 · ⚠ 장시간' && c.tone === 'bad'))
+  const nw = buildRequestGraph(turn({ agents_detail: [{ ...long, wrote: true }] }), [])
+  assert.deepEqual(AL(nw).find(n => !n.slot).alerts, ['장시간', '오류 다발']); assert.match(node(nw, '1').lines.at(-1), /CDX-루프 검수 검증 누락/)
   assert.deepEqual(nodeAlerts({ t0: P('2026-11-08T10:20:00+09:00'), t1: null, run: true }, 0, P('2026-11-08T11:00:00+09:00')), ['장시간'])
   assert.deepEqual(ALERT, { longMs: 30 * 60e3, errors: 5, nearCap: 4, cap: 5 })
   // 회차 단위 판정(복원 — c4-verify-codex-ac0222-p1 D-001) : 같은 78분을 25분 회차 3개로 나누면 장시간 아님(전체 소요 집계 회귀 검출), 진행 20분·오류 4회 = 경보 없음
   const split = { ...long, errors: 1, rounds: [0, 26, 52].map(m => ({ t0: P('2026-11-08T10:01:00+09:00') + m * 60e3, t1: P('2026-11-08T10:01:00+09:00') + (m + 25) * 60e3, run: false, errors: 0 })) }
   const s = AL(buildRequestGraph(turn({ agents_detail: [split] }), [])).find(n => !n.slot)
-  assert.deepEqual(s.alerts, ['검증 누락']); assert.equal(s.rounds[0].rows.length, 3)
+  assert.equal(s.alerts, undefined); assert.equal(s.rounds[0].rows.length, 3)
   assert.deepEqual(nodeAlerts({ t0: P('2026-11-08T10:40:00+09:00'), t1: null, run: true }, 4, P('2026-11-08T11:00:00+09:00')), [])
 })
 
-test('1.1.5.2 = 생성기 실행 기록(runs.jsonl) : 창 안 live → 완료 / 없음 → 미수행 / 로그 이전 → 기록 이전', () => {
-  const run = (ts, extra = {}) => ({ ts, trigger: 'subagent', mode: 'live', md: false, ...extra }), first = run('2026-11-08T09:00:00+09:00', { trigger: 'manual' })
-  const n = node(buildRequestGraph(turn(), [], { runs: [first, run('2026-11-08T10:05:00+09:00'), run('2026-11-08T10:30:03+09:00', { trigger: 'stop' })] }), '1.1.5.2')
-  assert.equal(n.status, 'done'); assert.ok(n.lines.includes('생성기 실행 2회(subagent 1 · stop 1)'))
-  assert.equal(node(buildRequestGraph(turn(), [], { runs: [first, run('2026-11-08T12:00:00+09:00')] }), '1.1.5.2').status, 'missing')
-  assert.equal(node(buildRequestGraph(turn(), [], { runs: [] }), '1.1.5.2').statusLabel, '기록 이전')
-  assert.deepEqual(SLOT_MAP['1.1.5.2'], { owner: '아소카(메인)', source: 'runs.jsonl' })
-})
-
-test('Codex 칸 매핑 : 원장 id 접두 c<N>- → Codex<N> 칸, 칸별 검수 대상·호출 규칙 정의', () => {
+test('Codex 칸 매핑(2026-11-10 개정) : 원장 id 접두 c4- → CDX-루프, 검수 대상·호출 규칙 정의, 과거 접두(c1·c2·c3·c5·c6) = 집계 제외', () => {
   assert.equal(codexNo('c4-codex-wiring'), 4); assert.equal(codexNo('first-call'), null); assert.equal(codexNo('c7-x'), null)
-  const ns = buildRequestGraph(turn({ tools: { Read: 1 } }), [loop('c3-hooks', [ev2(1, 'FAIL', '10')])])
-  const c3 = node(ns, '1.1.3.1'); assert.equal(c3.statusLabel, '검증 N · 1회차 진행 (1/5)'); assert.equal(c3.badge, '매핑 연결')
-  for (const [n, id] of [[1, '1.1.1.1'], [2, '1.1.2.1'], [3, '1.1.3.1'], [4, '1.1.4.1'], [5, '1.1.5.1'], [6, '1.1.5.2.1']]) { const s = SLOTS.find(x => x.id === id); assert.match(s.role, new RegExp(`^Codex${n} 검수 대상 : `)); assert.match(s.criteria, new RegExp(`원장 id 접두 c${n}-`)) }
-  assert.match(SLOTS.find(x => x.id === '1.1.4.1').criteria, /SubagentStop 훅 자동/); assert.ok(!SLOTS.some(s => /verify/.test(s.role + s.criteria)))
+  const ns = buildRequestGraph(turn({ tools: { Read: 1 } }), [loop('c4-hooks', [ev2(1, 'FAIL', '10')])])
+  const c = node(ns, '1.1.4.1'); assert.equal(c.statusLabel, '검증 N · 1회차 진행 (1/5)'); assert.equal(c.badge, '매핑 연결')
+  assert.deepEqual(SLOTS.filter(s => s.kind === 'codex').map(s => s.id), ['1.1.4.1'])
+  const s = SLOTS.find(x => x.id === '1.1.4.1'); assert.match(s.role, /^Codex4 검수 대상 : 파일을 바꾼 에이전트의 산출물\(하네스 파일 포함\)/); assert.match(s.criteria, /원장 id 접두 c4-/)
+  assert.match(s.criteria, /SubagentStop 훅 자동/); assert.ok(!SLOTS.some(s => /verify/.test(s.role + s.criteria)))
+  assert.match(SLOTS.find(x => x.id === '1.1.3').role, /하네스 파일 변경의 Codex 판정 = CDX-루프\(c4\)에 귀속/)
+  for (const id of ['c1-x', 'c2-x', 'c3-x', 'c5-x', 'c6-x-admin', 'c4-turn-f7dc16-1108100000']) assert.equal(isLoopLedger({ id }), false, id)
+  for (const l of [{ id: 'c4-x-a1b2c3' }, { id: 'c4-x-a1b2c3-p2' }, { id: 'loop-docs' }]) assert.equal(isLoopLedger(l), true, l.id)
+  assert.equal(isLoopLedger({ id: 'c4-x-decide-a1b2c3', agentType: 'anakin_phase-decide' }), false)
 })
 
 test('백그라운드 워크플로 재개 턴 : 요청 시각보다 앞서 시작한 귀속 에이전트 구간의 Codex 판정도 연결', () => {
-  const t = turn({ ts_req: '2026-11-09T13:49:00+09:00', ts_res: '2026-11-09T13:55:00+09:00', agents_detail: [ag('anakin_phase-collect', '2026-11-09T08:17:00+09:00', { ts_end: '2026-11-09T08:20:00+09:00' })] })
-  const c = node(buildRequestGraph(t, [loop('c2-wf', [{ iter: 1, at: '2026-11-09T08:31:00+09:00', verdict: 'PASS', open: 0 }], { startedAt: '2026-11-09T08:21:00+09:00' })]), '1.1.2.1')
+  const t = turn({ ts_req: '2026-11-09T13:49:00+09:00', ts_res: '2026-11-09T13:55:00+09:00', agents_detail: [ag('anakin_phase-build', '2026-11-09T08:17:00+09:00', { ts_end: '2026-11-09T08:20:00+09:00', wrote: true })] })
+  const c = node(buildRequestGraph(t, [loop('c4-wf', [{ iter: 1, at: '2026-11-09T08:31:00+09:00', verdict: 'PASS', open: 0 }], { startedAt: '2026-11-09T08:21:00+09:00' })]), '1.1.4.1')
   assert.equal(c.rounds[0].rows.length, 1); assert.equal(c.status, 'done')
 })
 
@@ -634,64 +653,95 @@ test('하네스 변경 감지 : Write·Edit 대상이 하네스 경로면 harnes
     fs.mkdirSync(wf, { recursive: true })
     fs.writeFileSync(path.join(sub, 'agent-a1.jsonl'), JSON.stringify(use('Edit', '.claude/hooks/x.mjs')) + '\n'); fs.writeFileSync(path.join(wf, 'agent-a2.jsonl'), JSON.stringify(use('Write', 'scripts/y.mjs')) + '\n')
     const T = { session_id: 's1', agents_detail: [{ agent_id: 'a1', type: 'anakin_phase-build' }, { agent_id: 'a2', type: 'general-purpose', workflow: 'wf_1' }, { agent_id: 'a3', type: 'anakin_phase-build' }, { agent_id: 'a4', type: 'anakin_phase-collect' }] }
-    loadAgentHarness([T], dir, path.join(dir, 'cache.json')); assert.deepEqual(T.agents_detail.map(x => x.harness), [true, false, undefined, undefined])
+    loadAgentHarness([T], dir, path.join(dir, 'cache.json')); assert.deepEqual(T.agents_detail.map(x => [x.harness, x.wrote]), [[true, true], [false, true], [undefined, undefined], [undefined, undefined]])   // wrote = 파일 변경 실행(CDX-루프 판정 대상)
+    const C2 = path.join(dir, 'cache.json'), cache = JSON.parse(fs.readFileSync(C2, 'utf8')); delete cache.a1.wrote; fs.writeFileSync(C2, JSON.stringify(cache))
+    const T2 = { session_id: 's1', agents_detail: [{ agent_id: 'a1', type: 'anakin_phase-build' }] }; loadAgentHarness([T2], dir, C2); assert.equal(T2.agents_detail[0].wrote, true)   // wrote 없는 옛 캐시 = 다시 읽음
   } finally { fs.rmSync(dir, { recursive: true, force: true }) }
 })
 
 test('원장 묶음 AND(codex-gate 파일 묶음 -p<N>) : 전부 PASS 일 때만 Y, 하나라도 FAIL = N, 일부 판정 없음 = 보류, 나뉘기 전 기준 원장은 대체 — 칸 안 회차·상세에 묶음 표시', () => {
-  assert.equal(partBase('c2-x-a1b2c3-p2'), 'c2-x-a1b2c3'); assert.equal(partBase('c2-x-a1b2c3'), 'c2-x-a1b2c3')
+  assert.equal(partBase('c4-x-a1b2c3-p2'), 'c4-x-a1b2c3'); assert.equal(partBase('c4-x-a1b2c3'), 'c4-x-a1b2c3')
   const at = m => `2026-11-08T01:${m}:00Z`, L = (id, evs) => loop(id, evs.map(([iter, v, m]) => ({ iter, at: at(m), verdict: v, open: v === 'FAIL' ? 1 : 0 })), { startedAt: at('02') })
-  const col = ag('anakin_phase-collect', '2026-11-08T10:01:00+09:00')
-  const run = loops => node(buildRequestGraph(turn({ agents_detail: [col] }), loops), '1.1.2.1')
-  const broad = loop('c2-x-a1b2c3', [{ iter: 1, at: at('04'), verdict: 'BLOCKED', open: null, reason: 'scope-too-broad' }], { startedAt: at('02') })
-  let c = run([broad, L('c2-x-a1b2c3-p1', [[1, 'PASS', '10']]), L('c2-x-a1b2c3-p2', [[1, 'FAIL', '11']])])
-  assert.equal(c.statusLabel, '검증 N · 1회차 진행 (1/5)'); assert.deepEqual(c.rounds.map(g => g.name), ['Codex 판정 c2-x-a1b2c3'])   // 기준 원장 BLOCKED 는 대체 — 묶음 1개 단위
-  assert.equal(c.chips[0].txt, '원장 c2-x-a1b2c3 (묶음 2개 AND)'); assert.match(c.lines[0], /묶음 c2-x-a1b2c3-p1 · c2-x-a1b2c3-p2 AND\(전부 PASS 일 때만 Y\)/)
-  c = run([L('c2-x-a1b2c3-p1', [[1, 'PASS', '10'], [2, 'PASS', '20']]), L('c2-x-a1b2c3-p2', [[1, 'FAIL', '11'], [2, 'PASS', '21']])])
+  const bd = ag('anakin_phase-build', '2026-11-08T10:01:00+09:00')
+  const run = loops => node(buildRequestGraph(turn({ agents_detail: [bd] }), loops), '1.1.4.1')
+  const broad = loop('c4-x-a1b2c3', [{ iter: 1, at: at('04'), verdict: 'BLOCKED', open: null, reason: 'scope-too-broad' }], { startedAt: at('02') })
+  let c = run([broad, L('c4-x-a1b2c3-p1', [[1, 'PASS', '10']]), L('c4-x-a1b2c3-p2', [[1, 'FAIL', '11']])])
+  assert.equal(c.statusLabel, '검증 N · 1회차 진행 (1/5)'); assert.deepEqual(c.rounds.map(g => g.name), ['Codex 판정 c4-x-a1b2c3'])   // 기준 원장 BLOCKED 는 대체 — 묶음 1개 단위
+  assert.equal(c.chips[0].txt, '원장 c4-x-a1b2c3 (묶음 2개 AND)'); assert.match(c.lines[0], /묶음 c4-x-a1b2c3-p1 · c4-x-a1b2c3-p2 AND\(전부 PASS 일 때만 Y\)/)
+  c = run([L('c4-x-a1b2c3-p1', [[1, 'PASS', '10'], [2, 'PASS', '20']]), L('c4-x-a1b2c3-p2', [[1, 'FAIL', '11'], [2, 'PASS', '21']])])
   assert.equal(c.statusLabel, '검증 Y · 2회 만에 완료'); assert.equal(c.verdict.fails, 1)
-  c = run([L('c2-x-a1b2c3-p1', [[1, 'PASS', '10']]), L('c2-x-a1b2c3-p2', [])])
+  c = run([L('c4-x-a1b2c3-p1', [[1, 'PASS', '10']]), L('c4-x-a1b2c3-p2', [])])
   assert.equal(c.status, 'blocked')   // 일부 묶음 판정 없음 = Y 아님
   // 실행별 판정(상세)도 묶음 AND : 대상 접미(-a1b2c3)가 기준 id 에 남는다
-  const ns = buildRequestGraph(turn({ agents_detail: [{ ...col, agent_id: 'a1b2c3ffff', ts_end: '2026-11-08T10:02:00+09:00' }] }), [L('c2-x-a1b2c3-p1', [[1, 'PASS', '10']]), L('c2-x-a1b2c3-p2', [[1, 'FAIL', '11']])])
+  const ns = buildRequestGraph(turn({ agents_detail: [{ ...bd, agent_id: 'a1b2c3ffff', ts_end: '2026-11-08T10:02:00+09:00' }] }), [L('c4-x-a1b2c3-p1', [[1, 'PASS', '10']]), L('c4-x-a1b2c3-p2', [[1, 'FAIL', '11']])])
   assert.equal(agentsOf(ns)[0].cdx, '검증 N')
   assert.deepEqual(mergeParts([{ id: 'c4-a', rows: [] }]), [{ id: 'c4-a', rows: [] }])   // 묶음 없음 = 그대로
 })
 
-// ── 2026-11-10 마스터 "총괄검수가 끝나면 반드시 파다완 아소카의 종료 승인" · "턴 묶음 1회 판정"(Stop 훅 turn-gate.mjs) ──
-test('턴 묶음 원장 c<N>-turn-<요청키> : 각 CDX 칸에 매칭, 실행별 판정에는 쓰지 않음, 묶음 원장(bundle-) 제외', async () => {
-  const { turnKey, TURN_ID_RE, loadLoops } = await import('../scripts/request-graph.mjs')
-  assert.equal(turnKey('f7dc16b9-2b2b', P('2026-11-08T01:10:00Z')), 'f7dc16-1108101000')
-  const SID = 'f7dc16b9-2b2b', key = turnKey(SID, P(T0))   // 턴 원장은 이 요청 키(세션·요청 시각)와 같을 때만 연결
-  assert.equal(key, 'f7dc16-1108100000'); assert.ok(TURN_ID_RE.test(`c1-turn-${key}`)); assert.ok(!TURN_ID_RE.test('c4-turn-gate-a1b2c3'))   // 에이전트 설명 슬러그 'turn-…' 과 구분
-  const at = '2026-11-08T01:20:00Z', ls = [1, 2, 3, 4, 5, 6].map(no => KL(`c${no}-turn-${key}`, at, no === 3 ? 'FAIL' : 'PASS'))
-  const b = { ...ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:05:00+09:00', agent_id: 'a0b1c2d3e4' }) }
-  const ns = buildRequestGraph(turn({ session_id: SID, tools: { Read: 2 }, agents_detail: [b, ag('anakin_phase-build', '2026-11-08T10:06:00+09:00')] }), ls, { runs: [{ ts: '2026-11-08T01:15:00Z', trigger: 'stop', mode: 'live' }] })
-  const cx = { '1.1.1.1': 1, '1.1.2.1': 2, '1.1.3.1': 3, '1.1.4.1': 4, '1.1.5.1': 5, '1.1.5.2.1': 6 }
-  for (const [id, no] of Object.entries(cx)) { const n = node(ns, id); assert.ok(n, id); assert.equal(n.rounds?.[0]?.name, `Codex 판정 c${no}-turn-${key}`, id); assert.equal(n.verdict.yn, no === 3 ? 'N' : 'Y', id) }
-  assert.equal(AL(ns).find(n => n.aid === 'a0b1c2d3e4').cdx, '검증 누락')   // 턴 원장(c4-turn)은 build 실행의 판정이 아니다
-  // 묶음 원장 폴더는 loadLoops 가 뺀다
+// ── 2026-11-10 개정 : 턴 묶음 판정 폐지(과거 원장 무시) · 종료 승인 줄 = 기록용(Stop 훅 turn-gate.mjs 기록기) ──
+test('과거 원장 무시(2026-11-10 개정) : c1·c2·c3·c5·c6·c*-turn-*·비대상 에이전트 원장을 넣어도 노드·집계 불변, loadLoops = bundle- 제외 + gate.json agentType', () => {
+  const key = 'f7dc16-1108100000'
+  assert.ok(TURN_ID_RE.test(`c1-turn-${key}`)); assert.ok(!TURN_ID_RE.test('c4-turn-gate-a1b2c3'))   // 에이전트 설명 슬러그 'turn-…' 과 구분
+  const at = '2026-11-08T01:20:00Z', old = [...[1, 2, 3, 4, 5, 6].map(no => KL(`c${no}-turn-${key}`, at, no === 3 ? 'FAIL' : 'PASS')), KL('c2-collect-a0b1c2', at, 'FAIL'), KL('c5-graph-a0b1c2', at, 'FAIL'), { ...KL('c4-x-decide-a0b1c2', at, 'FAIL'), agentType: 'anakin_phase-decide' }]
+  const t = () => turn({ tools: { Read: 2 }, agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:05:00+09:00', agent_id: 'a0b1c2d3e4' })] })
+  assert.equal(JSON.stringify(buildRequestGraph(t(), old)), JSON.stringify(buildRequestGraph(t(), [])))
   const d = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-loops-'))
   try {
-    for (const id of [`bundle-turn-${key}`, `c1-turn-${key}`]) { fs.mkdirSync(path.join(d, id)); fs.writeFileSync(path.join(d, id, 'ledger.json'), JSON.stringify({ id, startedAt: at, iters: [{ iter: 1, at, verdict: 'PASS', openDefects: [] }] })) }
-    assert.deepEqual(loadLoops(d).map(l => l.id), [`c1-turn-${key}`])
+    for (const id of [`bundle-turn-${key}`, `c1-turn-${key}`, 'c4-x-a0b1c2']) { fs.mkdirSync(path.join(d, id)); fs.writeFileSync(path.join(d, id, 'ledger.json'), JSON.stringify({ id, startedAt: at, iters: [{ iter: 1, at, verdict: 'PASS', openDefects: [] }] })) }
+    fs.writeFileSync(path.join(d, 'c4-x-a0b1c2', 'gate.json'), JSON.stringify({ agentType: 'anakin_phase-build' }))
+    assert.deepEqual(loadLoops(d).map(l => [l.id, l.agentType]), [[`c1-turn-${key}`, undefined], ['c4-x-a0b1c2', 'anakin_phase-build']])
+    assert.deepEqual(loadLoops(d).filter(isLoopLedger).map(l => l.id), ['c4-x-a0b1c2'])
   } finally { fs.rmSync(d, { recursive: true, force: true }) }
 })
 
-test('원장↔요청 창 (c5-turn-f7dc16 D-001 · c4-codex-ac436f-p1 D-001·D-002) : 턴 원장 = 같은 요청 키만·응답 뒤 Stop 판정 포함, 요청 전 원장 = 귀속 에이전트 접미·접미 없음만(재개 A6 유지)', async () => {
-  const { turnKey } = await import('../scripts/request-graph.mjs')
-  const SID = 'f7dc16b9-2b2b', key = turnKey(SID, P(T0)), other = turnKey('ab12cd34', P(T0))
-  const c1 = ns => node(ns, '1.1.1.1')
-  // ① 응답(10:30) 뒤 Stop 판정(10:31) = 같은 키면 연결 · 다른 세션 같은 시각 키(반대 판정) = 연결 안 함
-  let ns = buildRequestGraph(turn({ session_id: SID }), [KL(`c1-turn-${key}`, '2026-11-08T01:31:00Z', 'PASS'), KL(`c1-turn-${other}`, '2026-11-08T01:20:00Z', 'FAIL')])
-  assert.deepEqual(c1(ns).rounds.map(g => g.name), [`Codex 판정 c1-turn-${key}`]); assert.equal(c1(ns).verdict.yn, 'Y')
-  // ② 요청 시작(10:00) 전 다른 실행(접미 a9f8e7 — 이 요청 귀속 아님) 원장 = 귀속 에이전트가 창을 앞(09:00)으로 넓혀도 연결 안 함, 귀속 에이전트 접미 원장 = 연결(재개)
-  const col = ag('anakin_phase-collect', '2026-11-08T09:00:00+09:00', { agent_id: 'a1b2c3d4e5', ts_end: '2026-11-08T10:20:00+09:00' })
-  ns = buildRequestGraph(turn({ session_id: SID, agents_detail: [col] }), [KL('c1-codex-a9f8e7', '2026-11-08T00:43:00Z', 'FAIL'), KL('c3-codex-a9f8e7', '2026-11-08T00:43:00Z', 'FAIL'), KL('c2-collect-a1b2c3', '2026-11-08T00:30:00Z', 'PASS')])
-  assert.equal(c1(ns).rounds, undefined); assert.notEqual(c1(ns).verdict?.yn, 'N')   // 요청 전 다른 대상 원장이 c1 을 N 으로 만들지 않는다
-  assert.equal(node(ns, '1.1.2.1').rounds?.[0]?.name, 'Codex 판정 c2-collect-a1b2c3')
-  // ③ 요청 창 안 다른 대상 원장 = 종전처럼 시간창 매칭(바뀌지 않음)
-  ns = buildRequestGraph(turn({ session_id: SID }), [KL('c1-codex-a9f8e7', '2026-11-08T01:10:00Z', 'PASS')])
-  assert.equal(c1(ns).rounds?.[0]?.name, 'Codex 판정 c1-codex-a9f8e7')
+test('면제 해소(2026-11-10 팀장 지적 · c4-loadloops-a1b42f D-001) : 열린 결함 전부 waived + met 아닌 기준마다 근거(기준 id 면제·evidence 의 면제 결함 id) = Y(면제) · 일부 면제·면제 없음·독립 미충족 기준·래퍼 보충 기준 = N — 훅 liveDefects 와 같은 결함 판단', async () => {
+  const { liveDefects } = await import('../.claude/hooks/codex-gate.mjs')
+  const at = '2026-11-08T01:10:00Z', d = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-waive-'))
+  const by = 'teamanakin-admin CONDITIONAL 2026-11-10', W = { reason: '근거', at, iter: 1, by }
+  const defects = [{ id: 'D-001', status: 'open', file: 'a.mjs' }, { id: 'D-002', status: 'regressed', file: 'b.mjs' }, { id: 'D-003', status: 'fixed', file: 'c.mjs' }]
+  // 기준 : AC-1 met · AC-2 unmet(근거 D-001) · AC-3 unverifiable(근거 D-002) — 결함 면제로만 생긴 미충족
+  const crit = [{ id: 'AC-1', status: 'met', evidence: '확인' }, { id: 'AC-2', status: 'unmet', evidence: 'D-001 때문에 미충족' }, { id: 'AC-3', status: 'unverifiable', evidence: '(D-002) 로 확인 불가' }]
+  const mk = (id, waived, criteria = crit, extra = {}) => {   // criteria null = 결과에 criteria 키 없음, extra = 원장 추가 필드(criteriaIds)
+    fs.mkdirSync(path.join(d, id))
+    fs.writeFileSync(path.join(d, id, 'iter-1.codex.json'), JSON.stringify({ verdict: 'FAIL', ...(criteria === null ? {} : { criteria }), defects }))
+    fs.writeFileSync(path.join(d, id, 'ledger.json'), JSON.stringify({ id, startedAt: '2026-11-08T01:02:00Z', iters: [{ iter: 1, at, verdict: 'FAIL', openDefects: ['D-001', 'D-002'] }], waived, ...extra }))
+  }
+  const bd = ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { agent_id: 'a1b2c3d4e5', ts_end: '2026-11-08T10:05:00+09:00', wrote: true })
+  const cx = id => node(buildRequestGraph(turn({ agents_detail: [bd] }), loadLoops(d).filter(l => l.id === id)), '1.1.4.1')
+  try {
+    const all = { 'D-001': W, 'D-002': W }, filled = { id: 'AC-4', status: 'unverifiable', evidence: '판정자 출력에 없음 — 래퍼가 채움 D-001' }
+    mk('c4-all-a1b2c3', all, crit, { criteriaIds: ['AC-1', 'AC-2', 'AC-3'] }); mk('c4-part-a1b2c3', { 'D-001': W }); mk('c4-none-a1b2c3', {})
+    mk('c4-indep-a1b2c3', all, [...crit, { id: 'AC-5', status: 'unmet', evidence: '문서 갱신 누락' }])   // 결함과 무관한 미충족 기준
+    mk('c4-filled-a1b2c3', all, [...crit, filled])                                                          // 래퍼 보충 = (b) 불인정
+    mk('c4-acw-a1b2c3', { ...all, 'AC-4': W, 'AC-5': W }, [...crit, filled, { id: 'AC-5', status: 'unmet', evidence: '문서 갱신 누락' }])   // (a) 기준 id 면제 = 해소
+    // 근거 확인 불가(2회차 D-001) : criteria 누락 · 빈 배열 · 원장 계약 기준(criteriaIds) id 가 결과에 없음
+    mk('c4-nocrit-a1b2c3', all, null); mk('c4-emptycrit-a1b2c3', all, []); mk('c4-missid-a1b2c3', all, crit, { criteriaIds: ['AC-1', 'AC-2', 'AC-3', 'AC-9'] })
+    // 전부 면제 → 면제 해소 : Y 취급(N·검증 누락 아님), 화면은 PASS 와 구별
+    let c = cx('c4-all-a1b2c3')
+    assert.equal(c.verdict.yn, 'Y'); assert.equal(c.status, 'done'); assert.ok(!c.alerts)
+    assert.equal(c.statusLabel, `검증 Y · 1회 만에 완료 · Y(면제) — 면제 2건 · ${by}`)
+    assert.match(c.chips[0].txt, /^1회 Y\(면제\) \d\d:\d\d · 면제 2건 · teamanakin-admin/)
+    assert.equal(agentsOf(buildRequestGraph(turn({ agents_detail: [bd] }), loadLoops(d).filter(l => l.id === 'c4-all-a1b2c3')))[0].cdx, '검증 Y')
+    assert.deepEqual(liveDefects(path.join(d, 'c4-all-a1b2c3')), [])   // 훅 판단도 열린 결함 0
+    assert.equal(cx('c4-acw-a1b2c3').verdict.yn, 'Y'); assert.match(cx('c4-acw-a1b2c3').statusLabel, /Y\(면제\) — 면제 2건/)
+    // 일부만 면제 · waived 없음 → FAIL 유지(훅도 열린 결함 있음)
+    for (const id of ['c4-part-a1b2c3', 'c4-none-a1b2c3']) assert.ok(liveDefects(path.join(d, id)).length > 0, id)
+    // 결함은 전부 면제됐지만 독립 미충족 기준 · 래퍼 보충 기준만 남음 → FAIL 유지
+    for (const id of ['c4-part-a1b2c3', 'c4-none-a1b2c3', 'c4-indep-a1b2c3', 'c4-filled-a1b2c3', 'c4-nocrit-a1b2c3', 'c4-emptycrit-a1b2c3', 'c4-missid-a1b2c3']) {
+      c = cx(id); assert.equal(c.verdict.yn, 'N', id); assert.match(c.statusLabel, /^검증 N/, id); assert.ok(!/면제/.test(c.statusLabel), id)
+    }
+  } finally { fs.rmSync(d, { recursive: true, force: true }) }
+})
+
+test('원장↔요청 창 (c4-codex-ac436f-p1 D-001·D-002) : 요청 전 원장 = 귀속 에이전트 접미·접미 없음만(재개 A6 유지), 요청 창 안 = 시간창 매칭', () => {
+  const cx = ns => node(ns, '1.1.4.1')
+  // 요청 시작(10:00) 전 다른 실행(접미 a9f8e7 — 이 요청 귀속 아님) 원장 = 귀속 에이전트가 창을 앞(09:00)으로 넓혀도 연결 안 함, 귀속 에이전트 접미 원장 = 연결(재개)
+  const bd = ag('anakin_phase-build', '2026-11-08T09:00:00+09:00', { agent_id: 'a1b2c3d4e5', ts_end: '2026-11-08T10:20:00+09:00', wrote: true })
+  let ns = buildRequestGraph(turn({ agents_detail: [bd] }), [KL('c4-codex-a9f8e7', '2026-11-08T00:43:00Z', 'FAIL'), KL('c4-build-a1b2c3', '2026-11-08T00:30:00Z', 'PASS')])
+  assert.deepEqual(cx(ns).rounds.map(g => g.name), ['Codex 판정 c4-build-a1b2c3']); assert.equal(cx(ns).verdict.yn, 'Y')   // 요청 전 다른 대상 원장이 N 으로 만들지 않는다
+  // 요청 창 안 다른 대상 원장 = 종전처럼 시간창 매칭
+  ns = buildRequestGraph(turn(), [KL('c4-codex-a9f8e7', '2026-11-08T01:10:00Z', 'PASS')])
+  assert.equal(cx(ns).rounds?.[0]?.name, 'Codex 판정 c4-codex-a9f8e7')
 })
 
 test('종료 승인 유예(c4-codex-ac436f-p1 D-003) : 응답 뒤 60초 유예는 같은 세션 다음 요청 시작 전까지만', async () => {
@@ -719,7 +769,156 @@ test('승인 칸 1.2 : 종료 승인 줄 있으면 완료(시각·승인/보류�
   assert.ok(n.chips.some(c => c.txt.startsWith('admin ×1')), '팀장 실행 = 칸 안 줄'); assert.ok(route(buildPath(ns)).includes('1.2'))
   ns = buildRequestGraph(turn({ agents_detail: [adm] }), []); n = node(ns, '1.2')
   assert.equal(n.status, 'notrun'); assert.match(n.lines[0], /종료 승인 : <승인\|보류> — <근거>' 줄 없음/)   // 팀장 실행만으로는 완료 아님
-  { const pp = buildPath(ns), e = pp.edges.find(x => x.to === '1.2'); assert.deepEqual(route(pp).slice(-2), ['1.2', 'E']); assert.ok(SLOTS.find(x => x.id === route(pp).at(-3))?.kind === 'codex', route(pp).join(',')); assert.equal(e.label, '⚠ 승인 미실행') }   // D-002 : … → CDX-총괄 → 승인(미실행 경고) → 종료
+  { const pp = buildPath(ns), e = pp.edges.find(x => x.to === '1.2'); assert.deepEqual(route(pp).slice(-2), ['1.2', 'E']); assert.equal(route(pp).at(-3), '1.1.5', route(pp).join(',')); assert.equal(e.label, '⚠ 승인 미실행') }   // D-002 : … → SA-그래프 → 승인(미실행 경고) → 종료(CDX-총괄 폐지)
   ns = buildRequestGraph(turn({ forced: [{ at: '2026-11-08T01:30:00Z', why: '연속 차단 3회' }] }), []); n = node(ns, '1.2')
   assert.equal(n.statusLabel, '승인 강제 실패'); assert.deepEqual(n.alerts, ['승인 강제 실패']); assert.match(node(ns, '1').lines.join(' '), /승인 강제 실패/)
+})
+
+test('c4-build-loop-only-aef4b3-p3 D-001 : 파일 변경 에이전트 A·B 중 A 원장만 PASS = CDX-루프 검증 누락 경보(Y 로 덮지 않음), 둘 다 원장 = Y, 진행 중 = 대기', () => {
+  const at = '2026-11-08T10:02:00+09:00', A = ag('general-purpose', at, { agent_id: 'a11111f00d', wrote: true }), B = ag('anakin_phase-build', '2026-11-08T10:06:00+09:00', { agent_id: 'a22222f00d', wrote: true })
+  let ns = buildRequestGraph(turn({ agents_detail: [A, B] }), [KL('c4-x-a11111', '2026-11-08T01:04:00Z', 'PASS')]), cx = node(ns, '1.1.4.1')
+  assert.equal(cx.statusLabel, '검증 누락'); assert.deepEqual(cx.alerts, ['검증 누락']); assert.notEqual(cx.verdict.yn, 'Y')
+  assert.match(cx.lines.join(' '), /원장 없는 파일 변경 실행 1건 — anakin_phase-build\(a22222\)/); assert.equal(ns[0].check.miss, 1); assert.equal(ns[0].alertN, 1)
+  // 원장 FAIL + 다른 실행 원장 없음 = N 유지 + 누락 경보
+  cx = node(buildRequestGraph(turn({ agents_detail: [A, B] }), [KL('c4-x-a11111', '2026-11-08T01:04:00Z', 'FAIL')]), '1.1.4.1')
+  assert.equal(cx.verdict.yn, 'N'); assert.deepEqual(cx.alerts, ['검증 누락'])
+  // 둘 다 원장(묶음 -pN 포함) = Y
+  cx = node(buildRequestGraph(turn({ agents_detail: [A, B] }), [KL('c4-x-a11111', '2026-11-08T01:04:00Z', 'PASS'), KL('c4-y-a22222-p1', '2026-11-08T01:08:00Z', 'PASS'), KL('c4-y-a22222-p2', '2026-11-08T01:08:00Z', 'PASS')]), '1.1.4.1')
+  assert.match(cx.statusLabel, /^검증 Y/); assert.equal(cx.alerts, undefined)
+  // 진행 중 요청 : 원장 없는 실행 = 대기(경보 아님)
+  cx = node(buildRequestGraph(turn({ ts_res: null, agents_detail: [A, { ...B, ts_end: null, live: true }] }), [KL('c4-x-a11111', '2026-11-08T01:04:00Z', 'PASS')], { now: P('2026-11-08T10:25:00+09:00') }), '1.1.4.1')
+  assert.equal(cx.statusLabel, '검증 대기 — 판정 전'); assert.equal(cx.alerts, undefined)
+})
+
+test('c4-build-loop-only-aef4b3-p3 D-002 : 셸로만 파일을 바꾼 실행도 wrote(codex-gate 귀속 함수 공유 — Bash·PowerShell + 기준선 diff ∩ 시간창), 셸 없음·창 밖·생성물만 = false', async () => {
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-sh-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-ses-')), g = (...a) => spawnSyncGit(r, a)
+  try {
+    g('init', '-q'); g('config', 'user.email', 't@t'); g('config', 'user.name', 't'); fs.writeFileSync(path.join(r, 'base.md'), 'b'); g('add', '-A'); g('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString()
+    const use = (t, name, input) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', name, input }] } })
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })   // 세션 기록 = 저장소 밖(실제 ~/.claude 와 같음 — 기록 파일이 git 미추적 변경으로 섞이지 않게)
+    const put = (id, recs) => fs.writeFileSync(path.join(sub, `agent-${id}.jsonl`), recs.map(x => JSON.stringify(x)).join('\n') + '\n')
+    fs.writeFileSync(path.join(r, 'bash-made.mjs'), 'x')   // 셸 산출(수정 시각 = 지금)
+    put('a1', [use(now - 60e3, 'Bash', { command: 'node gen.mjs > bash-made.mjs' }), use(now + 60e3, 'Read', { file_path: 'x' })])      // 셸 + 창 안 = true
+    put('a2', [use(now - 60e3, 'Read', { file_path: 'x' }), use(now + 60e3, 'Read', { file_path: 'y' })])               // 셸 없음 = false
+    put('a3', [use(now - 600e3, 'Bash', { command: 'ls bash-made.mjs' }), use(now - 300e3, 'Read', { file_path: 'y' })])              // 셸 + 끝난 창 밖 변경 = false
+    const T = { session_id: 's1', agents_detail: ['a1', 'a2', 'a3'].map(id => ({ agent_id: id, type: 'general-purpose', ts_end: iso(now + 60e3) })) }
+    const attr = o => cg.attributeOf?.({ ...o, root: r })
+    loadAgentHarness([T], ses, path.join(r, 'cache.json'), { attribute: cg.attributeOf ? attr : undefined })
+    assert.deepEqual(T.agents_detail.map(x => x.wrote), [true, false, false])
+    // 생성물(설계도판)만 Write = 판정 대상 아님(codex-gate 와 같은 splitScope) — 옛 규칙(wroteFiles)은 true 였음
+    put('a4', [use(now, 'Write', { file_path: path.join(r, '.claude', 'engineering', '50. graph', 'myRequestGraph.html') })])
+    const T2 = { session_id: 's1', agents_detail: [{ agent_id: 'a4', type: 'anakin_phase-build', ts_end: iso(now) }] }
+    loadAgentHarness([T2], ses, path.join(r, 'cache2.json'), { attribute: cg.attributeOf ? attr : undefined }); assert.equal(T2.agents_detail[0].wrote, false)
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
+})
+
+test('c4-fail-5-aeb16d-p2 D-001 : 셸 변경 실행 B 종료 뒤 다른 실행이 같은 파일을 다시 고쳐도 B.wrote·CDX-루프 누락 경보 유지 — 종료 시점 귀속 기록 우선, 기록 없는 과거 실행 = 추정 + 캐시 단조', async () => {
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-re-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-ses-')), g = (...a) => spawnSyncGit(r, a)
+  try {
+    g('init', '-q'); g('config', 'user.email', 't@t'); g('config', 'user.name', 't'); fs.writeFileSync(path.join(r, 'base.md'), 'b'); g('add', '-A'); g('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString(), f = path.join(r, 'shared.mjs')
+    const use = (t, name, input) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', name, input }] } })
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })   // 세션 기록 = 저장소 밖(실제 ~/.claude 와 같음 — 기록 파일이 git 미추적 변경으로 섞이지 않게)
+    const put = (id, recs) => fs.writeFileSync(path.join(sub, `agent-${id}.jsonl`), recs.map(x => JSON.stringify(x)).join('\n') + '\n')
+    const recsB = [use(now - 60e3, 'Bash', { command: 'node gen.mjs > shared.mjs' }), use(now + 60e3, 'Read', { file_path: 'x' })]
+    fs.writeFileSync(f, 'B 셸 산출'); put('abbbbb01', recsB)
+    const attr = o => (cg.attributionFor || cg.attributeOf)({ ...o, root: r })
+    // ① 종료 시점(SubagentStop) 귀속 기록 — 훅이 남긴다
+    cg.saveAttrib?.('abbbbb01', cg.attributeOf({ recs: recsB, tp: path.join(sub, 'agent-abbbbb01.jsonl'), mainTp: null, agentId: 'abbbbb01', root: r }))
+    // ② 다른 실행이 B 종료(+60초) 뒤 같은 파일을 다시 수정
+    fs.writeFileSync(f, '다른 실행 재수정'); const later = new Date(now + 600e3); fs.utimesSync(f, later, later)
+    const B = { agent_id: 'abbbbb01', type: 'anakin_phase-build', ts_start: iso(now - 60e3), ts_end: iso(now + 60e3) }, A = { agent_id: 'aaaaaa01', type: 'general-purpose', ts_start: iso(now - 120e3), ts_end: iso(now - 90e3), wrote: true }
+    const T = { session_id: 's1', ts_req: iso(now - 200e3), ts_res: iso(now + 700e3), req_head: '요청', agents_detail: [A, B] }
+    loadAgentHarness([T], ses, path.join(r, 'cache.json'), { attribute: attr })   // 그래프 첫 집계 = 재수정 뒤
+    assert.equal(B.wrote, true, '종료 시점 기록 우선'); assert.ok(!B.wroteEst)
+    const cx = node(buildRequestGraph(T, [KL('c4-x-aaaaaa', iso(now - 80e3), 'PASS')]), '1.1.4.1')
+    assert.equal(cx.statusLabel, '검증 누락'); assert.deepEqual(cx.alerts, ['검증 누락'])
+    // ③ 기록 없는 과거 실행 = 추정 판단, 한 번 true 면 이후 재계산(기록 길이 변화)에서 파일 시각이 바뀌어도 false 로 내리지 않음(단조)
+    const recsC = [use(now - 60e3, 'Bash', { command: 'node gen2.mjs > c.mjs' }), use(now + 60e3, 'Read', { file_path: 'x' })]
+    const f2 = path.join(r, 'c.mjs'); fs.writeFileSync(f2, 'C 셸 산출'); fs.utimesSync(f2, new Date(now), new Date(now)); put('accccc01', recsC)
+    const C = { agent_id: 'accccc01', type: 'general-purpose', ts_end: iso(now + 60e3) }, T2 = { session_id: 's1', agents_detail: [C] }, cache = path.join(r, 'cache2.json')
+    loadAgentHarness([T2], ses, cache, { attribute: attr }); assert.equal(C.wrote, true); assert.equal(C.wroteEst, true)
+    fs.utimesSync(f2, later, later); put('accccc01', [...recsC, use(now + 61e3, 'Read', { file_path: 'z' })])
+    delete C.wrote; loadAgentHarness([T2], ses, cache, { attribute: attr }); assert.equal(C.wrote, true, '단조 — true 유지')
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
+})
+
+test('c4-build-a9fcfc AC-2 그래프 형제 : 병렬 A(Edit x + node --test test/*.test.mjs)·A2(node --test 만)·B(Bash cat >> test/y.test.mjs) — 그래프 귀속(loadAgentHarness → attributionFor) A·A2 에 y 0건·B 에 y, A2 wrote=false·B 원장 없음 = 검증 누락', async () => {
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-par-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-ses-')), g = (...a) => spawnSyncGit(r, a)
+  try {
+    g('init', '-q'); g('config', 'user.email', 't@t'); g('config', 'user.name', 't'); fs.mkdirSync(path.join(r, 'test')); fs.writeFileSync(path.join(r, 'test', 'x.test.mjs'), '1'); fs.writeFileSync(path.join(r, 'test', 'y.test.mjs'), '1'); g('add', '-A'); g('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString(), use = (t, name, input) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', name, input }] } })
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })   // 세션 기록 = 저장소 밖
+    const put = (id, recs) => fs.writeFileSync(path.join(sub, `agent-${id}.jsonl`), recs.map(x => JSON.stringify(x)).join('\n') + '\n')
+    const mt = (f, t) => fs.utimesSync(path.join(r, f), new Date(t), new Date(t))   // 수정 시각 = 기록의 쓰기 시각(시간창 겹침)
+    fs.writeFileSync(path.join(r, 'test', 'x.test.mjs'), 'A'); mt('test/x.test.mjs', now - 40e3); fs.appendFileSync(path.join(r, 'test', 'y.test.mjs'), '\nB'); mt('test/y.test.mjs', now - 50e3)
+    put('aaaaaa91', [use(now - 70e3, 'Read', { file_path: 'x' }), use(now - 40e3, 'Edit', { file_path: path.join(r, 'test', 'x.test.mjs') }), use(now - 10e3, 'Bash', { command: 'node --test test/*.test.mjs' })])
+    put('accccc91', [use(now - 70e3, 'Read', { file_path: 'x' }), use(now - 10e3, 'Bash', { command: 'node --test test/*.test.mjs' })])
+    put('abbbbb91', [use(now - 65e3, 'Read', { file_path: 'y' }), use(now - 50e3, 'Bash', { command: "cat >> test/y.test.mjs <<'EOF'\ntest('t', () => { assert.ok(a > b) })\nEOF" })])
+    const seen = {}, attr = o => { const res = cg.attributionFor({ ...o, root: r }); seen[o.agentId] = res.files; return res }   // 그래프가 넘기는 인자(tp·mainTp·closed) 그대로 + 시험 저장소 root
+    const A = { agent_id: 'aaaaaa91', type: 'anakin_phase-build', ts_start: iso(now - 70e3), ts_end: iso(now - 10e3) }, A2 = { agent_id: 'accccc91', type: 'general-purpose', ts_start: iso(now - 70e3), ts_end: iso(now - 10e3) }, B = { agent_id: 'abbbbb91', type: 'general-purpose', ts_start: iso(now - 65e3), ts_end: iso(now - 50e3) }
+    const T = { session_id: 's1', ts_req: iso(now - 200e3), ts_res: iso(now + 700e3), req_head: '요청', agents_detail: [A, A2, B] }
+    loadAgentHarness([T], ses, path.join(r, 'cache.json'), { attribute: attr, recordAt: cg.attribAt })
+    assert.deepEqual(seen, { aaaaaa91: ['test/x.test.mjs'], accccc91: [], abbbbb91: ['test/y.test.mjs'] })   // 고치기 전 : A·A2 에 test/y.test.mjs(디렉터리 일치 2차 귀속)
+    assert.deepEqual([A.wrote, A2.wrote, B.wrote], [true, false, true])
+    let cx = node(buildRequestGraph(T, [KL('c4-x-aaaaaa', iso(now - 5e3), 'PASS'), KL('c4-y-abbbbb', iso(now - 5e3), 'PASS')]), '1.1.4.1')
+    assert.match(cx.statusLabel, /^검증 Y/); assert.equal(cx.alerts, undefined)   // A2 = 판정 대상 아님(고치기 전 : A2 원장 없음 = 검증 누락)
+    cx = node(buildRequestGraph(T, [KL('c4-x-aaaaaa', iso(now - 5e3), 'PASS')]), '1.1.4.1')
+    assert.deepEqual(cx.alerts, ['검증 누락']); assert.match(cx.lines.join(' '), /원장 없는 파일 변경 실행 1건 — general-purpose\(abbbbb · 추정\)/)   // B = y 귀속 → 원장 없음 경보(훅 귀속 기록 없음 = 추정)
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
+})
+
+test('c4-fail-5-aeb16d-p2 iter-2 D-001 : 하네스 캐시(추정 false)가 먼저 생긴 뒤 종료 시점 귀속 기록(wrote=true)이 생기면 다시 집계 때 기록이 캐시보다 우선 — B.wrote true·누락 경보 유지, 기록 갱신(mtime)도 반영', async () => {
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-rc-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-ses-')), g = (...a) => spawnSyncGit(r, a)
+  try {
+    g('init', '-q'); g('config', 'user.email', 't@t'); g('config', 'user.name', 't'); fs.writeFileSync(path.join(r, 'base.md'), 'b'); g('add', '-A'); g('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString(), id = 'abbbbb77'
+    const use = (t, name, input) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', name, input }] } })
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })
+    const recsB = [use(now - 60e3, 'Bash', { command: 'node gen.mjs > late.mjs' }), use(now + 60e3, 'Read', { file_path: 'x' })]
+    fs.writeFileSync(path.join(sub, `agent-${id}.jsonl`), recsB.map(x => JSON.stringify(x)).join('\n') + '\n')
+    const later = new Date(now + 600e3); fs.writeFileSync(path.join(r, 'late.mjs'), '재수정됨'); fs.utimesSync(path.join(r, 'late.mjs'), later, later)   // 창 밖 = 추정 false
+    const attr = o => cg.attributionFor({ ...o, root: r }), opts = { attribute: attr, recordAt: cg.attribAt }, cache = path.join(r, 'cache.json')
+    const B = () => ({ agent_id: id, type: 'anakin_phase-build', ts_start: iso(now - 60e3), ts_end: iso(now + 60e3) }), A = { agent_id: 'aaaaaa77', type: 'general-purpose', ts_start: iso(now - 120e3), ts_end: iso(now - 90e3), wrote: true }
+    let b = B(); loadAgentHarness([{ session_id: 's1', agents_detail: [b] }], ses, cache, opts)
+    assert.equal(b.wrote, false); assert.equal(JSON.parse(fs.readFileSync(cache, 'utf8'))[id].wrote, false)   // ① 캐시 = 추정 false
+    cg.saveAttrib(id, { files: ['late.mjs'] })                                                                // ② 종료 시점 기록 wrote=true 가 나중에 생김(기록 파일·캐시 sig 그대로)
+    b = B(); const T = { session_id: 's1', ts_req: iso(now - 200e3), ts_res: iso(now + 700e3), req_head: '요청', agents_detail: [A, b] }
+    loadAgentHarness([T], ses, cache, opts)
+    assert.equal(b.wrote, true, '기록이 캐시보다 우선'); assert.ok(!b.wroteEst)
+    const cx = node(buildRequestGraph(T, [KL('c4-x-aaaaaa', iso(now - 80e3), 'PASS')]), '1.1.4.1'); assert.equal(cx.statusLabel, '검증 누락'); assert.deepEqual(cx.alerts, ['검증 누락'])
+    // ③ 기록 갱신(재전달 뒤 훅이 wrote=false 로 다시 씀) — 기록 mtime 이 바뀌면 캐시(true) 대신 새 기록
+    cg.saveAttrib(id, { files: [] }, now + 5e3); const fA = path.join(process.env.CODEX_GATE_STATE, 'codex-gate', 'attrib', `${id}.json`), t2 = new Date(Date.now() + 5e3); fs.utimesSync(fA, t2, t2)
+    b = B(); loadAgentHarness([{ session_id: 's1', agents_detail: [b] }], ses, cache, opts); assert.equal(b.wrote, false, '갱신된 기록 반영')
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
+})
+
+test('c4-fail-5-aeb16d-p2 D-001 캐시·귀속 : 수정 전 판이 만든 {v:2, sig, wrote:false}(ra 없음) 캐시 + 귀속 기록 = 기록 반영, 다른 에이전트 기록 변경 = 재사용, 기록 삭제 = 재계산하되 true 유지(누락 경보 생존)', async () => {
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-rd-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-ses-')), g = (...a) => spawnSyncGit(r, a)
+  const id = 'abbbbb88', other = 'aooooo88', fA = path.join(process.env.CODEX_GATE_STATE, 'codex-gate', 'attrib', `${id}.json`)
+  try {
+    g('init', '-q'); g('config', 'user.email', 't@t'); g('config', 'user.name', 't'); fs.writeFileSync(path.join(r, 'base.md'), 'b'); g('add', '-A'); g('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString()
+    const use = (t, name, input) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', name, input }] } })
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })
+    const tp = path.join(sub, `agent-${id}.jsonl`); fs.writeFileSync(tp, [use(now - 60e3, 'Bash', { command: 'node gen.mjs > old.mjs' }), use(now + 60e3, 'Read', { file_path: 'x' })].map(x => JSON.stringify(x)).join('\n') + '\n')
+    const later = new Date(now + 600e3); fs.writeFileSync(path.join(r, 'old.mjs'), '재수정됨'); fs.utimesSync(path.join(r, 'old.mjs'), later, later)   // 창 밖 = 추정 false
+    let calls = 0; const attr = o => { calls++; return cg.attributionFor({ ...o, root: r }) }, opts = { attribute: attr, recordAt: cg.attribAt }, cache = path.join(r, 'cache.json')
+    const st = fs.statSync(tp); fs.writeFileSync(cache, JSON.stringify({ [id]: { v: 2, sig: `${st.size}:${Math.round(st.mtimeMs)}`, harness: false, wrote: false } }))   // ① 수정 전 판 캐시(ra 칸 없음)
+    cg.saveAttrib(id, { files: ['old.mjs'] })                                                                                              // 종료 시점 기록 = 파일 변경 있음
+    const B = () => ({ agent_id: id, type: 'anakin_phase-build', ts_start: iso(now - 60e3), ts_end: iso(now + 60e3) }), A = { agent_id: 'aaaaaa88', type: 'general-purpose', ts_start: iso(now - 120e3), ts_end: iso(now - 90e3), wrote: true }
+    const alarm = b => node(buildRequestGraph({ session_id: 's1', ts_req: iso(now - 200e3), ts_res: iso(now + 700e3), req_head: '요청', agents_detail: [A, b] }, [KL('c4-x-aaaaaa', iso(now - 80e3), 'PASS')]), '1.1.4.1').alerts
+    let b = B(); loadAgentHarness([{ session_id: 's1', agents_detail: [b] }], ses, cache, opts)
+    assert.equal(b.wrote, true, '옛 캐시 false 대신 귀속 기록'); assert.ok(!b.wroteEst); assert.deepEqual(alarm(b), ['검증 누락'])
+    calls = 0; cg.saveAttrib(other, { files: ['x.mjs'] })                                                                                  // ② 다른 에이전트 기록 변경 = 이 에이전트 캐시 재사용
+    b = B(); loadAgentHarness([{ session_id: 's1', agents_detail: [b] }], ses, cache, opts); assert.equal(calls, 0, '다른 기록 변경에 재판단 없음'); assert.equal(b.wrote, true)
+    fs.rmSync(fA)                                                                                                                         // ③ 기록 삭제 = 재계산(추정 false)이지만 단조로 true 유지
+    b = B(); loadAgentHarness([{ session_id: 's1', agents_detail: [b] }], ses, cache, opts); assert.equal(calls, 1, '기록 삭제 = 재판단'); assert.equal(b.wrote, true, '삭제 뒤에도 true'); assert.equal(b.wroteEst, true); assert.deepEqual(alarm(b), ['검증 누락'])
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }); fs.rmSync(fA, { force: true }); fs.rmSync(path.join(path.dirname(fA), `${other}.json`), { force: true }) }
 })

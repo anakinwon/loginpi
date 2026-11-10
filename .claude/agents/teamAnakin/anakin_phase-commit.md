@@ -16,9 +16,9 @@ model: claude-haiku-4-5-20251001
    - 앱 코드(`src/`) / 도구(`scripts/`) / 설정(`.claude/`·`package.json` 등) / 문서(`docs/`·`CLAUDE.md`)는 서로 다른 커밋
    - 예외 : 정의·설정 변경과 그에 대한 CLAUDE.md 하네스 등록, 생성기와 생성 문서(예 : `docs/WORK_METRICS.md`)는 같은 커밋
 3. 스테이징은 파일 이름을 지정해서만 한다(`git add -- <파일>`). `git add .`·`git add -A`(경로 없이) 금지.
-4. 커밋 메시지는 한국어, 첫 줄 `<이모지> <type>(<scope>): <핵심 요약>[ — <상세>]` 형식, "수정"·"업데이트" 단독 금지(형식은 최근 `git log --format=%s` 관행 우선, 묶음·금지 규칙은 git-rules.md). 메인이 넘긴 메시지와 Co-Authored-By 줄은 그대로 쓴다. Co-Authored-By 줄을 넘겨받지 못했으면 커밋하지 않고 멈춰서 보고한다. 반드시 heredoc으로 넘긴다 :
+4. 커밋 메시지는 한국어, 첫 줄 `<이모지> <type>(<scope>): <핵심 요약>[ — <상세>]` 형식, "수정"·"업데이트" 단독 금지(형식은 최근 `git log --format=%s` 관행 우선, 묶음·금지 규칙은 git-rules.md). 메인이 넘긴 메시지와 Co-Authored-By 줄은 그대로 쓴다. Co-Authored-By 줄을 넘겨받지 못했으면 커밋하지 않고 멈춰서 보고한다. 커밋은 결정적 검사 래퍼 `scripts/precommit-check.mjs --commit` 으로만 한다(2026-11-10 개정 — 커밋 칸 Codex 판정 대신 금지 경로·5MB·추가 줄 비밀·Co-Authored-By 검사, 통과하면 같은 메시지로 `git commit -q -F -`). 반드시 heredoc으로 넘긴다 :
    ```
-   git commit -q -F - <<'EOF'
+   node scripts/precommit-check.mjs --commit <<'EOF'
    <첫 줄>
 
    <본문(선택)>
@@ -26,6 +26,7 @@ model: claude-haiku-4-5-20251001
    Co-Authored-By: <메인 세션 모델명> <noreply@anthropic.com>
    EOF
    ```
+   종료 1(위반) = `✖ <규칙> <파일> — <상세>` 목록 원문을 보고하고 멈춘다. `git commit` 직접 실행으로 우회 금지. `--allow-secret <종류>` 는 메인이 마스터 승인과 함께 넘긴 경우만 쓴다(비밀 패턴만 면제 — 금지 경로·크기·메시지 규칙은 면제 없음). 종료 2 = 사용법·git 오류, 그대로 보고.
 5. **push 는 훅이 차단한다 — 시도하지 말 것**(`.claude/hooks/push-guard.mjs`, 2026-11-07 마스터 결정 : 승인 없는 master 푸시 = 운영 배포 사고). 커밋 뒤 `git fetch -q` 후 `git status -sb` 를 실행하고, 보고의 푸시 상태는 그 출력 원문(예 `## master...origin/master [ahead 2]`)으로 적는다. 푸시는 마스터가 `! git push` 로 직접 한다.
 
 ## 절대 스테이징하지 않는 것
@@ -33,6 +34,7 @@ model: claude-haiku-4-5-20251001
 - `.env*`, 키·토큰·비밀번호·접속 문자열이 보이는 파일, `Thumbs.db`, `~$*`
 - `work-history/`·`work-statistics/` (gitignore 대상 : 대화 전문 포함, 강제 추가 금지)
 - `.claude/settings.local.json`, 임시·스크래치 산출물
+- 강제 장치 = `scripts/precommit-check.mjs`(금지 경로·5MB 초과·추가 줄 비밀 패턴·Co-Authored-By 끝 줄 — 위반이면 커밋하지 않음)
 
 ## 멈추고 보고하는 경우 (직접 해결 금지)
 

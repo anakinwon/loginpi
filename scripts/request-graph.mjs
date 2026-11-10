@@ -2,7 +2,7 @@
  * request-graph.mjs : 요청 처리 흐름 그래프(마스터 설계 트리 1 ~ 1.2) + 실요청 모니터링 HTML·Obsidian md 노드 생성기 (2026-11-08 마스터 지시)
  * 원천 : work-history jsonl 턴·agent 레코드(loadRows·buildTurns) + Codex 루프 원장 .omc/state/loop/<id>/ledger.json + 턴 중간 = 세션 기록(~/.claude/projects/<프로젝트>/) 꼬리 스캔
  * 실행 : node scripts/request-graph.mjs [--out html] [--days 7] [--md [dir]] [--delay ms] | --design-only [--out html] [--md [dir]]  (실데이터판 = Stop·SubagentStart/Stop 훅 자동 갱신)
- *   [--trigger stop|subagent|manual] : 실행마다 .omc/state/request-graph/runs.jsonl 에 {ts, trigger, mode, md} append(기본 manual, 훅이 넘김) — 1.1.5.2 판정 원천
+ *   [--trigger …] : 훅이 넘기는 호출 출처 — 무시(2026-11-10 실행 기록 runs.jsonl 폐지)
  */
 import fs from 'node:fs'
 import os from 'node:os'
@@ -20,27 +20,21 @@ const PATHS = {
   flowMd: '.claude/engineering/50. graph/request-flow',              // 설계 슬롯 md(커밋 대상)
   reqMd: '.claude/engineering/50. graph/requests',                   // 요청별 md(실데이터 — gitignore)
   loops: '.omc/state/loop',
-  runs: '.omc/state/request-graph/runs.jsonl',                      // 생성기 실행 기록(append-only, gitignore) — 1.1.5.2 판정 원천
   roundsCache: '.omc/state/request-graph/rounds-cache.json',         // 팀원 에이전트 회차 캐시(agent_id → 기록 크기·mtime·회차, gitignore)
   harnessCache: '.omc/state/request-graph/harness-cache.json',
   summaries: '.omc/state/request-graph/summaries',                  // SA-컨텍스트 요약 캐시 <요청 id>.json = { before, after, related, points, by, at } — anakin_phase-graph 가 판독 때 작성(gitignore)
   toolCache: '.omc/state/request-graph/tool-cache.json',            // 하네스 사용 기록 캐시(기록 파일 → 크기·mtime·[시각, 도구명], gitignore — 입력값 없음)       // 산출 실행 하네스 변경 감지 캐시(agent_id → 기록 크기·mtime·결과, gitignore)
   wfCache: '.omc/state/request-graph/workflow-cache.json',           // 워크플로 에이전트 캐시(agent_id → 기록 크기·mtime·시작·끝·모델, gitignore)
-  approvals: '.omc/state/codex-gate/approvals.jsonl',                 // Stop 훅 turn-gate.mjs 의 종료 승인 기록(승인·보류·승인 강제 실패, gitignore) — 1.2 '승인 강제 실패' 원천
+  approvals: '.omc/state/codex-gate/approvals.jsonl',                 // Stop 훅 turn-gate.mjs 종료 승인 줄 기록기(비차단, 2026-11-10 개정 — 승인·보류, gitignore) — 과거 '승인 강제 실패' 이력만 1.2 에 읽음
 }
-/**
- * 턴 묶음 판정 원장(2026-11-10 마스터 "턴 묶음 1회 판정" — Stop 훅 .claude/hooks/turn-gate.mjs) : 칸 원장 id = c<N>-turn-<요청키>, 요청키 = <세션 id 앞 6자>-<요청 시각 KST MMDDHHmmss>
- *   묶음 원장(Codex 1회 호출의 잠금·예산 몫) = bundle-turn-<요청키> — 칸이 아니라 그래프 매칭에서 뺀다(loadLoops)
- */
-export const turnKey = (sid, t) => `${String(sid || 'nosess').replace(/[^0-9a-f]/gi, '').slice(0, 6).toLowerCase() || 'nosess'}-${new Date(t).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).replace(/\D/g, '').slice(4, 14)}`
+/** 과거 턴 묶음 판정 원장 id(c<N>-turn-<세션 6자>-<KST MMDDHHmmss> — Stop 훅 턴 묶음 판정은 2026-11-10 개정으로 폐지) : 집계 제외용(isLoopLedger) */
 export const TURN_ID_RE = /-turn-[0-9a-z]{1,6}-\d{10}$/
 /** 메인 응답의 종료 승인 줄(2026-11-10 마스터 "총괄검수가 끝나면 반드시 파다완 아소카의 종료 승인") : '종료 승인 : <승인|보류> — <근거>' → { kind, why } | null(마지막 줄 우선) */
 export const APPROVAL_RE = /^[ \t>*_-]*종료 승인\s*:\s*(승인|보류)\s*[—–-]+\s*(.+?)\s*$/gm
 export const approvalOf = text => { const m = [...String(text || '').matchAll(APPROVAL_RE)].at(-1); return m ? { kind: m[1], why: m[2].replace(/[*_`]+$/g, '').trim().slice(0, 200) } : null }
-const RUN_TRIGGERS = ['stop', 'subagent', 'manual']
 // ponytail: Stop 훅 실행은 응답 직후(로거·통계 다음)라 턴 창 끝 뒤에 찍힌다 → 창 끝 60초 유예. 그 사이 다음 턴이 시작되면 그 턴 실행도 앞 턴에 잡힐 수 있음(세션 구분 필드 추가 시 해소)
 const RUN_GRACE_MS = 60e3
-/** BLOCKED 사유 표기 — in-progress = 서브에이전트 수정 진행 중 보류(turn-gate, 2026-11-10 결함 7·9) */
+/** BLOCKED 사유 표기 — in-progress = 과거 턴 묶음 판정의 '수정 진행 중' 보류(2026-11-10 폐지 — 과거 원장 표기용) */
 export const reasonTxt = r => String(r || '사유 미기록').split(',').map(x => x === 'in-progress' ? '수정 진행 중' : x).join(',')
 /**
  * 상태 색(2026-11-08 마스터 : 완료 = 연초록, 진행 = 형광 노랑 + 깜빡임, 주황 = 미수행 점선만)
@@ -86,12 +80,11 @@ const EST_BADGE = '시간 기준 연결(추정)'
 /** anakin_phase-verify = 2026-11-10 폐지(Codex 판정은 SubagentStop 훅 .claude/hooks/codex-gate.mjs 자동). 과거 기록의 verify 실행은 화면·집계에서 숨기고 그 판정(원장)은 CDX 칸에만 반영 */
 const LEGACY_VERIFY = 'anakin_phase-verify'
 /**
- * 서브에이전트 type → 필수 Codex 칸(codex_procedure.md 13절 표·규칙 4, 훅 codex-gate.mjs 의 원장 id 매핑과 같은 표) : req = 늘 필수, opt = 판정 창 안에 그 칸 원장이 있을 때만 추가 필수, sfx = 원장 id 접미 우선 매칭(칸 안에서 접미 원장이 있으면 그것만)
- *   collect c2 · build c4(+c3 하네스 변경 시) · decide c4-…-decide · review c4-…-review · graph c5 · commit c6-…-commit · teamanakin-admin(팀장 모드 1) c6-…-admin
- *   표에 없는 대행(general-purpose 등) = 성격(조사 c2 / 산출 c4)을 기록으로 알 수 없어 창 안에 있는 c2·c4 칸 전부 필수. 칸마다 독립 판정 후 AND(c4 iter2 D-001 — 한 칸 PASS 가 다른 칸 FAIL·누락을 덮지 않음)
+ * Codex 루프 판정 비대상 에이전트(2026-11-10 마스터 "프롬프트+컨텍스트+그래프+총괄=>제거, 루프 유지+하네스는 루프에 흡수" — 훅 codex-gate.mjs NO_GATE 와 같은 값, 훅 selftest 가 일치 확인)
+ *   이 밖의 실행은 파일을 바꿨을 때만(wrote) c4 원장 하나(c4-<주제>-<agentId 앞 6자>)로 판정 — 하네스 파일도 같은 원장
  */
-const CDX_OF = { 'anakin_phase-collect': { req: [2] }, 'anakin_phase-build': { req: [4], opt: [3] }, 'anakin_phase-decide': { req: [4], sfx: '-decide' }, 'anakin_phase-review': { req: [4], sfx: '-review' }, 'anakin_phase-graph': { req: [5] }, 'anakin_phase-commit': { req: [6], sfx: '-commit' }, 'teamanakin-admin': { req: [6], sfx: '-admin' } }, CDX_ANY = { req: [], opt: [2, 4] }
-/** 하네스 경로(codex_procedure.md 13절 c3 = 훅·settings·에이전트 정의·운용 기준서 + 40. loop 절차) — 산출 실행의 Write·Edit 대상이 여기면 c3 필수(c6 iter1 D-001). 하위 앱 .claude/ 도 포함 */
+export const NO_GATE = new Set(['anakin_phase-collect', 'anakin_phase-decide', 'anakin_phase-review', 'anakin_phase-graph', 'anakin_phase-commit', 'teamanakin-admin'])
+/** 하네스 경로(훅·settings·에이전트 정의·운용 기준서 + 40. loop 절차) — 산출 실행의 Write·Edit 대상이 여기면 SA-하네스 표식, 판정은 CDX-루프(c4) 원장에 포함(2026-11-10 개정). 하위 앱 .claude/ 도 포함 */
 export const HARNESS_RE = /(^|[\\/])\.claude[\\/](hooks|agents|skills|engineering[\\/]40\. loop)[\\/]|(^|[\\/])\.claude[\\/]settings[^\\/]*\.json$/
 const WRITE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit'])
 export const ENG_SLOTS = ['1.1.1', '1.1.2', '1.1.3', '1.1.4', '1.1.5']   // 표준 처리 엔지니어링 5단계(10 프롬프트 · 20 컨텍스트 · 30 하네스 · 40 루프 · 50 그래프)
@@ -108,49 +101,35 @@ export const SLOT_MAP = {
   '1.1.2': { agents: ['anakin_phase-collect'], show: 'context' },
   // 하네스 = 메인·서브에이전트 tool_use 와 훅 주입 시각순 목록(+ 하네스 파일 변경 HARNESS_RE 표식)
   '1.1.3': { show: 'harness' },
-  // 루프 = 어느 CDX 칸이든 N 판정 1회 이상(C-13) · 같은 에이전트 종류 2회 이상 · 같은 원장 판정 2회 이상. build 실행 줄은 루프 쌍이 보일 때 이 칸(아니면 2 접수), decide·review·commit·일반 에이전트 = 2 접수, admin = 승인
+  // 루프 = c4 판정 1회 이상 · 파일 변경 실행 1건 이상 · N 판정 1회 이상(C-13) · 같은 에이전트 종류 2회 이상 · 같은 원장 판정 2회 이상. build 실행 줄은 루프 쌍이 보일 때 이 칸(아니면 2 접수), decide·review·commit·일반 에이전트 = 2 접수, admin = 승인
   '1.1.4': { agents: ['anakin_phase-build'], show: 'loop' },
-  // Codex 칸(마스터 결정 2026-11-09 "Codex1~6 칸은 마스터 설계 유지 + 칸별 검수 대상 정의") : 원장 id 접두 c<N>- = Codex<N> 칸 → '매핑 연결'
-  //   (원장 id 규칙 40. loop/codex_procedure.md 3절, 예 c4-codex-wiring). 접두 없는 과거 원장(first-call·loop-docs·loop-cap5) = legacy → Codex4 턴 시간창 추정(기존 동작)
-  '1.1.1.1': { codex: 1 }, '1.1.2.1': { codex: 2 }, '1.1.3.1': { codex: 3 }, '1.1.4.1': { codex: 4, legacy: true }, '1.1.5.1': { codex: 5 }, '1.1.5.2.1': { codex: 6 },
+  // Codex 칸(2026-11-10 개정 — CDX-루프 하나) : 원장 id 접두 c4- = '매핑 연결'. 과거 c1·c2·c3·c5·c6·턴 묶음 원장은 집계 제외(isLoopLedger)
+  //   (원장 id 규칙 40. loop/codex_procedure.md 3절). 접두 없는 과거 원장(first-call·loop-docs·loop-cap5) = legacy → Codex4 턴 시간창 추정(기존 동작)
+  '1.1.4.1': { codex: 4, legacy: true },
   // 마스터 확정 2026-11-08 "그래프 분석의 담당 서브에이전트 추가" → anakin_phase-graph 신설(.claude/agents/teamAnakin/anakin_phase-graph.md, 산출 턴의 검증 뒤·승인 앞)
   '1.1.5': { agents: ['anakin_phase-graph'], show: 'graph' },   // graph 미실행 = '생성기 자동 갱신(Stop 훅)'
-  // 마스터 확정 2026-11-09 "1.1.5.2 담당은 아소카" — 실행 주체는 생성기(Stop 훅 work-stats-refresh · SubagentStart/Stop 훅 request-graph-refresh · 수동)라
-  //   work-history 훅 기록(이벤트명뿐)으로는 구분 불가 → 생성기가 실행마다 남기는 runs.jsonl(PATHS.runs)로 판정 : 창 안 live 실행 있음 = 완료 · 없음 = 미수행 · 로그 첫 기록 이전 턴 = 기록 이전
-  '1.1.5.2': { owner: '아소카(메인)', source: 'runs.jsonl' },
 }
 
 const CODEX = { role: '외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수', criteria: 'verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED', docs: ['40. loop/codex_procedure.md', '60. nodes/codex-judge.md'] }
 /**
- * Codex 칸별 검수 대상·호출 시점(정본 40. loop/codex_procedure.md 13절 표 · 그래프 정본 50. graph/anakins_graph.md B-6-2) : [검수 대상, 호출 시점]
- *   13절 "CDX 관문 — 모든 서브에이전트 결과 검수"(마스터 결정 2026-11-09) : 예외 없이 결과를 낸 단계 직후 필수, Y 전에는 다음 단계 진행 금지(c3 만 하네스 변경 0건이면 '해당 없음' 기록)
+ * Codex 칸 검수 대상·호출 시점(정본 40. loop/codex_procedure.md 13절 표 · 그래프 정본 50. graph/anakins_graph.md B-6-2) : [검수 대상, 호출 시점]
+ *   2026-11-10 개정 — CDX 칸은 CDX-루프(c4) 하나 : 파일을 바꾼 에이전트만 판정, 하네스 파일 변경도 같은 원장(계약 AC-4)
  */
 export const CODEX_SLOTS = {
-  1: ['메인 브리프 — 요구 항목 누락·추가 해석 없음 / 쓰기 허용·금지 경로 명시 / AC-n 이 명령·파일·수치로 판정 가능', '브리프 작성 직후·build 앞(산출 턴) 필수'],
-  2: ['collect 결과(조회 단독 포함)·조사형 대행 — 주장·수치마다 출처(경로:줄·명령) / 필요한 근거 누락 없음 / 미확인은 [확인중]·[TBD]', 'collect 결과 직후 필수'],
-  3: ['build 의 하네스 파일 변경(훅·settings·에이전트 정의·운용 기준서) — 규칙 정합 / 우회·회귀 없음 / selftest 통과', 'build 직후 c4 와 함께 SubagentStop 훅 자동 필수 — 하네스 변경 0건이면 해당 없음 기록'],
-  4: ['build 산출물 / decide 결론 / review 결과 / 산출형 대행 — 브리프 AC-n 충족 / 결론 근거·반론 검토 / 검수 지적의 근거', 'build 직후 / decide 직후 / review 직후 필수(SubagentStop 훅 자동)'],
-  5: ['graph 보고 — 엔지니어링 N/5·미수행·비정상이 생성기 출력과 일치 / 판독이 정본 정의를 따름', 'graph 직후 필수'],
-  6: ['팀장 승인 직전 총괄 / commit 결과 / 팀장 모드 2 재평가 결과 / 팀장 모드 1 승인 판정 — 실행된 단계 CDX 전부 PASS / 요청 항목마다 근거 / 팀원 결과 간 모순 없음 ; 커밋 = 묶음·메시지 규칙·비밀 없음 ; 승인 = 등급·지적이 칸별 결과·maxGrade·실기기 미검증 상한과 일치', 'admin 직전 / commit 직후 / 재평가 직후 / 승인 직후·응답 앞 필수'],
+  4: ['파일을 바꾼 에이전트의 산출물(하네스 파일 포함) — 브리프 AC-n 충족 / 하네스 변경 = 규칙 정합·우회·회귀 없음·selftest 근거 / 비밀 없음', '파일 변경 에이전트 종료 때 SubagentStop 훅 자동'],
 }
 const codexSlot = n => ({ ...CODEX, role: `Codex${n} 검수 대상 : ${CODEX_SLOTS[n][0]} (외부 판정자 Codex read-only 교차 검수)`, criteria: `${CODEX.criteria} · 호출 : ${CODEX_SLOTS[n][1]} · 원장 id 접두 c${n}-` })
-/** 마스터 설계 트리. 원문의 '1.1.5.3.1 Codex6'(현 CDX-총괄 검수)은 번호 오기로 보고 1.1.5.2.1 로 정규화 · 라벨 단축 2026-11-09 마스터 지시(서브에이전트N → SA-, CodexN → CDX-) */
+/** 마스터 설계 트리 · 라벨 단축 2026-11-09 마스터 지시(서브에이전트N → SA-, CodexN → CDX-) · 2026-11-10 개정 : CDX 칸은 CDX-루프 하나(프롬프트·컨텍스트·하네스·그래프·총괄 CDX 칸 폐지) */
 export const SLOTS = [
   { id: '1', parent: null, kind: 'request', label: '마스터 아나킨 요청', role: '요청·needs-input 응답·최종 승인 주체(사람)', criteria: '요청 원문이 정본 — 목표·범위·완료 기준은 아소카가 계약으로 확정', docs: ['60. nodes/마스터.md'] },
   { id: '1.1', parent: '1', kind: 'main', label: '파다완 아소카 접수', role: '요청 접수 → 목표·범위·완료 기준 확정 → 단계 계획대로 전문가 서브에이전트 지명(메인 직접 작업 금지)', criteria: '운영 규칙 0절 — 메인 = 정리·리뷰·승인·회신', docs: ['60. nodes/아소카.md', '10. prompt/anakins_prompt.md'] },
   { id: '1.1.1', parent: '1.1', kind: 'sub', label: 'SA-프롬프트', role: '지시문 한 건의 설계 점검 — 목표·제약·출력 계약', criteria: '10장 지시문 설계 규칙', docs: ['10. prompt/anakins_prompt.md'] },
-  { id: '1.1.1.1', parent: '1.1.1', kind: 'codex', label: 'CDX-프롬프트 검수', ...codexSlot(1) },
   { id: '1.1.2', parent: '1.1', kind: 'sub', label: 'SA-컨텍스트', role: '한 턴에 보는 토큰 전체 점검 — 넣을 것·뺄 것·남길 곳', criteria: '20장 컨텍스트 규칙', docs: ['20. context/anakins_context.md'] },
-  { id: '1.1.2.1', parent: '1.1.2', kind: 'codex', label: 'CDX-컨텍스트 검수', ...codexSlot(2) },
-  { id: '1.1.3', parent: '1.1', kind: 'sub', label: 'SA-하네스', role: '모델 바깥 강제 장치 점검 — 훅·권한·에이전트 정의·격리·관측', criteria: '30장 하네스 규칙', docs: ['30. harnes/anakins_harnes.md'] },
-  { id: '1.1.3.1', parent: '1.1.3', kind: 'codex', label: 'CDX-하네스 검수', ...codexSlot(3) },
+  { id: '1.1.3', parent: '1.1', kind: 'sub', label: 'SA-하네스', role: '모델 바깥 강제 장치 점검 — 훅·권한·에이전트 정의·격리·관측 · 하네스 파일 변경의 Codex 판정 = CDX-루프(c4)에 귀속', criteria: '30장 하네스 규칙', docs: ['30. harnes/anakins_harnes.md'] },
   { id: '1.1.4', parent: '1.1', kind: 'sub', label: 'SA-루프', role: '되돌아가는 엣지 점검 — build → Codex(SubagentStop 훅 자동) → 회송 → 승인', criteria: '40장 A절 완료 기준 · C절 금지와 멈춤', docs: ['40. loop/anakins_loop.md', '40. loop/codex_procedure.md'] },
   { id: '1.1.4.1', parent: '1.1.4', kind: 'codex', label: 'CDX-루프 검수', ...codexSlot(4) },
   { id: '1.1.5', parent: '1.1', kind: 'sub', label: 'SA-그래프', role: '노드·엣지·파일 계약으로 작업 흐름 전체 점검 — 병렬·직렬·합류', criteria: '50장 A절 그래프 설계 체크리스트 10', docs: ['50. graph/anakins_graph.md'] },
-  { id: '1.1.5.1', parent: '1.1.5', kind: 'codex', label: 'CDX-그래프 검수', ...codexSlot(5) },
-  { id: '1.1.5.2', parent: '1.1.5', kind: 'sub', label: '서브에이전트6 : 요청건을 obsidian 그래프로 생성해 가시적으로 모니터링', role: '요청건을 그래프 페이지·Obsidian md 노드로 생성해 모니터링(scripts/request-graph.mjs)', criteria: '50장 그래프 규칙 — 기록에 있는 사실만 표시, 추정 연결은 배지로 구분', docs: ['50. graph/anakins_graph.md'] },
-  { id: '1.1.5.2.1', parent: '1.1.5.2', kind: 'codex', label: 'CDX-총괄 검수', ...codexSlot(6) },
-  { id: '1.2', parent: '1', kind: 'approve', label: '파다완 아소카 승인', role: '턴 묶음 판정(Stop 훅 turn-gate.mjs — 보이는 CDX 칸 중 Y 아닌 칸을 Codex 1회로) 뒤 아소카가 직접 종료 승인 — 팀장(teamanakin-admin) 판정은 있으면 근거로 함께', criteria: "메인 응답 끝 '종료 승인 : <승인|보류> — <근거>' 줄 = 완료(없으면 Stop 훅이 차단, 연속 차단 3회 상한 = 승인 강제 실패) · 팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)", docs: ['60. nodes/아소카.md', '60. nodes/teamanakin-admin.md'] },
+  { id: '1.2', parent: '1', kind: 'approve', label: '파다완 아소카 승인', role: '아소카가 직접 종료 승인 — 팀장(teamanakin-admin) 판정은 근거로 함께', criteria: "메인 응답 끝 '종료 승인 : <승인|보류> — <근거>' 줄 = 완료(기록용 — Stop 훅 turn-gate.mjs 는 적기만 하고 막지 않음), 팀장 판정은 근거로 · 팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)", docs: ['60. nodes/아소카.md', '60. nodes/teamanakin-admin.md'] },
 ]
 
 // ── 순수 함수(시험 대상 — fmtSpan·roundSummary 는 화면 스크립트에도 원문 그대로 인라인되므로 바깥 이름 참조 금지) ──
@@ -183,7 +162,7 @@ export function roundSummary(rows, now) {
  */
 export function loopRounds(loop, a, b) {
   const ev = [...loop.events].sort((x, y) => ms(x.at) - ms(y.at)), start0 = loop.startedAt ? ms(loop.startedAt) : null
-  const rows = ev.map((e, i) => ({ label: e.verdict === 'BLOCKED' ? `${e.iter}회차 BLOCKED` : `${e.iter}회차`, t0: i ? ms(ev[i - 1].at) : start0, t1: ms(e.at), run: false, blocked: e.verdict === 'BLOCKED', verdict: e.verdict, iter: e.iter, reason: e.reason, open: e.open, state: e.verdict + (e.open != null ? ` · 열린 결함 ${e.open}` : '') }))
+  const rows = ev.map((e, i) => ({ label: e.verdict === 'BLOCKED' ? `${e.iter}회차 BLOCKED` : `${e.iter}회차`, t0: i ? ms(ev[i - 1].at) : start0, t1: ms(e.at), run: false, blocked: e.verdict === 'BLOCKED', verdict: e.verdict, iter: e.iter, reason: e.reason, open: e.open, ...(e.waived ? { waived: e.waived } : {}), state: e.waived ? `PASS(면제) · 면제 ${e.waived.n}건 · ${e.waived.by}` : e.verdict + (e.open != null ? ` · 열린 결함 ${e.open}` : '') }))
   const nextIter = Math.max(0, ...ev.filter(e => e.verdict !== 'BLOCKED').map(e => e.iter)) + 1
   if (loop.running) rows.push({ label: `${nextIter}회차`, iter: nextIter, t0: ev.length ? ms(ev.at(-1).at) : start0 ?? loop.lockAt, t1: null, run: true, verdict: 'RUNNING', state: '진행(ledger.lock)' })
   return rows.filter(r => r.run ? b >= (r.t0 ?? 0) : r.t1 >= a && r.t1 <= b)
@@ -260,29 +239,13 @@ function agentNode(ag, id, parent, turnRunning, now) {
   const rounds = (ag.rounds || []).length >= 2 || base ? [{ name: '재작업 회차(같은 에이전트에 과제 재전달)', re: true, cap: LOOP_CAP, base, rows: ag.rounds.map((r, i) => ({ label: `${base + i + 1}회차`, t0: r.t0, t1: r.t1, run: r.run, state: (r.run ? '진행' : r.t1 != null ? '완료' : '—') + (r.errors ? ` · 도구 오류 ${r.errors}` : '') })) }] : undefined
   const cost = ag.cont ? '비용 — 첫 요청 노드에 합산(지속 에이전트)' : ag.cost_usd != null ? `비용 $${ag.cost_usd.toFixed(2)} (API 환산${ag.roundsTotal > (ag.rounds || []).length ? ' · 이어받은 요청 몫 포함' : ''})` : '비용 — (턴 종료 후 기록)'
   const n = {
-    id, parent, label: ag.type || ag.name || '에이전트', slot: null, ...sty(k), errN: ag.errors || 0, ...(ag.agent_id ? { aid: String(ag.agent_id) } : {}), ...(ag.report ? { report: ag.report } : {}), ...(typeof ag.harness === 'boolean' ? { harness: ag.harness } : {}), t0: ms(ag.ts_start), t1: ag.ts_end ? ms(ag.ts_end) : null, run,
+    id, parent, label: ag.type || ag.name || '에이전트', slot: null, ...sty(k), errN: ag.errors || 0, ...(ag.agent_id ? { aid: String(ag.agent_id) } : {}), ...(ag.report ? { report: ag.report } : {}), ...(typeof ag.harness === 'boolean' ? { harness: ag.harness } : {}), ...(typeof ag.wrote === 'boolean' ? { wrote: ag.wrote } : {}), t0: ms(ag.ts_start), t1: ag.ts_end ? ms(ag.ts_end) : null, run,
     statusLabel: k === 'error' ? '오류(종료 기록 없음)' : STATUS_STYLE[k].label + (ag.errors ? `(도구 오류 ${ag.errors}회)` : ''),
     lines: [`모델 ${String(ag.model || '-').replace(/^claude-/, '')}`, cost, ...(ag.errors ? [`도구 오류 ${ag.errors}회 기록`] : []), ...(ag.name && ag.name !== ag.type ? [`이름 ${ag.name}`] : []), ...(base ? [`지속 에이전트 이어받음 — 앞 요청 ${base}회차 뒤`] : [])],
     ...(rounds ? { rounds } : {}),
   }
   const alerts = nodeAlerts(n, ag.errors || 0, now)
   return alerts.length ? { ...n, alerts } : n
-}
-
-/**
- * 생성기 실행 기록(runs.jsonl) → 1.1.5.2 슬롯 상태. 창 = [a, b + RUN_GRACE_MS], live 실행만 셈(설계도판 재생성은 요청 모니터링이 아님)
- *   창 안 실행 있음 = 완료(진행 중 턴이면 진행) / 없음 + 턴 시작이 로그 첫 기록 이전 = 기록 이전(미수행으로 세지 않음) / 그 밖 = 미수행
- */
-function runSlot(runs, a, b, running, owner) {
-  const rs = runs.map(r => ({ ...r, t: ms(r.ts) })).filter(r => r.t != null).sort((x, y) => x.t - y.t)
-  const win = rs.filter(r => r.mode === 'live' && r.t >= a && r.t <= b + RUN_GRACE_MS), who = `담당 ${owner} — 생성기 실행 기록 runs.jsonl 기준`
-  if (win.length) {
-    const last = win.at(-1), by = {}; for (const r of win) by[r.trigger] = (by[r.trigger] || 0) + 1
-    const kst = new Date(last.t).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(5)
-    return { ...sty(running ? 'running' : 'done'), lines: [who, `생성기 실행 ${win.length}회(${Object.entries(by).map(([k, n]) => `${k} ${n}`).join(' · ')})`, `마지막 실행 ${kst} · 트리거 ${last.trigger}`] }
-  }
-  if (!rs.length || a < rs[0].t) return { ...sty('unassigned'), statusLabel: '기록 이전', lines: [who, '실행 기록 시작 이전 턴 — 판정 안 함(미수행으로 세지 않음)'] }
-  return { ...sty('missing'), lines: [who, '이 턴 시간창 안 생성기 실행 기록 없음'] }
 }
 
 /** 원장 묶음 id : 끝 '-p<N>'(codex-gate 가 프롬프트 상한 초과 때 파일 묶음으로 나눈 원장)을 뗀 기준 id */
@@ -304,8 +267,9 @@ export function mergeParts(list) {
       const fin = ps.map(p => { const rs = p.rows.filter(r => r.iter === it); return rs.filter(r => !r.blocked).at(-1) || rs.at(-1) || null })
       const has = fin.filter(Boolean), v = fin.some(r => r?.run) ? 'RUNNING' : has.length === ps.length && has.every(r => r.verdict === 'PASS') ? 'PASS' : has.some(r => r.verdict === 'FAIL') ? 'FAIL' : 'BLOCKED'
       const t0s = has.map(r => r.t0).filter(t => t != null), t1s = has.map(r => r.t1).filter(t => t != null), open = has.reduce((n, r) => n + (r.open || 0), 0)
-      const why = fin.map((r, i) => `${ps[i].id.slice(b.length + 1)} ${r ? (r.run ? '진행' : r.verdict) : '판정 없음'}`).join(' · ')
-      return { label: v === 'BLOCKED' ? `${it}회차 BLOCKED` : `${it}회차`, iter: it, t0: t0s.length ? Math.min(...t0s) : null, t1: v === 'RUNNING' ? null : t1s.length ? Math.max(...t1s) : null, run: v === 'RUNNING', blocked: v === 'BLOCKED', verdict: v, open, reason: v === 'BLOCKED' ? `묶음 AND — ${why}` : undefined, state: `${v} · 묶음 AND(${why})` }
+      const why = fin.map((r, i) => `${ps[i].id.slice(b.length + 1)} ${r ? (r.run ? '진행' : r.verdict + (r.waived ? '(면제)' : '')) : '판정 없음'}`).join(' · ')
+      const wv = v === 'PASS' ? has.filter(r => r.waived).map(r => r.waived) : [], waived = wv.length ? { n: wv.reduce((n, x) => n + x.n, 0), by: [...new Set(wv.map(x => x.by))].join(' · ') } : null
+      return { label: v === 'BLOCKED' ? `${it}회차 BLOCKED` : `${it}회차`, iter: it, t0: t0s.length ? Math.min(...t0s) : null, t1: v === 'RUNNING' ? null : t1s.length ? Math.max(...t1s) : null, run: v === 'RUNNING', blocked: v === 'BLOCKED', verdict: v, open, ...(waived ? { waived } : {}), reason: v === 'BLOCKED' ? `묶음 AND — ${why}` : undefined, state: `${v} · 묶음 AND(${why})` }
     })
     out.push({ id: b, parts: ps.map(p => p.id), ...(ps.some(p => p.est) ? { est: true } : {}), rows })
   }
@@ -398,17 +362,19 @@ export function agentChips(kids, now) {
  * CDX 칸 안 판정 회차 줄(2026-11-10 마스터 "여러 차례 진행된 검수는 CDX 박스 내에서") — 원장이 2개 이상이면 원장별 머리 줄
  *   회차마다 '<k>회 Y|N|BLOCKED|진행 HH:mm · 결함 n|사유' (N = ✖ 빨강, BLOCKED = ⚠ 주황), 끝 줄 '→ k회 만에 완료 · 되돌림 n회'
  */
+/** 면제 해소 글자 : 마지막 판정 중 면제 해소가 있으면 ' · Y(면제) — 면제 N건 · 승인자' (PASS 와 구별) */
+const waivedTxt = rs => { const w = rs.filter(r => r.waived).map(r => r.waived); return w.length ? ` · Y(면제) — 면제 ${w.reduce((n, x) => n + x.n, 0)}건 · ${[...new Set(w.map(x => x.by))].join(' · ')}` : '' }
 export function codexChips(lr) {
   const out = []
   for (const x of lr) {
     if (lr.length > 1 || x.parts) out.push({ txt: `원장 ${x.id}${x.parts ? ` (묶음 ${x.parts.length}개 AND)` : ''}`, tone: 'head' })
     for (const r of x.rows) {
       const v = r.run ? '진행' : r.verdict === 'PASS' ? 'Y' : r.verdict === 'FAIL' ? 'N' : 'BLOCKED', at = r.run ? r.t0 : r.t1
-      const why = v === 'N' && r.open ? ` · 결함 ${r.open}` : v === 'BLOCKED' && r.reason ? ` · ${r.reason}` : ''   // 묶음 AND 행의 BLOCKED 사유 = 묶음별 판정
-      out.push({ txt: `${v === 'N' ? '✖ ' : v === 'BLOCKED' ? '⚠ ' : ''}${r.iter}회 ${v}${at != null ? ' ' + kstOf(at).slice(11, 16) : ''}${why}`, tone: v === 'N' ? 'bad' : v === 'BLOCKED' ? 'warn' : v === '진행' ? 'run' : 'ok' })
+      const why = v === 'N' && r.open ? ` · 결함 ${r.open}` : v === 'BLOCKED' && r.reason ? ` · ${r.reason}` : r.waived ? ` · 면제 ${r.waived.n}건 · ${r.waived.by}` : ''   // 묶음 AND 행의 BLOCKED 사유 = 묶음별 판정
+      out.push({ txt: `${v === 'N' ? '✖ ' : v === 'BLOCKED' ? '⚠ ' : ''}${r.iter}회 ${v}${r.waived ? '(면제)' : ''}${at != null ? ' ' + kstOf(at).slice(11, 16) : ''}${why}`, tone: v === 'N' ? 'bad' : v === 'BLOCKED' ? 'warn' : v === '진행' ? 'run' : 'ok' })
     }
     const last = x.rows.filter(r => !r.run).at(-1), fails = x.rows.filter(r => r.verdict === 'FAIL').length
-    const end = [...(last?.verdict === 'PASS' ? [`→ ${last.iter}회 만에 완료`] : []), ...(fails ? [`되돌림 ${fails}회`] : [])]
+    const end = [...(last?.verdict === 'PASS' ? [`→ ${last.iter}회 만에 완료${last.waived ? '(면제)' : ''}`] : []), ...(fails ? [`되돌림 ${fails}회`] : [])]
     if (end.length) out.push({ txt: end.join(' · '), tone: '' })
   }
   return out
@@ -421,7 +387,10 @@ export function codexChips(lr) {
  *   에이전트 = SLOT_MAP agents 대응 칸, 없으면 1.1(접수), teamanakin-admin = 1.2(승인), 같은 type 2회 이상 = 그 칸 '반복 실행' 회차표
  *   엔지니어링 슬롯 = 대응(에이전트·훅·루프) 중 진행 있으면 진행, 있으면 완료, 없으면 미수행 / Codex 슬롯 = 대응 루프 회차표·칸 안 회차 줄, 상태 = 마지막 판정
  */
-export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Date.now(), runs = [] } = {}) {
+/** 집계 대상 원장(2026-11-10 개정) : c4(또는 접두 없는 과거 원장) + 턴 묶음 아님 + 비대상(NO_GATE) 에이전트 원장 아님 — 과거 c1·c2·c3·c5·c6·c*-turn-* 원장은 디스크에 두고 집계만 뺀다 */
+export const isLoopLedger = l => { const b = partBase(l.id); return !TURN_ID_RE.test(b) && (codexNo(b) ?? 4) === 4 && !NO_GATE.has(l.agentType) }
+export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Date.now() } = {}) {
+  loops = loops.filter(isLoopLedger)
   const ts = turnStatus(t), a = ms(t.ts_req), turnRunning = ts.key === 'running'
   // 시작 시각순(2026-11-09 그래프 분석 ① : 로거 ts_start = '+09:00' 지역 시각, 생성기 = 'Z' — 문자열 비교면 회차 번호가 시간순이 아니었음 → 숫자 비교, 시각 없음은 뒤로)
   const tKey = ag => ms(ag.ts_start) ?? Number.MAX_SAFE_INTEGER
@@ -432,11 +401,10 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   const b = anyRun ? now : t.ts_res ? ms(t.ts_res) : Math.max(a, ...raw.map(x => ms(x.ts_end) || 0))
   // 루프 전용 창 : 이전 턴에 시작된 백그라운드 워크플로가 재개 턴에 귀속되면 에이전트가 요청 시각보다 앞서 돌므로 귀속 에이전트 시작·종료까지 넓힌다
   const la = Math.min(a, ...raw.map(x => ms(x.ts_start) ?? a)), lb = Math.max(b, ...raw.map(x => ms(x.ts_end) || 0))
-  // 원장별 시간창(2026-11-10 c5-turn-f7dc16 D-001 · c4-codex-ac436f-p1 D-001·D-002) :
-  //   턴 묶음 원장(c<N>-turn-<요청키>) = 이 요청 키와 정확히 같을 때만, 요청 시각 ~ 끝 없음(Stop 훅 판정은 응답 뒤라 창 끝을 두지 않음) — 다른 세션·요청 키 = 연결 안 함
+  // 원장별 시간창(2026-11-10 c4-codex-ac436f-p1 D-001·D-002) :
   //   다른 실행 대상 접미(-a<16진 5> 인데 이 요청 귀속 에이전트가 아님) = 요청 창 [a, lb] 만 — 넓힌 창(la, 재개 턴 A6·C-5)은 귀속 에이전트 원장·접미 없는 원장에만
-  const myKey = turnKey(t.session_id, a), mine6 = new Set(raw.map(x => String(x.agent_id || '').slice(0, 6)).filter(Boolean))
-  const rowsOf = l => { const id = partBase(l.id); if (TURN_ID_RE.test(id)) return id.endsWith(`-turn-${myKey}`) ? loopRounds(l, a, Infinity) : []; const sfx = /-(a[0-9a-f]{5})$/.exec(id)?.[1]; return loopRounds(l, sfx && !mine6.has(sfx) ? a : la, lb) }
+  const mine6 = new Set(raw.map(x => String(x.agent_id || '').slice(0, 6)).filter(Boolean))
+  const rowsOf = l => { const id = partBase(l.id); const sfx = /-(a[0-9a-f]{5})$/.exec(id)?.[1]; return loopRounds(l, sfx && !mine6.has(sfx) ? a : la, lb) }
   const nodes = SLOTS.map(s => ({ id: s.id, parent: s.parent, label: s.label, slot: s.id, ...sty('unassigned'), lines: [], t0: null, t1: null, run: false }))
   const byId = Object.fromEntries(nodes.map(n => [n.id, n])), kind = Object.fromEntries(SLOTS.map(s => [s.id, s.kind]))
   // Codex 칸 원장 먼저(루프 반복 판정·짝 표시에 씀)
@@ -454,10 +422,12 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   //   글 = '<CDX 칸> N k회(<회차>회차 결함 n …) → 재작업 대기 | 재판정 진행 | <회차>회차 Y | 보류(사유)' — 마지막 기록 기준
   const backs = SLOTS.filter(s => s.kind === 'codex').flatMap(s => { const xs = (cl[s.id] || []).filter(x => x.rows.some(r => r.verdict === 'FAIL')); return xs.map(x => {
     const ns = x.rows.filter(r => r.verdict === 'FAIL'), last = x.rows.at(-1)
-    const next = last.run ? '재판정 진행' : last.verdict === 'PASS' ? `${last.iter}회차 Y` : last.verdict === 'FAIL' ? '재작업 대기' : `보류(${reasonTxt(last.reason)})`
+    const next = last.run ? '재판정 진행' : last.verdict === 'PASS' ? `${last.iter}회차 Y${last.waived ? '(면제)' : ''}` : last.verdict === 'FAIL' ? '재작업 대기' : `보류(${reasonTxt(last.reason)})`
     return { s, x, txt: `${s.label.replace(/ 검수$/, '')}${xs.length > 1 ? `(${x.id})` : ''} N ${ns.length}회(${ns.map(r => `${r.iter}회차${r.open != null ? ` 결함 ${r.open}` : ''}`).join(' · ')}) → ${next}` }
   }) })
-  const repeats = [...repAg, ...repLd.map(y => y.txt)], loopOn = repeats.length > 0 || backs.length > 0
+  // 2026-11-10 개정 : CDX-루프가 유일한 판정 칸 — c4 판정 1회 이상(judged) 또는 파일 변경 실행 1건 이상(target)이면 루프 쌍 표시(1회 Y 로 끝난 산출 턴·판정 누락 턴도 보이게)
+  const judged = cl['1.1.4.1'].length > 0, target = agents.some(ag => ag.wrote === true)
+  const repeats = [...repAg, ...repLd.map(y => y.txt)], loopOn = repeats.length > 0 || backs.length > 0 || judged || target
   // 에이전트 → 칸 : admin = 승인, SLOT_MAP agents 대응 칸(build 는 루프 쌍이 보일 때만 SA-루프 — 반복 없으면 2 접수), 나머지 = 2 접수(1.1)
   const slotOf = ag => ag.type === ADMIN_TYPE ? '1.2' : Object.keys(slotMap).find(id => kind[id] === 'sub' && (slotMap[id].agents || []).includes(ag.type) && (slotMap[id].show !== 'loop' || loopOn)) || '1.1'
   const all = agents.map((ag, i) => { const p = slotOf(ag); return agentNode(ag, `${p}.a${i + 1}`, p, turnRunning, now) })
@@ -476,7 +446,6 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   const prompts = (t.prompts || []).length ? t.prompts : [{ t: a, text: t.req_head || '' }]   // 세션 기록에서 읽은 요청 원문(같은 턴 추가 지시 포함), 없으면 work-history 요청문 앞부분
   for (const s of SLOTS.filter(s => s.kind === 'sub')) {
     const m = slotMap[s.id]; if (!m) continue
-    if (m.source === 'runs.jsonl') { Object.assign(byId[s.id], runSlot(runs, a, b, anyRun, m.owner)); continue }
     const kids = kidsOf(s.id), ks = spanOf(kids), kRun = kids.some(n => n.run), n = byId[s.id]
     if (m.show === 'prompt') {
       // 2026-11-10 마스터 C-10 "프롬프트를 원본 그대로를 축약" : 요청 원문(같은 턴 추가 지시 포함, 시각순)을 주입문·이미지 표기·system-reminder 제거 + 공백 정리 후 글자 수만 자름(새 문장 없음)
@@ -501,90 +470,86 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
       if (!useN) { Object.assign(n, sty('missing'), { lines: ['도구 사용·훅 주입 0건 — 쌍 숨김'] }); continue }
       const totTxt = Object.entries(tot).sort((x, y) => y[1] - x[1]).map(([k, v]) => `${k} ${v}`).join(' · ')
       Object.assign(n, ev.length ? { t0: ev[0].t, t1: ev.at(-1).t, run: anyRun } : { t0: null, t1: null, run: false, tmNote: '도구 시각 미기록(집계만)' }, anyRun && ev.length ? sty('running') : sty('done'), {
-        chips: [{ txt: totTxt, tone: 'head' }, ...(hz.length ? [{ txt: `⚙ 하네스 파일 변경 ${hz.length}건`, tone: 'warn' }] : [])], toolLog: tlog,
-        lines: [`도구·훅 사용 ${useN}건 — ${totTxt}`, ...(hz.length ? [`하네스 파일 변경(HARNESS_RE) 실행 ${hz.length}건 — ${hz.map(x => x.label).join(' · ')}`] : [])] })
+        chips: [{ txt: totTxt, tone: 'head' }, ...(hz.length ? [{ txt: `⚙ 하네스 파일 변경 ${hz.length}건 → CDX-루프 판정`, tone: 'warn' }] : [])], toolLog: tlog,
+        lines: [`도구·훅 사용 ${useN}건 — ${totTxt}`, ...(hz.length ? [`하네스 파일 변경(HARNESS_RE) 실행 ${hz.length}건 — ${hz.map(x => x.label).join(' · ')}`, 'Codex 판정은 CDX-루프(c4)에 귀속'] : [])] })
     } else if (m.show === 'loop') {
-      if (!loopOn) { Object.assign(n, sty('missing'), { lines: ['반복·되돌림 0건 — 쌍 숨김'] }); continue }
-      const lx = [...repLd, ...backs].map(y => y.x), sp = spanOf([...kids, ...lx.flatMap(x => x.rows)]), run = kRun || lx.some(x => x.rows.some(r => r.run))
+      if (!loopOn) { Object.assign(n, sty('missing'), { lines: ['판정·파일 변경·반복·되돌림 0건 — 쌍 숨김'] }); continue }
+      const lx = cl['1.1.4.1'], jN = lx.reduce((k, x) => k + x.rows.filter(r => !r.run).length, 0), sp = spanOf([...kids, ...lx.flatMap(x => x.rows)]), run = kRun || lx.some(x => x.rows.some(r => r.run))
       Object.assign(n, sp, run ? sty('running') : sty('done'), {
-        chips: [...backs.map(y => ({ txt: y.txt, tone: 'bad' })), ...(repeats.length ? [{ txt: repeats.join(' · '), tone: '' }] : [])],
-        lines: [...backs.map(y => `되돌림 — ${y.txt}`), ...(repeats.length ? [`반복 — ${repeats.join(' · ')}`] : [])] })
+        chips: [...backs.map(y => ({ txt: y.txt, tone: 'bad' })), ...(repeats.length ? [{ txt: repeats.join(' · '), tone: '' }] : []), ...(backs.length || repeats.length ? [] : [{ txt: judged ? `Codex 판정 ${jN}건 — 되돌림 0` : '파일 변경 실행 — 판정 전', tone: '' }])],
+        lines: [...backs.map(y => `되돌림 — ${y.txt}`), ...(repeats.length ? [`반복 — ${repeats.join(' · ')}`] : []), ...(backs.length || repeats.length ? [] : [judged ? `Codex 판정 ${jN}건 — 되돌림 0` : '파일 변경 실행 — 판정 전'])] })
     } else if (m.show === 'graph') {
       if (kids.length) Object.assign(n, ks, kRun ? sty('running') : sty('done'), { lines: [`에이전트 ${kids.length}건`] })
       else Object.assign(n, sty('estimated'), { statusLabel: '생성기 자동 갱신(Stop 훅)', tmNote: '생성기 자동 갱신(Stop 훅)', lines: ['graph 에이전트 실행 없음 — 생성기 자동 갱신(Stop 훅·SubagentStart/Stop 훅)'] })
     }
   }
-  // Codex 슬롯 = 검증 결과(2026-11-09 마스터 "Codex 목적은 루프가 아니라 검증 — Y/N", "몇 회 만에 검증 완료가 중요") : 마지막 판정 기준
-  //   PASS = 검증 Y · N회 만에 완료 / FAIL = 검증 N · k회차 진행 (k/5) / BLOCKED = 검증 보류(사유) · k회차 / 원장 없음 = 검증 누락(⚠ — 경로는 이어 감, 2026-11-10)
+  // CDX-루프(유일한 Codex 칸, 2026-11-10 개정) = 검증 결과 : 원장별 마지막 판정의 AND — 전부 PASS = Y · 하나라도 FAIL = N · 진행 중 원장 = 진행 · 그 밖 = 보류
+  //   원장 없음 : 파일 변경 실행 없음 = 판정 대상 없음(숨김) · 있음 + 진행 중 요청 = 검증 대기 · 있음 + 끝난 요청 = 검증 누락(경보)
   //   회차 = 원장 iter 번호(BLOCKED 는 회차 미소모), verdict = { yn, fails } — N 되돌림 화살표 근거(buildPath), chips = 칸 안 회차 줄(codexChips)
   for (const s of SLOTS.filter(s => s.kind === 'codex')) {
     const m = slotMap[s.id]; if (!m?.loops && !m?.codex) continue
-    const lr = cl[s.id]
+    const lr = cl[s.id], hzN = all.filter(n => n.harness === true).length, hzLine = hzN ? [`하네스 파일 변경 ${hzN}건 포함(SA-하네스 귀속)`] : []
     if (!lr.length) {
-      // 부모 실행인데 판정 원장 없음 = 검증 누락(빨강 경보). 부모 미실행 칸은 아래 가지치기로 숨김. 진행 중 요청(anyRun)이면 아직 판정 전 = '검증 대기'(경보 아님)
-      const ran = !IDLE.has(byId[s.parent].status)
-      const st = !ran ? { ...sty('notrun'), statusLabel: '검증 미수행' } : anyRun ? { status: 'notrun', statusLabel: '검증 대기 — 판정 전', verdict: { yn: null, fails: 0, wait: true } } : { status: 'error', statusLabel: '검증 누락', alerts: ['검증 누락'], verdict: { yn: null, fails: 0, miss: true } }
-      Object.assign(byId[s.id], st, { lines: ['이 턴 시간창 안 Codex 판정 기록 없음'] }); continue
+      const st = !target ? { ...sty('notrun'), statusLabel: '판정 대상 없음' } : anyRun ? { status: 'notrun', statusLabel: '검증 대기 — 판정 전', verdict: { yn: null, fails: 0, wait: true } } : { status: 'error', statusLabel: '검증 누락', alerts: ['검증 누락'], verdict: { yn: null, fails: 0, miss: true } }
+      Object.assign(byId[s.id], st, { lines: [target ? '파일 변경 실행이 있는데 이 턴 시간창 안 Codex 판정 기록 없음' : '파일 변경 실행 없음 — 판정 대상 없음', ...hzLine] }); continue
     }
-    const rows = lr.flatMap(x => x.rows), last = rows.slice().sort((x, y) => (x.run ? Infinity : x.t1) - (y.run ? Infinity : y.t1)).at(-1)
-    const k = last.iter, fails = rows.filter(r => r.verdict === 'FAIL').length
-    const v = last.run ? { ...sty('running'), statusLabel: `검증 진행 · ${k}회차 (${k}/${LOOP_CAP})`, yn: null }
-      : last.verdict === 'PASS' ? { status: 'done', statusLabel: `검증 Y · ${k}회 만에 완료`, yn: 'Y', yAt: last.t1 }
-        : last.verdict === 'BLOCKED' ? { status: 'blocked', statusLabel: `검증 보류(${reasonTxt(last.reason)}) · ${k}회차`, yn: null }
-          : { status: 'error', statusLabel: `검증 N · ${k}회차 진행 (${k}/${LOOP_CAP})`, yn: 'N' }
-    Object.assign(byId[s.id], spanOf(rows), { status: v.status, statusLabel: v.statusLabel }, {
-      badge: lr.some(x => x.est) ? EST_BADGE : '매핑 연결', verdict: { yn: v.yn, fails, ...(v.yAt != null ? { yAt: v.yAt } : {}) },
-      lines: [...lr.map(x => `원장 ${x.id}${x.parts ? ` = 묶음 ${x.parts.join(' · ')} AND(전부 PASS 일 때만 Y)` : ''} · 판정 ${x.rows.length}건`), ...(fails ? [`N 되돌림 ${fails}회 — 검증 대상 ${byId[s.parent].label} 재작업`] : [])],
+    const rows = lr.flatMap(x => x.rows), fails = rows.filter(r => r.verdict === 'FAIL').length
+    const lasts = lr.map(x => x.rows.slice().sort((p, q) => (p.run ? Infinity : p.t1) - (q.run ? Infinity : q.t1)).at(-1)), last = lasts.slice().sort((p, q) => (p.run ? Infinity : p.t1) - (q.run ? Infinity : q.t1)).at(-1)
+    const k = last.iter, many = lr.length > 1, nN = lasts.filter(r => !r.run && r.verdict === 'FAIL').length
+    const v = lasts.some(r => r.run) ? { ...sty('running'), statusLabel: `검증 진행 · ${k}회차 (${k}/${LOOP_CAP})`, yn: null }
+      : lasts.every(r => r.verdict === 'PASS') ? { status: 'done', statusLabel: (many ? `검증 Y · 원장 ${lr.length}개 전부 Y` : `검증 Y · ${k}회 만에 완료`) + waivedTxt(lasts), yn: 'Y', yAt: Math.max(...lasts.map(r => r.t1)) }
+        : nN ? { status: 'error', statusLabel: many ? `검증 N · 원장 ${nN}/${lr.length} N` : `검증 N · ${k}회차 진행 (${k}/${LOOP_CAP})`, yn: 'N' }
+          : { status: 'blocked', statusLabel: `검증 보류(${reasonTxt(lasts.find(r => r.verdict === 'BLOCKED')?.reason)}) · ${k}회차`, yn: null }
+    // 실행별 원장 대조(2026-11-10 c4-build-loop-only-aef4b3-p3 D-001 — A 원장 PASS 가 B 원장 누락을 Y 로 덮음) : 파일 변경 실행(wrote)마다 자기 접미(-<agentId 앞 6자>) c4 원장이 있어야 함
+    //   접미 없는 과거 원장 = 파일 변경 실행이 하나뿐일 때만 그 실행 몫 · agent id 없는 실행 = 대조 불가(건너뜀). 누락 있으면 끝난 요청 = 경보 '검증 누락'(N 은 유지), 진행 중 요청의 Y = 대기
+    const sfx = new Set(lr.map(x => /-(a[0-9a-f]{5})$/.exec(x.id)?.[1]).filter(Boolean)), bare = lr.some(x => !/-a[0-9a-f]{5}$/.test(x.id)), wr = agents.filter(ag => ag.wrote === true)
+    const unc = wr.filter(ag => { const k = String(ag.agent_id || '').slice(0, 6); return k && !sfx.has(k) && !(bare && wr.length === 1) })
+    const uncLine = unc.length ? [`원장 없는 파일 변경 실행 ${unc.length}건 — ${unc.map(ag => `${ag.type || '에이전트'}(${String(ag.agent_id).slice(0, 6)}${ag.wroteEst ? ' · 추정' : ''})`).join(' · ')}`] : []
+    let vd = { yn: v.yn, fails, ...(v.yAt != null ? { yAt: v.yAt } : {}) }, missAl = null
+    if (unc.length && v.status !== 'running' && v.yn !== 'N') {
+      if (anyRun) { if (v.yn === 'Y') { Object.assign(v, { status: 'notrun', statusLabel: '검증 대기 — 판정 전' }); vd = { yn: null, fails, wait: true } } }
+      else { Object.assign(v, { status: 'error', statusLabel: '검증 누락' }); vd = { yn: null, fails, miss: true } }
+    }
+    if (unc.length && !anyRun) missAl = { alerts: ['검증 누락'] }
+    Object.assign(byId[s.id], spanOf(rows), { status: v.status, statusLabel: v.statusLabel }, missAl || {}, {
+      badge: lr.some(x => x.est) ? EST_BADGE : '매핑 연결', verdict: vd,
+      lines: [...lr.map(x => `원장 ${x.id}${x.parts ? ` = 묶음 ${x.parts.join(' · ')} AND(전부 PASS 일 때만 Y)` : ''} · 판정 ${x.rows.length}건`), ...uncLine, ...(fails ? [`N 되돌림 ${fails}회 — 검증 대상 ${byId[s.parent].label} 재작업`] : []), ...hzLine],
       rounds: lr.map(x => ({ name: `Codex 판정 ${x.id}`, cap: LOOP_CAP, rows: x.rows })), chips: codexChips(lr),
     })
   }
-  // 루프 CDX(자기 원장 없음) : 반복·되돌림 원장들의 최종 판정을 CDX-루프 칸에 요약(C-13 — 판정 없음 = '진행'). 루프 원장이 없으면 진행 중 요청 = 진행, 끝난 요청 = 일반 규칙(검증 누락)
-  const cx = byId['1.1.4.1'], lps = [...new Map([...backs.map(y => [y.x.id, { txt: y.s.label.replace(/ 검수$/, ''), x: y.x }]), ...repLd.map(y => [y.x.id, { txt: y.txt, x: y.x }])]).values()]   // 같은 원장 = 반복 글 우선(뒤 값이 덮음)
-  if (loopOn && !cx.rounds && (lps.length || anyRun)) {
-    const ls = lps.map(y => y.x.rows.filter(r => !r.run).at(-1)), run = !lps.length || lps.some(y => y.x.rows.some(r => r.run))
-    const yn = ls.map(l => l?.verdict === 'PASS' ? 'Y' : l?.verdict === 'FAIL' ? 'N' : null), allY = yn.every(v => v === 'Y'), anyN = yn.includes('N')
-    Object.assign(cx, spanOf(lps.flatMap(y => y.x.rows)), run ? sty('running') : allY ? { status: 'done' } : anyN ? { status: 'error' } : { status: 'blocked' }, {
-      statusLabel: `루프 최종 판정 ${run ? '진행' : allY ? 'Y' : anyN ? 'N' : '보류'}`, alerts: undefined, loopSum: lps.length > 0, verdict: { yn: run ? null : allY ? 'Y' : anyN ? 'N' : null, fails: 0, ...(run ? { wait: true } : {}) },
-      lines: [lps.length ? `반복·되돌림 판정 원장 요약(자기 원장 없음) — ${lps.map(y => `${y.txt}(${y.x.id})`).join(' · ')}` : '루프 원장 판정 전(진행 중 요청)'],
-      chips: lps.length ? lps.map((y, i) => ({ txt: `${y.txt} → ${y.x.rows.at(-1).run ? '진행' : yn[i] ?? '보류'}`, tone: y.x.rows.at(-1).run ? 'run' : yn[i] === 'Y' ? 'ok' : yn[i] === 'N' ? 'bad' : 'warn' })) : [{ txt: '진행', tone: 'run' }],
-    })
-  }
   // 서브에이전트 실행 회차별 Codex 판정(2026-11-09 마스터 "모든 서브에이전트 프로세스는 Codex 승인 OK 후 다음 진행", 정본 40. loop/codex_procedure.md 13절) — 상세·md 글자용(경로는 막지 않음, 2026-11-10)
-  //   단위 = 실행 회차(같은 에이전트 재전달 회차 각각). 회차의 판정 = 대응 칸 원장(CDX_OF — 접두 c<N>-, 접두 없는 과거 원장 = c4)의
+  //   단위 = 실행 회차(같은 에이전트 재전달 회차 각각). 판정 대상 = 파일을 바꾼 실행(wrote) 또는 자기 접미 c4 원장이 창 안에 있는 실행(2026-11-10 개정), 그 밖 = '판정 대상 아님'
+  //   회차의 판정 = c4 원장(접두 없는 과거 원장 포함)의
   //   판정 시각이 [그 회차 종료, 다음 회차 시작) 안인 마지막 판정 — 실행 전 판정·무관 칸 판정은 불인정(c4 iter1 D-001). 판정 없음 = 누락(실행 중·턴 진행 중 마지막이면 대기)
   //   병렬 묶음(c4 iter3 D-003) : 같은 시각(t0 동일) 시작 회차끼리는 서로의 '다음'이 아니고, 각자 판정 창 = [자기 종료, 묶음 뒤 첫 회차(t0 > 묶음 t0) 시작).
   //   대상 연결(c4 iter4 D-004) : 같은 칸이 필요한 실행 2개 이상이 판정 창을 공유하면 원장 id 끝 접미 -<agentId 앞 6자> 가 그 실행인 원장만 인정,
   //     접미 없는 원장은 '검증 보류(대상 불명)'. 대상이 하나뿐인 창 = 칸·시간창 매칭(접미 없어도 인정, 다른 실행 접미 원장은 불인정)
-  //   불변식 : 모든 실행 회차는 Y·N·보류·진행·대기·누락 중 하나(루프 뒤 검사)
+  //   불변식 : 모든 실행 회차는 Y·N·보류·진행·대기·누락·대상 아님 중 하나(루프 뒤 검사). 누락 경보는 CDX-루프 칸에만(실행 단위 경보 없음)
   const judg = mergeParts(loops.map(l => ({ id: l.id, rows: rowsOf(l) }))).flatMap(l => l.rows.map(r => ({ id: l.id, no: codexNo(l.id) ?? 4, t: r.run ? Infinity : r.t1, v: r.run ? 'RUN' : r.verdict }))).sort((x, y) => x.t - y.t)
   const steps = all.flatMap(n => { const g = n.rounds?.find(x => x.re); return (g ? g.rows : [n]).map(r => ({ n, k: g ? r.label : '', t0: r.t0, t1: r.t1, run: !!r.run })) }).sort((x, y) => (x.t0 ?? Infinity) - (y.t0 ?? Infinity))
   const check = { y: 0, miss: 0, viol: 0 }
-  const GATE_TXT = { Y: '검증 Y', N: '검증 N', hold: '검증 보류', unk: '검증 보류(대상 불명)', run: '검증 진행', wait: '검증 대기', miss: '검증 누락' }
+  const GATE_TXT = { Y: '검증 Y', N: '검증 N', hold: '검증 보류', unk: '검증 보류(대상 불명)', run: '검증 진행', wait: '검증 대기', miss: '검증 누락', na: '판정 대상 아님' }
   // 1차 : 회차별 판정 창 [종료, 다음 회차 시작)·필수 칸. 대상 접미 = agent id 앞 6자(이 턴 실행들의 접미만 '대상 지정' 원장으로 봄)
   //   agent id 형식 = 'a' + 16진(실기록 subagents/agent-a0016aab….jsonl) → 마지막 토막이 /^a[0-9a-f]{5}$/ 인데 이 턴 실행이 아니면 다른 대상 접미(foreign = 불인정)
-  //   턴 묶음 원장(c<N>-turn-<요청키>, Stop 훅) = 실행 회차가 아니라 턴 전체 판정 → 'turn'(어느 실행의 판정으로도 쓰지 않음 — CDX 칸에만 반영)
-  const tagOf = new Map(steps.filter(x => x.n.aid).map(x => [x.n.aid.slice(0, 6), x.n])), tag = j => TURN_ID_RE.test(partBase(j.id)) ? 'turn' : [...tagOf.keys()].find(k => j.id.endsWith('-' + k)) ?? (/-a[0-9a-f]{5}$/.test(j.id) ? 'foreign' : null)
+  const tagOf = new Map(steps.filter(x => x.n.aid).map(x => [x.n.aid.slice(0, 6), x.n])), tag = j => [...tagOf.keys()].find(k => j.id.endsWith('-' + k)) ?? (/-a[0-9a-f]{5}$/.test(j.id) ? 'foreign' : null)
   for (const x of steps) {
-    x.nx = x.t0 == null ? undefined : steps.find(y => y.t0 != null && y.t0 > x.t0); x.end = x.nx ? x.nx.t0 : Infinity; x.done = x.run ? null : x.t1 ?? x.t0; x.ok = CDX_OF[x.n.label] || CDX_ANY
-    if (x.n.harness === true) x.ok = { ...x.ok, req: [...new Set([...(x.ok.req || []), 3])], opt: (x.ok.opt || []).filter(no => no !== 3) }   // 하네스 파일 변경 감지 = c3 필수(감지 근거 없으면 기존 opt)
-    x.inWin = x.done == null ? [] : judg.filter(j => j.t >= x.done && j.t < x.end); x.need = [...(x.ok.req || []), ...(x.ok.opt || []).filter(no => x.inWin.some(j => j.no === no))]
-    // 대행(CDX_ANY) 본 칸 필수(c6-gate-rule-total-r2 D-001) : 창 안에 c2·c4 원장이 없으면 c4(산출형) 누락으로 남김 → c3 PASS 만으로 Y 불가
-    if (!CDX_OF[x.n.label] && !x.need.some(no => no === 2 || no === 4)) x.need.unshift(4)
+    x.nx = x.t0 == null ? undefined : steps.find(y => y.t0 != null && y.t0 > x.t0); x.end = x.nx ? x.nx.t0 : Infinity; x.done = x.run ? null : x.t1 ?? x.t0
+    const mine = x.n.aid ? x.n.aid.slice(0, 6) : null
+    x.inWin = x.done == null ? [] : judg.filter(j => j.t >= x.done && j.t < x.end); x.need = x.n.wrote === true || (mine && x.inWin.some(j => tag(j) === mine)) ? [4] : []
     x.lo = x.done ?? x.t0 ?? -Infinity
   }
   const shared = (x, no) => steps.some(y => y !== x && y.n !== x.n && y.need.includes(no) && y.lo < x.end && x.lo < y.end)   // 같은 칸 필요 + 창 겹침(같은 에이전트 재전달 회차는 순차라 제외)
   for (const x of steps) {
-    const n = x.n, ok = x.ok, mine = n.aid ? n.aid.slice(0, 6) : null
+    const n = x.n, mine = n.aid ? n.aid.slice(0, 6) : null
     // 칸별 독립 판정 → AND : 필수 칸마다 그 칸 마지막 판정(대상 규약 적용), 모두 Y 여야 Y. 아니면 N > 보류 > 보류(대상 불명) > 진행 > (판정 없는 칸) 누락·대기 순으로 대표
     const per = x.need.map(no => {
       const w = x.inWin.filter(j => j.no === no), many = shared(x, no), cand = w.filter(j => tag(j) === mine && mine != null || (!many && tag(j) == null))
-      const p = ok.sfx ? cand.filter(j => j.id.endsWith(ok.sfx) || j.id.includes(ok.sfx + '-')) : [], j = (p.length ? p : cand).at(-1)
+      const j = cand.at(-1)
       return { no, v: j ? (j.v === 'PASS' ? 'Y' : j.v === 'FAIL' ? 'N' : j.v === 'BLOCKED' ? 'hold' : 'run') : many && w.some(k => tag(k) == null) ? 'unk' : null }
     })
-    const vs = per.map(p => p.v), st = vs.length && vs.every(v => v === 'Y') ? 'Y' : ['N', 'hold', 'unk', 'run'].find(v => vs.includes(v)) || (x.run || (!x.nx && anyRun) ? 'wait' : 'miss')
+    const vs = per.map(p => p.v), st = !per.length ? 'na' : vs.every(v => v === 'Y') ? 'Y' : ['N', 'hold', 'unk', 'run'].find(v => vs.includes(v)) || (x.run || (!x.nx && anyRun) ? 'wait' : 'miss')
     const brk = per.length > 1 ? ` (${per.map(p => `c${p.no} ${p.v ? GATE_TXT[p.v].replace('검증 ', '') : (st === 'wait' ? '대기' : '누락')}`).join(' · ')})` : ''
     n.cdx = GATE_TXT[st]; n.lines = [...n.lines, `Codex 판정${x.k ? ' ' + x.k : ''} : ${GATE_TXT[st]}${brk}`]
-    if (st === 'miss' && !(n.alerts || []).includes('검증 누락')) n.alerts = [...(n.alerts || []), '검증 누락']
     check.y += st === 'Y'; check.miss += st === 'miss'; x.st = st
   }
   const stray = steps.filter(x => !GATE_TXT[x.st])
@@ -617,7 +582,7 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   const own = Math.max(0, ...[...nodes, ...all].flatMap(n => (n.rounds || []).filter(g => g.cap).map(g => (g.base || 0) + roundSummary(g.rows, now).n)))
   const cumN = Math.max(own, t.bundle?.n || 0), size = t.bundle?.size || 1
   const level = cumN >= ALERT.cap ? '상한 도달' : cumN >= ALERT.nearCap ? '상한 근접' : null
-  const miss = SLOTS.filter(s => s.kind === 'codex' && byId[s.id].alerts).map(s => byId[s.id])   // 검증 누락 칸(부모 실행 = 가지치기 대상 아님)
+  const miss = SLOTS.filter(s => s.kind === 'codex' && byId[s.id].alerts).map(s => byId[s.id])   // 검증 누락 칸 = CDX-루프(파일 변경 실행이 있는데 원장 없음)
   const alerts = all.reduce((s, n) => s + (n.alerts || []).length, 0) + miss.length + (level ? 1 : 0) + (byId['1.2'].alerts ? 1 : 0)
   Object.assign(byId['1'], turnSt, {
     t0: a, t1: anyRun ? null : ms(t.ts_res), run: anyRun, agentN: all.length, check, eng: eng.length, engEst: est.length, cum: { n: cumN, size, cap: ALERT.cap, ...(level ? { level } : {}) }, alertN: alerts,
@@ -627,10 +592,10 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   Object.assign(byId['1.1'], turnSt, { t0: a, t1: anyRun ? null : sub.t1, run: anyRun })
   // 칸 안 실행 줄 : 에이전트를 그 칸에 묶는다(독립 노드 없음)
   for (const n of nodes) { const k = kidsOf(n.id); if (k.length) Object.assign(n, { agents: k, chips: [...(n.chips || []), ...agentChips(k, now)] }) }   // 칸 자체 요약 먼저, 에이전트 실행 줄 뒤
-  // 쌍 단위 표시(2026-11-10 마스터 C-7 "SA 가 없으면 CDX 도 없다") : 프롬프트·컨텍스트·하네스·루프 4쌍은 SA 실행 증거가 없으면 SA·CDX 둘 다 그리지 않는다.
-  //   그 밖의 codex 칸(그래프·총괄)은 부모 칸이 실행 안 됨이면 숨김(원장 연결 rounds 가 있으면 유지 — 부모 칸은 늘 그려짐). 집계(N/5·묶음)는 위에서 끝남 = 표시만 제외
+  // 쌍 단위 표시(2026-11-10 마스터 C-7 "SA 가 없으면 CDX 도 없다") : 프롬프트·컨텍스트·하네스·루프 SA 는 실행 증거가 없으면 그리지 않는다.
+  //   CDX 칸(CDX-루프 하나 — 2026-11-10 개정)은 부모 SA 가 숨거나 판정 대상 없음(원장·파일 변경 실행 0건)이면 숨김. 집계(N/5·묶음)는 위에서 끝남 = 표시만 제외
   const drop = new Set(PAIRS.filter(id => IDLE.has(byId[id].status)))
-  for (const s of SLOTS) if (kind[s.id] === 'codex' && (drop.has(s.parent) || (IDLE.has(byId[s.parent]?.status) && !byId[s.id].rounds))) drop.add(s.id)
+  for (const s of SLOTS) if (kind[s.id] === 'codex' && (drop.has(s.parent) || (IDLE.has(byId[s.parent]?.status) && !byId[s.id].rounds) || (byId[s.id].status === 'notrun' && !byId[s.id].verdict))) drop.add(s.id)
   for (const n of nodes) if (drop.has(n.parent)) drop.add(n.id)   // 자손(nodes = SLOTS 순서라 부모가 먼저)
   const vis = nodes.filter(n => !drop.has(n.id))
   // 위반 수(2026-11-10 마스터 단순화) = 보이는 CDX 칸 중 Y 아닌 칸 수(진행 중 요청의 판정 대기·진행 칸은 아직 판정 전이라 제외)
@@ -671,9 +636,9 @@ export function buildPath(nodes, { design = false } = {}) {
   const term = { S: { t0: n1.t0 }, E: { t0: n1.run || stopped ? null : n1.t1, pending: !!n1.run, stopped } }
   const pos = Object.fromEntries(SLOTS.map((s, i) => [s.id, i]))
   // 경로 후보 : SA·승인 = 실행 흔적 있는 칸, CDX = 화면에 보이는 칸(실행된 SA 의 짝 — 누락이어도 지나감). 실제 실행 = CDX 는 판정 원장(rounds) 있음
-  //   승인 칸(1.2)은 상태와 관계없이 늘 경로에(2026-11-10 c5-turn-f7dc16-1110112110 D-002 — 미실행이면 CDX-총괄 → 종료로 건너뛰던 결함) : 미실행 = 들어가는 선 '⚠ 승인 미실행'
+  //   승인 칸(1.2)은 상태와 관계없이 늘 경로에(2026-11-10 c5-turn-f7dc16-1110112110 D-002 — 미실행이면 마지막 CDX → 종료로 건너뛰던 결함) : 미실행 = 들어가는 선 '⚠ 승인 미실행'
   const cand = SLOTS.filter(s => ['sub', 'codex', 'approve'].includes(s.kind)).map(s => by[s.id]).filter(n => n && (kind[n.id] !== 'sub' || !IDLE.has(n.status)))
-  const did = n => kind[n.id] === 'codex' ? !!(n.rounds || n.loopSum) : kind[n.id] === 'approve' ? !IDLE.has(n.status) : true
+  const did = n => kind[n.id] === 'codex' ? !!n.rounds : kind[n.id] === 'approve' ? !IDLE.has(n.status) : true
   const live = !!n1.run || stopped, upto = live ? cand.reduce((k, n, i) => did(n) ? i : k, -1) : cand.length - 1
   const seq = [{ id: 'S' }, { id: '1' }, { id: '1.1' }]
   let y = false
@@ -787,17 +752,43 @@ export const safeName = s => String(s).replace(/[\\/:*?"<>|#^[\]\r\n\t]/g, ' ').
 export const slotFile = s => safeName(`${s.id} ${s.label}`)
 
 // ── 입출력 ────────────────────────────────────────────────────────────────────
+/** 열린 결함 상태 — codex-verify.mjs C.liveDefect · codex-gate.mjs liveDefects 와 같은 값(시험이 liveDefects 와 일치 확인) */
+export const LIVE_DEFECT = ['open', 'regressed', 'contested']
+/**
+ * 면제 해소(2026-11-10 팀장 지적 · c4-loadloops-a1b42f D-001 회송) : 원장 마지막 판정이 FAIL 이고 아래 ①② 모두 만족하면 { n, by }, 아니면 null(FAIL 유지)
+ *   ① 열린 결함(LIVE_DEFECT — 훅 liveDefects 와 같은 상태, 단 파일 없는 결함도 센다 : 빼면 면제 안 된 결함이 숨어 Y 가 됨) 1건 이상 · 전부 원장 waived
+ *   ② met 아닌 기준(unmet·unverifiable)마다 (a) waived 에 그 기준 id 명시 또는 (b) 판정자 evidence 에 면제된 결함 id(D-NNN) 언급
+ *      — 래퍼 보충 기준(evidence '래퍼가 채움')은 (b) 불인정, (a) 로만. 근거 확인 불가 = FAIL 유지
+ */
+const FILLED_BY_WRAPPER = '래퍼가 채움'   // codex-verify.mjs finalize 기준 누락 보충 evidence '판정자 출력에 없음 — 래퍼가 채움'
+export function waiverOf(dir, l) {
+  const it = (l.iters || []).at(-1); if (it?.verdict !== 'FAIL') return null
+  try {
+    const out = it.out && fs.existsSync(it.out) ? it.out : path.join(dir, `iter-${it.iter}.codex.json`), w = l.waived || {}, r = JSON.parse(fs.readFileSync(out, 'utf8'))
+    const ds = (r.defects || []).filter(d => LIVE_DEFECT.includes(d.status))
+    if (!ds.length || !ds.every(d => w[d.id])) return null
+    const byDefect = c => !String(c.evidence || '').includes(FILLED_BY_WRAPPER) && (String(c.evidence || '').match(/\bD-\d+\b/g) || []).some(id => w[id])
+    // 근거 확인 불가 = FAIL 유지(c4-loadloops-a1b42f 2회차 D-001) : criteria 없음·배열 아님·빈 배열, 원장 계약 기준(criteriaIds)이 결과에 하나라도 없음(형식 이상 포함)
+    const cs = r.criteria, ids = l.criteriaIds
+    if (!Array.isArray(cs) || !cs.length || (ids !== undefined && (!Array.isArray(ids) || !ids.every(id => cs.some(c => c?.id === id))))) return null
+    if (!cs.filter(c => c?.status !== 'met').every(c => w[c?.id] || byDefect(c))) return null
+    return { n: ds.length, by: [...new Set(ds.map(d => w[d.id].by).filter(Boolean))].join(' · ') || '승인자 미기록' }
+  } catch { return null }   // 결과 파일 없음·깨짐 = 면제 확인 불가 → FAIL 유지
+}
 export function loadLoops(dir) {
   if (!fs.existsSync(dir)) return []
   return fs.readdirSync(dir).flatMap(id => {
-    if (/^bundle-/.test(id)) return []   // 턴 묶음 원장(Codex 호출 몫) — 칸 판정은 c<N>-turn-… 칸 원장에 있다
+    if (/^bundle-/.test(id)) return []   // 과거 턴 묶음 원장(Codex 호출 몫, 2026-11-10 폐지) — 칸이 아님
     if (fs.existsSync(path.join(dir, id, 'superseded.json'))) return []   // 대체된 원장(codex-gate supersede — scope 재산정으로 이번 판정 계획 밖, 2026-11-10 결함 8) = 집계 제외
     try {
       const l = JSON.parse(fs.readFileSync(path.join(dir, id, 'ledger.json'), 'utf8'))
-      const events = [...(l.iters || []).map(x => ({ iter: x.iter, at: x.at, verdict: x.verdict, open: (x.openDefects || []).length })),
+      // 면제 해소 = 마지막 판정 PASS 로 취급(루프 쌍·N·검증 누락·실행별 판정 모두 Y) + waived 표식(화면 'Y(면제)')
+      const wv = waiverOf(path.join(dir, id), l), lastIt = (l.iters || []).at(-1)
+      const events = [...(l.iters || []).map(x => ({ iter: x.iter, at: x.at, verdict: x.verdict, open: (x.openDefects || []).length, ...(wv && x === lastIt ? { verdict: 'PASS', waived: wv } : {}) })),
         ...(l.blocked || []).map(x => ({ iter: x.iter, at: x.at, verdict: 'BLOCKED', open: null, reason: x.reason || [...new Set((x.blocked || []).map(b => b.reason))].join(',') }))]
       let lockAt = null; try { lockAt = fs.statSync(path.join(dir, id, 'ledger.lock')).mtimeMs } catch { /* 잠금 없음 = 실행 중 아님 */ }
-      return [{ id, startedAt: l.startedAt, running: lockAt != null, lockAt, events: events.filter(e => e.at) }]
+      let agentType; try { agentType = JSON.parse(fs.readFileSync(path.join(dir, id, 'gate.json'), 'utf8')).agentType } catch { /* gate.json 없음 = 수동 원장 */ }
+      return [{ id, startedAt: l.startedAt, running: lockAt != null, lockAt, events: events.filter(e => e.at), agentType }]
     } catch { return [] }   // 원장 없음·깨짐 : 그 루프는 건너뜀
   })
 }
@@ -940,16 +931,28 @@ export function loadWorkflowAgents(turns, sessDir, { cacheFile, now = Date.now()
  */
 /** 서브에이전트 기록 → 하네스 변경 여부 : assistant tool_use(Write·Edit·MultiEdit·NotebookEdit) 대상 경로가 HARNESS_RE 면 true, 아니면 false. Bash 로 쓴 변경은 감지 못 함(기록에 대상 경로 필드가 없음) */
 export const harnessTouched = recs => recs.some(j => j?.type === 'assistant' && Array.isArray(j.message?.content) && j.message.content.some(b => b?.type === 'tool_use' && WRITE_TOOLS.has(b.name) && HARNESS_RE.test(String(b.input?.file_path || b.input?.notebook_path || '').replace(/\\/g, '/'))))
-/** 산출 실행(build·표에 없는 대행)마다 ag.harness = harnessTouched(기록). 기록 없음·읽기 실패 = 미설정(게이트는 기존 opt). 캐시 = agent_id → 기록 크기·mtime 같으면 재사용 */
-export function loadAgentHarness(turns, sessDir, cacheFile) {
+/** 파일 변경 실행(폴백) = Write·Edit·MultiEdit·NotebookEdit tool_use 1건 이상 — 본 판단은 codex-gate attributeOf(셸 변경 포함, 아래 loadAgentHarness attribute) */
+export const wroteFiles = recs => recs.some(j => j?.type === 'assistant' && Array.isArray(j.message?.content) && j.message.content.some(b => b?.type === 'tool_use' && WRITE_TOOLS.has(b.name)))
+/**
+ * 판정 대상 실행(NO_GATE 밖)마다 ag.harness = harnessTouched · ag.wrote = 판정 대상 파일 1건 이상. 기록 없음·읽기 실패 = 미설정. 캐시 = agent_id → 기록 크기·mtime 같으면 재사용(판단 규칙 판 v 다르면 다시 읽음)
+ *   wrote 판단(2026-11-10 c4-build-loop-only-aef4b3-p3 D-002) = codex-gate attributeOf 주입(훅과 같은 귀속 — Bash·PowerShell 셸 변경 = 기준선 diff ∩ 시간창, 생성물 제외), 미주입 = wroteFiles 폴백
+ *   주입 이유 : 생성기가 훅을 정적 import 하면 훅 selftest 의 생성기 동적 import 와 순환 — main 진입 때만 불러 넘긴다
+ *   종료 시점 고정(c4-fail-5-aeb16d-p2 D-001) : attribute = 훅 attributionFor — 훅 기록(attrib/<agentId>.json) 우선, 없으면 지금 다시 판단(est = ag.wroteEst 추정 표식)
+ *     추정값은 단조 — 한 번 true 면 이후 재계산에서 파일 시각이 바뀌어도 false 로 내리지 않는다
+ *     기록 우선(c4-fail-5-aeb16d-p2 iter-2 D-001) : 캐시 키 = 기록 크기·mtime + 훅 기록 mtime(recordAt, 없음 0) — 기록이 생기거나 다시 쓰이면 캐시값(옛 추정 false·옛 기록값)을 버리고 기록을 읽는다
+ */
+export function loadAgentHarness(turns, sessDir, cacheFile, { attribute, recordAt } = {}) {
   let cache = {}; try { cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8')) } catch { /* 캐시 없음 = 전부 읽기 */ }
   const next = {}
   for (const t of turns) for (const ag of t.agents_detail || []) {
-    if (!ag.agent_id || !t.session_id || ag.type === LEGACY_VERIFY || (CDX_OF[ag.type] && ag.type !== 'anakin_phase-build')) continue
+    if (!ag.agent_id || !t.session_id || ag.type === LEGACY_VERIFY || NO_GATE.has(ag.type)) continue
     const dir = ag.workflow ? path.join(sessDir, t.session_id, 'subagents', 'workflows', ag.workflow) : path.join(sessDir, t.session_id, 'subagents'), f = path.join(dir, `agent-${ag.agent_id}.jsonl`)
     let st; try { st = fs.statSync(f) } catch { continue }
-    const sig = `${st.size}:${Math.round(st.mtimeMs)}`, c = cache[ag.agent_id]?.sig === sig ? cache[ag.agent_id] : { sig, harness: harnessTouched(tailJsonl(f, Infinity)) }
-    next[ag.agent_id] = c; ag.harness = c.harness
+    const v = attribute ? 2 : 1, sig = `${st.size}:${Math.round(st.mtimeMs)}`, old = cache[ag.agent_id]
+    const judge = recs => { if (!attribute) return { wrote: wroteFiles(recs) }; const r = attribute({ recs, tp: f, mainTp: path.join(sessDir, `${t.session_id}.jsonl`), agentId: ag.agent_id, closed: !!ag.ts_end }); return { wrote: r.files.length > 0, ...(r.est ? { est: true } : {}) } }
+    const ra = (attribute && recordAt?.(ag.agent_id)) || 0, same = old?.v === v && typeof old.wrote === 'boolean', reuse = same && old.sig === sig && (old.ra || 0) === ra
+    const c = reuse ? old : (recs => { const w = judge(recs); return { v, sig, ra, harness: harnessTouched(recs), wrote: w.wrote || (!!w.est && same && old.wrote === true), ...(w.est ? { est: true } : {}) } })(tailJsonl(f, Infinity))
+    next[ag.agent_id] = c; ag.harness = c.harness; ag.wrote = c.wrote; if (c.est) ag.wroteEst = true
   }
   try { fs.mkdirSync(path.dirname(cacheFile), { recursive: true }); fs.writeFileSync(cacheFile, JSON.stringify(next)) } catch { /* 캐시 저장 실패 = 다음 실행에서 다시 읽음 */ }
 }
@@ -1379,9 +1382,8 @@ export function writeSlotMd(dir) {
   const no = Object.fromEntries(designGraph().map(n => [n.id, n.no])), lk = s => `[[${slotFile(s)}|${no[s.id]}. ${s.label}]]`   // 파일명(id)은 그대로, 보이는 글자 = 일련번호(CDX = 짝 SA 번호 + '-1')
   const mapTxt = (s) => {
     const m = SLOT_MAP[s.id]
-    if (!m) return s.kind === 'approve' ? "메인 응답의 '종료 승인 :' 줄(세션 기록) — 없음 + Stop 훅 상한 기록 = 승인 강제 실패, teamanakin-admin 실행은 칸 안 줄" : s.kind === 'request' || s.kind === 'main' ? '턴(요청) 기록' : '미배정(설계) — SLOT_MAP 항목 없음'
-    if (m.source === 'runs.jsonl') return `담당 ${m.owner} — 생성기 실행 기록 runs.jsonl 기준(\`${PATHS.runs}\`, 마스터 확정 2026-11-09) : 턴 창 안 실행 있으면 완료 · 없으면 미수행 · 로그 첫 기록 이전 턴 = 기록 이전`
-    const SHOW = { prompt: '늘 표시 — 요청문 1 · 메인 브리프 디스패치 건수', context: '늘 표시 — 주입 훅·파일 읽기(Read) 건수 + collect 실행', harness: '도구 tool_use·훅 주입 1건 이상일 때 표시 — 종류별 합계 + 시각순 사용 목록, 하네스 파일 변경 표식', loop: '되돌림 OR 반복일 때 표시(C-13) — 어느 CDX 칸이든 N 판정 1회 이상 · 같은 에이전트 종류 2회 이상 · 같은 원장 판정 2회 이상. 칸 = 되돌림 줄(<CDX 칸> N k회(<회차>회차 결함 n) → 재작업 대기 | 재판정 진행 | <회차>회차 Y | 보류) + 반복 목록, CDX-루프 = 최종 판정(진행 중 요청·마지막 기록 진행 = 진행, 끝난 요청에 판정 없음 = ⚠ 검증 누락)', graph: "늘 표시 — graph 실행 없으면 '생성기 자동 갱신(Stop 훅)'" }
+    if (!m) return s.kind === 'approve' ? "메인 응답의 '종료 승인 :' 줄(세션 기록, 기록용 — Stop 훅은 막지 않음) — 과거 Stop 훅 상한 기록 = 승인 강제 실패(이력), teamanakin-admin 실행은 칸 안 줄" : s.kind === 'request' || s.kind === 'main' ? '턴(요청) 기록' : '미배정(설계) — SLOT_MAP 항목 없음'
+    const SHOW = { prompt: '늘 표시 — 요청문 1 · 메인 브리프 디스패치 건수', context: '늘 표시 — 주입 훅·파일 읽기(Read) 건수 + collect 실행', harness: '도구 tool_use·훅 주입 1건 이상일 때 표시 — 종류별 합계 + 시각순 사용 목록, 하네스 파일 변경 표식', loop: 'c4 판정 1회 이상 OR 파일 변경 실행 OR 되돌림 OR 반복일 때 표시(2026-11-10 개정 · C-13) — 판정 대상 없으면 CDX-루프 숨김. 칸 = 되돌림 줄(CDX-루프 N k회(<회차>회차 결함 n) → 재작업 대기 | 재판정 진행 | <회차>회차 Y | 보류) + 반복 목록, CDX-루프 = 원장별 마지막 판정 AND(진행 중 요청 = 대기, 끝난 요청에 파일 변경이 있는데 판정 없음 = ⚠ 검증 누락)', graph: "늘 표시 — graph 실행 없으면 '생성기 자동 갱신(Stop 훅)'" }
     const xs = [...(m.show ? [SHOW[m.show]] : []), ...(m.agents || []).map(x => `에이전트 ${x}`), ...(m.hooks || []).map(x => `훅 ${x}`), ...(m.loops ? [m.loops === true ? `Codex 루프(${EST_BADGE})` : `Codex 루프 ${m.loops.join(', ')}`] : []),
       ...(m.codex ? [`Codex 루프 원장 id 접두 \`c${m.codex}-\`(매핑 연결)${m.legacy ? ` + 접두 없는 과거 원장(${EST_BADGE})` : ''}`] : [])]
     return xs.length ? xs.join(' · ') + (PAIRS.includes(s.id) && ['harness', 'loop'].includes(m.show) ? ' — 증거 없으면 SA·CDX 쌍 숨김' : '') : '대응 없음 [확인중 : 마스터] — 늘 미수행'
@@ -1429,7 +1431,7 @@ export function writeRequestMd(dir, items, now) {
   return items.length
 }
 
-function main() {
+function main(attr = {}) {
   const args = process.argv.slice(2), has = k => args.includes(k)
   const argOf = (k, d) => { const i = args.indexOf(k); const v = args[i + 1]; return i < 0 ? undefined : v && !v.startsWith('--') ? v : d }
   const delay = +argOf('--delay', 0) || 0   // 훅 직후 실행 : 세션 기록 마지막 줄이 디스크에 쓰일 시간
@@ -1437,9 +1439,6 @@ function main() {
   const design = has('--design-only')
   const out = path.resolve(ROOT, argOf('--out', '') || (design ? PATHS.design : PATHS.live)), outDir = path.dirname(out)
   const mdDir = has('--md') ? path.resolve(ROOT, argOf('--md', design ? PATHS.flowMd : PATHS.reqMd)) : null
-  // 실행 기록 append(요청문·비용 없음) — 그리기 전에 남겨 이번 실행이 진행 중 턴의 1.1.5.2 에 바로 잡힌다. 실패는 그래프 생성을 막지 않음
-  const runsFile = path.join(ROOT, PATHS.runs), trigger = RUN_TRIGGERS.includes(argOf('--trigger')) ? argOf('--trigger') : 'manual'
-  try { fs.mkdirSync(path.dirname(runsFile), { recursive: true }); fs.appendFileSync(runsFile, JSON.stringify({ ts: new Date().toISOString(), trigger, mode: design ? 'design' : 'live', md: !!mdDir }) + '\n') } catch (e) { if (!has('--quiet')) console.error(`실행 기록 건너뜀 : ${e.message}`) }
   let requests, msg
   if (design) {
     requests = [{ key: 'design', when: '설계도', head: '설계도 — 요청 1건의 처리 흐름(마스터 설계 트리)', meta: '', nodes: designGraph() }].map(r => ({ ...r, path: buildPath(r.nodes, { design: true }) }))
@@ -1460,7 +1459,7 @@ function main() {
     const all = [...liveTurns, ...turns].sort((x, y) => ms(y.ts_req) - ms(x.ts_req))
     try { loadWorkflowAgents(all, sessDir, { cacheFile: path.join(ROOT, PATHS.wfCache), now }) } catch (e) { if (!has('--quiet')) console.error(`워크플로 에이전트 읽기 건너뜀 : ${e.message}`) }
     try { loadAgentRounds(all, sessDir, path.join(ROOT, PATHS.roundsCache)) } catch (e) { if (!has('--quiet')) console.error(`팀원 회차 읽기 건너뜀 : ${e.message}`) }
-    try { loadAgentHarness(all, sessDir, path.join(ROOT, PATHS.harnessCache)) } catch (e) { if (!has('--quiet')) console.error(`하네스 변경 감지 건너뜀 : ${e.message}`) }
+    try { loadAgentHarness(all, sessDir, path.join(ROOT, PATHS.harnessCache), attr) } catch (e) { if (!has('--quiet')) console.error(`하네스 변경 감지 건너뜀 : ${e.message}`) }
     try { loadToolEvents(all, sessDir, path.join(ROOT, PATHS.toolCache), now) } catch (e) { if (!has('--quiet')) console.error(`하네스 사용 기록 건너뜀 : ${e.message}`) }
     // 요청 원문·보고·요약 캐시는 화면·md 에 실리므로 비밀값 마스킹(redact) 후 사용, 요약 캐시 = 문자열 배열 필드만
     for (const t of all) {
@@ -1474,10 +1473,8 @@ function main() {
     for (const t of all) { const a = ms(t.ts_req), b = t.ts_res ? ms(t.ts_res) : now, xs = apv.filter(x => x.sid === t.session_id && ms(x.at) >= a && ms(x.at) <= b + RUN_GRACE_MS); if (xs.length) t.forced = xs }
     linkContext(all, now)
     splitAgentRounds(all)
-    // ponytail: 실행 기록 전체 읽기(줄당 약 80바이트) — 수 MB 넘으면 기간 회전 추가
-    let runs = []; try { runs = fs.readFileSync(runsFile, 'utf8').split('\n').flatMap(l => { try { return l ? [JSON.parse(l)] : [] } catch { return [] } }) } catch { /* 기록 없음 = 전 턴 '기록 이전' */ }
     requests = all.map(t => {
-      const nodes = buildRequestGraph(t, loops, { now, runs }), n1 = nodes[0], ag = n1.agentN, p = buildPath(nodes), ck = n1.check, when = new Date(ms(t.ts_req)).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)
+      const nodes = buildRequestGraph(t, loops, { now }), n1 = nodes[0], ag = n1.agentN, p = buildPath(nodes), ck = n1.check, when = new Date(ms(t.ts_req)).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)
       const cost = t.live ? null : (t.cost_usd || 0) + (t.cost_agents_usd || 0)
       const head = redact(t.req_head || '').replace(/<\/?[a-z_-]+(?:\s[^>]*)?>/gi, '').trim().slice(0, SIZE.headCut) || '(요청문 없음)'
       return { sumId: summaryId(t), key: t.key, sid: `${t.session || ''}-${t.turn ?? ''}`, date: when.slice(0, 10), when, head, cat: t.category || '', catLabel: catLabel[t.category] || t.category || (t.live ? '진행 중(기록 전)' : ''), st: n1.status, statusLabel: n1.statusLabel, running: n1.run, path: p, meta: `에이전트 ${ag} · ${cost == null ? '$—' : '$' + cost.toFixed(2)} · 엔지니어링 ${engTxt(n1.eng, n1.engEst)} · 검증 Y ${ck.y} / 누락 ${ck.miss} / 위반 ${ck.viol} · 묶음 ${n1.cum.n}/${n1.cum.cap} ·`, alert: n1.alertN ? `경보 ${n1.alertN}${n1.cum.level ? ' · ' + n1.cum.level : ''}` : '', nodes }
@@ -1490,4 +1487,8 @@ function main() {
   if (!has('--quiet')) console.log(msg)
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main()
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  // 변경 귀속 = 훅과 같은 함수(D-002) — 불러오기 실패 시 Write·Edit 폴백(생성은 계속)
+  let attr = {}; try { const cg = await import('../.claude/hooks/codex-gate.mjs'); attr = { attribute: cg.attributionFor, recordAt: cg.attribAt } } catch (e) { console.error(`변경 귀속 함수 불러오기 실패(Write·Edit 폴백) : ${e.message}`) }
+  main(attr)
+}
