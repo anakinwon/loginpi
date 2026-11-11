@@ -21,9 +21,9 @@ node sitemap/schema.pi/pitel/loader/load-schema-pi.mjs --db-url "$URL" --owner <
 - 이름·관문 판정은 schema.pi 앱 함수(`entNames`·`domName`·`termNames`·`checkLogical`·`scopeWhy`·`toPhysical`·`planSync`·`dgmWhy`·`cdKind`·`runCheck`)를 그대로 쓴다 — 앱과 다르게 판정하지 않는다.
 - 전제(대상 DB) : `sql/001~077` 적용 + 기준 데이터(`std_lgc_tp`·`std_tp_map` = `scripts/db-seed.mjs`) 적재. 논리 타입은 이름(VARCHAR·CHAR·NUMERIC·TIMESTAMP)으로 찾으므로 코드값이 달라도 된다.
 
-## 운영 적용 절차(마스터 승인 후 메인 세션만)
+## 운영 적용 절차(마스터 직접 실행 — `!` 접두, 메인은 명령·점검표 전달과 dry-run 출력 대조만)
 
-> ⛔ 서브 에이전트는 운영 DB 에 접속하지 않는다(조회 포함). 아래는 **마스터 승인 뒤 메인 세션**이 한다.
+> ⛔ 서브 에이전트는 운영 DB 에 접속하지 않는다(조회 포함). 아래는 **마스터 직접 실행**(`!` 접두, 메인은 명령·점검표 전달과 dry-run 출력 대조만)으로 한다.
 
 1. **대상 확인(메모리 '운영 DB 대상 확인 필수')** — 접속 문자열의 Supabase ref 가 schema.pi 운영 앱(schem.vercel.app)이 읽는 DB 와 같은지, 비운영 ref 가 아닌지 대조한다. 값은 출력하지 않고 ref 일치 여부만 본다.
 2. **마이그레이션 수준 확인** — 운영 `sys_mgrt_hist` 에 `077_sys_lnk_tkn.sql` 까지 있는지(읽기 1회). 모자라면 `pnpm db:migrate` 먼저.
