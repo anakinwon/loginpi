@@ -1,6 +1,6 @@
 # CLAUDE.md : schema.pi
 
-데이터 표준사전 메타시스템(표준분류체계·표준단어·표준도메인·표준용어·승인·변경 이력). **loginpi 워크스페이스 멤버**(`sitemap/schema.pi`, 2026-10-16 dr-project에서 승계)이며, 루트 `loginpi/CLAUDE.md`의 규칙(Pi Browser 핵심가치·쿠키 OR `X-Pi-Token` 이중 경로·`redirect` 금지·DA 표준)을 먼저 적용한다. 배포 : Vercel 프로젝트 `schema`(Root Directory `sitemap/schema.pi`, 운영 브랜치 `prod/schema`, https://schem.vercel.app)
+데이터 표준사전 메타시스템(표준분류체계·표준단어·표준도메인·표준용어·승인·변경 이력). **loginpi 워크스페이스 멤버**(`sitemap/schema.pi`, 2026-10-16 dr-project에서 승계)이며, 루트 `loginpi/CLAUDE.md`의 규칙(Pi Browser 핵심가치·쿠키 OR `X-Pi-Token` 이중 경로·`redirect` 금지·DA 표준)을 먼저 적용한다. 배포 : Vercel 프로젝트 `schema`(Root Directory `sitemap/schema.pi`, 운영 브랜치 master, https://schem.vercel.app — Vercel 운영 브랜치 = master : 2026-11-04 확인, 2026-11-11 dpl 대조에서 schem 이 master `92f48233` 서빙)
 
 - 상위 7단계 계획(METAPi→ModelPi→PiErd→물리 구축→PiMig→PiCDC/PipeLine→PiAnal) : `docs/MASTER_ROADMAP.md`(단계별 앱 분리, METAPi = 이 앱) / 요구사항 정본 : `docs/PRD.md` / 일정·진행 현황 : `docs/ROADMAP.md` / 출발 근거 : `docs/requirement/reqst.md`(DA Wordict 분석서)
 - 기능·규칙을 바꾸면 ROADMAP 해당 단계에 진행 기록 1줄을 같은 커밋으로 남긴다
@@ -9,7 +9,7 @@
 ## 절대 규칙
 
 1. **공용 패키지 재사용** : 인증·가드는 `@pi/auth`·`@pi/guard`(workspace) 의존 — 복제 금지(PRD_28 §4). cafe.pi·sitemap.pi 코드는 수정하지 않는다. (구 "loginpi 무영향·`@pi/*` 금지" 규칙은 nia-dr-project 분리 시절 — 2026-10-16 loginpi 편입으로 폐기)
-2. **운영 반영은 명시 승인 후** : master 푸시까지 기본, `prod/schema` 푸시(운영 배포)는 마스터 지시 뒤. 배포 후 `Vercel – schema: success` 개별 확인(루트 CLAUDE.md 배포 검증 철칙)
+2. **운영 반영은 명시 승인 후** : 운영 브랜치 = master 이므로 master 푸시가 곧 운영 배포 — 마스터 지시 뒤(2026-11-04 확인·2026-11-11 dpl 대조). 배포 후 `Vercel – schema: success` 개별 확인(루트 CLAUDE.md 배포 검증 철칙)
 3. **추측 금지** : 미확정 값은 `[TBD]`·`[확인중 : 확인 채널]`로만 표기
 
 ## 스택·명령
