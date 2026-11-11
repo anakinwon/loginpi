@@ -63,6 +63,8 @@ test('결함 ① 작업 묶음 : 지속 에이전트 회차를 요청별로 나�
   assert.deepEqual(solo.cum, { n: 0, size: 1, cap: 5 }); assert.match(solo.lines[1], /요청 단위/)
   const html = renderHtml({ design: false, outDir: '.', requests: [], meta: '' })
   assert.match(html, /\.badge\.alert\{color:#b42f2f;border:2px solid #d03b3b/); assert.match(html, /"alert":\{"longMs":1800000,"errors":5,"nearCap":4,"cap":5\}/)
+  for (const d of [false, true]) assert.ok(!renderHtml({ design: d, outDir: '.', requests: [], meta: '' }).includes('지나감(실선)'))   // 흐름선 범례 문구 삭제(마스터 2026-11-11)
+  for (const d of [false, true]) assert.ok(renderHtml({ design: d, outDir: '.', requests: [], meta: '' }).includes('id="dtog" aria-controls="detail" aria-expanded="true"'))   // 노드 상세 접기 토글(두 판)
 })
 
 test('판 간 링크 : 설계도판 → 실시간 모니터링판(상대경로·로컬 생성 안내), 실데이터판 → 설계도판', () => {

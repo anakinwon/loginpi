@@ -1085,6 +1085,7 @@ function client() {
   }
   function detail(n) {
     const s = SL[n.slot]
+    if (!booting && wrapEl.classList.contains('dc')) dtog.classList.add('new')
     $('detail').innerHTML = '<h3>' + esc(ttl(n)) + '</h3><p><span class="badge st-' + esc(n.status) + '">' + esc(n.statusLabel) + '</span>'
       + (n.badge ? ' <span class="badge est">' + esc(n.badge) + '</span>' : '') + (n.approval ? ' <span class="badge' + (n.approval === '최종' ? ' final' : '') + '">' + esc(n.approval) + ' 승인</span>' : '') + (n.eng != null ? ' <span class="badge">엔지니어링 ' + engT(n) + ' 수행</span>' : '') + (n.check ? ' <span class="badge' + (n.check.miss || n.check.viol ? ' alert' : '') + '">검증 Y ' + n.check.y + ' / 누락 ' + n.check.miss + ' / 위반 ' + n.check.viol + '</span>' : '')
       + (n.cum ? ' <span class="badge">묶음 누적 ' + n.cum.n + '/' + n.cum.cap + (n.cum.size > 1 ? ' · 요청 ' + n.cum.size + '건' : '') + '</span>' + alertHtml(n.cum.level ? [n.cum.level] : []) : '') + alertHtml(n.alerts) + '</p>'
@@ -1298,12 +1299,23 @@ function client() {
   const flowBtn = $('flow'); flowBtn.setAttribute('aria-pressed', flowOn)
   flowBtn.onclick = () => { flowOn = !flowOn; flowBtn.setAttribute('aria-pressed', flowOn); const r = D.requests.find(x => x.key === cur); if (r) draw(r); saveHash() }
   $('theme').onclick = () => { const h = document.documentElement, dark = (h.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark'; h.dataset.theme = dark ? 'light' : 'dark' }
+  // 노드 상세 패널 접기 : 상태는 localStorage(자동 새로고침에도 유지), 접힌 채 노드 클릭 = 자동 펼침 없이 토글에 '새 상세' 점
+  const wrapEl = document.querySelector('.wrap'), dtog = $('dtog'); let booting = true
+  const setFold = (c, save) => {
+    const t = c ? '노드 상세 펼치기' : '노드 상세 접기'
+    wrapEl.classList.toggle('dc', c); dtog.setAttribute('aria-expanded', !c); dtog.setAttribute('aria-label', t); dtog.title = t; dtog.textContent = c ? '◀' : '▶'
+    if (!c) dtog.classList.remove('new')
+    if (save) try { localStorage.setItem('rg.detailFold', c ? '1' : '0') } catch (e) { /* 저장 불가 브라우저 : 이번 화면만 */ }
+  }
+  let fold0 = false; try { fold0 = localStorage.getItem('rg.detailFold') === '1' } catch (e) { /* 읽기 불가 = 펼침 */ }
+  setFold(fold0); dtog.onclick = () => setFold(!wrapEl.classList.contains('dc'), true)
   setView(view)
   if (D.requests.length) {
     select((D.requests.find(r => r.key === H.k) || D.requests[0]).key)
     if (H.z) { const z = H.z.split(',').map(Number); if (z.length === 4 && z.every(Number.isFinite)) { vb.x = z[0]; vb.y = z[1]; vb.w = z[2]; vb.h = z[3]; setVB(); touched = true } }
     if (H.s) $('list').scrollTop = +H.s
   } else { renderList(); $('detail').innerHTML = '<p class="muted">범위 안 요청 기록 없음 — 다음 요청부터 자동 기록</p>' }
+  booting = false
   // 실데이터판 자동 새로고침 : 진행 중 요청이 있으면 짧게 — 선택·보기·쪽·스크롤·확대는 location.hash 로 보존
   if (D.live) setTimeout(() => { saveHash(); location.reload() }, D.requests.some(r => r.running) ? Z.reloadRun : Z.reloadIdle)
 }
@@ -1337,7 +1349,8 @@ ${statusCss()}
 *{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:13.5px/1.5 "Nanum Gothic","Malgun Gothic",system-ui,sans-serif}
 header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 20px 6px}h1{font-size:19px;margin:0}.meta{color:var(--ink2);font-size:12.5px;margin:0 20px 10px}.meta a{color:var(--w);font-weight:700}.sp{flex:1}
 button,input,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--axis);border-radius:6px;padding:3px 9px}button{cursor:pointer}button[aria-pressed=true]{background:var(--w);border-color:var(--w);color:#fff}button:disabled{opacity:.4;cursor:default}
-.wrap{display:grid;grid-template-columns:260px minmax(0,1fr) 280px;gap:12px;padding:0 20px 20px}@media (max-width:1100px){.wrap{grid-template-columns:1fr}}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr) 280px;gap:12px;padding:0 20px 20px}.wrap.dc{grid-template-columns:260px minmax(0,1fr) 40px}@media (max-width:1100px){.wrap,.wrap.dc{grid-template-columns:1fr}}
+#dpane{position:relative}.dc #dpane{padding:6px 4px}.dc #detail{display:none}#dtog{float:right;margin:0 0 4px 6px;width:28px;height:28px;padding:0;position:relative}.dc #dtog{float:none;display:block;margin:0 auto}#dtog.new::after{content:"";position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:${STATUS_STYLE.error.text};border:2px solid var(--surface)}
 .card{background:var(--surface);border:1px solid var(--ring);border-radius:10px;padding:10px 12px;min-width:0}
 .ctl{display:grid;gap:6px;margin:0 0 8px}#list{list-style:none;margin:0;padding:0;max-height:70vh;overflow:auto}#list button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--grid);border-radius:0;background:none;padding:6px 4px}#list button[aria-current]{background:color-mix(in srgb,var(--w) 14%,transparent)}
 .rt,.rm{display:block;color:var(--muted);font-size:11.5px}.rh{display:block;word-break:break-all}.lpg{display:flex;gap:6px;align-items:center;margin-top:8px}
@@ -1347,7 +1360,7 @@ button,input,select{font:inherit;color:var(--ink);background:var(--surface);bord
 ${Object.entries(FLOW_COLOR).map(([k, c]) => `.fl.${k} .v{stroke:${c}}.seqg.${k} .sq{fill:${c}}`).join('')}.fl.loop .v{stroke-width:2.6}.fl.no .v,.fl.noold .v{stroke-dasharray:5 4}.fl.noold,.seqg.noold{opacity:.35}
 .fl.running .v{stroke-width:3.2;animation:pulse 1.2s ease-in-out infinite}.fl.plan .v{stroke-dasharray:6 5}.seqg.plan{opacity:.45}
 .seqg.running .sq{fill:${RUN.fill};stroke:${RUN.color}}.sq{stroke:var(--surface);stroke-width:1.5}.sqt{font-size:9.5px;font-weight:700;fill:#fff}.seqg.running .sqt{fill:${RUN.ink}}.lpl{font-size:10.5px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
-.fv .seqg{opacity:0}.fv .fl:hover .seqg{opacity:1}.term.pend .box,.fnode.term.pend circle{stroke-dasharray:4 3}.fleg{color:var(--ink2)}.fleg .fr{color:${RUN.color};text-shadow:0 0 4px ${RUN.fill}}
+.fv .seqg{opacity:0}.fv .fl:hover .seqg{opacity:1}.term.pend .box,.fnode.term.pend circle{stroke-dasharray:4 3}
 .box{fill:var(--sf,var(--surface));stroke:var(--sc);stroke-width:1.6}.strip{fill:var(--sc)}.st-missing .box{stroke-dasharray:5 3;stroke-width:2}
 .l1{font-size:12.5px;fill:var(--si,var(--ink))}.l1.b{font-weight:700}.l2{font-size:11.5px;fill:var(--si,var(--st))}.tm{font-size:10px;fill:var(--si,var(--ink2))}
 .fnode circle{fill:var(--sf,var(--sc));stroke:var(--sc);stroke-width:2}.fnode.st-missing circle{fill:var(--surface);stroke-dasharray:3 2}.chip{font-size:10px;fill:var(--si,var(--ink2))}.chip.head,.chip.run{font-weight:700}.chip.bad{fill:${STATUS_STYLE.error.text};font-weight:700}.chip.warn{fill:${STATUS_STYLE.missing.text};font-weight:700}.k-codex .chip{fill:var(--ci)}.st-running .chip{fill:var(--si)}:root[data-theme=dark] .node:not(.k-codex):not(.st-running) .chip.bad{fill:${STATUS_STYLE.error.dark.text}}:root[data-theme=dark] .node:not(.k-codex):not(.st-running) .chip.warn{fill:${STATUS_STYLE.missing.dark.text}}.edge.pair{stroke-width:2;stroke-opacity:.8}.chipsep{stroke:var(--grid);stroke-width:1}#detail li.sep{border-top:1px solid var(--grid);margin-top:3px;padding-top:3px;list-style:none}
@@ -1369,9 +1382,9 @@ ${Object.entries(FLOW_COLOR).map(([k, c]) => `.fl.${k} .v{stroke:${c}}.seqg.${k}
 <div class="wrap">
 <aside class="card"><div class="ctl"${design ? ' hidden' : ''}><input id="q" type="search" placeholder="요청문 검색"><select id="fc"><option value="">카테고리 전체</option>${cats.map(c => `<option value="${esc(c)}">${esc(catLabel[c] || c)}</option>`).join('')}</select><select id="fd"><option value="">날짜 전체</option>${dates.map(d => `<option>${esc(d)}</option>`).join('')}</select></div>
 <ul id="list"></ul><div class="lpg"${design ? ' hidden' : ''}><button type="button" id="lprev">‹ 이전</button><button type="button" id="lnext">다음 ›</button><span id="lcnt" class="muted"></span></div></aside>
-<section class="card"><div class="ghd"><div class="legend">${Object.entries(STATUS_STYLE).map(([k, s]) => `<span><i class="st-${k}"></i>${esc(s.label)}</span>`).join('')}<span><i class="k-codex st-notrun"></i>Codex 미수행(점선)</span><span><i class="k-codex"></i>Codex 미완료(실선)</span><span><i class="k-codex st-done"></i>Codex 완료</span><span><span class="badge est">${EST_BADGE}</span></span><span class="fleg"><b style="color:${FLOW_COLOR.done}">—</b> 지나감(실선) · <b style="color:${FLOW_COLOR.planned}">- -</b> 예정(점선) · <b class="fr">—</b> 진행 중 노드로 진입 · 번호 = 표준 처리 순서(실행된 칸을 SA → 짝 CDX → 다음 SA … 순으로 끝까지 연결) · <b style="color:${FLOW_COLOR.yes}">→Y</b> 검증 Y 뒤 다음 칸 · CDX 가 Y 아니면 칸에 ⚠ 검증 누락·N 표시(선은 이어 감) · <b style="color:${FLOW_COLOR.no}">⇢N</b> 검증 N → 되돌림(점선, 최종 Y 면 흐리게) · 칸 안 줄 = 에이전트 실행(×n·회송·<b style="color:${STATUS_STYLE.error.text}">✖</b> 실패·<b style="color:${STATUS_STYLE.missing.text}">⚠</b> 장시간)·판정 회차·하네스 사용(시각순)</span></div><span class="zc" role="group" aria-label="확대/축소"><button type="button" data-z="fit" title="그림 전체를 화면에 맞춤">맞춤</button> <button type="button" data-z="in" title="확대">+</button> <button type="button" data-z="out" title="축소">−</button></span></div>
+<section class="card"><div class="ghd"><div class="legend">${Object.entries(STATUS_STYLE).map(([k, s]) => `<span><i class="st-${k}"></i>${esc(s.label)}</span>`).join('')}<span><i class="k-codex st-notrun"></i>Codex 미수행(점선)</span><span><i class="k-codex"></i>Codex 미완료(실선)</span><span><i class="k-codex st-done"></i>Codex 완료</span><span><span class="badge est">${EST_BADGE}</span></span></div><span class="zc" role="group" aria-label="확대/축소"><button type="button" data-z="fit" title="그림 전체를 화면에 맞춤">맞춤</button> <button type="button" data-z="in" title="확대">+</button> <button type="button" data-z="out" title="축소">−</button></span></div>
 <p id="gtitle" class="gtitle"></p><div class="gwrap"><svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="요청 처리 흐름 그래프"></svg></div></section>
-<aside class="card" id="detail"></aside>
+<aside class="card" id="dpane"><button type="button" id="dtog" aria-controls="detail" aria-expanded="true" aria-label="노드 상세 접기" title="노드 상세 접기">▶</button><div id="detail"></div></aside>
 </div>
 <script type="application/json" id="graphdata">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>
 <script>const fmtSpan = ${fmtSpan}, roundSummary = ${roundSummary}, layoutTree = ${layoutTree}, termPos = ${termPos}, matePos = ${matePos};(${client})()</script></body></html>`
