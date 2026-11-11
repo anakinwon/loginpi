@@ -268,7 +268,7 @@ test('재분할 계약 = 실제 묶음 파일로 하네스 목록·AC-4 재산�
   const base = { no: 4, type: 't', agentId: 'a1', part: [1, 2] }, ac4 = c => c.match(/^- AC-4 .*$/gm) || []
   const noH = cg.contractOf({ ...base, id: 'c4-x-a1b2c3-p1', files: ['a.md'] })
   const inH = cg.refreshContract(noH, { id: 'c4-x-a1b2c3-p2', files: ['.claude/hooks/x.mjs', 'a.md'], part: [2, 2] }, 'HEAD', null)
-  assert.deepEqual(ac4(inH), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/x.mjs) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 통과 근거가 보고에 있다'])   // 들어옴
+  assert.deepEqual(ac4(inH), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/x.mjs) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 근거 = 증거 checks.md'])   // 들어옴(11c : 근거 = 훅이 돌린 checks.md)
   assert.ok(/^- AC-3 [^\n]*\n- AC-4 /m.test(inH), 'AC-3 바로 뒤')
   const withH = cg.contractOf({ ...base, id: 'c4-x-a1b2c3-p1', files: ['.claude/hooks/x.mjs', 'b.md'] })
   assert.deepEqual(ac4(cg.refreshContract(withH, { id: 'c4-x-a1b2c3-p1', files: ['b.md'], part: [1, 2] }, 'HEAD', null)), [])   // 빠짐
@@ -452,6 +452,37 @@ test('같은 내용 재판정 건너뜀(P6) : 브리프만 바뀌어도 다시 �
   } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(dir, { recursive: true, force: true }) }
 })
 
+test('반복 지적 승격(2026-11-11 마스터 선택) : contested 2회 = 승격 문구 · 1회·open 반복 = 기존 회송 문구만', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const loops = path.join(process.env.CODEX_GATE_STATE, 'loop'), made = []
+  const ledger = (id, defects, extra = {}) => {
+    const dir = path.join(loops, `${id}-${process.pid}`); made.push(dir); fs.mkdirSync(dir, { recursive: true })
+    fs.writeFileSync(path.join(dir, 'ledger.json'), JSON.stringify({ id: path.basename(dir), iters: [{ iter: 2, verdict: 'FAIL' }], blocked: [] }))
+    fs.writeFileSync(path.join(dir, 'iter-2.codex.json'), JSON.stringify({ verdict: 'FAIL', defects, ...extra }))
+    return path.basename(dir)
+  }
+  const msgOf = id => cg.summarize({ agentType: 'anakin_phase-build', agentId: 'a1b2c3d4', baseRef: 'x', results: [{ id, iter: 2, code: 1, verdict: 'FAIL', ledger: 'l' }] })
+  try {
+    const d = (id, status, seenCount) => ({ id, severity: 'med', status, file: 'a.mjs', line: 1, summary: 's', seenCount })
+    const c2 = ledger('c4-promo-c2', [d('D-002', 'contested', 2), d('D-003', 'open', 1)]), m = msgOf(c2)
+    assert.match(m, new RegExp(`반복 지적 승격\\*\\* — 회송 대신 teamanakin-admin 면제 판단\\(13절 9항\\) : ${c2} D-002\\(이의 2회\\)`))
+    assert.doesNotMatch(m, /D-003\(/, '조건 밖 결함은 승격 안 함')
+    assert.match(m, /FAIL 은 그 결과를 낸 에이전트에 결함/, '기존 회송 문구 유지')
+    assert.doesNotMatch(msgOf(ledger('c4-promo-c1', [d('D-001', 'contested', 1)])), /반복 지적 승격/, '1회 지적 = 승격 없음')
+    assert.doesNotMatch(msgOf(ledger('c4-promo-o2', [d('D-001', 'open', 3)])), /반복 지적 승격/, 'open 반복 = 승격 없음')
+    // 이의 인정 표식(D-001 회송) : notes·기준 evidence 한 문장에 결함 id + 구절
+    const ack = ledger('c4-promo-ack', [d('D-004', 'open', 2)], { notes: '도구 없이 판정했다. D-004 는 의도된 동작이라 결함이 아니다. 끝', criteria: [{ id: 'AC-1', status: 'unmet', met: false, evidence: 'x' }] })
+    assert.match(msgOf(ack), new RegExp(`${ack} D-004\\(이의 2회\\)`), '표식 있음 + open 2회 = 승격')
+    const ev = ledger('c4-promo-ev', [d('D-005', 'open', 2)], { notes: '', criteria: [{ id: 'AC-2', status: 'unmet', met: false, evidence: '근거 · D-005 Not a defect' }] })
+    assert.match(msgOf(ev), /D-005\(이의 2회\)/, '기준 evidence 표식(대소문자 무시)')
+    assert.doesNotMatch(msgOf(ledger('c4-promo-noack', [d('D-004', 'open', 2)], { notes: 'D-004 는 아직 남았다' })), /반복 지적 승격/, '표식 없음 + open 2회 = 승격 없음')
+    assert.doesNotMatch(msgOf(ledger('c4-promo-other', [d('D-004', 'open', 2)], { notes: 'D-004 는 남았다. D-007 은 결함이 아니다' })), /반복 지적 승격/, '다른 결함 id 문장의 구절 = 승격 없음')
+    assert.doesNotMatch(msgOf(ledger('c4-promo-prefix', [d('D-004', 'open', 2)], { notes: 'D-0040 은 결함이 아니다' })), /반복 지적 승격/, 'D-0040 문장 = D-004 표식 아님(c4-build-ad8596 D-002)')
+  } finally { for (const dir of made) fs.rmSync(dir, { recursive: true, force: true }) }
+})
+
 test('c4-build-a8915f D-001 : 판정 시도 중 잠금으로 판정·BLOCKED 기록이 모두 실패한 내용은 다음 실행에서 이전 PASS 로 재사용하지 않는다(해시 = 확정 PASS 회차와 결합해서만 저장)', async () => {
   const fs = (await import('node:fs')).default, os = (await import('node:os')).default
   process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
@@ -474,4 +505,98 @@ test('c4-build-a8915f D-001 : 판정 시도 중 잠금으로 판정·BLOCKED 기
     fs.rmSync(path.join(dir, 'ledger.lock')); fs.writeFileSync(path.join(r, 'a.md'), '판정받은 내용 A1')
     assert.equal(cg.passedSame(dir, cg.judgeHash(job, ctx, r)), null, '실패한 시도가 gate.json 을 다시 써 옛 확정 해시는 사라짐(보수적 — 다시 판정)')
   } finally { if (js0 === undefined) delete process.env.CODEX_JS; else process.env.CODEX_JS = js0; fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('인터프리터 쓰기 귀속(11c — c4-c-ecc-flush-a1dd68 `cd /c/…; node -e …; for …; done` 0건 · c4-build-abc938 `cd …/references && node - <<EOF` 누락) : node -e·heredoc × /c/… · C:\\… 4형태 귀속, 다른 실행 경로·실행 밖 수정·node --test = 귀속 안 함', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-ip-')), git = (...a) => spawnSync('git', a, { cwd: r, encoding: 'utf8' })
+  const fsAll = ['.claude/settings.json', 'sub/ref/a.md', 'sub/ref/b.md', 'c.json', 'other.md', 'late.md', 'tst.md']
+  const w = (f, s) => { fs.mkdirSync(path.dirname(path.join(r, f)), { recursive: true }); fs.writeFileSync(path.join(r, f), s) }
+  try {
+    git('init', '-q'); git('config', 'user.email', 't@t'); git('config', 'user.name', 't'); for (const f of fsAll) w(f, '0'); git('add', '-A'); git('commit', '-qm', 'b')
+    const now = Date.now(), mt = (f, t) => { w(f, '1'); fs.utimesSync(path.join(r, f), new Date(t), new Date(t)) }
+    const R = r.replace(/\\/g, '/'), gb = '/' + R[0].toLowerCase() + R.slice(2), win = r   // Git Bash /c/… · Windows C:\…
+    const tail = '; for f in x; do echo $f; done'   // 실제 사례 꼴 : 복합 꼬리(for) = cwd 추적 불가 → 상대 언급이 버려지던 것
+    const sh = [
+      { c: `cd ${gb}; node -e "const fs=require('fs');fs.writeFileSync('.claude/settings.json','{}')"${tail}`, t: now - 100e3, t1: now - 99e3, f: '.claude/settings.json' },
+      { c: `cd ${win}; node -e "require('fs').writeFileSync('c.json','{}')"${tail}`, t: now - 90e3, t1: now - 89e3, f: 'c.json' },
+      { c: `cd ${gb}/sub/ref && node - <<'EOF'\nconst fs=require('fs'),f=['a'].map(x=>x+'.md')[0];fs.writeFileSync(f,'1')\nEOF\nfor f in x; do echo; done`, t: now - 80e3, t1: now - 79e3, f: 'sub/ref/a.md' },   // 쓰기 대상이 코드로 만들어짐(글에 없음)
+      { c: `cd ${win}\\sub\\ref && node - <<'EOF'\nrequire('fs').writeFileSync(require('path').join('.', 'b' + '.md'), '1')\nEOF\nfor f in x; do echo; done`, t: now - 70e3, t1: now - 69e3, f: 'sub/ref/b.md' },
+    ]
+    for (const x of sh) mt(x.f, x.t + 500)
+    mt('other.md', now - 99.5e3)   // 같은 창 안 수정이지만 다른 실행이 Write·Edit 로 쓴 경로 = 제외
+    mt('late.md', now - 50e3)      // 어느 인터프리터 실행 창에도 안 걸림 = 귀속 안 함
+    mt('tst.md', now - 30e3)       // node --test(인터프리터 인라인 아님) 실행 중 수정 = 귀속 안 함
+    const shell = [...sh.map(({ c, t, t1 }) => ({ c, t, t1 })), { c: 'node --test test/*.test.mjs', t: now - 31e3, t1: now - 29e3 }]
+    const got = cg.changedFiles([], now - 200e3, null, r, { shell, others: new Set(['other.md']) })
+    assert.deepEqual([...got], ['.claude/settings.json', 'c.json', 'sub/ref/a.md', 'sub/ref/b.md'])   // 고치기 전(11b) : ['sub/ref/a.md', 'sub/ref/b.md'] — node -e 두 형태 누락(heredoc 두 형태는 cd 인자의 디렉터리 언급으로 귀속)
+    assert.equal(got.excluded, 1, 'other.md = 병렬 귀속 제외')
+    // 시각 없는 명령(문자열·백그라운드) = 시간창 근거 없음 → 인터프리터여도 귀속 안 함(종전 규칙 유지)
+    assert.deepEqual([...cg.changedFiles([], now - 200e3, null, r, { shell: ["node -e \"require('fs').writeFileSync(require('path').join('l'+'ate.md'),'1')\""] })], [])
+    assert.deepEqual([...cg.changedFiles([], now - 200e3, null, r, { shell: [{ c: 'node - <<EOF\nx\nEOF', t: now - 51e3, t1: NaN }] })], [])
+  } finally { fs.rmSync(r, { recursive: true, force: true }) }
+})
+
+test('자동 검사 증거(11c) : 하네스 .mjs = node --check·훅 selftest 실행 결과(종료 코드·끝줄, env CODEX_GATE_ACTIVE=1) · 실패 = 종료 코드 ≠0 기록 · 시간 초과 기록 · 하네스 없음 = 없음 / AC-4 = checks.md 근거, 하네스 .md 뿐 = AC-4 없음', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-chk-')), w = (f, s) => { fs.mkdirSync(path.dirname(path.join(r, f)), { recursive: true }); fs.writeFileSync(path.join(r, f), s) }
+  try {
+    w('.claude/hooks/h.mjs', "if (process.argv[2] === '--selftest') { console.log('flag=' + process.env.CODEX_GATE_ACTIVE); console.log('selftest ok') }\n")
+    w('.claude/hooks/bad.mjs', 'const = 1\n'); w('scripts/s.mjs', 'export const s = 1\n'); w('docs/a.md', 'a')
+    const out = cg.checksOf(['.claude/hooks/h.mjs', '.claude/hooks/bad.mjs', 'scripts/s.mjs', 'docs/a.md', '.claude/hooks/gone.mjs'], r)
+    assert.match(out, /\$ node --check \.claude\/hooks\/h\.mjs\n종료 코드 : 0\n/)
+    assert.match(out, /\$ node --check \.claude\/hooks\/bad\.mjs\n종료 코드 : 1\n끝줄 : .*SyntaxError/)   // 실패 = 종료 코드 ≠0
+    assert.match(out, /\$ node --check scripts\/s\.mjs\n종료 코드 : 0/)   // 하네스가 있으면 scope 안 산출 .mjs 도
+    assert.match(out, /\$ node \.claude\/hooks\/h\.mjs --selftest\n종료 코드 : 0\n끝줄 : flag=1 ⏎ selftest ok/)   // 재진입 표식 유지
+    assert.ok(!out.includes('gone.mjs') && !out.includes('docs/a.md') && !out.includes('bad.mjs --selftest'), '없는 파일·문서·selftest 없는 훅 = 실행 안 함')
+    assert.match(cg.checksOf(['.claude/hooks/h.mjs'], r, Date.now() - 1), /종료 코드 : 시간 초과\(실행 안 함/)   // 상한 소진 = 기록하고 계속
+    assert.equal(cg.checksOf(['docs/a.md', 'scripts/s.mjs'], r), '', '하네스 없음 = checks.md 없음')
+    assert.match(cg.checksOf(['.claude/settings.json'], r), /검사 대상 없음/)   // AC-4 있음(.md 아닌 하네스) + 실행할 검사 없음 = 그 사실을 기록
+    assert.equal(cg.checksOf(['.claude/skills/x/SKILL.md', 'scripts/s.mjs'], r), '', '하네스 .md 뿐 = AC-4 없음 = checks.md 없음(D-001 — 기준과 근거 조건 일치)')
+    const ac4 = c => c.match(/^- AC-4 .*$/gm) || [], base = { id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1' }
+    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs', 'docs/a.md'] })), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 근거 = 증거 checks.md'])
+    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md', '.claude/engineering/40. loop/codex_procedure.md', 'docs/a.md'] })), [], '하네스 .md 뿐 = AC-4 없음')
+    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs'] }), { id: base.id, files: ['.claude/skills/x/SKILL.md'], part: null }, 'HEAD', null)), [], '재분할도 같은 규칙')
+  } finally { fs.rmSync(r, { recursive: true, force: true }) }
+})
+
+test('c4-build-a73e25 D-001 : 재판정·재분할(keepEvidence)도 checks.md 를 이번 묶음 파일로 다시 만든다 — 없던 증거에 생성 · 하네스가 옮겨지면 옛 묶음 정리·새 묶음 생성 · .md 뿐 묶음 없음 · 총 상한 공유', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-rechk-')), loops = path.join(process.env.CODEX_GATE_STATE, 'loop'), tag = `rechk${process.pid}`, js0 = process.env.CODEX_JS
+  const fake = path.join(r, 'fake-codex.mjs'); fs.writeFileSync(fake, 'process.exit(3)\n'); process.env.CODEX_JS = fake   // 안전 : 실제 Codex 호출 없음
+  const w = (f, s) => { fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, s) }
+  const ids = ['new', 'p1', 'p2', 'md', 'late'].map(k => `c4-${tag}-${k}`)
+  // 원장 = 계약 + 1회차 증거(report.md) + 잠금(--init·--ingest 즉시 실패 → BLOCKED, 증거 준비까지만 실행)
+  const ledger = (id, checks) => { const d = path.join(loops, id); w(path.join(d, 'contract.md'), `# 자동 계약 — ${id}\n\n## 완료 기준\n- AC-1 : x\n- AC-2 : y\n- AC-3 : z\n`); w(path.join(d, 'evidence-1', 'report.md'), '보고'); if (checks) w(path.join(d, 'evidence-1', 'checks.md'), checks); w(path.join(d, 'ledger.lock'), '{}'); return path.join(d, 'evidence-1', 'checks.md') }
+  const re = (job, chk = {}) => cg.judgeOne({ no: 4, ...job }, { keep: true, chk, type: 't', agentId: 'a1', root: r }, Date.now() + 60e3)
+  try {
+    w(path.join(r, '.claude/hooks/h.mjs'), 'export const h = 1\n'); w(path.join(r, 'docs/a.md'), 'a'); w(path.join(r, '.claude/skills/x/SKILL.md'), 's')
+    // ① 기존 증거에 checks.md 없음(11c 이전 원장) → 재판정이 생성
+    const f1 = ledger(ids[0], null)
+    assert.equal((await re({ id: ids[0], files: ['.claude/hooks/h.mjs'] })).verdict, 'BLOCKED')
+    assert.match(fs.readFileSync(f1, 'utf8'), /\$ node --check \.claude\/hooks\/h\.mjs\n종료 코드 : 0/)   // 고치기 전 : 파일 없음
+    // ② 재분할로 하네스가 p1 → p2 로 옮겨짐 : p2(자기 계약 없음 = p1 증거 복사, 옛 checks.md 'OLD' 포함) = 새로 생성, p1 = 옛 checks.md 정리
+    const fP1 = ledger(ids[1], 'OLD — 옛 scope 결과'), fP2 = path.join(loops, ids[2], 'evidence-1', 'checks.md')
+    await re({ id: ids[2], base: ids[1], src: ids[1], part: [2, 2], files: ['.claude/hooks/h.mjs'] })
+    assert.ok(fs.readFileSync(fP2, 'utf8').includes('$ node --check .claude/hooks/h.mjs') && !fs.readFileSync(fP2, 'utf8').includes('OLD'), '새 묶음 = 이번 파일로 다시 만듦')   // 고치기 전 : 복사된 'OLD' 그대로
+    await re({ id: ids[1], base: ids[1], part: [1, 2], files: ['docs/a.md'] })
+    assert.ok(!fs.existsSync(fP1), '하네스가 빠진 묶음 = 옛 checks.md 지움')   // 고치기 전 : 'OLD' 남음
+    // ③ .md 만 있는 묶음(하네스 문서 포함) = checks.md 없음
+    const fMd = ledger(ids[3], 'OLD')
+    await re({ id: ids[3], files: ['docs/a.md', '.claude/skills/x/SKILL.md'] })
+    assert.ok(!fs.existsSync(fMd))
+    // ④ 총 상한 하나 공유 : 같은 chk 객체의 상한이 이미 지났으면 다음 묶음은 실행하지 않고 '시간 초과'
+    const fL = ledger(ids[4], null)
+    await re({ id: ids[4], files: ['.claude/hooks/h.mjs'] }, { end: Date.now() - 1 })
+    assert.match(fs.readFileSync(fL, 'utf8'), /종료 코드 : 시간 초과\(실행 안 함/)
+  } finally {
+    if (js0 === undefined) delete process.env.CODEX_JS; else process.env.CODEX_JS = js0
+    fs.rmSync(r, { recursive: true, force: true }); for (const id of ids) fs.rmSync(path.join(loops, id), { recursive: true, force: true })
+  }
 })

@@ -2,7 +2,7 @@
 //   (2026-11-10 마스터 결정 — verify 폐지·훅 자동 실행 / 개정 "프롬프트+컨텍스트+그래프+총괄=>제거, 루프 유지+하네스는 루프에 흡수" — 원장 c4-<주제>-<agentId 앞 6자> 하나, 절차 정본 .claude/engineering/40. loop/codex_procedure.md 13절)
 // 실행 : 루트 .claude/settings.json SubagentStart(`--base` : 시작 스냅샷 git stash create) + SubagentStop(판정, timeout 600) + PostToolUse·UserPromptSubmit(`--flush` : 쌓인 판정 결과를 메인 additionalContext 로 1회 전달 — 서브에이전트 안 호출(입력 agent_id)은 건너뜀)
 //   PostToolUse·UserPromptSubmit 등록 = codex-flush.mjs(얇은 진입 — pending 이 있을 때만 이 파일을 불러 flushOut, 출력 바이트 동일 · 2026-11-11 P1). `--flush` 는 그대로 남김(같은 출력)
-//   판정 대상 = 파일 변경 1건 이상 + NO_GATE 밖 에이전트, 하네스 파일도 같은 c4 scope(계약 AC-4), 생성물 제외, 프롬프트 상한 넘을 때만 파일 묶음 -p1… (묶음 AND), 같은 요청의 BLOCKED c4 원장 1회 재판정
+//   판정 대상 = 파일 변경 1건 이상 + NO_GATE 밖 에이전트, 하네스 파일도 같은 c4 scope(계약 AC-4 — 하네스가 .md 뿐이면 없음, 근거 = 훅이 돌린 증거 checks.md), 생성물 제외, 프롬프트 상한 넘을 때만 파일 묶음 -p1… (묶음 AND), 같은 요청의 BLOCKED c4 원장 1회 재판정
 //   SubagentStop 의 additionalContext 는 서브에이전트에게 가서 그 에이전트가 계속 돈다(Claude Code 2.1.321 스키마 설명) → 메인 전달은 결과 파일 + 메인 쪽 훅 flush 로 한다
 // 시험 : node .claude/hooks/codex-gate.mjs --selftest (가짜 판정자 CODEX_JS — Codex 실호출 없음)
 import { spawn, spawnSync } from 'node:child_process'
@@ -29,7 +29,8 @@ const C = {
   reserve: 16 * 1024,       // 묶음 예산 여유 — 범위 목록·이전 회차 결함·가림 표식(budgetOf)
   minBudget: 120 * 1024,    // 묶음 예산 하한(계약·증거가 아주 커도 이만큼은 diff + 본문)
   refEach: 6000, refBody: 12000, refMax: 32000,   // 참조 발췌 글자 상한(항목당 · 결함 함수 본문·파일당 · 묶음당 — budgetOf 가 증거 몫으로 3바이트/자 뺌)
-  rulesVer: '2026-11-11b',  // 분할·참조·귀속 규칙 버전 — gate.json·attrib 기록에 남기고, 바뀌면 scope-missing 재시도 상한(retryMax)을 1회 풀어 주고 옛 귀속 기록은 다시 계산(회송 [2]c · 2026-11-11a = 셸 귀속 실행 시각 조건 · 11b = 셸 cd 작업 디렉터리 추적)
+  rulesVer: '2026-11-11c',  // 분할·참조·귀속 규칙 버전 — gate.json·attrib 기록에 남기고, 바뀌면 scope-missing 재시도 상한(retryMax)을 1회 풀어 주고 옛 귀속 기록은 다시 계산(회송 [2]c · 2026-11-11a = 셸 귀속 실행 시각 조건 · 11b = 셸 cd 작업 디렉터리 추적 · 11c = 인터프리터 쓰기 귀속·자동 검사 증거)
+  checkMs: 60e3,            // 자동 검사(checksOf — node --check·훅 selftest) 총 시간 상한, 넘으면 '시간 초과' 기록·판정 계속
   noScope: 'docs/__codex-gate-no-files__',   // 파일 scope 없는 판정(옛 원장 재판정 대비) — 없는 경로 = 변경·본문 0, 판정 본체는 증거
   retry: ['scope-too-broad', 'judge-unavailable', 'lock', 'scope-missing'],   // 자동 재판정 사유(device·master-permission·budget·ledger 는 사람 몫) — scope-missing = 묶음 분할로 대조 근거가 빠진 판정(2026-11-10 c4-fail-5-aeb16d), 새 분할로 재판정
   retryMax: 3,              // scope-missing 같은 회차 BLOCKED 기록 상한(쿨다운 없는 사유라 무한 재판정 방지)
@@ -207,17 +208,22 @@ export function changedFiles(writes, t0, base = null, root = ROOT, { shell = [],
   //     아직 기록에 안 실린 형제 Edit 가 '이 에이전트의 test/*.test.mjs 글롭·grep 경로 언급'으로 붙던 문제. t1 없음(백그라운드·결과 전) = 상한 없음
   //   ponytail: 수정 시각은 마지막 1개뿐 — 같은 파일을 뒤에 다른 실행이 또 고치면 이 에이전트 셸 쓰기는 빠짐(그 실행이 기록에 있으면 원래도 제외 대상). 정확히 하려면 명령 전후 파일 해시 기록
   //   cd 뒤 상대 표기(2026-11-11 후속 2) = 명령 글을 그 cwd 기준 저장소 상대로 바꿔(rootText — shellWrites 와 cwd 해석 공유) 비교, 저장소 밖·추적 불가 cwd 의 상대 언급은 근거 아님
-  const sh = (Array.isArray(shell) ? shell : []).map(x => typeof x === 'string' ? { c: x } : x).filter(x => x && typeof x.c === 'string').map(x => ({ ...x, rc: rootText(x.c, root) }))
+  //   인라인 인터프리터(2026-11-11c — c4-c-ecc-flush-a1dd68 `cd /c/…; node -e "…writeFileSync('.claude/settings.json')"; for …; done` = 0건 귀속·원장 없음, c4-build-abc938 `cd …/references && node - <<'EOF'` 누락) :
+  //     쓰기 대상이 코드 안에 있어 글로 확정할 수 없음(복합 셸 + cd = cwd 추적 불가로 상대 언급까지 버려짐) → 그 명령 실행 중([t, t1] ±1초, 둘 다 있을 때만) 수정 시각이 바뀐 파일을 귀속, 다른 실행이 쓴 경로(others)는 위처럼 제외
+  //     ponytail: 실행 중 같은 시각에 다른 세션(기록 밖)이 고친 파일도 붙음 — 시간창이 짧아(보통 수 초) 감수, 오귀속이 나오면 명령 전후 해시 비교로
+  const sh = (Array.isArray(shell) ? shell : []).map(x => typeof x === 'string' ? { c: x } : x).filter(x => x && typeof x.c === 'string').map(x => ({ ...x, rc: rootText(x.c, root), ip: INTERP_RE.test(shellSegs(x.c, root).segs.map(g => g.s).join('\n')) }))
   const T = sh.map(x => x.c).join('\n').replace(/\\/g, '/')
   const names = (c, f) => { c = c.replace(/\\/g, '/'); const d = path.posix.dirname(f); return c.includes(f) || (d !== '.' && new RegExp(`(^|[^\\w.-])${d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|[^\\w.-]|$)`).test(c)) }
   const mtOf = f => { try { return fs.statSync(path.join(root, f)).mtimeMs } catch { return NaN } }
-  const said = f => sh.some(x => names(x.rc, f) && (!Number.isFinite(x.t) || (m => m >= x.t - 1000 && (!Number.isFinite(x.t1) || m <= x.t1 + 1000))(mtOf(f))))
+  const win = (x, m) => m >= x.t - 1000 && (!Number.isFinite(x.t1) || m <= x.t1 + 1000)
+  const said = f => sh.some(x => names(x.rc, f) && (!Number.isFinite(x.t) || win(x, mtOf(f))))
+  const ran = f => sh.some(x => x.ip && Number.isFinite(x.t) && Number.isFinite(x.t1) && win(x, mtOf(f)))   // 인라인 인터프리터 실행 중 수정(백그라운드·시각 없음 = 근거 아님)
   // 다른 실행도 쓴 경로(others — Write·Edit·셸 쓰는 형태) = 이 에이전트 명령이 그 경로를 '쓰는 형태'로 적었을 때만 귀속, 읽기·실행·글롭·디렉터리 일치뿐이면 제외(c4-aeb16d-ae440b D-001)
   const mine = new Set(sh.flatMap(x => [...shellWrites(x.c, root)]).map(p => relOf(p, root)).filter(Boolean))
   if (T) {
     const cand = base ? [...git(['diff', '--name-only', '-z', base], root).stdout.split('\0'), ...git(['ls-files', '--others', '--exclude-standard', '-z'], root).stdout.split('\0')]
       : (g => g.status === 0 ? g.stdout.split('\0').filter(e => e && !e.startsWith('R')).map(e => e.slice(3)) : [])(git(['status', '--porcelain', '-uall', '-z'], root))
-    for (const f of new Set(cand)) if (f && !out.has(f) && fresh(f)) { if (others.has(f) && !mine.has(f)) excluded++; else if (said(f) || mine.has(f)) out.add(f) }   // mine = 쓰는 형태 대상(-tDIR 처럼 경로가 글자로 안 드러나도, D-002)
+    for (const f of new Set(cand)) if (f && !out.has(f) && fresh(f)) { if (others.has(f) && !mine.has(f)) excluded++; else if (said(f) || mine.has(f) || ran(f)) out.add(f) }   // mine = 쓰는 형태 대상(-tDIR 처럼 경로가 글자로 안 드러나도, D-002) · ran = 인라인 인터프리터 실행 중 수정(11c)
   }
   return Object.assign([...out].filter(f => !EXCLUDE_RE.test(f)).sort(), { excluded, own })
 }
@@ -243,6 +249,9 @@ const CD_CMD = new Set(['cd', 'chdir', 'pushd', 'sl', 'set-location', 'push-loca
 // 복합 셸 = 서브셸·묶음 ( ) { } · 명령 치환 $( 백틱 · 제어 키워드 · popd(가린 글 기준 — 따옴표·heredoc 본문 안은 안 봄)
 const COMPLEX_RE = /[(){}`]|(^|[\s;&|])(if|then|elif|else|fi|while|until|do|done|for|select|case|esac|popd|pop-location)(?=$|[\s;&|])/i
 const isAbsP = p => path.isAbsolute(String(p).replace(/^\/([a-z])\//i, '$1:/'))
+// 인라인 인터프리터(코드 안에서 파일을 쓸 수 있는 형태 — changedFiles ran, 가린 글 기준이라 따옴표·heredoc 본문 안 글은 안 봄) :
+//   node·bun·perl·ruby -e/--eval/-p/--print/- · python·py -c/- · 인터프리터 + heredoc(<<). node --test·--check·스크립트 파일 실행은 해당 없음
+const INTERP_RE = /(^|[\s;&|(])(?:(?:node|bun|perl|ruby)(?:\.exe)?(?:\s+-\S+)*?\s+(?:-e|--eval|-p|--print|-)(?=\s|$)|(?:python[\d.]*|py)(?:\.exe)?(?:\s+-\S+)*?\s+(?:-c|-)(?=\s|$)|(?:node|bun|perl|ruby|python[\d.]*|py)(?:\.exe)?\s[^\n]*<<)/im
 /**
  * 셸 명령 → 세그먼트(&&·||·;·|·&·줄바꿈 순서) [{ s: 가린 글, cwd: 그 세그먼트 실행 디렉터리(절대, 추적 불가 = null) }] + 표식 원문(q 따옴표 · b heredoc 본문 · r 리다이렉트 대상)
  *   가림 = 따옴표 \u0001N\u0001 · heredoc 본문 \u0003N\u0003 · 리다이렉트 대상 \u0002N\u0002 — 본문·따옴표 안 `>`·`;`·`(` 는 보지 않는다
@@ -582,13 +591,35 @@ export function diffRefOf(baseRef, files, root = ROOT) {
 const baseLine = (ref, baseRef) => `- 기준선 : ${!baseRef ? '기준선 없음 (SubagentStart 스냅샷 없음 — HEAD 기준, 같은 시간 다른 세션 변경이 섞일 수 있음)' : ref === baseRef ? `${baseRef} (SubagentStart 스냅샷 — 이 에이전트 시작 뒤 변경만)` : `HEAD — 시작 스냅샷 ${baseRef} 대비 scope 변경 0건(재개 때 다시 찍힌 스냅샷 — 2026-11-10 c4-fail-5-aeb16d), HEAD 기준이라 같은 시간 다른 세션 변경이 섞일 수 있음`}`
 const scopeLine = (n, part, related) => `- scope = 이 원장 파일 ${n}건${part ? ` · 묶음 ${part[0]}/${part[1]} — 이 원장은 모든 묶음 PASS 일 때만 Y(AND), 이 묶음 밖 파일은 판정하지 않는다(unverifiable 아님)` : ''}${related ? ' · 다른 묶음 연관 파일 발췌 = 증거 related-ref.md(참조 — 판정 대상 아님, 이 묶음 판정의 대조 근거로만)' : ''}`
 /** 자동 계약(contract.md, c4 전용) — 마스터 요청 원문 + 브리프 원문 + 검수 대상 + 기본 AC(하네스 파일 있으면 AC-4) + 기준선·묶음·생성물 표기 */
-/** AC-4 줄(하네스 파일이 있을 때만) — 첫 계약·재분할 계약 공용 */
-const ac4Of = files => { const hz = files.filter(f => HARNESS_RE.test(f)); return hz.length ? [`- AC-4 : 하네스 파일 변경 ${hz.length}건(${hz.join(', ')}) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 통과 근거가 보고에 있다`] : [] }
+/** AC-4 줄(하네스 파일 중 .md 아닌 것이 있을 때만 — 문서만 바꾼 하네스 변경은 없음, 11c) — 첫 계약·재분할 계약 공용. 근거 = 훅이 직접 돌린 증거 checks.md(build 보고 의존 안 함) */
+const ac4Of = files => { const hz = files.filter(f => HARNESS_RE.test(f)); return hz.some(f => !/\.md$/i.test(f)) ? [`- AC-4 : 하네스 파일 변경 ${hz.length}건(${hz.join(', ')}) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 근거 = 증거 checks.md`] : [] }
+/**
+ * 자동 검사 증거(2026-11-11c — 하네스 원장 BLOCKED 60건 중 26건 '증거·본문 누락', 문서 한 줄 수정도 'selftest 근거 없음' FAIL 2회차) : scope 에 하네스 파일이 1건 이상이면 훅이 직접 실행
+ *   scope 안 .mjs·.js·.cjs(있는 파일) 마다 node --check + 바뀐 훅(.claude/hooks/*) 중 원문에 --selftest 가 있으면 node <훅> --selftest → 명령·종료 코드·출력 끝 2줄(비밀 가림)
+ *   총 상한 end(기본 C.checkMs) — 넘으면 '시간 초과' 적고 판정은 계속. 자식 env CODEX_GATE_ACTIVE=1(훅이 띄운 프로세스 — 재진입 금지). AC-4 없는 묶음(하네스 없음·.md 뿐) = '' (checks.md 안 만듦·지움)
+ *   ponytail: node --test 전체는 넣지 않음(1~2분 — 훅 시간 예산·판정 지연), 시험 근거는 build 보고·tools.md. 필요해지면 바뀐 파일의 짝 시험만 골라 추가
+ */
+export function checksOf(files, root = ROOT, end = Date.now() + C.checkMs) {
+  if (!ac4Of(files).length) return ''   // AC-4 와 같은 조건(c4-build-a73e25 D-001 — 근거 파일과 기준이 같이 붙고 같이 빠짐)
+  const has = f => fs.existsSync(path.join(root, f)), src = f => { try { return fs.readFileSync(path.join(root, f), 'utf8') } catch { return '' } }
+  const cmds = [...files.filter(f => /\.(mjs|js|cjs)$/.test(f) && has(f)).map(f => ['--check', f]),
+    ...files.filter(f => /^\.claude\/hooks\/[^/]+\.(mjs|js|cjs)$/.test(f) && src(f).includes('--selftest')).map(f => [f, '--selftest'])]
+  const lim = `총 상한 ${Math.round((end - Date.now()) / 1000)}초`
+  const out = cmds.map(a => {
+    const left = end - Date.now(), cmd = `$ node ${a.join(' ')}`
+    if (left <= 0) return `${cmd}\n종료 코드 : 시간 초과(실행 안 함 — ${lim})`
+    const r = spawnSync(process.execPath, a, { cwd: root, encoding: 'utf8', windowsHide: true, timeout: left, env: { ...process.env, [C.envFlag]: '1' } })
+    const code = r.error?.code === 'ETIMEDOUT' ? `시간 초과(${lim})` : r.status ?? (r.error ? `실행 오류 ${r.error.code || r.error.message}` : `신호 ${r.signal}`)
+    const tail = redact((r.stdout || '') + (r.stderr || '')).split(/\r?\n/).filter(l => l.trim() && !/^\s+at |^Node\.js v\d/.test(l)).slice(-2).map(l => l.slice(0, 300))   // 스택·버전 줄 빼고 끝 2줄(오류 줄이 남게)
+    return `${cmd}\n종료 코드 : ${code}\n끝줄 : ${tail.join(' ⏎ ') || '(출력 없음)'}`
+  })
+  return `## 자동 검사(codex-gate 훅 실행 — ${lim}, env ${C.envFlag}=1 · node --test 전체는 넣지 않음)\n\n${out.join('\n\n') || '(검사 대상 없음 — scope 에 .mjs·.js·.cjs·selftest 훅 없음)'}\n`
+}
 export function contractOf({ id, brief, request, type, agentId, files = [], part, generated = [], baseRef, diffRef = baseRef, own = null, excluded = 0, shell = false, related = '' }) {
   return [`# 자동 계약 — ${id} (codex-gate 훅, ${new Date().toISOString()})`, '',
     `- 판정 대상 : ${type} (${agentId}) 의 최종 결과`, `- 검수 대상 : ${TARGET}`,
     baseLine(diffRef, baseRef), scopeLine(files.length, part, related),
-    ...(own ? [`- scope 귀속 : 이 에이전트 Write·Edit 기록 ${files.filter(f => own.includes(f)).length}건(gitignore 무관 — 무시 대상 본문은 evidence written-files.md) · Bash·PowerShell 변경 보조 ${files.filter(f => !own.includes(f)).length}건${shell ? '(시작 뒤 수정 시각 + 명령에 경로·디렉터리)' : '(셸 미사용 = 없음)'} · 병렬 에이전트 귀속 제외 ${excluded}건(같은 시간 다른 실행이 Write·Edit 또는 셸 쓰는 형태로 쓴 경로 — 이 에이전트 명령이 읽기·실행·글롭·디렉터리로만 걸친 것) · 기준선 이전 미커밋 변경 = 제외`] : []),
+    ...(own ? [`- scope 귀속 : 이 에이전트 Write·Edit 기록 ${files.filter(f => own.includes(f)).length}건(gitignore 무관 — 무시 대상 본문은 evidence written-files.md) · Bash·PowerShell 변경 보조 ${files.filter(f => !own.includes(f)).length}건${shell ? '(시작 뒤 수정 시각 + 명령에 경로·디렉터리, 또는 인라인 인터프리터 실행 중 수정)' : '(셸 미사용 = 없음)'} · 병렬 에이전트 귀속 제외 ${excluded}건(같은 시간 다른 실행이 Write·Edit 또는 셸 쓰는 형태로 쓴 경로 — 이 에이전트 명령이 읽기·실행·글롭·디렉터리로만 걸친 것) · 기준선 이전 미커밋 변경 = 제외`] : []),
     ...(generated.length ? [`- 생성물 ${generated.length}건은 scope 제외 — 생성기 실행 증거(evidence generated.txt)로만 본다`] : []), '',
     '## 완료 기준',
     '- AC-1 : 최종 보고가 브리프(+추가 지시)의 요구 항목 중 이 scope 에 해당하는 것을 다루고, 못 한 항목은 사유와 함께 밝힌다',
@@ -621,6 +652,7 @@ export async function judgeOne(job, ctx, deadline) {
   const ev = path.join(dir, `evidence-${iter}`), ref = diffRefOf(ctx.baseRef, job.files)
   if (ctx.keep) keepEvidence(job, ctx, dir, ev, ref)   // 재판정 : 첫 판정 때 만든 계약·증거 유지(묶음으로 새로 나뉜 원장은 기준 원장 것을 복사해 scope 만 고침)
   else { fs.mkdirSync(ev, { recursive: true }); writeEvidence(job, ctx, dir, ev, ref) }
+  putChecks(job, ctx, ev)   // c4-build-a73e25 D-001 : 첫 판정·재판정(재분할) 공통 — 이번 묶음 파일로 다시 만들거나, AC-4 없는 묶음이면 복사된 옛 checks.md 를 지움
   fs.writeFileSync(path.join(dir, 'gate.json'), JSON.stringify({ agentType: ctx.type, agentId: ctx.agentId, rulesVer: C.rulesVer, no: job.no, files: job.files, part: job.part || null, base: job.base || null, baseRef: ctx.baseRef || null, requestAt: ctx.requestAt ?? null, generated: ctx.generated || [] }))
   const res = await judgeRun(job, dir, ev, ref, iter, deadline)
   // c4-build-a8915f D-001 : 통과 근거(passHash) = 원장에 실제 기록된 이번 회차 PASS 와 결합해 판정 뒤에만 쓴다 — 판정 전에 쓰면 판정·BLOCKED 기록이 모두 실패한 내용이 이전 PASS 로 재사용됨
@@ -684,6 +716,11 @@ export const refreshContract = (c, job, ref, baseRef) => {
   const k = c.indexOf('\n## 마스터 요청 원문'), head = k < 0 ? c : c.slice(0, k)   // 머리(정의)만 고침 — 인용 구획(원문·브리프)의 같은 모양 줄('- AC-4 :' 등)은 그대로(c4-build-a19b07 iter-2 형제)
   return head.replace(/^# 자동 계약 — \S+/m, `# 자동 계약 — ${job.id}`).replace(/^- 기준선 : .*$/m, baseLine(ref, baseRef)).replace(/^- scope = .*$/m, scopeLine(job.files.length, job.part, job.related))
     .replace(/^- AC-4 : .*\n/m, '').replace(/^(- AC-3 : .*)$/m, m => [m, ...ac4Of(job.files)].join('\n')) + (k < 0 ? '' : c.slice(k))
+}
+/** 자동 검사 증거 쓰기(11c) — checksOf(job.files) 결과로 checks.md 덮어쓰기, 빈 글 = 지움. 총 상한 = ctx.chk.end 하나(gate 가 첫 판정·재판정 ctx 에 같은 객체를 넘김 — 첫 검사 때 시작) */
+export function putChecks(job, ctx, ev) {
+  const chk = ctx.chk ??= {}, out = checksOf(job.files, ctx.root || ROOT, chk.end ??= Date.now() + C.checkMs), f = path.join(ev, 'checks.md')
+  if (out) fs.writeFileSync(f, out); else fs.rmSync(f, { force: true })
 }
 function keepEvidence(job, ctx, dir, ev, ref) {
   const own = fs.existsSync(path.join(dir, 'contract.md')), from = own ? dir : path.join(C.loops, job.src || job.base || job.id)
@@ -750,13 +787,25 @@ export function retryTargets({ since, now = Date.now(), skip = new Set(), loops 
  *      새 묶음에 없는 옛 묶음 = superseded.json. 계약·증거는 출처 원장(src)에서 복사, 묶음마다 참조 발췌 related
  *   ③ 그 밖(scope-missing 단일 원장 포함) = 같은 원장 같은 회차
  */
-/** 원장 마지막 판정의 열린 결함(open·regressed·contested, 면제 제외, 파일 있는 것) */
-export function liveDefects(dir) {
+/** 원장 마지막 판정 결과(결함은 면제 제외) */
+function lastResult(dir) {
   try {
-    const l = JSON.parse(fs.readFileSync(path.join(dir, 'ledger.json'), 'utf8')), it = (l.iters || []).at(-1); if (!it) return []
-    const out = it.out && fs.existsSync(it.out) ? it.out : path.join(dir, `iter-${it.iter}.codex.json`)
-    return (JSON.parse(fs.readFileSync(out, 'utf8')).defects || []).filter(d => ['open', 'regressed', 'contested'].includes(d.status) && d.file && !(l.waived || {})[d.id])
-  } catch { return [] }
+    const l = JSON.parse(fs.readFileSync(path.join(dir, 'ledger.json'), 'utf8')), it = (l.iters || []).at(-1); if (!it) return null
+    const out = it.out && fs.existsSync(it.out) ? it.out : path.join(dir, `iter-${it.iter}.codex.json`), r = JSON.parse(fs.readFileSync(out, 'utf8'))
+    return { ...r, defects: (r.defects || []).filter(d => !(l.waived || {})[d.id]) }
+  } catch { return null }
+}
+/** 원장 마지막 판정의 열린 결함(open·regressed·contested, 면제 제외, 파일 있는 것) */
+export const liveDefects = dir => (lastResult(dir)?.defects || []).filter(d => ['open', 'regressed', 'contested'].includes(d.status) && d.file)
+/** 이의 인정 표식 구절(2026-11-11 c4-build-ad8596 D-001 회송 확정) — notes·기준 evidence 의 한 문장에 결함 id 와 함께 나오면 표식 */
+export const ACK_PHRASES = ['결함이 아니', '수정할 필요가 없', '이의를 인정', '이의 인정', 'not a defect']
+/** 반복 지적 승격 대상(2026-11-11 마스터 선택) = seenCount 2 이상 + (contested 또는 이의 인정 표식) — 회송 대신 팀장 면제 판단으로 안내만(판정·상한·면제 기록은 그대로) */
+export function promotedDefects(dir) {
+  const r = lastResult(dir); if (!r) return []
+  const sents = [r.notes, ...(r.criteria || []).map(c => c.evidence)].flatMap(t => String(t || '').split(/\. |。|\n|·/))
+  // 결함 id = 문장에서 뽑은 id 와 일치 비교(c4-build-ad8596 D-002 — 부분 문자열이면 'D-0040' 이 D-004 표식으로 잡힘)
+  const acked = id => sents.some(s => new Set(s.match(/\b[A-Z]+-\d+\b/g) || []).has(id) && ACK_PHRASES.some(p => s.toLowerCase().includes(p)))
+  return r.defects.filter(d => d.seenCount >= 2 && (d.status === 'contested' || acked(d.id)))
 }
 export function resplit(targets, costFor, loops = C.loops, { read = readRepo(), budgetFor = () => budgetOf(), changed = () => () => [], dry = false } = {}) {
   const seen = new Set(), now = () => new Date().toISOString()
@@ -838,7 +887,8 @@ export async function gate(input, { deadline = Date.now() + C.budgetMs, root = R
   const design = sc.generated.filter(f => /^\.claude\/engineering\/50\. graph\/(myRequestGraph\.html$|request-flow\/)/.test(f)), genRuns = []
   if (design.length) genRuns.push(runGenerator(['--design-only', '--md'], design, root))
   if (sc.generated.some(f => f.includes('/requests/'))) genRuns.push(runGenerator(['--md', '--trigger', 'subagent'], null, root))
-  const ctx = { type, agentId, brief: a.brief, report, own: [...changed.own], excluded: changed.excluded, shell, tools: toolLines(recs, String(type).replace(/^anakin_phase-|^teamanakin-/, '')).join('\n'), generated: sc.generated, genRuns, baseRef, request: req?.text, requestAt: req?.t ?? null, t0: a.t0, sessionId: input.session_id, root }
+  const chk = {}   // 자동 검사 총 상한 하나(이번 판정 묶음 + BLOCKED 재판정 묶음 공유 — putChecks)
+  const ctx = { chk, type, agentId, brief: a.brief, report, own: [...changed.own], excluded: changed.excluded, shell, tools: toolLines(recs, String(type).replace(/^anakin_phase-|^teamanakin-/, '')).join('\n'), generated: sc.generated, genRuns, baseRef, request: req?.text, requestAt: req?.t ?? null, t0: a.t0, sessionId: input.session_id, root }
   // 묶음 예산(AC-2) = 래퍼 프롬프트 상한 − 이 판정의 실측 고정 구획(계약 + 증거 추정)
   const all = [...sc.harness, ...sc.product].sort(), read = readRepo(root), ref0 = diffRefOf(baseRef, all, root)
   const budget = budgetOf({ contract: Buffer.byteLength(contractOf({ ...ctx, id: plan[0].id, files: all })), evidence: evidenceBytesOf(ctx) })
@@ -852,7 +902,7 @@ export async function gate(input, { deadline = Date.now() + C.budgetMs, root = R
   const reRef = t => diffRefOf(t.gate.baseRef, t.files, root)
   const reJobs = resplit(re, t => { const r = reRef(t); return f => costOf(f, r, root) }, C.loops, { read, budgetFor: t => budgetOf(sizesOf(path.join(C.loops, t.id))), changed: t => changedLinesOf(reRef(t), root) })
   const [results, again] = await Promise.all([Promise.all(jobs.map(j => safe(judgeOne(j, ctx, deadline)).then(r => ({ ...j, ...r })))),
-    Promise.all(reJobs.map(t => safe(judgeOne(t, { keep: true, type: t.gate.agentType, agentId: t.gate.agentId, generated: t.gate.generated, baseRef: t.gate.baseRef, requestAt: t.gate.requestAt }, deadline)).then(r => ({ ...t, ...r, re: true }))))])
+    Promise.all(reJobs.map(t => safe(judgeOne(t, { keep: true, chk, type: t.gate.agentType, agentId: t.gate.agentId, generated: t.gate.generated, baseRef: t.gate.baseRef, requestAt: t.gate.requestAt }, deadline)).then(r => ({ ...t, ...r, re: true }))))])
   const pick = ({ id, no, iter, code, verdict, reason, base, part, re }) => ({ id, no, iter, code, verdict, ...(reason ? { reason } : {}), ...(base ? { base, part } : {}), ...(re ? { re: true } : {}), ledger: path.relative(ROOT, path.join(C.loops, id)).replace(/\\/g, '/') })
   const rec = { at: new Date().toISOString(), agentType: type, agentId, changed: changed.length, baseRef: baseRef || null, results: [...results, ...again].map(pick) }
   fs.mkdirSync(C.pending, { recursive: true }); fs.writeFileSync(path.join(C.pending, `${Date.now()}-${agentId.slice(0, 12) || 'x'}.json`), JSON.stringify(rec))
@@ -862,10 +912,12 @@ export async function gate(input, { deadline = Date.now() + C.budgetMs, root = R
 export function summarize(rec) {
   const own = rec.results.filter(r => !r.re), all = own.every(r => r.code === 0)
   const bases = [...new Set(own.filter(r => r.base).map(r => r.base))].map(b => { const ps = own.filter(r => r.base === b); return `${b} 묶음 ${ps.length}개 AND → ${ps.every(r => r.code === 0) ? 'Y' : ps.some(r => r.code === 1) ? 'N' : '보류'}` })
+  const promo = rec.results.filter(r => r.code === 1).flatMap(r => promotedDefects(path.join(C.loops, r.id)).map(d => `${r.id} ${d.id}(이의 ${d.seenCount}회)`))
   return `[CDX 자동 판정 — codex-gate 훅] ${rec.agentType}(${rec.agentId.slice(0, 6)})${rec.baseRef ? '' : ' [기준선 없음]'} : ${own.map(r => `${r.id} ${r.iter ?? '-'}회차 ${r.verdict}(종료 ${r.code})${r.reason ? ` — ${r.reason}` : ''} · 원장 ${r.ledger}`).join(' / ')}`
     + (bases.length ? ` ; ${bases.join(' ; ')}` : '')
     + (rec.results.some(r => r.re) ? ` ; BLOCKED 재판정 : ${rec.results.filter(r => r.re).map(r => `${r.id} ${r.iter}회차 ${r.verdict}`).join(' / ')}` : '')
     + (all ? ' → 전부 PASS(Y) : 다음 단계 진행 가능' : ' → Y 아님 : FAIL 은 그 결과를 낸 에이전트에 결함(원장 iter-N.codex.json) 회송(재실행 끝나면 같은 원장 다음 회차를 훅이 자동 판정, 상한 5회), BLOCKED 는 다음 SubagentStop 때 훅이 재판정(사유 해소 필요 시 해소) — 전부 PASS 전 다음 단계 진행 금지')
+    + (promo.length ? ` ; **반복 지적 승격** — 회송 대신 teamanakin-admin 면제 판단(13절 9항) : ${promo.join(' / ')} — 이 결함은 회송 목록에서 뺌(판정·상한 그대로)` : '')
 }
 /** --flush : 쌓인 판정 결과를 한 번만 메인에 전달(pending → sent) */
 export function flush() {
@@ -885,6 +937,7 @@ const readStdin = async () => { let raw = ''; for await (const c of process.stdi
 const isMain = import.meta.url === pathToFileURL(process.argv[1] || '').href
 if (isMain && process.argv[2] === '--selftest') {
   const assert = (await import('node:assert/strict')).default
+  delete process.env[C.envFlag]   // 11c : 훅 자동 검사(checksOf)가 이 selftest 를 env CODEX_GATE_ACTIVE=1 로 띄움 — 시험 안 gate() 는 격리 상태 루트에서 돌아야 함(자식 검사는 다시 표식을 달고, 시험 기록의 훅 파일은 없는 경로라 재귀 없음)
   // 시험 격리(2026-11-10 E) : 원장·pending·sent·기준선을 임시 상태 루트로 — 실제 .omc/state 를 건드리지 않는다(자식 프로세스·래퍼는 env CODEX_GATE_STATE·CODEX_LOOP_ROOT 로 같은 루트)
   const realPending = C.pending, snap = d => { try { return Object.fromEntries(fs.readdirSync(d).map(f => [f, fs.readFileSync(path.join(d, f), 'utf8')])) } catch { return {} } }, before = snap(realPending)
   const stRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'cgate-state-'))
@@ -987,7 +1040,7 @@ if (isMain && process.argv[2] === '--selftest') {
       const B = changedFiles([path.join(r, 'b.md')], t0, base, r, { shell: [], others: new Set(['a.md', 'ign/x.md']) })
       assert.deepEqual([...B], ['b.md']); assert.equal(B.excluded, 0)   // 셸 미사용 = 자기 기록만(병렬 A 파일·기준선 이전 old.md 없음)
       assert.deepEqual([...changedFiles([], t0, null, r, { shell: ['cat a.md b.md bash-made.md'] })].sort(), ['a.md', 'b.md', 'bash-made.md']); assert.deepEqual([...changedFiles([], t0, null, r, { shell: ['node gen.mjs'] })], [])   // 명령에 경로·디렉터리 없음 = 셸 귀속 0건(시간창만으로 귀속 안 함)   // 기준선 없음 = git status ∩ 시작 뒤 수정(old.md 제외, gitignore 는 자기 기록으로만)
-      assert.match(contractOf({ id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1', files: [...A], own: [...A.own], excluded: A.excluded, shell: true }), /scope 귀속 : 이 에이전트 Write·Edit 기록 2건[^\n]*보조 1건\(시작 뒤 수정 시각 \+ 명령에 경로·디렉터리\) · 병렬 에이전트 귀속 제외 1건/)
+      assert.match(contractOf({ id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1', files: [...A], own: [...A.own], excluded: A.excluded, shell: true }), /scope 귀속 : 이 에이전트 Write·Edit 기록 2건[^\n]*보조 1건\(시작 뒤 수정 시각 \+ 명령에 경로·디렉터리, 또는 인라인 인터프리터 실행 중 수정\) · 병렬 에이전트 귀속 제외 1건/)
       // 결함 8-5 : 같은 에이전트 옛 묶음 원장(-p1·-p2)·더는 없는 칸 원장 = superseded 표식(다른 에이전트 원장은 그대로), 직접 판정 기준 원장의 split.json 은 치움
       const L = path.join(r, 'loops'), g = (id, agentId) => { fs.mkdirSync(path.join(L, id), { recursive: true }); fs.writeFileSync(path.join(L, id, 'gate.json'), JSON.stringify({ agentId })) }
       g('c4-b-a9509f-p1', 'a9509f1'); g('c4-b-a9509f-p2', 'a9509f1'); g('c3-b-a9509f', 'a9509f1'); g('c1-b-a9509f', 'a9509f1'); g('c4-b-a9509f', 'a9509f1'); g('c4-o-ae4137', 'ae41371'); fs.writeFileSync(path.join(L, 'c4-b-a9509f', 'split.json'), '{}')
@@ -1096,7 +1149,8 @@ if (isMain && process.argv[2] === '--selftest') {
     { const gj = JSON.parse(fs.readFileSync(path.join(C.loops, lid, 'gate.json'), 'utf8')); assert.equal(gj.agentId, 'af00d1234'); assert.equal(gj.rulesVer, C.rulesVer) }   // 재판정용 작업 기록
     assert.equal(rec.results.length, 1); assert.match(lid, /^c4-selftest-\d+-af00d1$/); assert.equal(rec.results[0].code, 0, JSON.stringify(rec)); assert.equal(rec.results[0].verdict, 'PASS')
     assert.ok(fs.existsSync(path.join(C.loops, lid, 'ledger.json')) && fs.existsSync(path.join(C.loops, lid, 'iter-1.codex.json')) && fs.existsSync(path.join(C.loops, lid, 'contract.md')))
-    { const ct = fs.readFileSync(path.join(C.loops, lid, 'contract.md'), 'utf8'); assert.ok(ct.includes('## 마스터 요청 원문') && ct.includes('## 브리프(첫 프롬프트 + 추가 지시)') && ct.includes('AC-4 : 하네스'), ct)
+    assert.match(fs.readFileSync(path.join(C.loops, lid, 'evidence-1', 'checks.md'), 'utf8'), /^## 자동 검사[\s\S]*검사 대상 없음/)   // 11c : 하네스 scope = 훅이 checks.md 를 붙임(시험 훅 경로는 없는 파일 = 실행 대상 0)
+    { const ct = fs.readFileSync(path.join(C.loops, lid, 'contract.md'), 'utf8'); assert.ok(ct.includes('## 마스터 요청 원문') && ct.includes('## 브리프(첫 프롬프트 + 추가 지시)') && ct.includes('AC-4 : 하네스') && ct.includes('근거 = 증거 checks.md'), ct)
       assert.ok(ct.includes('````text\n브리프 원문 AC-1') && ct.includes('- AC-9 : 아소카.md 정합\n````'), '울타리 = 본문 ``` 보다 길게')
       const rc = refreshContract(ct, { id: lid, files: ['docs/a.md'], part: null }, 'HEAD', null); assert.ok(rc.includes('- AC-9 : 아소카.md 정합') && !/^- AC-4 : 하네스/m.test(rc), '재분할 = 머리 정의만 고침, 브리프 인용 줄 보존') }
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(C.loops, lid, 'ledger.json'), 'utf8')).criteriaIds, ['AC-1', 'AC-2', 'AC-3', 'AC-4'])
