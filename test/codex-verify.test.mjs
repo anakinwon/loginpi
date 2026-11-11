@@ -75,3 +75,21 @@ test('묶음 판정(--bundle) 삭제 : 옵션·전용 export 가 없다(2026-11-
   for (const k of ['--bundle', '--skip-judge', '--skip-reason']) assert.throws(() => m.parseArgs([k, 'x', '--id', 't1']), /알 수 없는 인자/, k)
   for (const k of ['bundleTask', 'bundleCriteria', 'splitBundle', 'bundlePrev', 'BUNDLE_RULES']) assert.equal(m[k], undefined, k)
 })
+
+test('판정 지시문(2026-11-12) : N = 실제 결함만, 형식 지적 = notes 참고 줄 — 형식 지적만 = PASS(Y)+note, 실제 결함 = FAIL(N)', async () => {
+  const m = await import('../scripts/codex-verify.mjs')
+  const p = m.buildPrompt({ task: 't', evidence: 'e', scope: 's', iter: 1, nonce: 'n' })
+  assert.match(p, /8\. FAIL\(defects·unmet\) 대상 = 실제 결함만 : 로직·동작 오류 \/ 보안 취약·비밀값 노출 \/ 회귀 \/ 데이터 손실 \/ 브리프 쓰기 범위 밖 파일 변경 \/ 브리프가 요구한 기능 미구현/)
+  assert.match(p, /참고 지적이다 — defects 에 올리지 않고 기준 unmet 사유로도 쓰지 않으며, notes 에 '참고 : '/)
+  assert.match(p, /files·diff 로 충족이 확인되면 보고·증거 첨부가 없어도 met/)
+  assert.ok(!/증거가 없거나 반대 증거면 unmet/.test(p), '옛 규칙(증거 없음 = unmet) 삭제')
+  const judge = { kind: 'codex', model: 'x', durationSec: 0, tokens: { input: 0, cachedInput: 0, output: 0 } }
+  const ledger = { iters: [], defects: {}, waived: {} }
+  const met = ['AC-1', 'AC-2', 'AC-3'].map((id) => ({ id, status: 'met', met: true, evidence: 'f:1' }))
+  const fmt = m.finalize({ verdict: 'PASS', iter: 1, criteria: structuredClone(met), defects: [], blocked: [], blocked_reason: '', notes: '참고 : 보고에 selftest 출력 없음' }, { iter: 1, ledger, judge, expected: ['AC-1', 'AC-2', 'AC-3'] })
+  assert.equal(fmt.result.verdict, 'PASS')
+  assert.match(fmt.result.notes, /^참고 : 보고에 selftest 출력 없음$/m)
+  const bug = { id: 'D-001', severity: 'high', status: 'open', file: 'a.mjs', line: 1, summary: '로직 오류', repro: '', fix_hint: '' }
+  const real = m.finalize({ verdict: 'PASS', iter: 1, criteria: structuredClone(met), defects: [bug], blocked: [], blocked_reason: '', notes: '' }, { iter: 1, ledger, judge, expected: ['AC-1', 'AC-2', 'AC-3'] })
+  assert.equal(real.result.verdict, 'FAIL')
+})

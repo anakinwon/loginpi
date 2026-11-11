@@ -268,7 +268,7 @@ test('재분할 계약 = 실제 묶음 파일로 하네스 목록·AC-4 재산�
   const base = { no: 4, type: 't', agentId: 'a1', part: [1, 2] }, ac4 = c => c.match(/^- AC-4 .*$/gm) || []
   const noH = cg.contractOf({ ...base, id: 'c4-x-a1b2c3-p1', files: ['a.md'] })
   const inH = cg.refreshContract(noH, { id: 'c4-x-a1b2c3-p2', files: ['.claude/hooks/x.mjs', 'a.md'], part: [2, 2] }, 'HEAD', null)
-  assert.deepEqual(ac4(inH), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/x.mjs) — 규칙 정합 / 우회·회귀 없음 / node --check 근거 = 증거 checks.md · selftest 근거 = build 보고 원문(있는 훅만)'])   // 들어옴(11c : 근거 = 훅이 돌린 checks.md)
+  assert.deepEqual(ac4(inH), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/x.mjs) — 규칙 정합 / 우회·회귀 없음'])   // 들어옴(2026-11-12 : 검사 근거 첨부 요구 문구 삭제 — 근거 누락 = 참고 지적)
   assert.ok(/^- AC-3 [^\n]*\n- AC-4 /m.test(inH), 'AC-3 바로 뒤')
   const withH = cg.contractOf({ ...base, id: 'c4-x-a1b2c3-p1', files: ['.claude/hooks/x.mjs', 'b.md'] })
   assert.deepEqual(ac4(cg.refreshContract(withH, { id: 'c4-x-a1b2c3-p1', files: ['b.md'], part: [1, 2] }, 'HEAD', null)), [])   // 빠짐
@@ -560,7 +560,7 @@ test('추적 불가 cwd 시간창 귀속(11d 보안 검토 S-2 — fail-closed) 
   } finally { fs.rmSync(r, { recursive: true, force: true }) }
 })
 
-test('자동 검사 증거(11c·11d) : 하네스 .mjs = node --check ./<경로> 결과(종료 코드·끝줄) · 훅 selftest 자동 실행 없음 · \'-\' 이름 옵션 해석 없음 · 실패 = 종료 코드 ≠0 기록 · 시간 초과 기록 · 하네스 없음 = 없음 / AC-4 = checks.md 근거, 하네스 .md 뿐 = AC-4 있음(selftest 문구·checks.md 없음)', async () => {
+test('자동 검사 증거(11c·11d) : 하네스 .mjs = node --check ./<경로> 결과(종료 코드·끝줄) · 훅 selftest 자동 실행 없음 · \'-\' 이름 옵션 해석 없음 · 실패 = 종료 코드 ≠0 기록 · 시간 초과 기록 · 하네스 없음 = 없음 / AC-4 = 규칙 정합 줄만(근거 첨부 요구 없음, 2026-11-12), 하네스 .md 뿐 = AC-4 있음·checks.md 없음', async () => {
   const fs = (await import('node:fs')).default, os = (await import('node:os')).default
   process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
   const cg = await import('../.claude/hooks/codex-gate.mjs')
@@ -581,13 +581,13 @@ test('자동 검사 증거(11c·11d) : 하네스 .mjs = node --check ./<경로> 
     assert.match(cg.checksOf(['.claude/settings.json'], r), /검사 대상 없음/)   // AC-4 있음(.md 아닌 하네스) + 실행할 검사 없음 = 그 사실을 기록
     assert.equal(cg.checksOf(['.claude/skills/x/SKILL.md', 'scripts/s.mjs'], r), '', '하네스 .md 뿐 = checks.md 없음(D-001 — selftest 문구와 근거 파일 조건 일치)')
     const ac4 = c => c.match(/^- AC-4 .*$/gm) || [], base = { id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1' }
-    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs', 'docs/a.md'] })), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음 / node --check 근거 = 증거 checks.md · selftest 근거 = build 보고 원문(있는 훅만)'])
+    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs', 'docs/a.md'] })), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음'])
     // 2026-11-11 기대값 변경 : 종전 '하네스 .md 뿐 = AC-4 없음' → 팀장 지적("AC-4 를 통째로 빼면 규칙 정합·우회·회귀 기준까지 사라짐") + 마스터 선택 "selftest 요구만 빼기"
     //   = 문서뿐이어도 AC-4(규칙 정합 / 우회·회귀 없음)는 남기고 selftest·checks.md 문구만 뺀다
     const mdOnly = '- AC-4 : 하네스 파일 변경 2건(.claude/skills/x/SKILL.md, .claude/engineering/40. loop/codex_procedure.md) — 규칙 정합 / 우회·회귀 없음'
     assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md', '.claude/engineering/40. loop/codex_procedure.md', 'docs/a.md'] })), [mdOnly], '하네스 .md 뿐 = AC-4 있음·selftest 문구 없음')
-    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs'] }), { id: base.id, files: ['.claude/skills/x/SKILL.md'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/skills/x/SKILL.md) — 규칙 정합 / 우회·회귀 없음'], '재분할도 같은 규칙(.mjs → .md 로 옮겨지면 selftest 문구가 빠짐)')
-    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md'] }), { id: base.id, files: ['.claude/hooks/h.mjs'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음 / node --check 근거 = 증거 checks.md · selftest 근거 = build 보고 원문(있는 훅만)'], '재분할 반대 방향 = selftest 문구 붙음')
+    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs'] }), { id: base.id, files: ['.claude/skills/x/SKILL.md'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/skills/x/SKILL.md) — 규칙 정합 / 우회·회귀 없음'], '재분할도 같은 규칙')
+    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md'] }), { id: base.id, files: ['.claude/hooks/h.mjs'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음'], '재분할 반대 방향도 같은 줄(2026-11-12 근거 문구 삭제)')
   } finally { fs.rmSync(r, { recursive: true, force: true }) }
 })
 
@@ -626,4 +626,26 @@ test('c4-build-a73e25 D-001 : 재판정·재분할(keepEvidence)도 checks.md �
     if (js0 === undefined) delete process.env.CODEX_JS; else process.env.CODEX_JS = js0
     fs.rmSync(r, { recursive: true, force: true }); for (const id of ids) fs.rmSync(path.join(loops, id), { recursive: true, force: true })
   }
+})
+
+test('판정 범위(2026-11-12) : 계약 = N 은 실제 결함만·형식 항목은 참고 지적 / AC-1 = 기능 구현 / flush = 참고 지적 1줄 요약(Y 유지)', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const ct = cg.contractOf({ id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1', files: ['.claude/hooks/h.mjs'] })
+  const head = ct.slice(0, ct.indexOf('\n## 마스터 요청 원문'))
+  assert.match(head, /^- AC-1 : 브리프\(\+추가 지시\)가 요구한 기능 중 이 scope 에 해당하는 것이 scope 파일에 구현됐다$/m)
+  assert.ok(!/최종 보고가/.test(head) && !/checks\.md|보고 원문/.test(head), '보고·근거 첨부 요구 없음')
+  for (const k of ['로직·동작 오류', '보안 취약·비밀값 노출', '회귀', '데이터 손실', '쓰기 범위 밖 파일 변경', '요구한 기능 미구현']) assert.ok(head.includes(k), `N 대상 ${k}`)
+  const refLine = head.split('\n').find(l => l.includes('참고 지적(Y 유지')) || ''
+  for (const k of ['최종 보고의 누락·표현', '계약·브리프 문구 불일치', '근거 첨부 누락', '문서 간 표기 정합']) assert.ok(refLine.includes(k), `참고 지적 ${k}`)
+  assert.deepEqual(cg.refNotes('검증자 : x\n참고 : 보고에 selftest 출력 없음\n  참고: 문서 표기 다름\n기준 누락 0건'), ['참고 : 보고에 selftest 출력 없음', '참고: 문서 표기 다름'])
+  // flush 요약 : PASS 원장의 참고 지적 = 1줄 건수 요약, 판정은 PASS(Y) 그대로
+  const dir = path.join(cg.stateOf(path.resolve(process.env.CODEX_GATE_STATE)).loops, 'c4-ref-a1b2c3'); fs.mkdirSync(dir, { recursive: true })
+  fs.writeFileSync(path.join(dir, 'ledger.json'), JSON.stringify({ iters: [{ iter: 1, verdict: 'PASS' }] }))
+  fs.writeFileSync(path.join(dir, 'iter-1.codex.json'), JSON.stringify({ verdict: 'PASS', defects: [], notes: '참고 : 보고 누락\n참고 : 증거 서식' }))
+  const msg = cg.summarize({ agentType: 'anakin_phase-build', agentId: 'a1b2c3d4', baseRef: 'x', results: [{ id: 'c4-ref-a1b2c3', iter: 1, code: 0, verdict: 'PASS', ledger: 'l' }] })
+  assert.match(msg, /전부 PASS\(Y\).* ; 참고 지적 2건\(Y 유지 — 회송 대상 아님, 원장 notes\) : c4-ref-a1b2c3 2건$/)
+  assert.equal(msg.split('\n').length, 1, '1줄')
+  assert.ok(!cg.summarize({ agentType: 't', agentId: 'a1b2c3', results: [{ id: 'c4-none', iter: 1, code: 0, verdict: 'PASS', ledger: 'l' }] }).includes('참고 지적'), '참고 없음 = 줄 없음')
 })

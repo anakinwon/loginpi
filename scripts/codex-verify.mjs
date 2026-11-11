@@ -53,7 +53,7 @@ const C = {
   // ledger = 원장 부재·손상·불일치, lock = 같은 --id 동시 실행 잠금(마스터 결정 2026-11-08 — 예산 초과 budget 과 분리)
   // 판정자 출력 예시·스키마 enum 모두 이 목록 하나에서 만든다. 판정자가 보통 쓰는 사유 = device·master-permission(입력 결손이면 judge-unavailable),
   // 나머지(budget·ledger·lock·scope-*)는 래퍼가 판정 전에 붙이는 사유 — 판정자가 budget 을 내도 loopEndOf 가 종료로 처리
-  blockedReasons: ['device', 'master-permission', 'judge-unavailable', 'budget', 'ledger', 'lock', 'scope-missing', 'scope-too-broad', 'in-progress'], // in-progress = 과거 턴 묶음 원장의 '수정 진행 중' 보류 기록(판정 아님 — 묶음 판정 코드는 2026-11-11 삭제, 과거 원장 읽기용으로 유지)
+  blockedReasons: ['device', 'master-permission', 'judge-unavailable', 'budget', 'ledger', 'lock', 'scope-missing', 'scope-too-broad'], // 2026-11-12 : 턴 묶음 전용 in-progress 삭제(과거 원장 표기는 request-graph reasonTxt 가 처리 — 스키마 검사는 새 판정 출력에만)
   // 승인 상한(마스터 확정 2026-11-08) — 팀장·아소카는 이 등급을 넘겨 줄 수 없다
   maxGrade: { codex: 'APPROVED', 'claude-substitute': 'CONDITIONAL' },
   substituteNote: '검증자 : Claude 대체(Codex 미가용)',
@@ -70,7 +70,7 @@ const C = {
 
 // export·입력 묶음에서 제외할 비밀 후보 경로
 // 7회차 D-002 : 자격 증명 디렉터리·파일 추가(.ssh·.aws·.azure·.gnupg·.git-credentials·.npmrc·.pypirc·.netrc·.docker/config.json·p12·pfx·keystore·credentials*.json·service-account*.json)
-// 2026-11-10 보안 검토 : 훅 증거(codex-gate·turn-gate)와 공용 — .env*·id_ed25519*·.credentials*·auth.json·*.kdbx·secrets*·루트 voice/ 추가(승인 파일 push-allow* = .omc 로 포함)
+// 2026-11-10 보안 검토 : 훅 증거(codex-gate)와 공용 — .env*·id_ed25519*·.credentials*·auth.json·*.kdbx·secrets*·루트 voice/ 추가(승인 파일 push-allow* = .omc 로 포함)
 const SECRET_PATH =
   /(^|\/)(\.env[^/]*($|\/)|\.(omc|codex|ssh|aws|azure|gnupg)(\/|$)|\.git-credentials$|\.npmrc$|\.pypirc$|\.netrc$|\.docker\/config\.json$|id_rsa|id_ed25519|\.credentials|[^/]*\.(pem|key|p12|pfx|keystore|kdbx)$|credentials[^/]*\.json$|service-account[^/]*\.json$|auth\.json$|secrets[^/]*($|\/))|^voice\//i
 // 증거 본문 허용 확장자(allowlist) — 그 밖은 경로·크기만
@@ -201,17 +201,18 @@ const PROMPT_HEAD = `너는 독립 검증자다. 결과물을 만든 쪽(Claude)
 - 추측 판정. 확인하지 못한 것은 확인 못 했다고 적는다.
 
 ## 판정 규칙
-1. 완료 기준마다 충족 증거(파일:줄, 증거 섹션의 출력 줄)를 찾는다. 증거가 있으면 status met, 증거가 없거나 반대 증거면 unmet, 이 환경에서 확인 수단이 없으면 unverifiable(예: Pi Browser 실기기). met 필드는 status 가 met 일 때만 true. 모든 기준 ID(AC-…)를 criteria 에 빠짐없이 출력한다(빠진 기준은 래퍼가 unverifiable 로 채우고 PASS 를 FAIL 로 고친다).
+1. 완료 기준마다 충족 증거(파일:줄, 증거 섹션의 출력 줄)를 찾는다. 증거가 있으면 status met, 반대 증거(규칙 8 의 실제 결함)면 unmet, 이 환경에서 확인 수단이 없으면 unverifiable(예: Pi Browser 실기기). files·diff 로 충족이 확인되면 보고·증거 첨부가 없어도 met 이다. met 필드는 status 가 met 일 때만 true. 모든 기준 ID(AC-…)를 criteria 에 빠짐없이 출력한다(빠진 기준은 래퍼가 unverifiable 로 채우고 PASS 를 FAIL 로 고친다).
 2. 테스트 약화·삭제·skip·only·assert 완화·기대값 바꿔치기·타임아웃 부풀리기로 통과시킨 흔적 = severity high 결함.
 3. 비밀(키·토큰·접속 문자열) 하드코딩·로그 출력·커밋 대상 파일 기록 = severity high 결함. [REDACTED:*] 는 래퍼가 가린 자리다 — 그 자리에 원값이 있었다는 사실 자체도 결함 후보로 본다. <repo>·<workspace>·<home> 은 래퍼가 가린 절대경로(원 저장소·워크스페이스·사용자 홈)다.
-4. 아래 프로젝트 규칙 위반 = 결함(영향에 따라 severity).
+4. 아래 프로젝트 규칙 위반 중 규칙 8 의 실제 결함에 드는 것 = 결함(영향에 따라 severity). 표기·서식만 어긋난 것은 참고 지적.
 5. 이전 회차 결함 목록이 있으면 같은 문제는 같은 id 를 유지한다 — 해결됐으면 status fixed, 해결됐다가 다시 생겼으면 regressed, 근거를 들어 결함이 아니라고 판단하면 contested. 새 결함은 기존 최대 번호 다음 D-NNN. status waived 인 이전 결함은 팀장·아소카가 근거(waiveReason)를 들어 면제한 것이다 — 같은 문제를 새 결함으로 다시 올리지 말고 같은 id·status waived 로 둔다.
 6. 실기기 확인이 필요한 항목은 blocked[] 에 reason device, 마스터 권한(운영 DB·배포·로그인 등)이 필요한 항목은 master-permission 으로 적는다.
 7. verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 open·regressed 결함 있음 → FAIL / 입력 결손 등으로 판정 자체가 불가 → BLOCKED(blocked_reason 에 이유).
+8. FAIL(defects·unmet) 대상 = 실제 결함만 : 로직·동작 오류 / 보안 취약·비밀값 노출 / 회귀 / 데이터 손실 / 브리프 쓰기 범위 밖 파일 변경 / 브리프가 요구한 기능 미구현. 아래는 참고 지적이다 — defects 에 올리지 않고 기준 unmet 사유로도 쓰지 않으며, notes 에 '참고 : ' 로 시작하는 줄 하나씩만 적는다 : 최종 보고의 누락·표현 / 계약·브리프 문구 불일치 / 증거 서식·node --check·selftest 근거 첨부 누락 / 문서 간 표기 정합.
 
 ## 출력
 JSON 객체 하나만 출력한다(코드펜스·설명 금지). 형태 :
-{"verdict":"PASS|FAIL|BLOCKED","iter":N,"criteria":[{"id":"","status":"met|unmet|unverifiable","met":true,"evidence":""}],"defects":[{"id":"D-001","severity":"high|med|low","status":"open|fixed|regressed|contested|waived","file":"","line":0,"summary":"","repro":"","fix_hint":""}],"blocked":[{"reason":"${C.blockedReasons.filter((r) => r !== 'in-progress').join('|')}","detail":""}],"blocked_reason":"","notes":""}`
+{"verdict":"PASS|FAIL|BLOCKED","iter":N,"criteria":[{"id":"","status":"met|unmet|unverifiable","met":true,"evidence":""}],"defects":[{"id":"D-001","severity":"high|med|low","status":"open|fixed|regressed|contested|waived","file":"","line":0,"summary":"","repro":"","fix_hint":""}],"blocked":[{"reason":"${C.blockedReasons.join('|')}","detail":""}],"blocked_reason":"","notes":""}`
 
 // ───────── 인자 ─────────
 export function parseArgs(argv) {
@@ -1981,7 +1982,7 @@ async function selftest() {
   assert.equal(loopEndOf({ verdict: 'BLOCKED', blocked: [{ reason: 'lock' }] }, 6), false)
   // D-001 : 판정자 출력 예시 사유 = C.blockedReasons 8종 = 스키마 enum
   const exReasons = PROMPT_HEAD.match(/"reason":"([^"]+)"/)[1].split('|')
-  assert.deepEqual(exReasons, C.blockedReasons.filter((r) => r !== 'in-progress'), '출력 예시 사유 = blockedReasons(훅 기록 전용 in-progress 제외)')
+  assert.deepEqual(exReasons, C.blockedReasons, '출력 예시 사유 = blockedReasons')
   assert.equal(exReasons.length, 8)
   assert.deepEqual(MODEL_SCHEMA.properties.blocked.items.properties.reason.enum, C.blockedReasons, '스키마 enum 과 같음')
   const blk5 = finalize({ ...structuredClone(good), verdict: 'BLOCKED', blocked: [{ reason: 'device', detail: 'x' }] }, { iter: 5, ledger: emptyLedger('e'), judge })
