@@ -62,6 +62,20 @@ export const CODEX_STYLE = {
   pending: { fill: '#ffd9f4', ink: '#1a1a1a', strip: '#db2777' },
   done: { fill: '#ff4fc8', ink: '#1a1a1a', strip: '#831843' },
 }
+/**
+ * 칸 종류 색 테마(2026-11-11 마스터 : '1. 마스터 아나킨 요청' = 회색네이비, 시작·종료 터미널 = 진한 회색, '1.1 접수'·'1.2 승인' = 아소카 불꽃 주황) — 상태 색(--sc·--sf·--si·--st)을 덮어씀
+ * color = 테두리·띠, fill = 바탕, ink = 글자(대비 AA 4.5:1 이상), dark = 다크 모드 덮어쓰기. 진행(running) 칸은 형광 노랑 깜빡임 유지
+ * grad = 135° 그라데이션 [위치 %, 색](SVG <linearGradient id="kg-<종류>[-dark]">), glow = 바깥 그림자(광선검 보라), width = 테두리 굵기
+ *   asoka 대비 보정(마스터 제시값이 AA 미달) : 라이트 글자 #1F2742 → #141A2E(가장 어두운 끝 #D9622B 4.02 → 4.71), 다크 시작 #C9631E → #B0531A(크림 글자 3.71 → 4.78)
+ */
+export const KIND_STYLE = {
+  request: { color: '#34495E', fill: '#E8ECF1', ink: '#2C3E50', dark: { fill: '#2C3E50', ink: '#ECF0F1' } },
+  term: { color: '#4A4A4A', fill: '#D5D8DC', ink: '#212121', dark: { fill: '#1C1C1C', ink: '#F2F2F2' } },   // 다크 바탕 = 요청 칸 #2C3E50 과 명도 구분(2026-11-11 메인 D-002)
+  asoka: {
+    color: '#2E3A59', width: 2, glow: '#B9A6FF99', ink: '#141A2E', fill: 'url(#kg-asoka)', grad: [[0, '#F4A23C'], [55, '#E8862A'], [100, '#D9622B']],
+    dark: { ink: '#FFF6E8', fill: 'url(#kg-asoka-dark)', grad: [[0, '#B0531A'], [100, '#9E4316']] },
+  },
+}
 // 트리 : 노드 폭·열 간격·줄 높이(px, viewBox 단위), 화면 맞춤 배율 하한(글자 약 9px 유지)·상한 / 자유 배치 : 반발력·링크 길이·중심 인력 / 자동 새로고침 간격
 //   세로 트리 : wrapW = 형제 한 줄 최대 폭(넘으면 다음 줄로 접음 — SA·CDX 쌍 5개가 한 줄), rowGap = 깊이 사이 세로 간격(흐름 순번 배지 자리)
 //   pairGap·pairIndent = 세로 흐름에서 짝 CDX 를 SA 바로 아래 붙이는 간격(화살표가 보이게 28 — 마스터 2026-11-10)·들여쓰기(2026-11-10 마스터 C-11 — CDX = SA 자식 depth + 1, 가로 흐름은 바로 오른쪽 다음 열), chipH = 칸 안 실행·판정 줄 높이
@@ -1209,9 +1223,11 @@ function client() {
     const dx = B.cx - A.cx, dy = B.cy - A.cy, C = { x: (A.cx + B.cx) / 2 - dy * k, y: (A.cy + B.cy) / 2 + dx * k }, p0 = exitPt(A, C), p1 = exitPt(B, C)
     return { d: 'M' + p0.x + ' ' + p0.y + ' Q' + C.x + ' ' + C.y + ' ' + p1.x + ' ' + p1.y, mx: 0.25 * p0.x + 0.5 * C.x + 0.25 * p1.x, my: 0.25 * p0.y + 0.5 * C.y + 0.25 * p1.y }
   }
-  function markers() {
+  function markers(arrows) {
     const defs = el('defs', {}, svg)
-    for (const [k, c] of Object.entries(D.flow)) { const m = el('marker', { id: 'ah-' + k, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 9, markerHeight: 9, markerUnits: 'userSpaceOnUse', orient: 'auto-start-reverse' }, defs); el('path', { d: 'M0,0L10,5L0,10z', fill: c }, m) }
+    if (arrows) for (const [k, c] of Object.entries(D.flow)) { const m = el('marker', { id: 'ah-' + k, viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 9, markerHeight: 9, markerUnits: 'userSpaceOnUse', orient: 'auto-start-reverse' }, defs); el('path', { d: 'M0,0L10,5L0,10z', fill: c }, m) }
+    // 칸 종류 그라데이션(KIND_STYLE grad — 135° = 왼쪽 위 → 오른쪽 아래)
+    for (const [id, stops] of Object.entries(D.grads)) { const g = el('linearGradient', { id, x1: 0, y1: 0, x2: 1, y2: 1 }, defs); for (const [o, c] of stops) el('stop', { offset: o + '%', 'stop-color': c }, g) }
   }
   /** 흐름 화살표를 그리고 위치 갱신 함수를 돌려준다(자유 배치는 매 틱 호출). gLab 이 gPath 와 같으면 순번은 화살표 그룹 안(호버 표시) */
   function flowEdges(path, gPath, gLab, shape) {
@@ -1246,7 +1262,7 @@ function client() {
       else { const x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2, mx = (x1 + x2) / 2; el('path', { d: 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2, class: 'edge' }, gE) }
     }
     for (const n of nodes) {
-      const p = L.pos[n.id], w = p.w, g = el('g', { class: 'node st-' + n.status + (SL[n.slot]?.kind === 'codex' ? ' k-codex' : ''), transform: 'translate(' + p.x + ' ' + p.y + ')', 'data-id': n.id }, gN)
+      const p = L.pos[n.id], w = p.w, g = el('g', { class: 'node st-' + n.status + (SL[n.slot]?.kind === 'codex' ? ' k-codex' : '') + (/^(request|main|approve)$/.test(SL[n.slot]?.kind) ? ' k-' + SL[n.slot].kind : ''), transform: 'translate(' + p.x + ' ' + p.y + ')', 'data-id': n.id }, gN)
       el('title', {}, g).textContent = tip(n); geo[n.id] = { cx: p.x + w / 2, cy: p.y + p.h / 2, hw: w / 2, hh: p.h / 2 }
       el('rect', { width: w, height: p.h, rx: 7, class: 'box' }, g); el('rect', { width: 5, height: p.h, rx: 2.5, class: 'strip' }, g)
       const ls = nameLines(n)
@@ -1292,7 +1308,7 @@ function client() {
     }
     const gE = el('g', {}, root), gN = el('g', {}, root), gF = el('g', { class: 'flows fv' }, root), lines = [...E.slice(0, nStruct), ...pairLines].map((_, i) => el('line', { class: i < nStruct ? 'edge' : 'edge pair' }, gE))
     for (const p of P) {
-      p.g = el('g', { class: 'fnode st-' + p.n.status + (SL[p.n.slot]?.kind === 'codex' ? ' k-codex' : ''), 'data-id': p.n.id }, gN); el('title', {}, p.g).textContent = tip(p.n)
+      p.g = el('g', { class: 'fnode st-' + p.n.status + (SL[p.n.slot]?.kind === 'codex' ? ' k-codex' : '') + (/^(request|main|approve)$/.test(SL[p.n.slot]?.kind) ? ' k-' + SL[p.n.slot].kind : ''), 'data-id': p.n.id }, gN); el('title', {}, p.g).textContent = tip(p.n)
       el('circle', { r: p.r }, p.g); p.t = el('text', { class: 'l1', y: 4 }, p.g); const nm = ttl(p.n); p.t.textContent = nm.length > 22 ? nm.slice(0, 21) + '…' : nm
       if (p.n.term) { p.g.classList.add('term'); if (p.n.pend) p.g.classList.add('pend') }
     }
@@ -1334,7 +1350,7 @@ function client() {
   function draw(r) {
     const nodes = r.nodes, path = flowOn ? r.path : null
     cancelAnimationFrame(raf); svg.textContent = ''; touched = false; hooks = {}; drag = pan = null
-    svg.classList.toggle('flowon', !!path); if (path) markers()
+    svg.classList.toggle('flowon', !!path); markers(!!path)   // 그라데이션 defs 는 늘, 화살촉은 경로 표시 때만
     byId = Object.fromEntries(nodes.map(n => [n.id, n])); root = el('g', {}, svg)
     // 자유 배치 초기 위치는 가로 트리 좌표(깊이 → x)를 쓴다
     const L = layoutTree(nodes, view === 'tree' ? dir : 'h', Z, sizeOf, isPair)
@@ -1381,11 +1397,21 @@ function statusCss() {
   // Codex 칸 변수(--cf 바탕·--ci 글자·--cs 왼쪽 띠) : 라이트·다크 공통, 완료·완료(추정)는 미완료보다 우선
   const { pending: p, done: d } = CODEX_STYLE
   const codex = `.k-codex{--cf:${p.fill};--ci:${p.ink};--cs:${p.strip}}.k-codex.st-done,.k-codex.st-estimated{--cf:${d.fill};--ci:${d.ink};--cs:${d.strip}}`
+  // 칸 종류 테마 : 상태 색 뒤에 같은 테마 선택자로 덮어씀(다크 = 상태 다크 규칙과 같은 특이도·뒤 순서)
+  const kSel = { request: ['.k-request:not(.st-running)'], term: ['.term'], asoka: ['.k-main:not(.st-running)', '.k-approve:not(.st-running)'] }
+  const kv = s => `--sc:${s.color};--sf:${s.fill};--si:${s.ink};--st:${s.ink}`
+  const kind = pre => Object.entries(KIND_STYLE).map(([k, s]) => `${kSel[k].map(x => pre + x).join(',')}{${kv(pre ? { ...s, ...s.dark } : s)}}`).join('')
+  const A = KIND_STYLE.asoka, aShape = kSel.asoka.flatMap(x => [`${x} .box`, `.fnode${x} circle`]).join(',')
   return base + dark(':root[data-theme=dark]') + `@media (prefers-color-scheme: dark){${dark(':root:not([data-theme=light])')}}` + codex
+    + kind('') + kind(':root[data-theme=dark] ') + `@media (prefers-color-scheme: dark){${kind(':root:not([data-theme=light]) ')}}`
+    + `${aShape}{stroke-width:${A.width};filter:drop-shadow(0 0 8px ${A.glow})}`
+    // 칸 안 경고·오류 줄(.chip.warn·.bad 주황·빨강)은 주황 바탕에서 대비 미달 → 본문 글자색(굵게는 유지). 다크 덮어쓰기 규칙(특이도 0,7,0)보다 우선해야 해 !important
+    + `${kSel.asoka.map(x => x + ' .chip').join(',')}{fill:var(--si)!important}`
 }
 
 export function renderHtml({ design, outDir, requests, meta }) {
-  const data = { design: !!design, live: !design, size: SIZE, flow: FLOW_COLOR, alert: ALERT, slots: SLOTS.map(s => ({ id: s.id, kind: s.kind, role: s.role, criteria: s.criteria, docs: s.docs.map(d => docLink(outDir, d)) })), requests }
+  const grads = Object.fromEntries(Object.entries(KIND_STYLE).filter(([, s]) => s.grad).flatMap(([k, s]) => [['kg-' + k, s.grad], ['kg-' + k + '-dark', s.dark.grad]]))
+  const data = { design: !!design, live: !design, size: SIZE, flow: FLOW_COLOR, alert: ALERT, grads, slots: SLOTS.map(s => ({ id: s.id, kind: s.kind, role: s.role, criteria: s.criteria, docs: s.docs.map(d => docLink(outDir, d)) })), requests }
   const cats = [...new Set(requests.map(r => r.cat).filter(Boolean))], dates = [...new Set(requests.map(r => r.date).filter(Boolean))]
   const catLabel = Object.fromEntries(CATEGORIES.map(c => [c.key, c.label]))
   const DARK = '--surface:#1a1a19;--page:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--axis:#383835;--w:#3987e5;--o:#d95926;--ring:rgba(255,255,255,.10);color-scheme:dark'

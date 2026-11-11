@@ -7,7 +7,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 import assert from 'node:assert/strict'
-import { buildRequestGraph, buildPath, pathLog, agentsOf, mergeParts, partBase, codexChips, groupTools, toolEventsOf, cleanPrompt, linkContext, loadSummary, summaryId, promptsOf, PAIRS, notY, layoutTree, termPos, matePos, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, writeSlotMd, writeRequestMd, harnessTouched, loadAgentHarness, HARNESS_RE, serial, agentRounds, splitAgentRounds, nodeAlerts, engTxt, codexNo, loadWorkflowAgents, ALERT, SLOTS, SLOT_MAP, isLoopLedger, TURN_ID_RE, loadLoops, ENG_SLOTS, STATUS_STYLE, PAGE_BG, CODEX_STYLE } from '../scripts/request-graph.mjs'
+import { buildRequestGraph, buildPath, pathLog, agentsOf, mergeParts, partBase, codexChips, groupTools, toolEventsOf, cleanPrompt, linkContext, loadSummary, summaryId, promptsOf, PAIRS, notY, layoutTree, termPos, matePos, loopRounds, roundSummary, fmtSpan, designGraph, safeName, renderHtml, writeSlotMd, writeRequestMd, harnessTouched, loadAgentHarness, HARNESS_RE, serial, agentRounds, splitAgentRounds, nodeAlerts, engTxt, codexNo, loadWorkflowAgents, ALERT, SLOTS, SLOT_MAP, isLoopLedger, TURN_ID_RE, loadLoops, ENG_SLOTS, STATUS_STYLE, PAGE_BG, CODEX_STYLE, KIND_STYLE } from '../scripts/request-graph.mjs'
 
 const T0 = '2026-11-08T10:00:00+09:00', T1 = '2026-11-08T10:30:00+09:00', P = Date.parse
 const turn = (extra = {}) => ({ ts_req: T0, ts_res: T1, req_head: '요청', ...extra })
@@ -186,6 +186,15 @@ test('Codex 칸 분홍 2단계 : 미완료 연분홍·완료(추정 포함) 진�
   assert.ok(html.includes(`.k-codex{--cf:${CODEX_STYLE.pending.fill};--ci:${CODEX_STYLE.pending.ink};--cs:${CODEX_STYLE.pending.strip}}`) && html.includes('.k-codex .strip{fill:var(--cs)}') && html.includes('.k-codex.st-notrun .box,.k-codex.st-missing .box{stroke:var(--cs);stroke-dasharray:5 3') && html.includes('Codex 미수행(점선)') && html.includes(`.k-codex.st-done,.k-codex.st-estimated{--cf:${CODEX_STYLE.done.fill}`))
   assert.ok(html.includes("SL[n.slot]?.kind === 'codex' ? ' k-codex'") && html.includes('Codex 미완료') && html.includes('Codex 완료'))
   assert.deepEqual(SLOTS.filter(s => s.kind === 'codex').map(s => s.id), ['1.1.4.1'])   // 2026-11-10 개정 : CDX-루프 하나
+})
+
+test('칸 종류 테마(c4-build-a44005 D-001·D-002) : 경로 표시를 꺼도 kg-asoka 그라데이션 정의, 다크 요청·터미널 바탕 명도 구분, 글자 AA', () => {
+  const html = renderHtml({ design: false, outDir: '.', requests: [], meta: '' })
+  assert.ok(html.includes('"kg-asoka":') && html.includes('"kg-asoka-dark":'))   // 그라데이션 정의 데이터
+  assert.ok(html.includes('markers(!!path)') && !html.includes('if (path) markers()'))   // defs 는 경로 표시와 무관하게 늘 생성
+  assert.ok(/if \(arrows\) for \(const \[k, c\] of Object\.entries\(D\.flow\)\)/.test(html) && /\n\s*for \(const \[id, stops\] of Object\.entries\(D\.grads\)\)/.test(html))   // 화살촉만 조건, 그라데이션은 무조건
+  assert.ok(ratio(KIND_STYLE.request.dark.fill, KIND_STYLE.term.dark.fill) >= 1.5)
+  for (const s of Object.values(KIND_STYLE)) for (const v of [s, { ...s, ...s.dark }]) for (const bg of v.grad ? [v.grad[0][1], v.grad.at(-1)[1]] : [v.fill]) assert.ok(ratio(v.ink, bg) >= 4.5, `${v.ink} on ${bg} = ${ratio(v.ink, bg).toFixed(2)}`)
 })
 
 test('설계도 경로 : 표준 처리 순서 + Codex FAIL 회송 예시 되돌이(결정적)', () => {
