@@ -1,6 +1,6 @@
 # 이식 가이드 — 다른 프로젝트에 anakin_arch_4_claude 구성
 
-> 원본 = 이 저장소(loginpi). 경로는 저장소 루트 기준. ⚠ `turn-gate.mjs`·`request-graph.mjs`·`precommit-check.mjs`·`codex_procedure.md` 는 이 스킬 작성 시점에 수정 진행 중이었다 — 복사 직전 최신본과 시험 통과를 확인한다.
+> 원본 = 이 저장소(loginpi). 경로는 저장소 루트 기준. 복사 직전에 최신본과 시험 통과를 확인한다.
 
 ## 1. 복사할 파일
 
@@ -8,14 +8,14 @@
 |---|---|---|
 | 훅 4종 | `.claude/hooks/model-advisor.mjs` · `.claude/hooks/codex-gate.mjs` · `.claude/hooks/turn-gate.mjs` · `.claude/hooks/push-guard.mjs` | 필수 |
 | 관측 훅 | `.claude/hooks/work-history-logger.mjs` · `.claude/hooks/work-stats-refresh.mjs` · `.claude/hooks/request-graph-refresh.mjs` | 그래프를 쓰면 필수 |
-| 판정·검사 | `scripts/codex-verify.mjs` · `scripts/precommit-check.mjs` | 필수 |
-| 그래프 | `scripts/request-graph.mjs` + import 의존 `scripts/work-history-core.mjs` · `scripts/work-history-rows.mjs` · `scripts/work-history-stats.mjs` | 필수(turn-gate 가 생성기의 `approvalOf` 를, model-advisor 가 core 의 `categorize` 를 import) |
+| 판정·검사 | `scripts/codex-verify.mjs` · `scripts/precommit-check.mjs` | 필수(codex-gate·precommit-check 가 codex-verify 를 import) |
+| 그래프 | `scripts/request-graph.mjs` + import 의존 `scripts/work-history-core.mjs` · `scripts/work-history-rows.mjs` · `scripts/work-history-stats.mjs` | 필수(model-advisor 가 core 의 `categorize` 를 import) |
 | 대시보드 | `scripts/work-history-report.mjs` · `scripts/model-change-dashboard.mjs` · `scripts/my-claude-model-dashboard.mjs` | 선택 — 안 쓰면 `work-stats-refresh.mjs` 의 실행 목록에서 뺀다 |
 | 에이전트 | `.claude/agents/teamAnakin/` 7종 | 필수 |
 | 운용 기준 | `.claude/skills/anakin-skills/`(SKILL.md + 운용 기준서) · 이 스킬 폴더 | 필수 |
 | 상태줄 | `.claude/subagent-statusline.mjs` | 선택 |
 | 정본 문서 | `.claude/engineering/` 전체(00 목차 · 10~50 장표 · `40. loop/codex_procedure.md` · `60. nodes/`) — `50. graph/requests/`·`.obsidian/` 제외 | 필수(규칙 출처) |
-| 시험 | `test/codex-gate.test.mjs` · `test/codex-verify.test.mjs` · `test/precommit-check.test.mjs` · `test/request-graph.test.mjs` · `test/turn-gate.test.mjs` · `test/work-history.test.mjs` | 필수 |
+| 시험 | `test/codex-gate.test.mjs` · `test/codex-verify.test.mjs` · `test/precommit-check.test.mjs` · `test/request-graph.test.mjs` · `test/turn-gate.test.mjs` · `test/work-history.test.mjs` · `test/request-resume.test.mjs`(work-history-rows 시험) | 필수 |
 
 복사 뒤 바꿀 곳 : 에이전트 정의의 프로젝트 규칙(빌드 관문·DA·브랜드), `codex-verify.mjs` 의 'Codex 는 CLAUDE.md 를 모른다' 규칙 발췌, `model-advisor.mjs` 단계 문구, `push-guard.mjs` 의 보호 원격·브랜치.
 

@@ -13,7 +13,7 @@
 | 40 | 루프 | 되돌아가는 엣지 — 기준 미달 때 누가·무엇을 근거로·몇 번·언제 멈출지 | `.claude/engineering/40. loop/anakins_loop.md` |
 | 50 | 그래프 | 에이전트·단계·사람을 노드로, 전달을 엣지로, 공유 상태를 파일로 보고 흐름 전체를 설계 | `.claude/engineering/50. graph/anakins_graph.md` |
 
-보조 정본 : `.claude/engineering/40. loop/codex_procedure.md`(Codex 호출 절차, 13절 = 현행 루프 판정 — 작성 시점 수정 진행 중).
+보조 정본 : `.claude/engineering/40. loop/codex_procedure.md`(Codex 호출 절차, 13절 = 현행 루프 판정).
 
 ## 2. 단계별 목적·산출·검토 포인트
 

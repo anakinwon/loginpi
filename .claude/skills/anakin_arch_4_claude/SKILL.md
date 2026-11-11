@@ -6,8 +6,9 @@ description: loginpi 에서 만든 Claude Code 작업 아키텍처(5단계 엔�
 # anakin_arch_4_claude — Claude Code 작업 아키텍처
 
 > 작성 2026-11-10(마스터 지시 "요청한 엔지니어링 아키텍처를 skill로 구성해 줘! 5단계 엔지니어링과 그래프 엔지니어링 with obsidian, Codex검증").
+> 갱신 2026-11-11 — 간소 절차, 묶음 판정 코드 삭제, 셸 2차 귀속 실행 시각 조건, 연관 군집 `-pN` 분할, 그래프 면제·이어받은 원장·상세 창 접기 반영.
 > 이 스킬은 **요약과 지도**다. 규칙 정본은 저장소 파일이고, 서로 다르면 정본이 이긴다(우선순위 : 루트 `CLAUDE.md` → `.claude/engineering/10. prompt/anakins_prompt.md` 0절 → 각 장표, Codex 세부는 `codex_procedure.md`).
-> ⚠ 작성 시점에 다른 산출 에이전트가 `scripts/precommit-check.mjs`·`.claude/hooks/turn-gate.mjs`·`scripts/request-graph.mjs`·`codex_procedure.md` 를 고치는 중이었다(루프 판정 결함 5건). 이 넷의 세부 동작은 일반 수준으로만 적었다 — 세부는 그 파일을 직접 읽는다.
+> 상수·조건 같은 세부 값은 바뀔 수 있다 — 이식·수정 전에 해당 파일 머리 주석과 시험을 직접 확인한다.
 
 ## 1. 아키텍처 개요
 
@@ -48,7 +49,7 @@ description: loginpi 에서 만든 Claude Code 작업 아키텍처(5단계 엔�
 1.2 파다완 아소카 승인     (teamanakin-admin)
 ```
 
-## 2. 현재 정본 규칙 — 2026-11-10 마스터 확정
+## 2. 현재 정본 규칙 — 2026-11-10 마스터 확정 · 2026-11-11 보완
 
 **Codex 판정 범위**
 1. 프롬프트·컨텍스트·그래프·총괄 Codex 판정 **제거**, 루프 **유지**, 하네스는 루프에 **흡수**(원문 "프롬프트+컨텍스트+그래프+총괄=>제거, 루프 유지+하네스는 루프에 흡수").
@@ -67,6 +68,9 @@ description: loginpi 에서 만든 Claude Code 작업 아키텍처(5단계 엔�
 12. **SA-하네스 칸 = 도구를 시각순으로**('HH:MM:SS 도구 [주체]', 연속 묶음 'a~b 도구 ×k', 입력값 비노출).
 13. **세로 모드 배치** — 시작 = 1번 칸 왼쪽(같은 행), 승인 칸 = 맨 아래 정중앙, 종료 = 승인 칸 왼쪽.
 14. **총괄승인 칸 없음** — 1.1.5.2 '총괄승인' 칸은 2026-11-10 마스터 "총괄승인 칸 삭제하고, 볼트는 루트로 정리해 줘" 로 삭제(실행 기록 runs.jsonl 도 폐지). 그래프 갱신 = 훅 자동, 최종 종료 승인 = 1.2.
+15. **면제 = 'Y(면제)'** — 열린 결함이 전부 근거 있게 면제된 FAIL 원장은 'Y(면제)'로 그리고, 근거를 확인할 수 없으면 FAIL 유지 — 정본: `request-graph.mjs` `waiverOf`, `codex_procedure.md` 13절 9항(면제 기록).
+16. **이어받은 원장** — 같은 에이전트가 다음 요청까지 이어 처리한 c4 원장의 판정 결과를 앞 요청 CDX-루프 칸에도 반영한다('이어받은 원장'·'최종 판정 이어받음') — 정본: `request-graph.mjs` `buildRequestGraph` 이어받은 원장 주석.
+17. **오른쪽 상세 창 접기(폴더블)** — 토글로 접고 펼치며 접힘 상태를 저장한다 — 정본: `request-graph.mjs` `setFold`(노드 상세 패널 접기 주석).
 
 **폐지(이력) — 다시 만들지 않는다**
 - 검증 단계 에이전트 `anakin_phase-verify`(2026-11-10 폐지 — Codex 실행 주체 = 훅).
@@ -80,14 +84,16 @@ description: loginpi 에서 만든 Claude Code 작업 아키텍처(5단계 엔�
 
 | 턴 종류 | 단계 순서(담당 · 모델) |
 |---|---|
-| 산출(FEATURE·FIX·REFACTOR·DOCS·DATA·CONFIG) | (수집 collect · Sonnet) → (결론 decide · Fable) → 산출 build · Opus → **Codex 루프 판정(훅 자동, 파일 변경 시만)** → (검수 review · Opus — DOCS 면 필수) → 그래프 분석 graph · Sonnet → 취합·승인 teamanakin-admin · Opus → 종료 승인 줄(메인, 기록용) |
+| 산출(FEATURE·FIX·REFACTOR·DOCS·DATA·CONFIG) | (수집 collect · Sonnet) → (결론 decide · Fable) → 산출 build · Opus → **Codex 루프 판정(훅 자동, 파일 변경 시만)** → (검수 review · Opus — DOCS 면 필수) → 그래프 분석 graph · Sonnet → 취합·승인 teamanakin-admin · Opus(간소 절차면 이 둘 생략) → 종료 승인 줄(메인, 기록용) |
 | 조회 단독(QUERY) | 수집 collect · Sonnet → 응답 메인 → 종료 승인 줄 (팀장 승인 생략) |
 | 결론 단독 | 결론 decide · Fable → 취합·승인 admin → 응답 메인 → 종료 승인 줄 |
 | 커밋 단독(GIT) | 커밋 commit · Haiku 4.5(`precommit-check --commit`) → 응답 메인 → 종료 승인 줄 (팀장 승인 생략, push 는 마스터) |
 
 괄호 단계는 요청문에 수집·결론 신호가 있을 때만. 판정 결과(종료 0 PASS / 1 FAIL / 2 BLOCKED)는 메인의 다음 도구 호출·요청 때 `[CDX 자동 판정]` 으로 온다.
-**PASS 전 다음 단계 진행 금지**, FAIL = 그 에이전트에 회송(같은 원장 다음 회차, 상한 5회), BLOCKED = 사유 해소 후 재실행. 승인 전제 = c4 원장 전부 Y.
+**PASS 전 다음 단계 진행 금지**, FAIL = 그 에이전트에 회송(같은 원장 다음 회차, 상한 5회), BLOCKED = 사유 해소 후 재실행. 승인 전제 = c4 원장 전부 Y(간소 절차 턴은 아래 참조).
 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 최대 CONDITIONAL.
+
+**간소 절차** — 소규모 변경(하네스·문서·일반 앱 파일 — 제외 경로는 정본)은 조건 ①~⑤ 전부 충족 시 c4 PASS 뒤 그래프 분석·팀장 승인 생략 — 정본: 루트 `CLAUDE.md` teamAnakin 트리거, `.claude/hooks/model-advisor.mjs` `LITE_RULE`.
 
 ## 4. 사용법
 
@@ -123,20 +129,20 @@ description: loginpi 에서 만든 Claude Code 작업 아키텍처(5단계 엔�
 | `.claude/engineering/20. context/anakins_context.md` | 20 컨텍스트 정본(계층 지도·인계 메모) |
 | `.claude/engineering/30. harnes/anakins_harnes.md` | 30 하네스 정본(훅·권한·MCP·정의·격리·관측) |
 | `.claude/engineering/40. loop/anakins_loop.md` | 40 루프 정본(되돌림·상한·멈춤) |
-| `.claude/engineering/40. loop/codex_procedure.md` | Codex 호출 절차 정본(13절 = 현행 루프 판정) — 수정 진행 중 |
+| `.claude/engineering/40. loop/codex_procedure.md` | Codex 호출 절차 정본(13절 = 현행 루프 판정) |
 | `.claude/engineering/50. graph/anakins_graph.md` | 50 그래프 정본(B-6 요청 흐름 그래프 표시 규칙) |
 | `.claude/engineering/50. graph/request-flow/` | 설계 슬롯 md(생성기 산출, 손 수정 금지) |
 | `.claude/engineering/60. nodes/` | 역할 노드 카드(Obsidian 그래프 뷰용) |
 | `.claude/hooks/model-advisor.mjs` | UserPromptSubmit — 단계 계획 주입, decide 시작 때 ultrathink 지시 |
 | `.claude/hooks/codex-gate.mjs` | SubagentStart `--base`(기준선) · SubagentStop(판정) · PostToolUse/UserPromptSubmit `--flush`(결과 전달) |
-| `.claude/hooks/turn-gate.mjs` | Stop — 종료 승인 줄 기록기(비차단) — 수정 진행 중 |
+| `.claude/hooks/turn-gate.mjs` | Stop — 종료 승인 줄 기록기(비차단) |
 | `.claude/hooks/push-guard.mjs` | PreToolUse — Claude 의 git push 차단, 마스터 1회 승인 |
 | `.claude/hooks/request-graph-refresh.mjs` | SubagentStart/Stop — 그래프 실데이터판 턴 중간 갱신 |
 | `.claude/hooks/work-history-logger.mjs` | Stop·SessionEnd — 세션 기록 → `work-history/` jsonl(그래프 원천) |
 | `.claude/hooks/work-stats-refresh.mjs` | Stop — 통계·대시보드·그래프 재생성(분리 프로세스) |
 | `scripts/codex-verify.mjs` | Codex 판정 래퍼(원장·계약·export·스크럽·`isSecretPath`·출력 스키마) |
-| `scripts/request-graph.mjs` | 그래프 생성기(`SLOT_MAP`·`NO_GATE`·`HARNESS_RE`·`mergeParts`) — 수정 진행 중 |
-| `scripts/precommit-check.mjs` | 커밋 전 결정적 검사 — 수정 진행 중 |
+| `scripts/request-graph.mjs` | 그래프 생성기(`SLOT_MAP`·`NO_GATE`·`HARNESS_RE`·`mergeParts`) |
+| `scripts/precommit-check.mjs` | 커밋 전 결정적 검사 |
 | `scripts/work-history-core.mjs` | 요청 분류기 `categorize` 등 공용 정의(model-advisor 가 import) |
 | `.claude/agents/teamAnakin/` | 단계 에이전트 7종 정의(frontmatter model·effort) |
 | `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md` | 단계별 모델·effort 운용 기준서 |
