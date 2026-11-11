@@ -25,7 +25,7 @@
 5-1. 그래프 분석(산출 턴만, 산출·검수 뒤·팀장 승인 앞 : 이 요청의 흐름·엔지니어링 N/5·미수행 슬롯·비정상 흐름 판독 + SA-컨텍스트 요약 캐시 작성) : anakin_phase-graph = Sonnet · medium, 읽기 전용 + 생성기 node scripts/request-graph.mjs --md 실행·요약 캐시(.omc/state/request-graph/summaries/) 쓰기만 ; 조회·커밋·결론 단독 턴 제외(비용) (2026-11-08 마스터 신설) ; 결과는 팀장 승인(7)으로
 6. 응답(정리·회신) : 메인, effort medium 기본값 ; 조회는 수집 단계, 설정 변경은 산출 단계, 커밋은 6-1 로 위임
 6-1. 커밋·푸시(분류 GIT) : anakin_phase-commit = Haiku 4.5(effort 미지원), 저장소 git 규칙(.claude/rules/git-rules.md) 고정 수행, 커밋은 node scripts/precommit-check.mjs --commit(결정적 검사 — 금지 경로·5MB·추가 줄 비밀·Co-Authored-By, Codex 없음), src/ 변경은 pnpm build 통과 확인 후에만, 충돌·behind·훅 실패는 멈추고 보고 ; Haiku 5.5는 원 환경 2.1.293에서 400 오류(별칭·전체 ID·서브에이전트 모두, 2026-10-08) [확인중 : 2.1.295 재시험] ; 4.5 실호출 [확인중 : loginpi 첫 커밋 턴]
-7. 취합·검토·승인(팀장) : teamanakin-admin = Opus · high ; 팀원(anakin_phase-*)이 1명 이상 실행된 턴은 생략 불가 마지막 단계(커밋 단독 턴은 제외 : 푸시 후 반려는 되돌릴 수 없고 commit 이 자체 중단 규칙을 가짐 ; 조회 단독 턴(수집 → 응답)도 제외 — 마스터 확정 2026-11-07 ; 간소 절차 턴(소규모 하네스·문서 변경, 조건 ①~⑤ 전부 충족 — 정본 루트 CLAUDE.md teamAnakin 트리거, 마스터 승인 2026-11-11)은 c4 PASS 뒤 그래프 분석(5-1)·팀장 승인 생략), 승인·조건부 승인·반려 판정 ; 반려 시 anakin_phase-build 재작업 후 재승인 ; 승인 전제 = 루프 판정 PASS(4-1 — 파일을 바꾼 에이전트의 c4 원장 전부 Y, 원장 누락·N 미해결·device 외 BLOCKED = REJECTED, BLOCKED device = 최대 CONDITIONAL, 파일 변경 0건 = 판정 대상 없음), 등급 상한 = 결과 maxGrade(codex 판정 APPROVED 가능, claude-substitute 대체 판정 최대 CONDITIONAL — scripts/codex-verify.mjs 상수 maxGrade) ; 2026-10-22 정기 재평가(재배정안)도 담당
+7. 취합·검토·승인(팀장) : teamanakin-admin = Opus · high ; 팀원(anakin_phase-*)이 1명 이상 실행된 턴은 생략 불가 마지막 단계(커밋 단독 턴은 제외 : 푸시 후 반려는 되돌릴 수 없고 commit 이 자체 중단 규칙을 가짐 ; 조회 단독 턴(수집 → 응답)도 제외 — 마스터 확정 2026-11-07 ; 간소 절차 턴(소규모 하네스·문서·일반 앱 파일 변경 — 인증·결제·페이지 라우트·SQL·env 제외, 조건 ①~⑤ 전부 충족 — 정본 루트 CLAUDE.md teamAnakin 트리거, 마스터 승인 2026-11-11·같은 날 M2 확대)은 c4 PASS 뒤 그래프 분석(5-1)·팀장 승인 생략), 승인·조건부 승인·반려 판정 ; 반려 시 anakin_phase-build 재작업 후 재승인 ; 승인 전제 = 루프 판정 PASS(4-1 — 파일을 바꾼 에이전트의 c4 원장 전부 Y, 원장 누락·N 미해결·device 외 BLOCKED = REJECTED, BLOCKED device = 최대 CONDITIONAL, 파일 변경 0건 = 판정 대상 없음), 등급 상한 = 결과 maxGrade(codex 판정 APPROVED 가능, claude-substitute 대체 판정 최대 CONDITIONAL — scripts/codex-verify.mjs 상수 maxGrade) ; 2026-10-22 정기 재평가(재배정안)도 담당
 
 ## 팀원별 주·보조 모델과 도구 (teamAnakin, 2026-10-08)
 
@@ -59,6 +59,10 @@
 4. 단계가 한 개여도 작업이면 서브에이전트에 맡김(마스터 2026-11-07 : 쉬운 작업도 예외 없음) ; 응답만 있는 턴(설명·회신)은 메인
 5. 산출 effort 는 anakin_phase-build 정의(high)가 정함 ; 훅의 /effort high 안내는 메인 effort 안내로 남아 있음 [TBD : 필요 여부 재평가]
 6. 결론 단계 비중이 큰 작업이 세션 첫 요청이면 세션 자체를 claude --model fable 로 시작하는 선택지도 안내
+
+## 하네스 변경 창 (2026-11-11 마스터 결정 M1 "변경 창 도입")
+
+근거 : 지연 분석에서 순수 5분 이상 작업 59건 중 하네스 자체 변경이 40건·1,320분(72.5%) ; 대상 = 하네스 파일(.claude/hooks/**·scripts/codex-verify.mjs·scripts/request-graph.mjs·scripts/precommit-check.mjs·.claude/agents/teamAnakin/**)을 바꾸는 요청 중 결함 수정이 아닌 것(기능 추가·문구·표시·구조 개선) ; 처리 = 주 1회 '하네스 변경 창'에 모아 한 번에 처리(창 요일·시각 [TBD : 마스터 지정]) ; 창 밖에서 받으면 착수하지 않고 대기 목록 .claude/engineering/40. loop/harness-window.md 에 한 줄 적고 마스터에게 알림 ; 예외(즉시 처리) = 보안·판정 결함 수정, 마스터가 "지금"이라고 명시한 요청 ; 창에서 처리한 항목은 대기 목록에서 처리일을 적어 닫음
 
 ## 출력 형식 : 턴 첫머리 한 줄
 

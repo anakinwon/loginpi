@@ -1,4 +1,4 @@
-// 요청문을 work-history-core 분류기로 판정해 이 턴의 단계 계획(수집 → 결론 → 산출 → 검수 → 그래프 분석 → 승인(소규모 하네스·문서 산출 턴은 간소 절차로 그래프·승인 생략), 파일을 바꾼 서브에이전트 뒤 SubagentStop 훅 Codex 루프 판정, 턴 끝 = 아소카 종료 승인 줄(기록용), 단계별 모델·effort)을 Claude 컨텍스트에 한 줄로 넣고, 사용자가 직접 바꿔야 하는 effort만 화면에 안내하는 UserPromptSubmit 훅
+// 요청문을 work-history-core 분류기로 판정해 이 턴의 단계 계획(수집 → 결론 → 산출 → 검수 → 그래프 분석 → 승인(소규모 하네스·문서·일반 앱 파일 산출 턴은 간소 절차로 그래프·승인 생략), 파일을 바꾼 서브에이전트 뒤 SubagentStop 훅 Codex 루프 판정, 턴 끝 = 아소카 종료 승인 줄(기록용), 단계별 모델·effort)을 Claude 컨텍스트에 한 줄로 넣고, 사용자가 직접 바꿔야 하는 effort만 화면에 안내하는 UserPromptSubmit 훅
 // 실행: .claude/settings.json hooks.UserPromptSubmit 에 등록, 자체 점검 `node .claude/hooks/model-advisor.mjs --selftest` (기준서 .claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md)
 // 근거: 훅은 메인 모델·effort를 바꿀 수 없음 → 턴 안의 모델·effort 변경은 단계별 서브에이전트(정의 frontmatter model·effort)로 수행, 메인 /model 전환은 캐시 전체 재작성이라 안내 제외(code.claude.com prompt-caching·sub-agents 2026-10-08 확인)
 import { pathToFileURL } from 'node:url'
@@ -15,8 +15,8 @@ const LOOP_RULE = 'Codex 루프 판정(마스터 2026-11-10 "루프 유지 + 하
 // 턴 끝(2026-11-10 개정 "턴 끝 차단 제거, 종료 승인 줄은 기록만") : Stop 훅 turn-gate.mjs = 종료 승인 줄 기록기(비차단)
 export const TURN_END = ["종료 승인 → 메인(아소카) (응답 끝 '종료 승인 : <승인|보류> — <근거>' 한 줄 — 기록용 : Stop 훅 turn-gate.mjs는 적기만 하고 막지 않는다)"]
 const LOOP_STEP = 'Codex 루프 판정 → SubagentStop 훅 자동(codex-gate.mjs) (파일 변경 시만 : 산출물·하네스 파일 변경 vs 브리프 AC-n·마스터 원문, 원장 c4-<주제>-<agentId 앞 6자>)'
-// 간소 절차(2026-11-11 마스터 승인 "1번 부터 6번까지 모두 승인") : 소규모 하네스·문서 산출 턴은 c4 PASS 뒤 그래프 분석·팀장 승인 생략 — 정본 CLAUDE.md teamAnakin 트리거
-const LITE_RULE = '간소 절차(마스터 승인 2026-11-11, 정본 CLAUDE.md teamAnakin) : ① 변경 파일이 하네스·문서뿐(.claude/**·scripts/**·test/**·docs/**·CLAUDE.md·루트 *.md, 생성물 제외 — sitemap/**·SQL·env·package.json·lock 0건) ② 보안·판정·배포 장치·팀 규칙 변경 0건(.claude/hooks/** 전체·.claude/settings*.json·.gitignore·판정·배포 스크립트 scripts/codex-verify.mjs·scripts/precommit-check.mjs·scripts/promote-to-prod.mjs·.claude/agents/teamAnakin/**·CLAUDE.md 핵심 가치 절·teamAnakin 절 — 하나라도 바뀌면 간소 절차 불가) ③ 생성물 제외 변경 3파일 이하·산출 build 1명 ④ c4 원장 PASS · judge.kind = codex(Claude 대체 판정은 정식 절차) · 면제 없음 ⑤ 마스터 원문이 팀장 승인·그래프 분석을 명시 요구하지 않음 — 전부 충족이면 c4 PASS 뒤 그래프 분석·취합·승인을 생략하고 바로 보고(응답 첫머리 수행 단계에 "간소 절차(소규모)" + ①~⑤ 충족 근거·변경 파일 목록 ; 종료 승인 줄·Codex c4·커밋 precommit-check 유지), 하나라도 불충족이면 기존 절차'
+// 간소 절차(2026-11-11 마스터 승인 "1번 부터 6번까지 모두 승인", 같은 날 M2 "확대" — ① 에 인증·결제·페이지 라우트·SQL·env 가 아닌 앱 파일 포함) : 소규모 하네스·문서·일반 앱 파일 산출 턴은 c4 PASS 뒤 그래프 분석·팀장 승인 생략 — 정본 CLAUDE.md teamAnakin 트리거
+const LITE_RULE = '간소 절차(마스터 승인 2026-11-11, 정본 CLAUDE.md teamAnakin) : ① 변경 파일이 하네스·문서(.claude/**·scripts/**·test/**·docs/**·CLAUDE.md·루트 *.md) 또는 인증·결제·페이지 라우트·SQL·env 가 아닌 앱 파일(sitemap/<앱>/**)뿐(생성물 제외, package.json·lock 0건) — 앱 파일 제외 경로(대소문자 무시, 하나라도 해당하면 정식 절차) : 인증 = 경로에 auth·session·login·oauth·gate·pi-fetch·pi-sdk 포함(src/auth.ts·lib/auth-check.ts·pi-auth-*·api/auth/**·login-gate 등)과 src/middleware.ts·src/proxy.ts / 결제 = payment·pymnt·subscri·tip·refund·wallet·bean·a2u·pi-pay·pi-reward·/token/ 포함 / 페이지 라우트 = src/app/**/page.tsx·layout.tsx·route.ts / SQL = sql/**·*.sql / env = src/env.ts·.env*·next.config.* ; 앱 파일을 바꿨으면 build 의 그 앱 pnpm build 관문 통과는 간소 절차에서도 필수, 인증·결제·페이지 변경(Pi Browser 실기기 규칙 대상)은 늘 정식 절차 ② 보안·판정·배포 장치·팀 규칙 변경 0건(.claude/hooks/** 전체·.claude/settings*.json·.gitignore·판정·배포 스크립트 scripts/codex-verify.mjs·scripts/precommit-check.mjs·scripts/promote-to-prod.mjs·.claude/agents/teamAnakin/**·CLAUDE.md 핵심 가치 절·teamAnakin 절 — 하나라도 바뀌면 간소 절차 불가) ③ 생성물 제외 변경 3파일 이하·산출 build 1명 ④ c4 원장 PASS · judge.kind = codex(Claude 대체 판정은 정식 절차) · 면제 없음 ⑤ 마스터 원문이 팀장 승인·그래프 분석을 명시 요구하지 않음 — 전부 충족이면 c4 PASS 뒤 그래프 분석·취합·승인을 생략하고 바로 보고(응답 첫머리 수행 단계에 "간소 절차(소규모)" + ①~⑤ 충족 근거·변경 파일 목록 ; 종료 승인 줄·Codex c4·커밋 precommit-check 유지), 하나라도 불충족이면 기존 절차'
 const LITE_SKIP = '간소 절차 해당 시 생략'
 
 /** 요청문 → { user: 화면 안내 | null, plan: 단계 계획 | null } */
@@ -107,6 +107,7 @@ if (isMain && process.argv[2] === '--selftest') {
     const pl = route(p).plan
     assert.match(pl, /\d\) 그래프 분석 → Agent\(subagent_type: "anakin_phase-graph"\) \[Sonnet·medium\] \(간소 절차 해당 시 생략 ;/, p)
     assert.match(pl, /\d\) 취합·승인 → Agent\(subagent_type: "teamanakin-admin"\) \[Opus·high\] \(간소 절차 해당 시 생략, 그 밖엔 생략 불가 :/, p)
+    assert.match(pl, /① .*하네스·문서.* 또는 인증·결제·페이지 라우트·SQL·env 가 아닌 앱 파일\(sitemap\/<앱>\/\*\*\).*인증 = .*auth.*session.*api\/auth\/\*\*.*middleware\.ts.*결제 = .*payment.*pymnt.*subscri.*tip.*페이지 라우트 = src\/app\/\*\*\/page\.tsx·layout\.tsx·route\.ts.*SQL = sql\/\*\*.*env = src\/env\.ts·\.env\*.*pnpm build 관문.*간소 절차에서도 필수.*Pi Browser 실기기 규칙 대상.*늘 정식 절차.* ②/, p)   // 2026-11-11 M2 : ① 앱 파일 확대
     assert.match(pl, /간소 절차\(마스터 승인 2026-11-11.*①.*②.*\.claude\/hooks\/\*\* 전체.*promote-to-prod.*teamAnakin\/\*\*.*핵심 가치 절.*③.*3파일 이하.*build 1명.*④.*judge\.kind = codex\(Claude 대체 판정은 정식 절차\).*면제 없음.*⑤.*하나라도 불충족이면 기존 절차/, p)
   }
   for (const p of ['복제 방식 최종 결론 설계해 줘', '지금 sitemap 상태가 어때?', '전체 변경사항 커밋하고 푸시해 줘']) assert.doesNotMatch(route(p).plan, /간소 절차/, p)   // build 없는 턴은 간소 절차 대상 아님(③)
