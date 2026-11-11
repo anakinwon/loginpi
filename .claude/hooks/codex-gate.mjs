@@ -2,7 +2,7 @@
 //   (2026-11-10 마스터 결정 — verify 폐지·훅 자동 실행 / 개정 "프롬프트+컨텍스트+그래프+총괄=>제거, 루프 유지+하네스는 루프에 흡수" — 원장 c4-<주제>-<agentId 앞 6자> 하나, 절차 정본 .claude/engineering/40. loop/codex_procedure.md 13절)
 // 실행 : 루트 .claude/settings.json SubagentStart(`--base` : 시작 스냅샷 git stash create) + SubagentStop(판정, timeout 600) + PostToolUse·UserPromptSubmit(`--flush` : 쌓인 판정 결과를 메인 additionalContext 로 1회 전달 — 서브에이전트 안 호출(입력 agent_id)은 건너뜀)
 //   PostToolUse·UserPromptSubmit 등록 = codex-flush.mjs(얇은 진입 — pending 이 있을 때만 이 파일을 불러 flushOut, 출력 바이트 동일 · 2026-11-11 P1). `--flush` 는 그대로 남김(같은 출력)
-//   판정 대상 = 파일 변경 1건 이상 + NO_GATE 밖 에이전트, 하네스 파일도 같은 c4 scope(계약 AC-4 — 하네스가 .md 뿐이면 없음, 근거 = 훅이 돌린 증거 checks.md), 생성물 제외, 프롬프트 상한 넘을 때만 파일 묶음 -p1… (묶음 AND), 같은 요청의 BLOCKED c4 원장 1회 재판정
+//   판정 대상 = 파일 변경 1건 이상 + NO_GATE 밖 에이전트, 하네스 파일도 같은 c4 scope(계약 AC-4 — 하네스 1건 이상이면 항상, selftest 근거 = 훅이 돌린 증거 checks.md 는 .md 아닌 하네스가 있을 때만), 생성물 제외, 프롬프트 상한 넘을 때만 파일 묶음 -p1… (묶음 AND), 같은 요청의 BLOCKED c4 원장 1회 재판정
 //   SubagentStop 의 additionalContext 는 서브에이전트에게 가서 그 에이전트가 계속 돈다(Claude Code 2.1.321 스키마 설명) → 메인 전달은 결과 파일 + 메인 쪽 훅 flush 로 한다
 // 시험 : node .claude/hooks/codex-gate.mjs --selftest (가짜 판정자 CODEX_JS — Codex 실호출 없음)
 import { spawn, spawnSync } from 'node:child_process'
@@ -591,16 +591,19 @@ export function diffRefOf(baseRef, files, root = ROOT) {
 const baseLine = (ref, baseRef) => `- 기준선 : ${!baseRef ? '기준선 없음 (SubagentStart 스냅샷 없음 — HEAD 기준, 같은 시간 다른 세션 변경이 섞일 수 있음)' : ref === baseRef ? `${baseRef} (SubagentStart 스냅샷 — 이 에이전트 시작 뒤 변경만)` : `HEAD — 시작 스냅샷 ${baseRef} 대비 scope 변경 0건(재개 때 다시 찍힌 스냅샷 — 2026-11-10 c4-fail-5-aeb16d), HEAD 기준이라 같은 시간 다른 세션 변경이 섞일 수 있음`}`
 const scopeLine = (n, part, related) => `- scope = 이 원장 파일 ${n}건${part ? ` · 묶음 ${part[0]}/${part[1]} — 이 원장은 모든 묶음 PASS 일 때만 Y(AND), 이 묶음 밖 파일은 판정하지 않는다(unverifiable 아님)` : ''}${related ? ' · 다른 묶음 연관 파일 발췌 = 증거 related-ref.md(참조 — 판정 대상 아님, 이 묶음 판정의 대조 근거로만)' : ''}`
 /** 자동 계약(contract.md, c4 전용) — 마스터 요청 원문 + 브리프 원문 + 검수 대상 + 기본 AC(하네스 파일 있으면 AC-4) + 기준선·묶음·생성물 표기 */
-/** AC-4 줄(하네스 파일 중 .md 아닌 것이 있을 때만 — 문서만 바꾼 하네스 변경은 없음, 11c) — 첫 계약·재분할 계약 공용. 근거 = 훅이 직접 돌린 증거 checks.md(build 보고 의존 안 함) */
-const ac4Of = files => { const hz = files.filter(f => HARNESS_RE.test(f)); return hz.some(f => !/\.md$/i.test(f)) ? [`- AC-4 : 하네스 파일 변경 ${hz.length}건(${hz.join(', ')}) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 근거 = 증거 checks.md`] : [] }
+/** 하네스 파일 중 .md 아닌 것(코드·설정)이 있나 — checks.md 생성 조건이자 AC-4 의 selftest 문구 조건 */
+const harnessCode = files => files.some(f => HARNESS_RE.test(f) && !/\.md$/i.test(f))
+/** AC-4 줄(하네스 파일 1건 이상이면 항상 — 규칙 정합 / 우회·회귀 없음, 2026-11-11 마스터 선택 "selftest 요구만 빼기") — 첫 계약·재분할 계약 공용.
+ *  selftest·node --check 근거(훅이 직접 돌린 증거 checks.md)는 .md 아닌 하네스 파일이 있을 때만 붙인다(문서뿐이면 실행할 검사가 없음) */
+const ac4Of = files => { const hz = files.filter(f => HARNESS_RE.test(f)); return hz.length ? [`- AC-4 : 하네스 파일 변경 ${hz.length}건(${hz.join(', ')}) — 규칙 정합 / 우회·회귀 없음${harnessCode(hz) ? ' / selftest·node --check 근거 = 증거 checks.md' : ''}`] : [] }
 /**
  * 자동 검사 증거(2026-11-11c — 하네스 원장 BLOCKED 60건 중 26건 '증거·본문 누락', 문서 한 줄 수정도 'selftest 근거 없음' FAIL 2회차) : scope 에 하네스 파일이 1건 이상이면 훅이 직접 실행
  *   scope 안 .mjs·.js·.cjs(있는 파일) 마다 node --check + 바뀐 훅(.claude/hooks/*) 중 원문에 --selftest 가 있으면 node <훅> --selftest → 명령·종료 코드·출력 끝 2줄(비밀 가림)
- *   총 상한 end(기본 C.checkMs) — 넘으면 '시간 초과' 적고 판정은 계속. 자식 env CODEX_GATE_ACTIVE=1(훅이 띄운 프로세스 — 재진입 금지). AC-4 없는 묶음(하네스 없음·.md 뿐) = '' (checks.md 안 만듦·지움)
+ *   총 상한 end(기본 C.checkMs) — 넘으면 '시간 초과' 적고 판정은 계속. 자식 env CODEX_GATE_ACTIVE=1(훅이 띄운 프로세스 — 재진입 금지). .md 아닌 하네스 파일이 없는 묶음(하네스 없음·.md 뿐 — 후자는 AC-4 는 있되 selftest 문구 없음) = '' (checks.md 안 만듦·지움)
  *   ponytail: node --test 전체는 넣지 않음(1~2분 — 훅 시간 예산·판정 지연), 시험 근거는 build 보고·tools.md. 필요해지면 바뀐 파일의 짝 시험만 골라 추가
  */
 export function checksOf(files, root = ROOT, end = Date.now() + C.checkMs) {
-  if (!ac4Of(files).length) return ''   // AC-4 와 같은 조건(c4-build-a73e25 D-001 — 근거 파일과 기준이 같이 붙고 같이 빠짐)
+  if (!harnessCode(files)) return ''   // AC-4 의 selftest 문구와 같은 조건(c4-build-a73e25 D-001 — 근거 파일과 그 문구가 같이 붙고 같이 빠짐)
   const has = f => fs.existsSync(path.join(root, f)), src = f => { try { return fs.readFileSync(path.join(root, f), 'utf8') } catch { return '' } }
   const cmds = [...files.filter(f => /\.(mjs|js|cjs)$/.test(f) && has(f)).map(f => ['--check', f]),
     ...files.filter(f => /^\.claude\/hooks\/[^/]+\.(mjs|js|cjs)$/.test(f) && src(f).includes('--selftest')).map(f => [f, '--selftest'])]
@@ -652,7 +655,7 @@ export async function judgeOne(job, ctx, deadline) {
   const ev = path.join(dir, `evidence-${iter}`), ref = diffRefOf(ctx.baseRef, job.files)
   if (ctx.keep) keepEvidence(job, ctx, dir, ev, ref)   // 재판정 : 첫 판정 때 만든 계약·증거 유지(묶음으로 새로 나뉜 원장은 기준 원장 것을 복사해 scope 만 고침)
   else { fs.mkdirSync(ev, { recursive: true }); writeEvidence(job, ctx, dir, ev, ref) }
-  putChecks(job, ctx, ev)   // c4-build-a73e25 D-001 : 첫 판정·재판정(재분할) 공통 — 이번 묶음 파일로 다시 만들거나, AC-4 없는 묶음이면 복사된 옛 checks.md 를 지움
+  putChecks(job, ctx, ev)   // c4-build-a73e25 D-001 : 첫 판정·재판정(재분할) 공통 — 이번 묶음 파일로 다시 만들거나, .md 아닌 하네스 파일이 없는 묶음이면 복사된 옛 checks.md 를 지움
   fs.writeFileSync(path.join(dir, 'gate.json'), JSON.stringify({ agentType: ctx.type, agentId: ctx.agentId, rulesVer: C.rulesVer, no: job.no, files: job.files, part: job.part || null, base: job.base || null, baseRef: ctx.baseRef || null, requestAt: ctx.requestAt ?? null, generated: ctx.generated || [] }))
   const res = await judgeRun(job, dir, ev, ref, iter, deadline)
   // c4-build-a8915f D-001 : 통과 근거(passHash) = 원장에 실제 기록된 이번 회차 PASS 와 결합해 판정 뒤에만 쓴다 — 판정 전에 쓰면 판정·BLOCKED 기록이 모두 실패한 내용이 이전 PASS 로 재사용됨

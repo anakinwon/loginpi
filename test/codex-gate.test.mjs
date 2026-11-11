@@ -539,7 +539,7 @@ test('인터프리터 쓰기 귀속(11c — c4-c-ecc-flush-a1dd68 `cd /c/…; no
   } finally { fs.rmSync(r, { recursive: true, force: true }) }
 })
 
-test('자동 검사 증거(11c) : 하네스 .mjs = node --check·훅 selftest 실행 결과(종료 코드·끝줄, env CODEX_GATE_ACTIVE=1) · 실패 = 종료 코드 ≠0 기록 · 시간 초과 기록 · 하네스 없음 = 없음 / AC-4 = checks.md 근거, 하네스 .md 뿐 = AC-4 없음', async () => {
+test('자동 검사 증거(11c) : 하네스 .mjs = node --check·훅 selftest 실행 결과(종료 코드·끝줄, env CODEX_GATE_ACTIVE=1) · 실패 = 종료 코드 ≠0 기록 · 시간 초과 기록 · 하네스 없음 = 없음 / AC-4 = checks.md 근거, 하네스 .md 뿐 = AC-4 있음(selftest 문구·checks.md 없음)', async () => {
   const fs = (await import('node:fs')).default, os = (await import('node:os')).default
   process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
   const cg = await import('../.claude/hooks/codex-gate.mjs')
@@ -556,11 +556,15 @@ test('자동 검사 증거(11c) : 하네스 .mjs = node --check·훅 selftest �
     assert.match(cg.checksOf(['.claude/hooks/h.mjs'], r, Date.now() - 1), /종료 코드 : 시간 초과\(실행 안 함/)   // 상한 소진 = 기록하고 계속
     assert.equal(cg.checksOf(['docs/a.md', 'scripts/s.mjs'], r), '', '하네스 없음 = checks.md 없음')
     assert.match(cg.checksOf(['.claude/settings.json'], r), /검사 대상 없음/)   // AC-4 있음(.md 아닌 하네스) + 실행할 검사 없음 = 그 사실을 기록
-    assert.equal(cg.checksOf(['.claude/skills/x/SKILL.md', 'scripts/s.mjs'], r), '', '하네스 .md 뿐 = AC-4 없음 = checks.md 없음(D-001 — 기준과 근거 조건 일치)')
+    assert.equal(cg.checksOf(['.claude/skills/x/SKILL.md', 'scripts/s.mjs'], r), '', '하네스 .md 뿐 = checks.md 없음(D-001 — selftest 문구와 근거 파일 조건 일치)')
     const ac4 = c => c.match(/^- AC-4 .*$/gm) || [], base = { id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1' }
     assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs', 'docs/a.md'] })), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 근거 = 증거 checks.md'])
-    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md', '.claude/engineering/40. loop/codex_procedure.md', 'docs/a.md'] })), [], '하네스 .md 뿐 = AC-4 없음')
-    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs'] }), { id: base.id, files: ['.claude/skills/x/SKILL.md'], part: null }, 'HEAD', null)), [], '재분할도 같은 규칙')
+    // 2026-11-11 기대값 변경 : 종전 '하네스 .md 뿐 = AC-4 없음' → 팀장 지적("AC-4 를 통째로 빼면 규칙 정합·우회·회귀 기준까지 사라짐") + 마스터 선택 "selftest 요구만 빼기"
+    //   = 문서뿐이어도 AC-4(규칙 정합 / 우회·회귀 없음)는 남기고 selftest·checks.md 문구만 뺀다
+    const mdOnly = '- AC-4 : 하네스 파일 변경 2건(.claude/skills/x/SKILL.md, .claude/engineering/40. loop/codex_procedure.md) — 규칙 정합 / 우회·회귀 없음'
+    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md', '.claude/engineering/40. loop/codex_procedure.md', 'docs/a.md'] })), [mdOnly], '하네스 .md 뿐 = AC-4 있음·selftest 문구 없음')
+    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs'] }), { id: base.id, files: ['.claude/skills/x/SKILL.md'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/skills/x/SKILL.md) — 규칙 정합 / 우회·회귀 없음'], '재분할도 같은 규칙(.mjs → .md 로 옮겨지면 selftest 문구가 빠짐)')
+    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md'] }), { id: base.id, files: ['.claude/hooks/h.mjs'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음 / selftest·node --check 근거 = 증거 checks.md'], '재분할 반대 방향 = selftest 문구 붙음')
   } finally { fs.rmSync(r, { recursive: true, force: true }) }
 })
 
