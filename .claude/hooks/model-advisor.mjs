@@ -1,4 +1,4 @@
-// 요청문을 work-history-core 분류기로 판정해 이 턴의 단계 계획(수집 → 결론 → 산출 → 검수 → 그래프 분석 → 승인, 파일을 바꾼 서브에이전트 뒤 SubagentStop 훅 Codex 루프 판정, 턴 끝 = 아소카 종료 승인 줄(기록용), 단계별 모델·effort)을 Claude 컨텍스트에 한 줄로 넣고, 사용자가 직접 바꿔야 하는 effort만 화면에 안내하는 UserPromptSubmit 훅
+// 요청문을 work-history-core 분류기로 판정해 이 턴의 단계 계획(수집 → 결론 → 산출 → 검수 → 그래프 분석 → 승인(소규모 하네스·문서 산출 턴은 간소 절차로 그래프·승인 생략), 파일을 바꾼 서브에이전트 뒤 SubagentStop 훅 Codex 루프 판정, 턴 끝 = 아소카 종료 승인 줄(기록용), 단계별 모델·effort)을 Claude 컨텍스트에 한 줄로 넣고, 사용자가 직접 바꿔야 하는 effort만 화면에 안내하는 UserPromptSubmit 훅
 // 실행: .claude/settings.json hooks.UserPromptSubmit 에 등록, 자체 점검 `node .claude/hooks/model-advisor.mjs --selftest` (기준서 .claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md)
 // 근거: 훅은 메인 모델·effort를 바꿀 수 없음 → 턴 안의 모델·effort 변경은 단계별 서브에이전트(정의 frontmatter model·effort)로 수행, 메인 /model 전환은 캐시 전체 재작성이라 안내 제외(code.claude.com prompt-caching·sub-agents 2026-10-08 확인)
 import { pathToFileURL } from 'node:url'
@@ -15,6 +15,9 @@ const LOOP_RULE = 'Codex 루프 판정(마스터 2026-11-10 "루프 유지 + 하
 // 턴 끝(2026-11-10 개정 "턴 끝 차단 제거, 종료 승인 줄은 기록만") : Stop 훅 turn-gate.mjs = 종료 승인 줄 기록기(비차단)
 export const TURN_END = ["종료 승인 → 메인(아소카) (응답 끝 '종료 승인 : <승인|보류> — <근거>' 한 줄 — 기록용 : Stop 훅 turn-gate.mjs는 적기만 하고 막지 않는다)"]
 const LOOP_STEP = 'Codex 루프 판정 → SubagentStop 훅 자동(codex-gate.mjs) (파일 변경 시만 : 산출물·하네스 파일 변경 vs 브리프 AC-n·마스터 원문, 원장 c4-<주제>-<agentId 앞 6자>)'
+// 간소 절차(2026-11-11 마스터 승인 "1번 부터 6번까지 모두 승인") : 소규모 하네스·문서 산출 턴은 c4 PASS 뒤 그래프 분석·팀장 승인 생략 — 정본 CLAUDE.md teamAnakin 트리거
+const LITE_RULE = '간소 절차(마스터 승인 2026-11-11, 정본 CLAUDE.md teamAnakin) : ① 변경 파일이 하네스·문서뿐(.claude/**·scripts/**·test/**·docs/**·CLAUDE.md·루트 *.md, 생성물 제외 — sitemap/**·SQL·env·package.json·lock 0건) ② 보안·판정·배포 장치·팀 규칙 변경 0건(.claude/hooks/** 전체·.claude/settings*.json·.gitignore·판정·배포 스크립트 scripts/codex-verify.mjs·scripts/precommit-check.mjs·scripts/promote-to-prod.mjs·.claude/agents/teamAnakin/**·CLAUDE.md 핵심 가치 절·teamAnakin 절 — 하나라도 바뀌면 간소 절차 불가) ③ 생성물 제외 변경 3파일 이하·산출 build 1명 ④ c4 원장 PASS · judge.kind = codex(Claude 대체 판정은 정식 절차) · 면제 없음 ⑤ 마스터 원문이 팀장 승인·그래프 분석을 명시 요구하지 않음 — 전부 충족이면 c4 PASS 뒤 그래프 분석·취합·승인을 생략하고 바로 보고(응답 첫머리 수행 단계에 "간소 절차(소규모)" + ①~⑤ 충족 근거·변경 파일 목록 ; 종료 승인 줄·Codex c4·커밋 precommit-check 유지), 하나라도 불충족이면 기존 절차'
+const LITE_SKIP = '간소 절차 해당 시 생략'
 
 /** 요청문 → { user: 화면 안내 | null, plan: 단계 계획 | null } */
 export function route(prompt) {
@@ -28,16 +31,16 @@ export function route(prompt) {
   if (decide) stages.push(['결론 → Agent(subagent_type: "anakin_phase-decide") [Fable·high] (생략 불가, 메인은 결과를 받아 정리만)', null])
   if (produce) stages.push(['산출 → Agent(subagent_type: "anakin_phase-build") [Opus·high] (메인은 브리프(완료 기준 AC-n·scope 포함)·리뷰만, 쉬운 수정도 위임 ; 로컬 검사(tsc·lint·test·selftest·node --check)까지 build 가 실행·보고 ; Codex 실호출 금지 — 판정은 훅)', LOOP_STEP])
   if (produce && category === 'DOCS') stages.push(['검수 → Agent(subagent_type: "anakin_phase-review") [Opus·high] (파일로 저장하는 문서·보고서·i18n 메시지면 분량과 무관하게 생략 불가, 대화 답변만이면 생략)', null])
-  if (produce) stages.push(['그래프 분석 → Agent(subagent_type: "anakin_phase-graph") [Sonnet·medium] (산출 턴만 : 산출·검수 뒤·팀장 승인 앞, node scripts/request-graph.mjs --md 로 이 요청의 흐름·엔지니어링 N/5·미수행·비정상 판독 — 2026-11-08 마스터 신설)', null])
+  if (produce) stages.push([`그래프 분석 → Agent(subagent_type: "anakin_phase-graph") [Sonnet·medium] (${LITE_SKIP} ; 산출 턴만 : 산출·검수 뒤·팀장 승인 앞, node scripts/request-graph.mjs --md 로 이 요청의 흐름·엔지니어링 N/5·미수행·비정상 판독 — 2026-11-08 마스터 신설)`, null])
   if (category === 'GIT' && confidence >= MIN_CONFIDENCE && !produce) stages.push(['커밋·푸시 → Agent(subagent_type: "anakin_phase-commit") [Haiku 4.5] (커밋 묶음·메시지를 정했으면 함께 전달, 커밋은 node scripts/precommit-check.mjs --commit(결정적 검사 — Codex 없음), 충돌·behind·훅 실패는 에이전트가 멈추고 보고)', null])
   if (/팀\s?(구성|운영|재편|재평가)|팀원|재배정|에이전트\s?(성능|재평가|배정)/.test(prompt) && !stages.length) stages.push(['재평가 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (모드 2)', null])
   const queryOnly = !stages.length && category === 'QUERY' && confidence >= MIN_CONFIDENCE   // 조회 단독 턴 : 메인 직접 조회 금지(2026-11-07) → 수집 위임, 팀장 승인 생략(마스터 확정 2026-11-07)
   if (queryOnly) stages.push(['수집 → Agent(subagent_type: "anakin_phase-collect") [Sonnet·medium] (조회 단독 턴 : 메인 직접 조회 금지, 팀장 승인 생략)', null])
-  if (!queryOnly && stages.some(([s]) => s && s.includes('anakin_phase-') && !s.includes('anakin_phase-commit'))) stages.push(['취합·승인 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (생략 불가 : 팀원 결과 요약·요청 원문·산출물 경로 전달, 반려 시 anakin_phase-build 재작업 후 재승인 ; 승인 전제 = 루프 판정 PASS(파일을 바꾼 에이전트의 c4 원장 전부 Y, 파일 변경 0건 = 판정 대상 없음) — 원장 누락·N 미해결 = REJECTED, BLOCKED device 는 최대 CONDITIONAL, Claude 대체 판정은 maxGrade CONDITIONAL)', null])
+  if (!queryOnly && stages.some(([s]) => s && s.includes('anakin_phase-') && !s.includes('anakin_phase-commit'))) stages.push([`취합·승인 → Agent(subagent_type: "teamanakin-admin") [Opus·high] (${produce ? `${LITE_SKIP}, 그 밖엔 ` : ''}생략 불가 : 팀원 결과 요약·요청 원문·산출물 경로 전달, 반려 시 anakin_phase-build 재작업 후 재승인 ; 승인 전제 = 루프 판정 PASS(파일을 바꾼 에이전트의 c4 원장 전부 Y, 파일 변경 0건 = 판정 대상 없음) — 원장 누락·N 미해결 = REJECTED, BLOCKED device 는 최대 CONDITIONAL, Claude 대체 판정은 maxGrade CONDITIONAL)`, null])
   const steps = stages.flat().filter(Boolean)
   if (!produce && steps.length) steps.push(queryOnly ? '응답 → 메인 (수집 결과 리뷰·정리 후 회신)' : '응답 → 메인 (팀장 판정 첫 줄 포함)')
   if (steps.length) steps.push(TURN_END[0])   // 모든 턴 끝 = 아소카 종료 승인 줄(기록용)
-  const plan = steps.length ? `[모델 단계 계획] 이 턴은 다음 호출 순서로 진행 : ${steps.map((x, i) => `${i + 1}) ${x}`).join(' ')} ; ${LOOP_RULE} ; 메인 /model 전환 금지 ; 응답 첫머리에 "수행 단계 : <실제 수행 단계 → 담당>" 한 줄 보고 (기준 : anakins-claudemodel-for-work 스킬)` : `[턴 종료 규칙] ${TURN_END[0]}`   // 단계 계획이 없는 턴도 턴 끝 규칙은 같다
+  const plan = steps.length ? `[모델 단계 계획] 이 턴은 다음 호출 순서로 진행 : ${steps.map((x, i) => `${i + 1}) ${x}`).join(' ')} ; ${LOOP_RULE} ;${produce ? ` ${LITE_RULE} ;` : ''} 메인 /model 전환 금지 ; 응답 첫머리에 "수행 단계 : <실제 수행 단계 → 담당>" 한 줄 보고 (기준 : anakins-claudemodel-for-work 스킬)` : `[턴 종료 규칙] ${TURN_END[0]}`   // 단계 계획이 없는 턴도 턴 끝 규칙은 같다
   const user = produce ? `권장 effort high (${category}) : /effort high 입력 (작업 중 입력해도 다음 요청부터 적용, 5.5 계열은 캐시 유지)` : null
   const deep = !/ultrathink/i.test(prompt) && category !== 'GIT' && DEEP_MAIN_RE.test(prompt)   // 실측 : FEATURE 소요 차이 없음(113 vs 109초), QUERY 7배(n=5) → 설계·결정·원인 분석에만
   return { user, plan: [plan, deep ? DEEP_MAIN : null].filter(Boolean).join(' ') || null }
@@ -99,6 +102,14 @@ if (isMain && process.argv[2] === '--selftest') {
   assert.match(route('회의 결과를 전체 이력과 대조해서 문서로 요약해 줘').plan, /anakin_phase-review.*anakin_phase-graph.*teamanakin-admin/)   // 검수가 있어도 그래프는 승인 바로 앞
   assert.doesNotMatch(route('지금 sitemap 상태가 어때?').plan, /anakin_phase-graph/); assert.doesNotMatch(route('전체 변경사항 커밋하고 푸시해 줘').plan, /anakin_phase-graph/); assert.doesNotMatch(route('복제 방식 최종 결론 설계해 줘').plan, /anakin_phase-graph/)   // 조회·커밋·결론 단독 턴 제외(비용)
   assert.match(route('안녕').plan, /^\[턴 종료 규칙\] 종료 승인 → 메인/)
+  // 2026-11-11 간소 절차 : 산출 턴만 그래프·팀장 단계에 '간소 절차 해당 시 생략' + 조건 ①~⑤, 단계 순서는 그대로(위 1)~5) 단정)
+  for (const p of ['대시보드 만들어 줘', '환경변수 설정해 줘', '결제 버그 고쳐 줘', '회의 결과를 전체 이력과 대조해서 문서로 요약해 줘']) {
+    const pl = route(p).plan
+    assert.match(pl, /\d\) 그래프 분석 → Agent\(subagent_type: "anakin_phase-graph"\) \[Sonnet·medium\] \(간소 절차 해당 시 생략 ;/, p)
+    assert.match(pl, /\d\) 취합·승인 → Agent\(subagent_type: "teamanakin-admin"\) \[Opus·high\] \(간소 절차 해당 시 생략, 그 밖엔 생략 불가 :/, p)
+    assert.match(pl, /간소 절차\(마스터 승인 2026-11-11.*①.*②.*\.claude\/hooks\/\*\* 전체.*promote-to-prod.*teamAnakin\/\*\*.*핵심 가치 절.*③.*3파일 이하.*build 1명.*④.*judge\.kind = codex\(Claude 대체 판정은 정식 절차\).*면제 없음.*⑤.*하나라도 불충족이면 기존 절차/, p)
+  }
+  for (const p of ['복제 방식 최종 결론 설계해 줘', '지금 sitemap 상태가 어때?', '전체 변경사항 커밋하고 푸시해 줘']) assert.doesNotMatch(route(p).plan, /간소 절차/, p)   // build 없는 턴은 간소 절차 대상 아님(③)
   console.log('selftest ok')
 } else if (isMain) {
   let raw = ''
