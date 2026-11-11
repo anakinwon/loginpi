@@ -8,3 +8,4 @@
 | 2026-11-11 | 요청 104·105 원장 중복 귀속(그래프 표시) | `scripts/request-graph.mjs` | |
 | 2026-11-11 | graph 요약 캐시 `at` 은 실제 시계 값만 쓰도록 규정 | `.claude/agents/teamAnakin/` graph 정의·`scripts/request-graph.mjs` [확인중 : 변경 창에서 대상 확정] | |
 | 2026-11-11 | build 보고 형식 — 자동 증거 첨부 반영 뒤 재검토 | `.claude/agents/teamAnakin/` build 정의 | |
+| 2026-11-11 | 브리프 조건마다 판정 가능한 정의(기준·예시·시험)를 함께 적는 규칙 — 근거 c4-build-ad8596 1회차 FAIL(메인 브리프의 '이의 인정 표식' 정의 누락) | 운용 기준서 '일감 크기·위임 규칙' 절 · anakin_phase-build 정의 [확인중 : 변경 창에서 대상 확정] | |
