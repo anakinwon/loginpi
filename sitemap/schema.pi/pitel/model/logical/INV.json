@@ -9,7 +9,7 @@
     "coreCnt": 10,
     "basicCnt": 20,
     "stlCnt": 2,
-    "attrCnt": 303,
+    "attrCnt": 298,
     "relCnt": 71,
     "newTermCnt": 91,
     "newWordCnt": 6,
@@ -387,23 +387,13 @@
           "def": "수납 배분 상태의 유형 코드 — 공통코드(codes.json) — 배분·역배분·과오납대체·선납대체"
         },
         {
-          "attrNm": "청구년월",
-          "phyNm": "BILL_YM",
-          "domNm": "년월C6",
-          "pk": false,
-          "fk": null,
-          "nullYn": false,
-          "seq": 10,
-          "def": "청구의 년월 — 연월(YYYYMM) — 업무 키 보존(01 문서 5절-4) — 파티션·레이크 키 후보"
-        },
-        {
           "attrNm": "배분금액",
           "phyNm": "ALLC_AMT",
           "domNm": "금액N15",
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 11,
+          "seq": 10,
           "def": "배분의 금액 — 원화 금액(원 단위 정수) — 역배분은 음수(S7)"
         }
       ],
@@ -464,7 +454,7 @@
           ]
         }
       ],
-      "normNote": "N:M 해소(수납 ↔ 청구서×요금항목). 2NF: 단일 PK. 3NF: 청구년월은 청구번호 → PAY.청구기본 이행 종속이나 업무 키(01 문서 5절-4 청구월) 보존 예외. 납부기한일자는 업무 키가 아닌 이행 종속 속성이라 제거(관문 G1) — 배분 순서 판정 시 PAY.청구기본.납부기한일자 조회, 물리 반정규화 후보로 인계."
+      "normNote": "N:M 해소(수납 ↔ 청구서×요금항목). 2NF: 단일 PK. 3NF: 청구년월은 청구번호 → PAY.청구기본 이행 종속 — 논리에서 제거, 물리 반정규화(denorm BILL_YM ← PTL_PAY_BILL_M)로만 둠(결정 C1). 납부기한일자는 업무 키가 아닌 이행 종속 속성이라 제거(관문 G1) — 배분 순서 판정 시 PAY.청구기본.납부기한일자 조회, 물리 반정규화 후보로 인계."
     },
     {
       "entId": "INV-003",
@@ -999,23 +989,13 @@
           "def": "출금 요청 상태의 유형 코드 — 공통코드(codes.json) — 생성·전송·출금완료·부분출금·출금실패·취소"
         },
         {
-          "attrNm": "청구년월",
-          "phyNm": "BILL_YM",
-          "domNm": "년월C6",
-          "pk": false,
-          "fk": null,
-          "nullYn": false,
-          "seq": 10,
-          "def": "청구의 년월 — 연월(YYYYMM) — 업무 키 보존(01 문서 5절-4) — 파티션·레이크 키 후보"
-        },
-        {
           "attrNm": "출금요청금액",
           "phyNm": "WDRW_REQ_AMT",
           "domNm": "금액N15",
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 11,
+          "seq": 10,
           "def": "출금 요청의 금액 — 원화 금액(원 단위 정수)"
         },
         {
@@ -1025,7 +1005,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 12,
+          "seq": 11,
           "def": "출금 예정의 일자 — 연월일(YYYYMMDD) — 이체지정일 → 영업일 보정, 말일·1일 쏠림 S4"
         },
         {
@@ -1035,7 +1015,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 13,
+          "seq": 12,
           "def": "출금의 회차 — 분할·반복 거래의 차례 번호 — 1 = 정기, 2~ = 재출금"
         }
       ],
@@ -1096,7 +1076,7 @@
           ]
         }
       ],
-      "normNote": "2NF: 단일 PK. 3NF: 청구계정번호·청구년월은 청구번호 이행 종속 — 개념 확정(crossRels 승인) 승계, 물리 반정규화 항목으로 인계(결정 L4). 결과 통지는 자동이체출금결과내역으로 분리(반복 그룹 해소)."
+      "normNote": "2NF: 단일 PK. 3NF: 청구계정번호·청구년월은 청구번호 이행 종속 — 개념 확정(crossRels 승인) 승계, 물리 반정규화 항목으로 인계(결정 L4). 청구년월은 논리에서 제거, 물리 denorm(BILL_YM ← PTL_PAY_BILL_M)만(결정 C1). 결과 통지는 자동이체출금결과내역으로 분리(반복 그룹 해소)."
     },
     {
       "entId": "INV-006",
@@ -2439,23 +2419,13 @@
           "def": "수납의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 승인 성공분만"
         },
         {
-          "attrNm": "청구년월",
-          "phyNm": "BILL_YM",
-          "domNm": "년월C6",
-          "pk": false,
-          "fk": null,
-          "nullYn": false,
-          "seq": 6,
-          "def": "청구의 년월 — 연월(YYYYMM)"
-        },
-        {
           "attrNm": "카드승인요청일시",
           "phyNm": "CARD_APRV_REQ_DTM",
           "domNm": "일시TS",
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 7,
+          "seq": 6,
           "def": "카드 승인 요청의 일시 — 연월일 시분초까지의 시점"
         },
         {
@@ -2465,7 +2435,7 @@
           "pk": false,
           "fk": null,
           "nullYn": true,
-          "seq": 8,
+          "seq": 7,
           "def": "카드 승인의 일시 — 연월일 시분초까지의 시점"
         },
         {
@@ -2475,7 +2445,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 9,
+          "seq": 8,
           "def": "카드 승인의 금액 — 원화 금액(원 단위 정수)"
         },
         {
@@ -2485,7 +2455,7 @@
           "pk": false,
           "fk": null,
           "nullYn": true,
-          "seq": 10,
+          "seq": 9,
           "def": "승인의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 카드사 승인번호"
         },
         {
@@ -2495,7 +2465,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 11,
+          "seq": 10,
           "def": "카드 승인 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
         },
         {
@@ -2505,7 +2475,7 @@
           "pk": false,
           "fk": null,
           "nullYn": true,
-          "seq": 12,
+          "seq": 11,
           "def": "카드 승인 거절 사유의 유형 코드 — 공통코드(newCodes 신규 등재)"
         }
       ],
@@ -2555,7 +2525,7 @@
           ]
         }
       ],
-      "normNote": "2NF: 단일 PK. 3NF: 청구계정은 청구번호·납부방법번호에서 조회(두지 않음). 카드사코드는 승인 시점 사실값(납부방법 이력 변경과 독립). 청구년월은 파티션 업무 키 보존(결정 L4)."
+      "normNote": "2NF: 단일 PK. 3NF: 청구계정은 청구번호·납부방법번호에서 조회(두지 않음). 카드사코드는 승인 시점 사실값(납부방법 이력 변경과 독립). 청구년월은 논리에서 제거, 파티션 키는 물리 denorm(BILL_YM ← PTL_PAY_BILL_M)만(결정 C1)."
     },
     {
       "entId": "INV-015",
@@ -2633,23 +2603,13 @@
           "def": "수납 대행 기관의 번호 — 대상을 식별하거나 외부에서 부여받은 번호"
         },
         {
-          "attrNm": "청구년월",
-          "phyNm": "BILL_YM",
-          "domNm": "년월C6",
-          "pk": false,
-          "fk": null,
-          "nullYn": false,
-          "seq": 6,
-          "def": "청구의 년월 — 연월(YYYYMM)"
-        },
-        {
           "attrNm": "지로수납일시",
           "phyNm": "GIRO_RCV_DTM",
           "domNm": "일시TS",
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 7,
+          "seq": 6,
           "def": "지로 수납의 일시 — 연월일 시분초까지의 시점"
         },
         {
@@ -2659,7 +2619,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 8,
+          "seq": 7,
           "def": "지로 수납의 금액 — 원화 금액(원 단위 정수)"
         },
         {
@@ -2669,7 +2629,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 9,
+          "seq": 8,
           "def": "지로 수납 상태의 유형 코드 — 공통코드(newCodes 신규 등재)"
         },
         {
@@ -2679,7 +2639,7 @@
           "pk": false,
           "fk": null,
           "nullYn": true,
-          "seq": 10,
+          "seq": 9,
           "def": "지로 수납 파일의 명 — 대상을 부르는 이름"
         }
       ],
@@ -2729,7 +2689,7 @@
           ]
         }
       ],
-      "normNote": "2NF: 단일 PK. 3NF: 청구계정은 청구번호에서 조회(두지 않음). 청구년월은 파티션 업무 키 보존(결정 L4)."
+      "normNote": "2NF: 단일 PK. 3NF: 청구계정은 청구번호에서 조회(두지 않음). 청구년월은 논리에서 제거, 파티션 키는 물리 denorm(BILL_YM ← PTL_PAY_BILL_M)만(결정 C1)."
     },
     {
       "entId": "INV-016",
@@ -3414,23 +3374,13 @@
           "def": "청구의 번호 — 대상을 식별하거나 외부에서 부여받은 번호 — 청구 차감일 때만(환불·소멸은 NULL)"
         },
         {
-          "attrNm": "청구년월",
-          "phyNm": "BILL_YM",
-          "domNm": "년월C6",
-          "pk": false,
-          "fk": null,
-          "nullYn": true,
-          "seq": 4,
-          "def": "청구의 년월 — 연월(YYYYMM)"
-        },
-        {
           "attrNm": "선납사용일시",
           "phyNm": "PRPAY_USE_DTM",
           "domNm": "일시TS",
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 5,
+          "seq": 4,
           "def": "선납 사용의 일시 — 연월일 시분초까지의 시점"
         },
         {
@@ -3440,7 +3390,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 6,
+          "seq": 5,
           "def": "선납 사용의 금액 — 원화 금액(원 단위 정수)"
         },
         {
@@ -3450,7 +3400,7 @@
           "pk": false,
           "fk": null,
           "nullYn": false,
-          "seq": 7,
+          "seq": 6,
           "def": "선납 사용의 유형 코드 — 공통코드(newCodes 신규 등재)"
         }
       ],
@@ -3478,7 +3428,7 @@
           ]
         }
       ],
-      "normNote": "부모 = 선납기본(식별, 순번). 3NF: 청구년월은 청구번호 이행 종속 — 파티션 업무 키 보존(결정 L4), 청구 차감이 아니면 둘 다 NULL."
+      "normNote": "부모 = 선납기본(식별, 순번). 3NF: 청구년월은 청구번호 이행 종속 — 논리에서 제거, 파티션 키는 물리 denorm(BILL_YM ← PTL_PAY_BILL_M)만(결정 C1), 청구 차감이 아니면 청구번호 NULL."
     },
     {
       "entId": "INV-022",
@@ -4622,6 +4572,11 @@
       "id": "G3",
       "dec": "crossRelReq 3건 + G2 1건을 areas.json crossRels 에 반영, crossRelReq 비움",
       "why": "04 관문 — L10 요청 처리(관계 양끝 존재, 6절)"
+    },
+    {
+      "id": "C1",
+      "dec": "청구년월(PAY.청구기본 이행 종속 3NF) 5건을 논리에서 제거 — 수납배분상세·자동이체출금요청내역·카드자동납부승인내역·지로수납내역·선납사용내역. 물리 칼럼 BILL_YM 은 각 테이블 denorm(← PTL_PAY_BILL_M)으로 그대로 유지(L4 의 '논리 유지' 예외를 대체)",
+      "why": "08 설계 승인 조건 C1(규칙 2-7 반정규화는 물리 단계만) — 07 적재기 3절 schema.pi 관문 3NF 의심, 물리 denorm 정의가 있는 건만 이동(2026-11-11)"
     }
   ],
   "crossRelDone": "04 INV 논리 관문이 areas.json crossRels 에 4건 반영(요청 3 + G2 1)",
