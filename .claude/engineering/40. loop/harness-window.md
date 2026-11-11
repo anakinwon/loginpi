@@ -12,3 +12,4 @@
 | 2026-11-11 | graph 요약 캐시 `at` 은 실제 시계 값만 쓰도록 규정 | `.claude/agents/teamAnakin/` graph 정의·`scripts/request-graph.mjs` [확인중 : 변경 창에서 대상 확정] | 2026-11-12 대상 폐지(R3 — graph 에이전트 폐지, 생성기는 수동 실행) |
 | 2026-11-11 | build 보고 형식 — 자동 증거 첨부 반영 뒤 재검토 | `.claude/agents/teamAnakin/` build 정의 | |
 | 2026-11-11 | 브리프 조건마다 판정 가능한 정의(기준·예시·시험)를 함께 적는 규칙 — 근거 c4-build-ad8596 1회차 FAIL(메인 브리프의 '이의 인정 표식' 정의 누락) | 운용 기준서 '일감 크기·위임 규칙' 절(2026-11-12 삭제) · anakin_phase-build 정의 [확인중 : 변경 창에서 대상 확정] | |
+| 2026-11-11 | gitignore 런타임 상태·로그 파일은 본문 대신 기준선 대비 차이(추가 줄·바뀐 키)·해시·결정적 비밀 검사 결과로 증거를 만든다 — 원인 : gitignore 파일 본문이 written-files.md 상한 30000자로 잘려 구조적 BLOCKED(c4-pitel-verify-a7d45a). 판정 결함 성격 | .claude/hooks/codex-gate.mjs fileExcerpt | |
