@@ -94,6 +94,67 @@ test('병렬 셸 쓰기 귀속(2026-11-10 c4-aeb16d-ae440b D-001) : A(Edit x + n
   } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
 })
 
+test('워크플로 병렬 오귀속(2026-11-11 c4-build-4-a609bd·5-a04677·6-aed1dc) : 형제 A·B 병렬, B 가 test/y 를 씀, A 는 `node --test test/*.test.mjs` 만 — A scope 에 y 0건(셸 귀속 = 그 명령 실행 중 바뀐 파일만)', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-wf-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-ses-')), git = (...a) => spawnSync('git', a, { cwd: r, encoding: 'utf8' })
+  try {
+    git('init', '-q'); git('config', 'user.email', 't@t'); git('config', 'user.name', 't'); fs.mkdirSync(path.join(r, 'test')); fs.writeFileSync(path.join(r, 'test', 'y.test.mjs'), '1'); fs.writeFileSync(path.join(r, 'a.md'), '1'); git('add', '-A'); git('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString()
+    const use = (t, name, input, id = `tu${t}`) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', id, name, input }] } })
+    const res = (t, id) => ({ type: 'user', timestamp: iso(t), message: { content: [{ type: 'tool_result', tool_use_id: id, content: 'ok' }] } })
+    const wf = path.join(ses, 's1', 'subagents', 'workflows', 'wf_1'); fs.mkdirSync(wf, { recursive: true })
+    const put = (id, recs) => fs.writeFileSync(path.join(wf, `agent-${id}.jsonl`), recs.map(x => JSON.stringify(x)).join('\n') + '\n')
+    const mt = (f, t) => fs.utimesSync(path.join(r, f), new Date(t), new Date(t))
+    // A = a.md 를 Edit, 끝에 node --test test/*.test.mjs(디렉터리 글롭) 한 번 — B 의 y 쓰기(now-50초)와 시각이 안 겹친다
+    fs.writeFileSync(path.join(r, 'a.md'), 'A'); mt('a.md', now - 40e3)
+    const recsA = [use(now - 70e3, 'Read', { file_path: 'x' }), use(now - 40e3, 'Edit', { file_path: path.join(r, 'a.md') }), use(now - 10e3, 'Bash', { command: 'node --test test/*.test.mjs' }, 'tA'), res(now - 9e3, 'tA')]
+    put('aaaaaa01', recsA)
+    const at = (id, recs) => cg.attributeOf({ recs, tp: path.join(wf, `agent-${id}.jsonl`), mainTp: null, agentId: id, root: r }).files
+    fs.writeFileSync(path.join(r, 'test', 'y.test.mjs'), 'B'); mt('test/y.test.mjs', now - 50e3)
+    // ① 브리프 조건 그대로 : B 가 Edit 로 y — 기록에 실려 있으면 others 로 이미 제외(고치기 전에도 통과)
+    put('abbbbb01', [use(now - 50e3, 'Edit', { file_path: path.join(r, 'test', 'y.test.mjs') })])
+    assert.deepEqual(at('aaaaaa01', recsA), ['a.md'], '① B Edit 기록 있음')
+    // ② 실제 재현(c4-build-6-aed1dc) : A 정지 시점에 B 의 Edit 가 아직 B 기록에 안 실림 — 고치기 전 = y 가 A 글롭으로 귀속
+    put('abbbbb01', [use(now - 65e3, 'Read', { file_path: 'y' })])
+    assert.deepEqual(at('aaaaaa01', recsA), ['a.md'], '② B Edit 기록 전')
+    // ③ 실제 재현(c4-build-3 aac771 → 4·5·6 오귀속) : B 가 `node -e` 로 y 를 씀(shellWrites 로 안 보이는 쓰기) — 고치기 전 = y 가 A 글롭으로 귀속
+    const recsB = [use(now - 50.5e3, 'Bash', { command: "node -e \"const fs=require('fs');fs.writeFileSync('test/y.test.mjs','B')\"" }, 'tB'), res(now - 49e3, 'tB')]
+    put('abbbbb01', recsB)
+    assert.deepEqual(at('aaaaaa01', recsA), ['a.md'], '③ B node -e 쓰기')
+    assert.deepEqual(at('abbbbb01', recsB), ['test/y.test.mjs'], '③ B 자신 = 명령 실행 중 바뀐 y 귀속(양성 대조)')
+    // 백그라운드 명령(결과 전·상한 없음) = 시작 뒤 바뀐 파일 귀속 유지
+    const recsBg = [use(now - 55e3, 'Bash', { command: 'node gen.mjs --out test/y.test.mjs', run_in_background: true }, 'tG'), res(now - 54.9e3, 'tG')]
+    put('abbbbb01', recsBg)
+    assert.deepEqual(at('abbbbb01', recsBg), ['test/y.test.mjs'], '백그라운드')
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
+})
+
+test('c4-d-002-a5870f-p2 D-001 : 옛 귀속 규칙 버전 기록(오귀속 포함)은 쓰지 않고 다시 계산 — attributionFor = 실제 작성 파일만, attribAt = 0(그래프 캐시 키 변경), 현재 버전 기록 = 그대로', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-ver-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-ses-')), git = (...a) => spawnSync('git', a, { cwd: r, encoding: 'utf8' })
+  const id = 'aver0001', fA = path.join(process.env.CODEX_GATE_STATE, 'codex-gate', 'attrib', `${id}.json`)
+  try {
+    git('init', '-q'); git('config', 'user.email', 't@t'); git('config', 'user.name', 't'); fs.writeFileSync(path.join(r, 'a.md'), '1'); git('add', '-A'); git('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString(), use = (t, name, input) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', name, input }] } })
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })
+    fs.writeFileSync(path.join(r, 'a.md'), 'A')
+    const recs = [use(now - 10e3, 'Edit', { file_path: path.join(r, 'a.md') })], tp = path.join(sub, `agent-${id}.jsonl`); fs.writeFileSync(tp, recs.map(x => JSON.stringify(x)).join('\n') + '\n')
+    const o = { recs, tp, mainTp: null, agentId: id, root: r, closed: true }
+    // 옛 판 기록(rulesVer 없음 — 수정 전 훅이 남긴 꼴) + 오귀속 파일
+    fs.mkdirSync(path.dirname(fA), { recursive: true }); fs.writeFileSync(fA, JSON.stringify({ wrote: true, files: ['a.md', 'test/codex-verify.test.mjs'], at: iso(now) }))
+    assert.deepEqual(cg.attributionFor(o).files, ['a.md'])   // 고치기 전 : ['a.md', 'test/codex-verify.test.mjs'](기록 그대로)
+    assert.equal(cg.attribAt(id), 0, '옛 판 기록 = 캐시 키 0(기록 없음과 같음)')
+    assert.ok(JSON.parse(fs.readFileSync(fA, 'utf8')).files.includes('test/codex-verify.test.mjs'), '읽기 = 기록을 덮어쓰지 않음')
+    // 현재 판 기록 = 종료 시점 고정 그대로(다시 계산하지 않음)
+    cg.saveAttrib(id, { files: ['a.md', 'b.md'] })
+    assert.deepEqual(cg.attributionFor(o), { files: ['a.md', 'b.md'], recorded: true }); assert.ok(cg.attribAt(id) > 0)
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }); fs.rmSync(fA, { force: true }) }
+})
+
 test('c4-build-a19b07-p1 D-001 : 옛 고정 ``` 울타리 계약 + 중첩 인용 \'- AC-9 :\' + 오염 원장(criteriaIds AC-9) — 재작성(refreshContract = keepEvidence) 뒤 재판정 = 기준 AC-1 만·PASS', async () => {
   const fs = (await import('node:fs')).default, os = (await import('node:os')).default
   process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))

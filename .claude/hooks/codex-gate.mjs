@@ -28,7 +28,7 @@ const C = {
   reserve: 16 * 1024,       // 묶음 예산 여유 — 범위 목록·이전 회차 결함·가림 표식(budgetOf)
   minBudget: 120 * 1024,    // 묶음 예산 하한(계약·증거가 아주 커도 이만큼은 diff + 본문)
   refEach: 6000, refBody: 12000, refMax: 32000,   // 참조 발췌 글자 상한(항목당 · 결함 함수 본문·파일당 · 묶음당 — budgetOf 가 증거 몫으로 3바이트/자 뺌)
-  rulesVer: '2026-11-10b',  // 분할·참조 규칙 버전 — gate.json 에 남기고, 바뀌면 scope-missing 재시도 상한(retryMax)을 1회 풀어 준다(회송 [2]c)
+  rulesVer: '2026-11-11a',  // 분할·참조·귀속 규칙 버전 — gate.json·attrib 기록에 남기고, 바뀌면 scope-missing 재시도 상한(retryMax)을 1회 풀어 주고 옛 귀속 기록은 다시 계산(회송 [2]c · 2026-11-11a = 셸 귀속 실행 시각 조건)
   noScope: 'docs/__codex-gate-no-files__',   // 파일 scope 없는 판정(옛 원장 재판정 대비) — 없는 경로 = 변경·본문 0, 판정 본체는 증거
   retry: ['scope-too-broad', 'judge-unavailable', 'lock', 'scope-missing'],   // 자동 재판정 사유(device·master-permission·budget·ledger 는 사람 몫) — scope-missing = 묶음 분할로 대조 근거가 빠진 판정(2026-11-10 c4-fail-5-aeb16d), 새 분할로 재판정
   retryMax: 3,              // scope-missing 같은 회차 BLOCKED 기록 상한(쿨다운 없는 사유라 무한 재판정 방지)
@@ -40,6 +40,8 @@ const C = {
   envFlag: 'CODEX_GATE_ACTIVE',   // 훅이 띄운 프로세스 표식 — 재진입 금지
   legacy: 'anakin_phase-verify',  // 폐지된 판정 실행자 — 과거 실행이 끝나도 판정하지 않음(재판정 금지)
 }
+/** 귀속 규칙 판(그래프 하네스 캐시 키 — request-graph loadAgentHarness ver) */
+export const RULES_VER = C.rulesVer
 /** 래퍼 상한 사본(scripts/codex-verify.mjs C.maxPromptBytes·maxEvidenceBytes·maxFileEmbedBytes — 래퍼가 C 를 내보내지 않아 사본, selftest 가 래퍼 원문과 대조) */
 export const W = { prompt: 600 * 1024, evidence: 200_000, file: 200 * 1024 }
 /** 프롬프트 고정 머리(판정 규칙·프로젝트 규칙 발췌·구획 표식 — 빈 구획으로 래퍼 buildPrompt 를 실제 조립해 잰 값) */
@@ -198,11 +200,17 @@ export function changedFiles(writes, t0, base = null, root = ROOT, { shell = [],
   const fresh = f => { try { const m = fs.statSync(path.join(root, f)).mtimeMs; return t0 != null && m >= t0 - 1000 && (until == null || m <= until + 1000) } catch { return false } }
   let excluded = 0
   // 셸 귀속은 명령 근거가 있을 때만(2026-11-10 c4-anakin-arch-4-claude-a11648 — 링크 점검 Bash 하나로 병렬 실행이 셸로 고친 파일까지 끌어옴) :
-  //   shell = 그 에이전트의 Bash·PowerShell 명령 문자열 배열, 후보는 명령에 그 경로 또는 그 디렉터리(저장소 루트 제외)가 나올 때만 귀속
-  const T = (Array.isArray(shell) ? shell : []).join('\n').replace(/\\/g, '/')
-  const said = f => { const d = path.posix.dirname(f); return T.includes(f) || (d !== '.' && new RegExp(`(^|[^\\w.-])${d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|[^\\w.-]|$)`).test(T)) }
+  //   shell = 그 에이전트의 Bash·PowerShell 명령 — 문자열 또는 { c, t, t1 }(명령 시각·결과 시각, attributeOf 가 넘김). 후보는 명령에 그 경로 또는 그 디렉터리(저장소 루트 제외)가 나올 때만 귀속
+  //   시각 있는 명령(2026-11-11 c4-build-4-a609bd·5-a04677·6-aed1dc 오귀속) = 파일 수정 시각이 그 명령 실행 중([t, t1] ±1초)일 때만 — 형제가 `node -e` 로 쓴 파일(shellWrites 로 안 보임)·
+  //     아직 기록에 안 실린 형제 Edit 가 '이 에이전트의 test/*.test.mjs 글롭·grep 경로 언급'으로 붙던 문제. t1 없음(백그라운드·결과 전) = 상한 없음
+  //   ponytail: 수정 시각은 마지막 1개뿐 — 같은 파일을 뒤에 다른 실행이 또 고치면 이 에이전트 셸 쓰기는 빠짐(그 실행이 기록에 있으면 원래도 제외 대상). 정확히 하려면 명령 전후 파일 해시 기록
+  const sh = (Array.isArray(shell) ? shell : []).map(x => typeof x === 'string' ? { c: x } : x).filter(x => x && typeof x.c === 'string')
+  const T = sh.map(x => x.c).join('\n').replace(/\\/g, '/')
+  const names = (c, f) => { c = c.replace(/\\/g, '/'); const d = path.posix.dirname(f); return c.includes(f) || (d !== '.' && new RegExp(`(^|[^\\w.-])${d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|[^\\w.-]|$)`).test(c)) }
+  const mtOf = f => { try { return fs.statSync(path.join(root, f)).mtimeMs } catch { return NaN } }
+  const said = f => sh.some(x => names(x.c, f) && (!Number.isFinite(x.t) || (m => m >= x.t - 1000 && (!Number.isFinite(x.t1) || m <= x.t1 + 1000))(mtOf(f))))
   // 다른 실행도 쓴 경로(others — Write·Edit·셸 쓰는 형태) = 이 에이전트 명령이 그 경로를 '쓰는 형태'로 적었을 때만 귀속, 읽기·실행·글롭·디렉터리 일치뿐이면 제외(c4-aeb16d-ae440b D-001)
-  const mine = new Set((Array.isArray(shell) ? shell : []).flatMap(c => [...shellWrites(c, root)]).map(p => relOf(p, root)).filter(Boolean))
+  const mine = new Set(sh.flatMap(x => [...shellWrites(x.c, root)]).map(p => relOf(p, root)).filter(Boolean))
   if (T) {
     const cand = base ? [...git(['diff', '--name-only', '-z', base], root).stdout.split('\0'), ...git(['ls-files', '--others', '--exclude-standard', '-z'], root).stdout.split('\0')]
       : (g => g.status === 0 ? g.stdout.split('\0').filter(e => e && !e.startsWith('R')).map(e => e.slice(3)) : [])(git(['status', '--porcelain', '-uall', '-z'], root))
@@ -292,7 +300,9 @@ export function otherWrites(dir, self, mainTp, t0, root = ROOT) {
 export function attributeOf({ recs, tp, mainTp, agentId, root = ROOT, closed = false }) {
   const a = readAgent(recs), baseRef = baseOf(agentId, root)
   const oth = otherWrites(path.dirname(tp), tp, mainTp, a.t0, root)
-  const cmds = recs.flatMap(j => j.type === 'assistant' && Array.isArray(j.message?.content) ? j.message.content.filter(b => b?.type === 'tool_use' && SHELL.has(b.name)).map(b => String(b.input?.command ?? '')) : [])
+  // 셸 명령 + 실행 시각창(명령 기록 시각 ~ 결과 기록 시각, 백그라운드 = 상한 없음) — changedFiles 2차 귀속이 '그 명령 실행 중 바뀐 파일'만 보게(2026-11-11 워크플로 병렬 오귀속)
+  const done = new Map(); for (const j of recs) if (j?.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b?.type === 'tool_result') done.set(b.tool_use_id, Date.parse(j.timestamp))
+  const cmds = recs.flatMap(j => j.type === 'assistant' && Array.isArray(j.message?.content) ? j.message.content.filter(b => b?.type === 'tool_use' && SHELL.has(b.name)).map(b => ({ c: String(b.input?.command ?? ''), t: Date.parse(j.timestamp), t1: b.input?.run_in_background ? NaN : done.get(b.id) ?? NaN })) : [])
   const changed = changedFiles(a.writes, a.t0, baseRef, root, { shell: cmds, others: oth, until: closed ? a.t1 : null }), sc = splitScope(changed)
   return { a, baseRef, shell: cmds.length > 0, changed, sc, files: [...sc.harness, ...sc.product] }
 }
@@ -303,11 +313,12 @@ export function attributeOf({ recs, tp, mainTp, agentId, root = ROOT, closed = f
 const attribFile = agentId => path.join(C.attrib, `${String(agentId).replace(/[^\w-]/g, '')}.json`)
 export function saveAttrib(agentId, res, now = Date.now()) {
   if (!agentId) return
-  fs.mkdirSync(C.attrib, { recursive: true }); fs.writeFileSync(attribFile(agentId), JSON.stringify({ wrote: res.files.length > 0, files: res.files, at: new Date(now).toISOString() }))
+  fs.mkdirSync(C.attrib, { recursive: true }); fs.writeFileSync(attribFile(agentId), JSON.stringify({ wrote: res.files.length > 0, files: res.files, at: new Date(now).toISOString(), rulesVer: C.rulesVer }))
 }
-export const loadAttrib = agentId => { try { const r = JSON.parse(fs.readFileSync(attribFile(agentId), 'utf8')); return Array.isArray(r.files) ? r : null } catch { return null } }
-/** 귀속 기록 mtime(없음 = 0) — 그래프 하네스 캐시 키(기록이 생기거나 다시 쓰이면 캐시보다 기록 우선, c4-fail-5-aeb16d-p2 iter-2 D-001) */
-export const attribAt = agentId => { try { return agentId ? Math.round(fs.statSync(attribFile(agentId)).mtimeMs) : 0 } catch { return 0 } }
+/** 귀속 기록 — 귀속 규칙 버전(rulesVer)이 지금과 같을 때만(2026-11-11 c4-d-002-a5870f-p2 D-001 : 옛 규칙 기록의 오귀속이 그래프에 남음). 옛 판·버전 없음 = 기록 없음과 같게(다시 계산, 기록은 덮어쓰지 않음) */
+export const loadAttrib = agentId => { try { const r = JSON.parse(fs.readFileSync(attribFile(agentId), 'utf8')); return Array.isArray(r.files) && r.rulesVer === C.rulesVer ? r : null } catch { return null } }
+/** 귀속 기록 mtime(없음·옛 규칙 판 = 0) — 그래프 하네스 캐시 키(기록이 생기거나 다시 쓰이거나 규칙 판이 바뀌면 캐시를 버림, c4-fail-5-aeb16d-p2 iter-2 D-001) */
+export const attribAt = agentId => { try { return agentId && loadAttrib(agentId) ? Math.round(fs.statSync(attribFile(agentId)).mtimeMs) : 0 } catch { return 0 } }
 export function attributionFor(o) { const r = loadAttrib(o.agentId); return r ? { files: r.files, recorded: true } : { ...attributeOf(o), est: true } }
 /** scope 분류 : 하네스 경로(계약 AC-4 조건) · 그 밖 산출 파일 — 둘 다 같은 c4 scope · 생성물(설계도판·슬롯 md·실데이터판) = scope 제외(생성기 실행 증거로만) */
 export function splitScope(changed) {

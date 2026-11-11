@@ -70,39 +70,8 @@ test('CODEX_JS 가짜 판정자 : evidence 구획이 채워진 프롬프트를 �
   }
 })
 
-test('묶음 판정 : 칸 계약을 접두 ID 로 묶고, 결과를 칸별 판정자 출력(AC-n · D-NNN)으로 나눈다', async () => {
-  const { bundleTask, bundleCriteria, splitBundle } = await import('../scripts/codex-verify.mjs')
-  const cells = [{ id: 'c1-turn-k', no: 1, prefix: 'P', contract: 'p.md' }, { id: 'c3-turn-k', no: 3, prefix: 'H', contract: 'h.md' }, { id: 'c6-turn-k', no: 6, prefix: 'T', contract: 't.md' }]
-  const read = (f) => `# 계약 ${f}\n- AC-1 : a\n- AC-2 : b\n`
-  const task = bundleTask(cells, read)
-  assert.match(task, /## 칸 P — 원장 c1-turn-k \(c1\)[\s\S]*- P-1 : a\n- P-2 : b[\s\S]*## 칸 H — 원장 c3-turn-k \(c3\)[\s\S]*- H-1 : a/)
-  assert.ok(!/AC-\d/.test(task.split('## 칸 P')[1]), '칸 절 안 AC-n 은 모두 접두 ID 로')
-  assert.deepEqual(bundleCriteria(cells, read), ['P-1', 'P-2', 'H-1', 'H-2', 'T-1', 'T-2'])
-  const c = (id, status) => ({ id, status, met: status === 'met', evidence: 'e' })
-  const raw = { verdict: 'FAIL', iter: 2, criteria: [c('P-1', 'met'), c('P-2', 'met'), c('H-1', 'unmet'), c('H-2', 'met'), c('T-1', 'met')], defects: [{ id: 'H-D-001', severity: 'high', status: 'open', file: 'a', line: 1, summary: 's', repro: 'r', fix_hint: 'f', firstSeen: 1, seenCount: 1 }, { id: 'D-009', severity: 'low', status: 'open', file: 'b', line: 0, summary: '접두 없음', repro: '', fix_hint: '' }], blocked: [{ reason: 'device', detail: 'H: 실기기' }], blocked_reason: '', notes: 'n' }
-  const per = splitBundle(raw, cells, '묶음 분리')
-  assert.deepEqual(Object.keys(per), ['c1-turn-k', 'c3-turn-k', 'c6-turn-k'])
-  assert.equal(per['c1-turn-k'].verdict, 'PASS'); assert.deepEqual(per['c1-turn-k'].criteria.map((x) => x.id), ['AC-1', 'AC-2']); assert.deepEqual(per['c1-turn-k'].defects, [])
-  assert.equal(per['c3-turn-k'].verdict, 'FAIL'); assert.deepEqual(per['c3-turn-k'].defects.map((d) => d.id), ['D-001']); assert.ok(!('firstSeen' in per['c3-turn-k'].defects[0]), '판정자 출력 모양(MODEL_SCHEMA)만')
-  assert.deepEqual(per['c3-turn-k'].blocked, [{ reason: 'device', detail: 'H: 실기기' }]); assert.deepEqual(per['c1-turn-k'].blocked, [])
-  assert.equal(per['c6-turn-k'].verdict, 'FAIL'); assert.deepEqual(per['c6-turn-k'].defects.map((d) => d.id), ['D-009'])   // 접두 없는 결함 = 총괄(마지막 칸), T-2 누락 = FAIL
-  assert.match(per['c6-turn-k'].notes, /^묶음 분리\nn$/)
-  // c4-codex-ac436f-p2 D-001 : 묶음 판정 규칙 = 신뢰 구획(BUNDLE_RULES → buildPrompt rules), task(데이터)에는 계약만
-  const { BUNDLE_RULES, buildPrompt, bundlePrev } = await import('../scripts/codex-verify.mjs')
-  assert.ok(!task.includes('묶음 판정 규칙') && !task.includes('결함 id 는'))
-  const pr = buildPrompt({ task, evidence: 'E', diffText: '', scope: '', files: '', prevDefects: [], iter: 1, rules: BUNDLE_RULES, nonce: 'n1' })
-  assert.ok(pr.indexOf(BUNDLE_RULES) > 0 && pr.indexOf(BUNDLE_RULES) < pr.indexOf('# 입력 묶음') && pr.indexOf('<<<BEGIN DATA nonce=n1 section=task>>>') > pr.indexOf(BUNDLE_RULES), '규칙은 데이터 구획 밖·앞')
-  // c4-codex-ac436f-p2 D-002 : 칸 원장별 마지막 결과 결함 + waived 사유 → 접두 id
-  const lr = fs.mkdtempSync(path.join(os.tmpdir(), 'cv-prev-'))
-  try {
-    const out = path.join(lr, 'c3-turn-k', 'iter-2.codex.json')
-    fs.mkdirSync(path.dirname(out), { recursive: true })
-    fs.writeFileSync(out, JSON.stringify({ defects: [{ id: 'D-001', severity: 'high', status: 'open', file: 'a', line: 1, summary: 's' }, { id: 'D-002', severity: 'low', status: 'open', file: 'b', line: 2, summary: 't' }] }))
-    fs.writeFileSync(path.join(lr, 'c3-turn-k', 'ledger.json'), JSON.stringify({ iters: [{ iter: 1, out: 'none' }, { iter: 2, out }], waived: { 'D-002': { reason: '팀장 면제' } } }))
-    assert.deepEqual(bundlePrev(cells, lr).map((d) => [d.id, d.status, d.waiveReason]), [['H-D-001', 'open', undefined], ['H-D-002', 'waived', '팀장 면제']])
-  } finally {
-    fs.rmSync(lr, { recursive: true, force: true })
-  }
-  const bl = splitBundle({ verdict: 'BLOCKED', iter: 1, criteria: [], defects: [], blocked: [{ reason: 'judge-unavailable', detail: 'token_expired' }], blocked_reason: 'token_expired', notes: '' }, cells)
-  assert.ok(Object.values(bl).every((r) => r.verdict === 'BLOCKED' && r.blocked[0].reason === 'judge-unavailable' && r.blocked_reason === 'token_expired'))
+test('묶음 판정(--bundle) 삭제 : 옵션·전용 export 가 없다(2026-11-11 보안 지적 — 증거 평탄화 복사가 비밀 경로 필터를 우회)', async () => {
+  const m = await import('../scripts/codex-verify.mjs')
+  for (const k of ['--bundle', '--skip-judge', '--skip-reason']) assert.throws(() => m.parseArgs([k, 'x', '--id', 't1']), /알 수 없는 인자/, k)
+  for (const k of ['bundleTask', 'bundleCriteria', 'splitBundle', 'bundlePrev', 'BUNDLE_RULES']) assert.equal(m[k], undefined, k)
 })
