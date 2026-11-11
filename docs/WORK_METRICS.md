@@ -48,8 +48,8 @@ L0  완료 요청당 비용 ★  = (메인 비용 + 서브에이전트 비용) �
 |---|---|---|---|---|---|---|
 | `ctx_growth` | 컨텍스트 팽창률 | 끝 턴 (context÷api_calls) ÷ 첫 턴 (context÷api_calls) | all | 배 | > 5배 |  |
 | `cache_miss_events` | 캐시 미스 이벤트 | 직전 고수위 대비 호출당 cache_read 20k 이상 하락 횟수 | all | 회 | > 3 |  |
-| `rework_rate` | 파일 재작업률 | 2턴 이상에서 수정된 파일 ÷ 수정 파일 | steps | 비율 | > 50% |  |
-| `unverified_rate` | 무검증 쓰기 턴 비율 | 쓰기 후 테스트·실행 확인 없는 턴 ÷ 쓰기 턴 | requests | 비율 | > 1% |  |
+| `rework_rate` | 파일 재작업률 | 2요청 이상에서 수정된 파일 ÷ 수정 파일 (서브에이전트 쓰기 = 디스패치 요청에 포함) | steps | 비율 | > 50% |  |
+| `unverified_rate` | 무검증 쓰기 턴 비율 | 쓰기 후 테스트·실행 확인 없는 턴 ÷ 쓰기 턴 (메인 또는 서브에이전트가 쓴 턴, 쓴 주체별로 마지막 쓰기 뒤 검증 판별) | requests | 비율 | > 1% |  |
 | `recovery_multiplier` | 오류 회복 배수 | Σ(오류 후 같은 도구 성공까지 추가 호출 시간) ÷ Σ 오류 호출 시간 | steps | 배 | > 5배 |  |
 | `agent_cost_share` | 위임 비용 비중 | cost_agents_usd ÷ cost_total_usd | agents | 비율 | > 60% | 병렬도와 함께 판단 — 비중이 높아도 벽시계 절감이 크면 정당 |
 | `agent_parallelism` | 병렬도 | Σ agent wall ÷ max agent wall | agents | 배 |  |  |
@@ -105,7 +105,7 @@ L0  완료 요청당 비용 ★  = (메인 비용 + 서브에이전트 비용) �
 
 | 키 | 라벨 | 예 |
 |---|---|---|
-| FEATURE | 기능 구현 | 만들어, 만들고, 구현, 추가해 |
+| FEATURE | 기능 구현 | 만들어, 만들고, 만들자, 구현 |
 | FIX | 수정·버그 | 고쳐, 수정해, 바로잡, 해결해 |
 | REFACTOR | 재구성 | 리팩토, 재구성, 정리해, 단순화 |
 | GIT | Git | 커밋, 푸시, commit, push |

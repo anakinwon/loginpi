@@ -33,7 +33,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
 import { fileURLToPath } from 'node:url'
-import { SCHEMA_VERSION, categorize, costUsd, makeRedactor, kfmt, elapsed, usd } from '../../scripts/work-history-core.mjs'
+import { SCHEMA_VERSION, categorize, costUsd, makeRedactor, kfmt, elapsed, usd, WRITE_TOOL_RE, verifiedAfterLastWrite } from '../../scripts/work-history-core.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const PROJECT = path.resolve(HERE, '..', '..')
@@ -168,8 +168,7 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
     const since = st.responded && st.sinceTs ? st.sinceTs : st.reqTs
     const ttft = st.firstTextTs ? Math.max(0, new Date(st.firstTextTs) - new Date(since)) : null
     const filesChanged = [...new Set(st.writes)]
-    const lastWriteIdx = st.steps.map(s => /^(Write|Edit|MultiEdit|NotebookEdit)$/.test(s.t)).lastIndexOf(true)
-    const verified = filesChanged.length ? st.steps.slice(lastWriteIdx + 1).some(s => (s.t === 'Bash' || s.t === 'PowerShell') && /test|검증|verify|확인|check|run|실행|render|screenshot|--check|lint|build/i.test(s.d || '')) : null
+    const verified = filesChanged.length ? verifiedAfterLastWrite(st.steps) : null
     return {
       v: SCHEMA_VERSION, id: `${sid}:${st.turn}.${part}`, session: short, session_id: sid, project: PROJECT_NAME, model: st.model, effort: st.effort ?? null,
       date: dayOf(st.reqTs), hour: hourOf(st.reqTs), weekday: weekdayOf(st.reqTs), turn: st.turn, part, mid_turn: !!st.midTurn, ultrathink: /\bultrathink\b/i.test(st.reqText),
@@ -195,7 +194,8 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
       const agentId = mf.replace(/^agent-/, '').replace(/\.meta\.json$/, '')   // 파일명 agent-<agentId>.meta.json (agentId 는 'a'+이름+'-'+해시)
       // 파일이 그대로여도 Workflow 결과가 늦게 도착해 정확 매핑(wf:)이 새로 생기거나 바뀌면 재기록(시간 추정 귀속 보정, D-003 2026-11-09)
       const exact = (wf && st.agentTurn['wf:' + wf]) || null
-      const seen = st.agentSeen[agentId]; if (seen && seen.mtime === stat.mtimeMs && seen.size === stat.size && (seen.exact || null) === exact) continue
+      // seen.fv = 기록 필드 버전(2 = files·verified 추가, 2026-11-12) — 옛 기록을 가진 진행 중 세션도 1회 재기록
+      const seen = st.agentSeen[agentId]; if (seen && seen.fv === 2 && seen.mtime === stat.mtimeMs && seen.size === stat.size && (seen.exact || null) === exact) continue
       let text; try { text = fs.readFileSync(base + '.jsonl', 'utf8') } catch { continue }
       const firstTs = (text.match(/"timestamp":"([^"]+)"/) || [])[1] || null
       // 귀속 턴: ① 이미 매핑 ② toolUseId(일반 Agent) ③ name(팀원 에이전트: meta.name = Agent 호출의 name 인자) ④ 부모 에이전트의 턴 ⑤ 시작 시각이 속한 턴
@@ -206,6 +206,7 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
       if (!turnId) continue                                                // 아직 디스패치 턴을 모름(다음 Stop 에서 재시도)
       st.agentTurn[agentId] = turnId
       const tk = emptyTokens(); const seenReq = new Set(); let first = null, last = null, model = meta.model || null, tools = 0, errors = 0, outChars = 0
+      const steps = [], writes = []                                         // 재작업률·무검증률용 — 메인 턴과 같은 판별(verifiedAfterLastWrite)
       for (const l of text.split('\n')) {
         if (!l) continue; let j; try { j = JSON.parse(l) } catch { continue }
         if (j.timestamp) { first = first || j.timestamp; last = j.timestamp }
@@ -213,12 +214,17 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
           if (j.message?.model) model = j.message.model
           const rid = j.requestId || j.uuid
           if (j.message?.usage && !seenReq.has(rid)) { seenReq.add(rid); const u = j.message.usage; tk.api_calls++; tk.input += u.input_tokens || 0; tk.cache_read += u.cache_read_input_tokens || 0; tk.cache_create += u.cache_creation_input_tokens || 0; tk.output += u.output_tokens || 0; tk.thinking += u.output_tokens_details?.thinking_tokens || 0 }
-          for (const b of j.message?.content || []) { if (b.type === 'tool_use') tools++; else if (b.type === 'text') outChars += (b.text || '').length }
+          for (const b of j.message?.content || []) {
+            if (b.type === 'tool_use') {
+              tools++; steps.push({ t: b.name, d: String(b.input?.description || '') })
+              const f = WRITE_TOOL_RE.test(b.name) && rel(b.input?.file_path || b.input?.notebook_path || ''); if (f) writes.push(f)
+            } else if (b.type === 'text') outChars += (b.text || '').length
+          }
         } else if (j.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b.type === 'tool_result' && b.is_error) errors++
       }
       const nameFromTu = meta.toolUseId && st.agentTurn['name:' + meta.toolUseId]
-      record(logFileFor(st.agentTurn['ts:' + turnId] || st.reqTs, 'jsonl'), { v: SCHEMA_VERSION, agent: true, id: turnId, agent_id: agentId, ...(wf ? { workflow: wf, ...(turnId === st.agentTurn['wf:' + wf] ? { wf_exact: true } : {}) } : {}), name: meta.name || nameFromTu || (wf && meta.description) || agentId.slice(0, 12), type: meta.customAgentType || meta.agentType || null, model, depth: meta.spawnDepth || 1, parent: meta.parentAgentId || null, ts_start: first ? localIso(first) : null, ts_end: last ? localIso(last) : null, wall_ms: first && last ? Math.max(0, new Date(last) - new Date(first)) : null, tokens: { ...tk, context: tk.input + tk.cache_read + tk.cache_create }, cost_usd: costUsd(tk, model), tools, errors, out_chars: outChars })
-      st.agentSeen[agentId] = { mtime: stat.mtimeMs, size: stat.size, ...(exact ? { exact } : {}) }
+      record(logFileFor(st.agentTurn['ts:' + turnId] || st.reqTs, 'jsonl'), { v: SCHEMA_VERSION, agent: true, id: turnId, agent_id: agentId, ...(wf ? { workflow: wf, ...(turnId === st.agentTurn['wf:' + wf] ? { wf_exact: true } : {}) } : {}), name: meta.name || nameFromTu || (wf && meta.description) || agentId.slice(0, 12), type: meta.customAgentType || meta.agentType || null, model, depth: meta.spawnDepth || 1, parent: meta.parentAgentId || null, ts_start: first ? localIso(first) : null, ts_end: last ? localIso(last) : null, wall_ms: first && last ? Math.max(0, new Date(last) - new Date(first)) : null, tokens: { ...tk, context: tk.input + tk.cache_read + tk.cache_create }, cost_usd: costUsd(tk, model), tools, errors, out_chars: outChars, edit_calls: writes.length, files_changed: new Set(writes).size, files: [...new Set(writes)].slice(0, 40).map(redact), verified: writes.length ? verifiedAfterLastWrite(steps) : null })
+      st.agentSeen[agentId] = { fv: 2, mtime: stat.mtimeMs, size: stat.size, ...(exact ? { exact } : {}) }
     }
   }
   const resetPart = () => Object.assign(st, emptyPart())                  // part 델타: 방출 후 누적기 초기화 (agentTurn/agentSeen/fixQueue 는 턴·세션 단위라 유지)

@@ -7,7 +7,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { aggregate, tokensStats, perfStats, loadRows, isoWeek, kpiView } from '../scripts/work-history-stats.mjs'
+import { aggregate, tokensStats, perfStats, loadRows, isoWeek, kpiView, outcomeStats } from '../scripts/work-history-stats.mjs'
 import { categorize, costUsd, makeRedactor, METRICS, KPI_TREE, evaluateSlo } from '../scripts/work-history-core.mjs'
 
 test('metric registry: every KPI tree key is defined, and SLO evaluation flags breaches', () => {
@@ -189,6 +189,41 @@ test('subagent transcripts are attributed to the dispatching turn by name and co
   assert.equal(a[0].cost_usd, +((1000 * 2 + 3000 * 10) / 1e6).toFixed(4))                 // sonnet 5: $2 in / $10 out per M
   assert.equal(rows[0].cost_agents_usd, a[0].cost_usd)
   assert.equal(aggregate(rows).total.cost_total_usd, +(rows[0].cost_usd + a[0].cost_usd).toFixed(4))
+})
+
+test('subagent file writes and verification are recorded and counted in rework/unverified (main wrote nothing)', () => {
+  const { dir, env, transcript } = setup(); const s = sid()
+  fs.writeFileSync(transcript, jsonl([
+    user('고쳐줘', 0),
+    asst([toolUse('t1', 'Agent', { subagent_type: 'anakin_phase-build', name: 'build-a', description: 'x', prompt: 'p' })], 500, { requestId: 'r1' }), toolResult('t1', 900),
+    asst([{ type: 'text', text: '위임 완료' }], 3000, { requestId: 'r2' }),
+  ]))
+  const sub = path.join(dir, s, 'subagents'); fs.mkdirSync(sub, { recursive: true })
+  const sa = (ms, blocks) => ({ type: 'assistant', isSidechain: true, requestId: 'a' + ms, message: { model: 'claude-opus-5-5', content: blocks }, timestamp: iso(ms) })
+  const mk = (name, blocks) => { fs.writeFileSync(path.join(sub, `agent-a${name}-1.meta.json`), JSON.stringify({ agentType: 'anakin_phase-build', name })); fs.writeFileSync(path.join(sub, `agent-a${name}-1.jsonl`), jsonl(blocks)) }
+  mk('build-a', [sa(1000, [toolUse('e1', 'Edit', { file_path: 'src/a.ts' })]), sa(1200, [toolUse('e2', 'Edit', { file_path: 'src/a.ts' })]), sa(1500, [toolUse('b1', 'Bash', { description: 'node --test 실행' })])])
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })
+  const rows = loadRows({ root: env.WORK_HISTORY_DIR })
+  const a = rows[0].agents_detail[0]
+  assert.equal(a.files_changed, 1); assert.equal(a.edit_calls, 2); assert.deepEqual(a.files, ['src/a.ts']); assert.equal(a.verified, true)
+  assert.equal(rows[0].files_changed, 0)                                                            // 메인은 쓰지 않음
+  const o = outcomeStats(rows)
+  assert.equal(o.write_turns, 1); assert.equal(o.unverified_write_turns, 0); assert.equal(o.files_changed, 1); assert.equal(o.edit_calls, 2)
+})
+
+test('outcomeStats: agent writes across requests = rework, agent write without check = unverified, legacy agent records (no fields) = old result', () => {
+  const row = (id, extra) => ({ id: `${id}.1`, session: id.split(':')[0], turn: +id.split(':')[1], part: 1, date: '2026-09-20', files_changed: 0, steps: [], ...extra })
+  const rows = [
+    row('s:1', { agents_detail: [{ id: 's:1', files_changed: 1, files: ['src/x.ts'], verified: true }] }),
+    row('s:2', { agents_detail: [{ id: 's:2', files_changed: 1, files: ['src/x.ts'], verified: false }] }),   // 같은 파일 다른 요청 → 재작업, 검증 없음
+    row('t:1', { files_changed: 1, verified: true, steps: [{ t: 'Edit', tgt: 'src/y.ts' }] }),                // 다른 세션 turn 1 — s:1 과 섞이지 않음
+  ]
+  const o = outcomeStats(rows)
+  assert.equal(o.write_turns, 3); assert.equal(o.unverified_write_turns, 1); assert.equal(o.files_changed, 2); assert.equal(o.files_reworked, 1); assert.equal(o.rework_rate, 0.5)
+  const legacy = [row('s:1', { agents_detail: [{ id: 's:1', cost_usd: 1, wall_ms: 10 }] })]                   // 2026-11-12 이전 agent 레코드
+  const ol = outcomeStats(legacy)
+  assert.equal(ol.write_turns, 0); assert.equal(ol.unverified_rate, null); assert.equal(ol.rework_rate, null)
+  assert.doesNotThrow(() => aggregate(legacy))
 })
 
 test('workflow agents under subagents/workflows/wf_*/ are attributed to the turn that called Workflow (not the later turn they started in), once', () => {

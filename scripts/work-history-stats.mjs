@@ -19,7 +19,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { kfmt, ms2, pct, usd, csvSafe, CATEGORY_KEYS, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE, evaluateSlo, costUsd } from './work-history-core.mjs'
+import { kfmt, ms2, pct, usd, csvSafe, CATEGORY_KEYS, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE, evaluateSlo, costUsd, WRITE_TOOL_RE } from './work-history-core.mjs'
 export { kfmt, ms2, pct, usd, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE }
 export const fmtMetric = (k, v) => { if (v == null) return '-'; const u = METRICS[k]?.unit; if (u === 'USD') return usd(v); if (u === 'ms') return ms2(v); if (u === '비율') return pct(v, 1); if (u === '배') return `${v}배`; if (u === '자' || u === '건' || u === '개' || u === '회') return typeof v === 'number' ? v.toLocaleString() : String(v); return String(v) }
 
@@ -133,11 +133,20 @@ const agentSum = (rows, f) => rows.reduce((a, r) => a + (f(r) || 0), 0)
 export function outcomeStats(rows) {
   const p1 = rows.filter(r => r.part === 1 || r.part == null); const n = requestsOf(rows) || 1
   const corrections = p1.filter(r => r.correction).length, interrupted = rows.filter(r => r.interrupted).length
-  const writeTurns = p1.filter(r => (r.files_changed || 0) > 0); const unverified = writeTurns.filter(r => r.verified === false).length
-  const files = new Map(); for (const r of rows) for (const s of r.steps || []) if (s.tgt && /^(Write|Edit|MultiEdit|NotebookEdit)$/.test(s.t)) { const k = s.tgt; const e = files.get(k) || { file: k, calls: 0, turns: new Set() }; e.calls++; e.turns.add(r.turn); files.set(k, e) }
+  // 서브에이전트 쓰기·검증도 디스패치 턴에 포함(agent 레코드 files_changed·verified — 필드 없는 옛 레코드는 쓰기 없음으로 보아 종전 계산과 같다)
+  const agentWriters = r => (r.agents_detail || []).filter(a => (a.files_changed || 0) > 0)
+  const writeTurns = p1.filter(r => (r.files_changed || 0) > 0 || agentWriters(r).length)
+  const unverified = writeTurns.filter(r => ((r.files_changed || 0) > 0 && r.verified === false) || agentWriters(r).some(a => a.verified === false)).length
+  const turnKey = r => (r.id ? r.id.replace(/\.\d+$/, '') : `${r.session}:${r.turn}`)   // 세션마다 turn 번호가 1부터라 session 포함
+  const files = new Map(); const touch = (k, turn) => { const e = files.get(k) || { file: k, calls: 0, turns: new Set() }; e.calls++; e.turns.add(turn); files.set(k, e) }
+  for (const r of rows) {
+    for (const s of r.steps || []) if (s.tgt && WRITE_TOOL_RE.test(s.t)) touch(s.tgt, turnKey(r))
+    // shortcut: agent 레코드는 파일 목록만 있어 파일당 1회로 센다(calls 과소), 파일별 횟수가 필요해지면 로거에 횟수 기록 추가
+    for (const a of r.agents_detail || []) for (const f of a.files || []) touch(f, turnKey(r))
+  }
   const fileRows = [...files.values()].map(e => ({ file: e.file, calls: e.calls, turns: e.turns.size, rework: e.turns.size > 1 })).sort((a, b) => b.calls - a.calls)
   const rec = rows.map(r => r.recovery).filter(Boolean)
-  return { requests: n, records: rows.length, edit_calls: sum(rows, r => r.edit_calls), files_changed: files.size, files_reworked: fileRows.filter(f => f.rework).length, rework_rate: files.size ? +(fileRows.filter(f => f.rework).length / files.size).toFixed(3) : null, write_turns: writeTurns.length, unverified_write_turns: unverified, unverified_rate: writeTurns.length ? +(unverified / writeTurns.length).toFixed(3) : null, corrections, correction_rate: +(corrections / n).toFixed(3), interrupted, superseded: rows.filter(r => r.superseded).length, error_extra_calls: agentSum(rec, x => x.extra_calls), error_extra_ms: agentSum(rec, x => x.extra_ms), error_ms: agentSum(rec, x => x.error_ms), recovery_multiplier: agentSum(rec, x => x.error_ms) ? +(agentSum(rec, x => x.extra_ms) / agentSum(rec, x => x.error_ms)).toFixed(1) : null, files: fileRows.slice(0, 30) }
+  return { requests: n, records: rows.length, edit_calls: sum(rows, r => (r.edit_calls || 0) + agentSum(r.agents_detail || [], a => a.edit_calls)), files_changed: files.size, files_reworked: fileRows.filter(f => f.rework).length, rework_rate: files.size ? +(fileRows.filter(f => f.rework).length / files.size).toFixed(3) : null, write_turns: writeTurns.length, unverified_write_turns: unverified, unverified_rate: writeTurns.length ? +(unverified / writeTurns.length).toFixed(3) : null, corrections, correction_rate: +(corrections / n).toFixed(3), interrupted, superseded: rows.filter(r => r.superseded).length, error_extra_calls: agentSum(rec, x => x.extra_calls), error_extra_ms: agentSum(rec, x => x.extra_ms), error_ms: agentSum(rec, x => x.error_ms), recovery_multiplier: agentSum(rec, x => x.error_ms) ? +(agentSum(rec, x => x.extra_ms) / agentSum(rec, x => x.error_ms)).toFixed(1) : null, files: fileRows.slice(0, 30) }
 }
 export function aggregate(rows) {
   const timed = rows.filter(isTimed); const t = tokenSum(rows); const n = requestsOf(rows)

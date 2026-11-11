@@ -120,6 +120,15 @@ export function makeRedactor({ workspaceRoot, extra = [] } = {}) {
 }
 export const csvSafe = s => (typeof s === 'string' && /^[=+\-@\t\r]/.test(s) ? "'" + s : s)   // 스프레드시트 수식 인젝션 방지
 
+// 쓰기 검증 판별(메인 턴·서브에이전트 공용) — steps = [{ t: 도구명, d: Bash·PowerShell description }], 쓰기 없으면 null
+export const WRITE_TOOL_RE = /^(Write|Edit|MultiEdit|NotebookEdit)$/
+const VERIFY_DESC_RE = /test|검증|verify|확인|check|run|실행|render|screenshot|--check|lint|build/i
+export function verifiedAfterLastWrite(steps) {
+  const last = steps.map(s => WRITE_TOOL_RE.test(s.t)).lastIndexOf(true)
+  if (last < 0) return null
+  return steps.slice(last + 1).some(s => (s.t === 'Bash' || s.t === 'PowerShell') && VERIFY_DESC_RE.test(s.d || ''))
+}
+
 // ── 지표 정의 레지스트리 (단일 진실 원천 — 보고서·CSV·터미널이 이 정의만 쓴다; report 가 <stem>.metrics.json 으로 동봉) ────────────
 // population: all(모든 레코드) | timed(응답 완료 턴) | requests(distinct 턴) | steps(도구 호출) | agents(서브에이전트)
 export const METRICS = {
@@ -146,8 +155,8 @@ export const METRICS = {
   error_rate:       { label: '도구 오류율', formula: 'tool_errors ÷ tools_total', population: 'steps', unit: '비율', note: '보조 지표 — 서브에이전트·오답 산출물 미포함' },
   recovery_multiplier: { label: '오류 회복 배수', formula: 'Σ(오류 후 같은 도구 성공까지 추가 호출 시간) ÷ Σ 오류 호출 시간', population: 'steps', unit: '배', tier: 'L2', direction: 'lower' },
   correction_rate:  { label: '사용자 교정률', formula: 'correction 요청 ÷ requests (10분 내 머리글 일치·교정 어두·재전송)', population: 'requests', unit: '비율', tier: 'L1', direction: 'lower' },
-  rework_rate:      { label: '파일 재작업률', formula: '2턴 이상에서 수정된 파일 ÷ 수정 파일', population: 'steps', unit: '비율', tier: 'L2', direction: 'lower' },
-  unverified_rate:  { label: '무검증 쓰기 턴 비율', formula: '쓰기 후 테스트·실행 확인 없는 턴 ÷ 쓰기 턴', population: 'requests', unit: '비율', tier: 'L2', direction: 'lower' },
+  rework_rate:      { label: '파일 재작업률', formula: '2요청 이상에서 수정된 파일 ÷ 수정 파일 (서브에이전트 쓰기 = 디스패치 요청에 포함)',population: 'steps', unit: '비율', tier: 'L2', direction: 'lower' },
+  unverified_rate:  { label: '무검증 쓰기 턴 비율', formula: '쓰기 후 테스트·실행 확인 없는 턴 ÷ 쓰기 턴 (메인 또는 서브에이전트가 쓴 턴, 쓴 주체별로 마지막 쓰기 뒤 검증 판별)',population: 'requests', unit: '비율', tier: 'L2', direction: 'lower' },
   files_changed:    { label: '변경 파일 수', formula: 'distinct(Write|Edit 대상)', population: 'all', unit: '개', tier: 'outcome' },
   agent_parallelism:{ label: '병렬도', formula: 'Σ agent wall ÷ max agent wall', population: 'agents', unit: '배' },
   tool_chars:       { label: '도구 결과 컨텍스트 소비', formula: 'Σ tool_result 문자 수', population: 'steps', unit: '자' },
