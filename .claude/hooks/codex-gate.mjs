@@ -2,7 +2,7 @@
 //   (2026-11-10 마스터 결정 — verify 폐지·훅 자동 실행 / 개정 "프롬프트+컨텍스트+그래프+총괄=>제거, 루프 유지+하네스는 루프에 흡수" — 원장 c4-<주제>-<agentId 앞 6자> 하나, 절차 정본 .claude/engineering/40. loop/codex_procedure.md 13절)
 // 실행 : 루트 .claude/settings.json SubagentStart(`--base` : 시작 스냅샷 git stash create) + SubagentStop(판정, timeout 600) + PostToolUse·UserPromptSubmit(`--flush` : 쌓인 판정 결과를 메인 additionalContext 로 1회 전달 — 서브에이전트 안 호출(입력 agent_id)은 건너뜀)
 //   PostToolUse·UserPromptSubmit 등록 = codex-flush.mjs(얇은 진입 — pending 이 있을 때만 이 파일을 불러 flushOut, 출력 바이트 동일 · 2026-11-11 P1). `--flush` 는 그대로 남김(같은 출력)
-//   판정 대상 = 파일 변경 1건 이상 + NO_GATE 밖 에이전트, 하네스 파일도 같은 c4 scope(계약 AC-4 — 하네스 1건 이상이면 항상, selftest 근거 = 훅이 돌린 증거 checks.md 는 .md 아닌 하네스가 있을 때만), 생성물 제외, 프롬프트 상한 넘을 때만 파일 묶음 -p1… (묶음 AND), 같은 요청의 BLOCKED c4 원장 1회 재판정
+//   판정 대상 = 파일 변경 1건 이상 + NO_GATE 밖 에이전트, 하네스 파일도 같은 c4 scope(계약 AC-4 — 하네스 1건 이상이면 항상, node --check 근거 = 훅이 돌린 증거 checks.md 는 .md 아닌 하네스가 있을 때만 · selftest 근거 = build 보고 원문), 생성물 제외, 프롬프트 상한 넘을 때만 파일 묶음 -p1… (묶음 AND), 같은 요청의 BLOCKED c4 원장 1회 재판정
 //   SubagentStop 의 additionalContext 는 서브에이전트에게 가서 그 에이전트가 계속 돈다(Claude Code 2.1.321 스키마 설명) → 메인 전달은 결과 파일 + 메인 쪽 훅 flush 로 한다
 // 시험 : node .claude/hooks/codex-gate.mjs --selftest (가짜 판정자 CODEX_JS — Codex 실호출 없음)
 import { spawn, spawnSync } from 'node:child_process'
@@ -29,8 +29,8 @@ const C = {
   reserve: 16 * 1024,       // 묶음 예산 여유 — 범위 목록·이전 회차 결함·가림 표식(budgetOf)
   minBudget: 120 * 1024,    // 묶음 예산 하한(계약·증거가 아주 커도 이만큼은 diff + 본문)
   refEach: 6000, refBody: 12000, refMax: 32000,   // 참조 발췌 글자 상한(항목당 · 결함 함수 본문·파일당 · 묶음당 — budgetOf 가 증거 몫으로 3바이트/자 뺌)
-  rulesVer: '2026-11-11c',  // 분할·참조·귀속 규칙 버전 — gate.json·attrib 기록에 남기고, 바뀌면 scope-missing 재시도 상한(retryMax)을 1회 풀어 주고 옛 귀속 기록은 다시 계산(회송 [2]c · 2026-11-11a = 셸 귀속 실행 시각 조건 · 11b = 셸 cd 작업 디렉터리 추적 · 11c = 인터프리터 쓰기 귀속·자동 검사 증거)
-  checkMs: 60e3,            // 자동 검사(checksOf — node --check·훅 selftest) 총 시간 상한, 넘으면 '시간 초과' 기록·판정 계속
+  rulesVer: '2026-11-11d',  // 분할·참조·귀속 규칙 버전 — gate.json·attrib 기록에 남기고, 바뀌면 scope-missing 재시도 상한(retryMax)을 1회 풀어 주고 옛 귀속 기록은 다시 계산(회송 [2]c · 2026-11-11a = 셸 귀속 실행 시각 조건 · 11b = 셸 cd 작업 디렉터리 추적 · 11c = 인터프리터 쓰기 귀속·자동 검사 증거 · 11d = 추적 불가 cwd 시간창 귀속(fail-closed)·자동 selftest 실행 제거)
+  checkMs: 60e3,            // 자동 검사(checksOf — node --check 만) 총 시간 상한, 넘으면 '시간 초과' 기록·판정 계속
   noScope: 'docs/__codex-gate-no-files__',   // 파일 scope 없는 판정(옛 원장 재판정 대비) — 없는 경로 = 변경·본문 0, 판정 본체는 증거
   retry: ['scope-too-broad', 'judge-unavailable', 'lock', 'scope-missing'],   // 자동 재판정 사유(device·master-permission·budget·ledger 는 사람 몫) — scope-missing = 묶음 분할로 대조 근거가 빠진 판정(2026-11-10 c4-fail-5-aeb16d), 새 분할로 재판정
   retryMax: 3,              // scope-missing 같은 회차 BLOCKED 기록 상한(쿨다운 없는 사유라 무한 재판정 방지)
@@ -211,13 +211,15 @@ export function changedFiles(writes, t0, base = null, root = ROOT, { shell = [],
   //   인라인 인터프리터(2026-11-11c — c4-c-ecc-flush-a1dd68 `cd /c/…; node -e "…writeFileSync('.claude/settings.json')"; for …; done` = 0건 귀속·원장 없음, c4-build-abc938 `cd …/references && node - <<'EOF'` 누락) :
   //     쓰기 대상이 코드 안에 있어 글로 확정할 수 없음(복합 셸 + cd = cwd 추적 불가로 상대 언급까지 버려짐) → 그 명령 실행 중([t, t1] ±1초, 둘 다 있을 때만) 수정 시각이 바뀐 파일을 귀속, 다른 실행이 쓴 경로(others)는 위처럼 제외
   //     ponytail: 실행 중 같은 시각에 다른 세션(기록 밖)이 고친 파일도 붙음 — 시간창이 짧아(보통 수 초) 감수, 오귀속이 나오면 명령 전후 해시 비교로
-  const sh = (Array.isArray(shell) ? shell : []).map(x => typeof x === 'string' ? { c: x } : x).filter(x => x && typeof x.c === 'string').map(x => ({ ...x, rc: rootText(x.c, root), ip: INTERP_RE.test(shellSegs(x.c, root).segs.map(g => g.s).join('\n')) }))
+  //   추적 불가 cwd(2026-11-11d 보안 검토 S-2 — 종전 = 상대 쓰기 누락 = 판정 없이 통과, fail-open) : 세그먼트 하나라도 cwd = null 이면 인터프리터와 같은 시간창 귀속(ip) — fail-closed, others 제외 규칙 동일
+  const sh = (Array.isArray(shell) ? shell : []).map(x => typeof x === 'string' ? { c: x } : x).filter(x => x && typeof x.c === 'string')
+    .map(x => { const g = shellSegs(x.c, root).segs; return { ...x, rc: rootText(x.c, root), ip: g.some(s => s.cwd === null) || INTERP_RE.test(g.map(s => s.s).join('\n')) } })
   const T = sh.map(x => x.c).join('\n').replace(/\\/g, '/')
   const names = (c, f) => { c = c.replace(/\\/g, '/'); const d = path.posix.dirname(f); return c.includes(f) || (d !== '.' && new RegExp(`(^|[^\\w.-])${d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|[^\\w.-]|$)`).test(c)) }
   const mtOf = f => { try { return fs.statSync(path.join(root, f)).mtimeMs } catch { return NaN } }
   const win = (x, m) => m >= x.t - 1000 && (!Number.isFinite(x.t1) || m <= x.t1 + 1000)
   const said = f => sh.some(x => names(x.rc, f) && (!Number.isFinite(x.t) || win(x, mtOf(f))))
-  const ran = f => sh.some(x => x.ip && Number.isFinite(x.t) && Number.isFinite(x.t1) && win(x, mtOf(f)))   // 인라인 인터프리터 실행 중 수정(백그라운드·시각 없음 = 근거 아님)
+  const ran = f => sh.some(x => x.ip && Number.isFinite(x.t) && Number.isFinite(x.t1) && win(x, mtOf(f)))   // 인라인 인터프리터·추적 불가 cwd 명령 실행 중 수정(백그라운드·시각 없음 = 근거 아님)
   // 다른 실행도 쓴 경로(others — Write·Edit·셸 쓰는 형태) = 이 에이전트 명령이 그 경로를 '쓰는 형태'로 적었을 때만 귀속, 읽기·실행·글롭·디렉터리 일치뿐이면 제외(c4-aeb16d-ae440b D-001)
   const mine = new Set(sh.flatMap(x => [...shellWrites(x.c, root)]).map(p => relOf(p, root)).filter(Boolean))
   if (T) {
@@ -238,7 +240,7 @@ const relOf = (p, root = ROOT) => { const r = path.relative(root, absOf(p, root)
  *     -t·--target-directory = 대상 디렉터리(원본마다 대상/원본이름), -T = 대상 그대로 / PowerShell = 값 받는 매개변수 소비(-Filter 등)·4자 이상 유일 접두 약어(-Dest)
  *   작업 디렉터리(2026-11-11 후속 2 — `cd <dir> && cat > f` 의 f 가 저장소 루트 기준으로 풀려 저장소 밖 Temp·하위 앱 쓰기가 오귀속) : 세그먼트 순서로 cwd 누적(shellSegs),
  *     cwd ≠ 루트 세그먼트의 상대 대상 = 그 cwd 기준 절대경로로 반환(relOf 가 저장소 밖 = null), cwd 추적 불가 뒤 상대 대상 = 반환 안 함(오귀속보다 누락), 절대 대상 = 그대로
- *   ponytail: 복합 셸(서브셸·묶음·제어문·명령 치환)에서 cd 이후 상대 쓰기 = 귀속 안 함(누락 허용, 오귀속 방지) — 단순 연쇄에서만 cwd 추적,
+ *   ponytail: 복합 셸(서브셸·묶음·제어문·명령 치환)에서 cd 이후 상대 쓰기 = 여기서는 반환 안 함(오귀속 방지 — 대신 changedFiles 가 그 명령 시간창 귀속, 11d fail-closed) — 단순 연쇄에서만 cwd 추적,
  *     `a && cd x; cat > f` 처럼 && 실패로 건너뛴 cd 는 실행됐다고 봄, 파이프·& 안 cd 도 이어진다고 봄,
  *     PowerShell 별칭(-LP 등 쓰기 cmdlet 매개변수)은 못 봄 — 오귀속이 다시 나오면 push-guard 렉서 수준으로
  */
@@ -591,22 +593,21 @@ export function diffRefOf(baseRef, files, root = ROOT) {
 const baseLine = (ref, baseRef) => `- 기준선 : ${!baseRef ? '기준선 없음 (SubagentStart 스냅샷 없음 — HEAD 기준, 같은 시간 다른 세션 변경이 섞일 수 있음)' : ref === baseRef ? `${baseRef} (SubagentStart 스냅샷 — 이 에이전트 시작 뒤 변경만)` : `HEAD — 시작 스냅샷 ${baseRef} 대비 scope 변경 0건(재개 때 다시 찍힌 스냅샷 — 2026-11-10 c4-fail-5-aeb16d), HEAD 기준이라 같은 시간 다른 세션 변경이 섞일 수 있음`}`
 const scopeLine = (n, part, related) => `- scope = 이 원장 파일 ${n}건${part ? ` · 묶음 ${part[0]}/${part[1]} — 이 원장은 모든 묶음 PASS 일 때만 Y(AND), 이 묶음 밖 파일은 판정하지 않는다(unverifiable 아님)` : ''}${related ? ' · 다른 묶음 연관 파일 발췌 = 증거 related-ref.md(참조 — 판정 대상 아님, 이 묶음 판정의 대조 근거로만)' : ''}`
 /** 자동 계약(contract.md, c4 전용) — 마스터 요청 원문 + 브리프 원문 + 검수 대상 + 기본 AC(하네스 파일 있으면 AC-4) + 기준선·묶음·생성물 표기 */
-/** 하네스 파일 중 .md 아닌 것(코드·설정)이 있나 — checks.md 생성 조건이자 AC-4 의 selftest 문구 조건 */
+/** 하네스 파일 중 .md 아닌 것(코드·설정)이 있나 — checks.md 생성 조건이자 AC-4 의 검사 근거 문구 조건 */
 const harnessCode = files => files.some(f => HARNESS_RE.test(f) && !/\.md$/i.test(f))
 /** AC-4 줄(하네스 파일 1건 이상이면 항상 — 규칙 정합 / 우회·회귀 없음, 2026-11-11 마스터 선택 "selftest 요구만 빼기") — 첫 계약·재분할 계약 공용.
- *  selftest·node --check 근거(훅이 직접 돌린 증거 checks.md)는 .md 아닌 하네스 파일이 있을 때만 붙인다(문서뿐이면 실행할 검사가 없음) */
-const ac4Of = files => { const hz = files.filter(f => HARNESS_RE.test(f)); return hz.length ? [`- AC-4 : 하네스 파일 변경 ${hz.length}건(${hz.join(', ')}) — 규칙 정합 / 우회·회귀 없음${harnessCode(hz) ? ' / selftest·node --check 근거 = 증거 checks.md' : ''}`] : [] }
+ *  검사 근거(node --check = 훅이 직접 돌린 증거 checks.md · selftest = build 보고 원문, 11d)는 .md 아닌 하네스 파일이 있을 때만 붙인다(문서뿐이면 실행할 검사가 없음) */
+const ac4Of = files => { const hz = files.filter(f => HARNESS_RE.test(f)); return hz.length ? [`- AC-4 : 하네스 파일 변경 ${hz.length}건(${hz.join(', ')}) — 규칙 정합 / 우회·회귀 없음${harnessCode(hz) ? ' / node --check 근거 = 증거 checks.md · selftest 근거 = build 보고 원문(있는 훅만)' : ''}`] : [] }
 /**
- * 자동 검사 증거(2026-11-11c — 하네스 원장 BLOCKED 60건 중 26건 '증거·본문 누락', 문서 한 줄 수정도 'selftest 근거 없음' FAIL 2회차) : scope 에 하네스 파일이 1건 이상이면 훅이 직접 실행
- *   scope 안 .mjs·.js·.cjs(있는 파일) 마다 node --check + 바뀐 훅(.claude/hooks/*) 중 원문에 --selftest 가 있으면 node <훅> --selftest → 명령·종료 코드·출력 끝 2줄(비밀 가림)
- *   총 상한 end(기본 C.checkMs) — 넘으면 '시간 초과' 적고 판정은 계속. 자식 env CODEX_GATE_ACTIVE=1(훅이 띄운 프로세스 — 재진입 금지). .md 아닌 하네스 파일이 없는 묶음(하네스 없음·.md 뿐 — 후자는 AC-4 는 있되 selftest 문구 없음) = '' (checks.md 안 만듦·지움)
- *   ponytail: node --test 전체는 넣지 않음(1~2분 — 훅 시간 예산·판정 지연), 시험 근거는 build 보고·tools.md. 필요해지면 바뀐 파일의 짝 시험만 골라 추가
+ * 자동 검사 증거(2026-11-11c — 하네스 원장 BLOCKED 60건 중 26건 '증거·본문 누락') : scope 에 .md 아닌 하네스 파일이 1건 이상이면 훅이 직접 실행
+ *   scope 안 .mjs·.js·.cjs(있는 파일) 마다 node --check ./<상대경로> → 명령·종료 코드·출력 끝 2줄(비밀 가림)
+ *   총 상한 end(기본 C.checkMs) — 넘으면 '시간 초과' 적고 판정은 계속. 자식 env CODEX_GATE_ACTIVE=1. .md 아닌 하네스 파일이 없는 묶음 = '' (checks.md 안 만듦·지움)
+ *   ponytail: 미검토 코드 자동 실행 금지(11d 보안 검토 S-1 — scope = 방금 서브에이전트가 쓴 코드, 종전 훅 --selftest 자동 실행 제거). node --check = 파싱만,
+ *     selftest·node --test 는 build 가 실행하고 보고 원문에 적는다. './' = 파일 이름이 '-' 로 시작해도 node 옵션으로 읽히지 않게
  */
 export function checksOf(files, root = ROOT, end = Date.now() + C.checkMs) {
-  if (!harnessCode(files)) return ''   // AC-4 의 selftest 문구와 같은 조건(c4-build-a73e25 D-001 — 근거 파일과 그 문구가 같이 붙고 같이 빠짐)
-  const has = f => fs.existsSync(path.join(root, f)), src = f => { try { return fs.readFileSync(path.join(root, f), 'utf8') } catch { return '' } }
-  const cmds = [...files.filter(f => /\.(mjs|js|cjs)$/.test(f) && has(f)).map(f => ['--check', f]),
-    ...files.filter(f => /^\.claude\/hooks\/[^/]+\.(mjs|js|cjs)$/.test(f) && src(f).includes('--selftest')).map(f => [f, '--selftest'])]
+  if (!harnessCode(files)) return ''   // AC-4 의 검사 근거 문구와 같은 조건(c4-build-a73e25 D-001 — 근거 파일과 그 문구가 같이 붙고 같이 빠짐)
+  const cmds = files.filter(f => /\.(mjs|js|cjs)$/.test(f) && fs.existsSync(path.join(root, f))).map(f => ['--check', `./${f}`])
   const lim = `총 상한 ${Math.round((end - Date.now()) / 1000)}초`
   const out = cmds.map(a => {
     const left = end - Date.now(), cmd = `$ node ${a.join(' ')}`
@@ -616,7 +617,7 @@ export function checksOf(files, root = ROOT, end = Date.now() + C.checkMs) {
     const tail = redact((r.stdout || '') + (r.stderr || '')).split(/\r?\n/).filter(l => l.trim() && !/^\s+at |^Node\.js v\d/.test(l)).slice(-2).map(l => l.slice(0, 300))   // 스택·버전 줄 빼고 끝 2줄(오류 줄이 남게)
     return `${cmd}\n종료 코드 : ${code}\n끝줄 : ${tail.join(' ⏎ ') || '(출력 없음)'}`
   })
-  return `## 자동 검사(codex-gate 훅 실행 — ${lim}, env ${C.envFlag}=1 · node --test 전체는 넣지 않음)\n\n${out.join('\n\n') || '(검사 대상 없음 — scope 에 .mjs·.js·.cjs·selftest 훅 없음)'}\n`
+  return `## 자동 검사(codex-gate 훅 실행 — node --check 만(파싱, 코드 실행 안 함) · ${lim}, env ${C.envFlag}=1 · selftest·node --test 는 build 보고 원문)\n\n${out.join('\n\n') || '(검사 대상 없음 — scope 에 .mjs·.js·.cjs 없음)'}\n`
 }
 export function contractOf({ id, brief, request, type, agentId, files = [], part, generated = [], baseRef, diffRef = baseRef, own = null, excluded = 0, shell = false, related = '' }) {
   return [`# 자동 계약 — ${id} (codex-gate 훅, ${new Date().toISOString()})`, '',
@@ -940,7 +941,7 @@ const readStdin = async () => { let raw = ''; for await (const c of process.stdi
 const isMain = import.meta.url === pathToFileURL(process.argv[1] || '').href
 if (isMain && process.argv[2] === '--selftest') {
   const assert = (await import('node:assert/strict')).default
-  delete process.env[C.envFlag]   // 11c : 훅 자동 검사(checksOf)가 이 selftest 를 env CODEX_GATE_ACTIVE=1 로 띄움 — 시험 안 gate() 는 격리 상태 루트에서 돌아야 함(자식 검사는 다시 표식을 달고, 시험 기록의 훅 파일은 없는 경로라 재귀 없음)
+  delete process.env[C.envFlag]   // 훅이 띄운 프로세스(env CODEX_GATE_ACTIVE=1) 안에서 실행돼도 시험 안 gate() 는 격리 상태 루트에서 돌아야 함(11d 부터 훅은 selftest 를 자동 실행하지 않음 — 방어로 유지)
   // 시험 격리(2026-11-10 E) : 원장·pending·sent·기준선을 임시 상태 루트로 — 실제 .omc/state 를 건드리지 않는다(자식 프로세스·래퍼는 env CODEX_GATE_STATE·CODEX_LOOP_ROOT 로 같은 루트)
   const realPending = C.pending, snap = d => { try { return Object.fromEntries(fs.readdirSync(d).map(f => [f, fs.readFileSync(path.join(d, f), 'utf8')])) } catch { return {} } }, before = snap(realPending)
   const stRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'cgate-state-'))
