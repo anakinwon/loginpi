@@ -275,7 +275,7 @@ setx GOPATH "<Go 작업 폴더>"                                            # B-
 | `.mcp.json` | 4 KB | 아니오(supabase `project_ref` 포함) | 저장소에 포함 — clone 으로 따라옴 | 복사 불필요 |
 | VS Code `%APPDATA%\Code\User\` (`settings.json`·`mcp.json`·`snippets\`·`profiles\`) | [확인중] | [확인중] | A-33 설정 동기화 우선, 안 되면 직접 복사 | 선택 |
 | `loginpi\work-history\` | 49 MB | 대화 전문 포함 | USB·클라우드 직접 복사 | 선택(통계 원본) |
-| `loginpi\.omc\state\` | 9.2 MB | [확인중] | 같음 | 선택 |
+| `loginpi\.omc\state\` (판정 원장 `loop\` · `codex-gate\` · `request-graph\`) | 전체 12.6 MB · 2,260파일 (2026-11-11 실측 — `loop\` 8.2 MB · 142폴더 · 원장 135, `request-graph\` 4.0 MB, `codex-gate\` 42 KB) | 원장 증거에 코드 발췌 포함(비밀값은 가림) — 개인 보관 | 10절 **Claude 작업 상태 백업**(3폴더만, `push-allow.json` 제외) | 선택(P2) |
 | `loginpi\work-statistics\` | 76 MB | 아니오 | 옮기지 않음 — 다시 생성됨 | 불필요 |
 
 - `~\.claude` 는 git 저장소다(원격 `https://github.com/anakinwon/claude-dotfiles.git`, 마지막 커밋 2026-07-18). 그 뒤 변경이 있어 **직접 복사**를 기준으로 한다. `.credentials.json` 은 그 저장소의 `.gitignore` 에 들어 있다.
@@ -368,6 +368,27 @@ foreach ($d in 'skills','commands','agent-memory','hooks','scripts') { robocopy 
 foreach ($d in 'memory','skill-observations') { robocopy "$src\projects\C--Users-anaki-workspace-loginpi\$d" "$dst\projects\C--Users-anaki-workspace-loginpi\$d" /E }
 ```
 
+- [ ] **Claude 작업 상태 백업**(P2 · 마스터 직접 — 수작업) — `.omc/` 는 `.gitignore`(`.omc/*`) 라 clone 으로 따라오지 않는다. Codex 판정·면제 원장(`.omc/state/loop/`), 판정 훅 귀속·기준선(`.omc/state/codex-gate/`), 요청 그래프 요약 캐시(`.omc/state/request-graph/`) 3폴더만 옮긴다(크기 D-1 표). 없어도 개발은 되고 새 PC 에서 이력이 비어 시작할 뿐이다.
+  - **포함하지 않음** : `.omc/state/push-allow.json`(push 1회 승인 — 마스터 전용, 새 PC 에서 다시 받음) · `work-history\`(로거 상태) · `backup-*` 파일
+  - **주의** : 원장 증거에 코드 발췌가 들어 있다(비밀값은 가림). USB 등 개인 보관만 — 저장소 커밋·클라우드 공유 금지
+  - 마지막 Claude 턴이 끝난 뒤 백업한다(진행 중 판정이 섞이지 않게). 아래는 `loginpi` 루트 기준, `E:` = USB 예시
+
+```bash
+# Git Bash — 옛 PC 백업 (E: 는 /e/ 로 적는다 — 'E:' 는 tar 가 원격 호스트로 읽음)
+tar -czf /e/loginpi-omc-state.tgz .omc/state/loop .omc/state/codex-gate .omc/state/request-graph
+# Git Bash — 새 PC 복원 (B-06 clone 뒤, loginpi 루트에서)
+tar -xzf /e/loginpi-omc-state.tgz
+```
+
+```powershell
+# PowerShell — 옛 PC 백업 (압축 안에는 loop\ · codex-gate\ · request-graph\ 가 맨 위로 들어간다)
+Compress-Archive -Path .omc\state\loop, .omc\state\codex-gate, .omc\state\request-graph -DestinationPath E:\loginpi-omc-state.zip
+# PowerShell — 새 PC 복원 (B-06 clone 뒤, loginpi 루트에서)
+New-Item -Force -ItemType Directory .omc\state | Out-Null; Expand-Archive E:\loginpi-omc-state.zip -DestinationPath .omc\state -Force
+```
+
+  - 복원 확인(Git Bash) : `node scripts/request-graph.mjs --md && node -e "const fs=require('fs'),d='.omc/state/loop';console.log(fs.readdirSync(d).filter(x=>fs.existsSync(d+'/'+x+'/ledger.json')).length)"` → 종료 0 · 원장 수가 옛 PC 와 같음(2026-11-11 기준 135)
+
 - [ ] **목록 내보내기**(새 PC 대조용, 비밀 없음)
 
 ```bash
@@ -378,4 +399,4 @@ python -m pip freeze > pip-freeze.txt
 claude plugin list > claude-plugins.txt
 ```
 
-- [ ] (선택) `work-history\`·`.omc\state\`·VS Code `User\` 폴더 복사 — D-1 표
+- [ ] (선택) `work-history\`·VS Code `User\` 폴더 복사 — D-1 표 (`.omc\state\` 는 위 **Claude 작업 상태 백업**)
