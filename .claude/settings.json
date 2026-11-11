@@ -7,7 +7,8 @@
     "CLAUDE_FLOW_V3_ENABLED": "true",
     "CLAUDE_FLOW_HOOKS_ENABLED": "true",
     "CLAUDE_FLOW_ENABLE_NATIVE_BRIDGE_ON_WINDOWS": "1",
-    "WORKSPACE_ROOT": "C:/Users/anaki/workspace"
+    "WORKSPACE_ROOT": "C:/Users/anaki/workspace",
+    "ECC_DISABLED_HOOKS": "pre:mcp-health-check,post:mcp-health-check,post:ecc-metrics-bridge,post:ecc-context-monitor,post:session-activity-tracker"
   },
   "hooks": {
     "PreToolUse": [
@@ -82,7 +83,7 @@
           }
         ]
       },
-      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\" --flush", "timeout": 10 }] }
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-flush.mjs\"", "timeout": 10 }] }
     ],
     "SubagentStart": [
       {
@@ -103,7 +104,7 @@
       { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\"", "timeout": 600 }] }
     ],
     "PostToolUse": [
-      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\" --flush", "timeout": 10 }] },
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-flush.mjs\"", "timeout": 10 }] },
       {
         "matcher": "Write|Edit|MultiEdit",
         "hooks": [
@@ -130,7 +131,7 @@
   "statusLine": {
     "type": "command",
     "command": "bash $WORKSPACE_ROOT/loginpi/.claude/statusline.sh",
-    "refreshInterval": 2
+    "refreshInterval": 5
   },
   "permissions": {
     "allow": [

@@ -131,6 +131,58 @@ test('워크플로 병렬 오귀속(2026-11-11 c4-build-4-a609bd·5-a04677·6-ae
   } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
 })
 
+test('셸 cd 작업 디렉터리 추적(2026-11-11 후속 2 — `cd <dir> && cat > f` 의 f 가 루트 기준으로 풀림) : 쓰기 대상 = 그 cwd 기준, 저장소 밖 = 귀속 0, 추적 불가 뒤 상대 쓰기 = 제외, 병렬 형제 귀속', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-cd-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-ses-')), git = (...a) => spawnSync('git', a, { cwd: r, encoding: 'utf8' })
+  try {
+    git('init', '-q'); git('config', 'user.email', 't@t'); git('config', 'user.name', 't'); fs.writeFileSync(path.join(r, 'base.md'), 'b'); git('add', '-A'); git('commit', '-qm', 'b')
+    const rel = p => (a => path.isAbsolute(a) ? path.relative(r, a).replace(/\\/g, '/') : p)(p.replace(/^\/([a-z])\//i, '$1:/')), sw = c => [...cg.shellWrites(c, r)].map(rel).sort()
+    const R = r.replace(/\\/g, '/'), gb = '/' + R[0].toLowerCase() + R.slice(2)   // Git Bash 표기 /c/…
+    // 고치기 전 결과는 각 줄 끝 주석(전부 루트 기준) — 7번(절대경로 쓰기)만 고치기 전과 같음
+    const want = {
+      '1 cd sub + heredoc': [["cd sub && cat > f.txt <<'EOF'\na > b\nEOF", ['sub/f.txt']]],   // 전 ['f.txt']
+      '3 cd 누적': [['cd a; cd b && echo x > f', ['a/b/f']], ['cd a/b && cd .. && echo x >> g', ['a/g']]],   // 전 ['f'] · ['g']
+      '4 cd /d': [[`cd /d ${r}\\sub && echo x > f`, ['sub/f']], [`cd ${gb}/sub && echo y | tee t1 t2`, ['sub/t1', 'sub/t2']]],   // 전 ['f'] · ['t1','t2']
+      '5 PowerShell': [['Set-Location sub; Set-Content f x', ['sub/f']], ["sl -LiteralPath 'my dir'; Out-File -FilePath g", ['my dir/g']], ['Push-Location -Path "p q"; Add-Content h y', ['p q/h']], ['pushd sub && cp a.md b.md', ['sub/b.md']]],   // 전 ['f'] · ['g'] · ['h'] · ['b.md']
+      '6 따옴표 공백 경로': [['cd "my dir" && cat > f', ['my dir/f']]],   // 전 ['f']
+      '7 절대경로 쓰기(cd 무관)': [[`cd sub && echo x > ${R}/abs.md`, ['abs.md']], [`cd $D && echo x > ${gb}/abs2.md`, ['abs2.md']]],   // 전 같음
+      '8 추적 불가 뒤 상대 = 없음': [['(cd sub && cat > f)', []], ['cd $D && cat > f', []], ['cd "$D" && cat > f', []], ['cd ~ && echo > f', []], ['cd - && echo > f', []], ['cd && echo > f', []],
+        ['cd `pwd`/x && echo > f', []], ['cd "$(dirname x)" && echo > f', []], ['cd %TEMP% && echo > f', []], ['pushd sub; popd; echo x > f', []], ['if true; then cd sub; fi; echo > f', []],
+        [`cd $D; cd ${R}/sub && echo x > f`, ['sub/f']]],   // 전 전부 ['f'] / 절대 cd 로 다시 추적
+      // c4-2-cd-a10f27 회송 결정(4회차 단순화) : 복합 셸(서브셸·묶음·제어문·명령 치환·popd)에 cd 계열이 있으면 첫 cd 세그먼트부터 상대 쓰기 = 귀속 안 함(누락 허용, 오귀속 방지)
+      //   — 경계 사례(조건문 D-001 → 서브셸 D-002 → 그룹 리다이렉트 D-003 → 중괄호 D-004)를 하나씩 막으면 회차마다 새 구멍이 나와서. 아래 일부는 bash 실제 위치(예 `(cd sub && x) > f` = 루트 f)와 다르지만 의도된 누락
+      '8b 복합 + cd = 첫 cd 뒤 상대 쓰기 없음': [['if true\nthen\ncd sub\nfi\necho > f', []], ['while x; do\ncd sub; done; echo > f', []], ['while x\ndo\ncd sub\ndone\necho > f', []],
+        ['if [ -d a ]; then\n  cd a\nfi\necho > f', []], ['for d in a b; do cd sub; done; echo > f', []], ['case $x in a) cd sub;; esac; echo > f', []], ['if x; then echo y; fi\ncd sub && echo > f', []],
+        ['cd sub && (cat > f)', []], ['(cd sub && make) && cat > f', []], ['(cd sub && cat > g); cat > f', []], ['cd a && (cd b; x) && cat > f', []],
+        ['(cd sub && x) > f', []], ['cd a && (cd b && x) > f', []], ['(cd sub && cat > g) > f', []], ['{ cd sub; x; } > f', []], ['cd a && { x; } > f', []], ['echo $(cd sub; pwd) > f', []],
+        ['{ x; cd sub; cat > g; } > f', []], ['{\n  x\n  cd sub\n  cat > g\n} > f', []]],   // 3회차 판 : D-004 두 경우 = ['sub/g', 'f'](여러 세그먼트로 나뉜 중괄호 안 cd 를 그대로 추적)
+      // 복합이어도 첫 cd 앞 상대 쓰기(루트 확정)·절대 쓰기 = 반환 / cd 계열이 없으면 전부 루트(서브셸은 부모 cwd 상속 — D-002 '결함 아님' 유지)
+      '10 복합 — cd 앞·cd 없음': [['echo a > pre; (cd sub && x) > f', ['pre']], [`(cd sub && x) > ${R}/abs.md`, ['abs.md']], ['(cat > f)', ['f']], ['{ x; } > f', ['f']], ['if x; then echo > f; fi', ['f']]],
+    }
+    const got = Object.fromEntries(Object.entries(want).map(([k, cs]) => [k, cs.map(([c]) => [c, sw(c)])]))
+    assert.deepEqual(got, want)
+    // 2 저장소 밖 cd(진단 사례 aed1dc pscheck.ps1) : 쓰기 대상 = 저장소 밖 절대경로, 루트에 같은 이름 파일이 바뀌어도 귀속 0건(said·mine 둘 다)
+    const now = Date.now(), iso = t => new Date(t).toISOString(), mt = (f, t) => fs.utimesSync(path.join(r, f), new Date(t), new Date(t))
+    const out = '/c/Users/x/AppData/Local/Temp', ps = `cd ${out} && cat > pscheck.ps1 <<'EOF'\nWrite-Host 1\nEOF`
+    assert.deepEqual([...cg.shellWrites(ps, r)].map(p => p.replace(/\\/g, '/').toLowerCase()), ['c:/users/x/appdata/local/temp/pscheck.ps1'])   // 전 ['pscheck.ps1']
+    fs.writeFileSync(path.join(r, 'pscheck.ps1'), 'other'); mt('pscheck.ps1', now - 10e3)
+    assert.deepEqual([...cg.changedFiles([], now - 60e3, null, r, { shell: [{ c: ps, t: now - 20e3, t1: now - 5e3 }] })], [])   // 전 ['pscheck.ps1']
+    // 9 병렬 형제 : A = `cd sitemap/x && cat > src/a.ts`, B = `node --test sitemap/x/src/`(같은 시간) — A scope 에 a.ts, B scope 0건(others 가 A 의 쓰기를 sitemap/x/src/a.ts 로 봄)
+    const use = (t, name, input, id) => ({ type: 'assistant', timestamp: iso(t), message: { content: [{ type: 'tool_use', id, name, input }] } })
+    const res = (t, id) => ({ type: 'user', timestamp: iso(t), message: { content: [{ type: 'tool_result', tool_use_id: id, content: 'ok' }] } })
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })
+    const put = (id, recs) => fs.writeFileSync(path.join(sub, `agent-${id}.jsonl`), recs.map(x => JSON.stringify(x)).join('\n') + '\n')
+    fs.rmSync(path.join(r, 'pscheck.ps1')); fs.mkdirSync(path.join(r, 'sitemap/x/src'), { recursive: true }); fs.writeFileSync(path.join(r, 'sitemap/x/src/a.ts'), 'export const a = 1\n'); mt('sitemap/x/src/a.ts', now - 49.5e3)
+    const recsA = [use(now - 50e3, 'Bash', { command: "cd sitemap/x && cat > src/a.ts <<'EOF'\nexport const a = 1\nEOF" }, 'tA'), res(now - 49e3, 'tA')]
+    const recsB = [use(now - 60e3, 'Bash', { command: 'node --test sitemap/x/src/' }, 'tB'), res(now - 30e3, 'tB')]
+    put('aaaaaa01', recsA); put('abbbbb01', recsB)
+    const at = (id, recs) => cg.attributeOf({ recs, tp: path.join(sub, `agent-${id}.jsonl`), mainTp: null, agentId: id, root: r }).files
+    assert.deepEqual({ A: at('aaaaaa01', recsA), B: at('abbbbb01', recsB) }, { A: ['sitemap/x/src/a.ts'], B: [] })   // 전 { A: [], B: ['sitemap/x/src/a.ts'] }
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }) }
+})
+
 test('c4-d-002-a5870f-p2 D-001 : 옛 귀속 규칙 버전 기록(오귀속 포함)은 쓰지 않고 다시 계산 — attributionFor = 실제 작성 파일만, attribAt = 0(그래프 캐시 키 변경), 현재 버전 기록 = 그대로', async () => {
   const fs = (await import('node:fs')).default, os = (await import('node:os')).default
   process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
@@ -303,4 +355,123 @@ test('같은 원장 재시도(단일 scope-missing · 묶음 원장 lock 등)도
     const [p1] = cg.resplit([{ id: 'c4-sm-p1', base: 'c4-sm', part: [1, 2], reason: 'lock', files: ['scripts/x.mjs'] }], () => () => 1, L, opt)
     assert.equal(p1.id, 'c4-sm-p1'); assert.match(p1.related || '', /scripts\/y\.mjs \(다른 묶음[\s\S]*L1: export const yy/)
   } finally { fs.rmSync(L, { recursive: true, force: true }) }
+})
+
+test('도구 기록 셸 출력 발췌 = 앞 2줄 + 끝 8줄(P4 — 끝의 시험 요약 줄 ℹ pass 106 이 증거에 남음), 겹치면 합침 · 줄당 200자 · 비밀 가림 유지', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const sec = 'ghp_' + 'A'.repeat(30)
+  const tl = out => cg.toolLines([{ type: 'assistant', timestamp: '2026-11-11T01:00:00Z', message: { content: [{ type: 'tool_use', id: 'b1', name: 'Bash', input: { command: 'node --test test/*.test.mjs' } }] } },
+    { type: 'user', timestamp: '2026-11-11T01:00:05Z', message: { content: [{ type: 'tool_result', tool_use_id: 'b1', content: out.join('\n') }] } }])[0].split('\n    → ').slice(1)
+  // 30줄(빈 줄 섞임) : 앞 2 + 생략 표식 + 끝 8 — 끝 줄(요약)·긴 줄 200자 자름·끝 구간 비밀 가림
+  const o30 = Array.from({ length: 30 }, (_, i) => `줄${i + 1}`); o30.splice(5, 0, ''); o30[25] = `비밀 ${sec}`; o30[26] = 'x'.repeat(300); o30[30] = 'ℹ pass 106'
+  const got = tl(o30)
+  assert.equal(got.at(-1), 'ℹ pass 106')   // 고치기 전 : ['줄1', '줄2'] — 요약 줄 없음
+  assert.deepEqual(got.slice(0, 3), ['줄1', '줄2', '…(가운데 20줄 생략)'])
+  assert.equal(got.length, 11); assert.ok(got.includes('x'.repeat(200)) && !got.some(l => l.includes(sec)) && got.some(l => l.includes('[REDACTED')), got.join('\n'))
+  // 10줄 이하 = 겹침 → 전부 한 번씩(생략 표식 없음)
+  assert.deepEqual(tl(['a', 'b', 'c', 'd', 'e']), ['a', 'b', 'c', 'd', 'e'])
+  assert.deepEqual(tl(Array.from({ length: 10 }, (_, i) => `L${i}`)), Array.from({ length: 10 }, (_, i) => `L${i}`))
+})
+
+test('otherWrites 형제 기록 기억(P3-3) : 같은 경로·크기·mtime = 다시 읽지 않음(같은 결과), 크기·mtime 이 바뀌면 다시 읽음', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-owc-')), wr = p => JSON.stringify({ type: 'assistant', timestamp: '2026-11-11T01:05:00Z', message: { content: [{ type: 'tool_use', name: 'Write', input: { file_path: p } }] } }) + '\n'
+  try {
+    const sib = path.join(d, 'agent-a2.jsonl'), t0 = Date.parse('2026-11-11T01:00:00Z'), ow = () => [...cg.otherWrites(d, path.join(d, 'agent-a1.jsonl'), null, t0)].sort()
+    const T = t0 / 1000 + 3600; fs.writeFileSync(sib, wr('x1.md')); fs.utimesSync(sib, T, T)   // mtime = 정수 초(Date 왕복의 밀리초 아래 손실 없이 같은 값 재설정)
+    assert.deepEqual(ow(), ['x1.md'])
+    fs.writeFileSync(sib, wr('y1.md')); fs.utimesSync(sib, T, T)   // 같은 크기·mtime 으로 내용만 바꿈 = 기억한 결과(다시 읽지 않았다는 증거)
+    assert.deepEqual(ow(), ['x1.md'])
+    fs.appendFileSync(sib, wr('z2.md'))   // 덧붙임 = 크기 바뀜 → 다시 읽음
+    assert.deepEqual(ow(), ['y1.md', 'z2.md'])
+  } finally { fs.rmSync(d, { recursive: true, force: true }) }
+})
+
+test('codex-flush.mjs 얇은 진입(P1) : 같은 pending 입력 = codex-gate --flush 와 출력 바이트 동일 · pending 없음·agent_id·CODEX_GATE_ACTIVE = 침묵(pending 그대로)', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  const st = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-flush-')), pend = path.join(st, 'codex-gate', 'pending')
+  const env = { ...process.env, CODEX_GATE_STATE: st }; delete env.CODEX_GATE_ACTIVE
+  const run = (file, args, input, e = env) => spawnSync(process.execPath, [path.join(ROOT, '.claude', 'hooks', file), ...args], { cwd: ROOT, input: typeof input === 'string' ? input : JSON.stringify(input), encoding: 'utf8', env: e })
+  const recs = [{ agentType: 'anakin_phase-build', agentId: 'af00d1234', changed: 2, baseRef: null, results: [{ id: 'c4-x-af00d1', no: 4, iter: 1, code: 0, verdict: 'PASS', ledger: '.omc/state/loop/c4-x-af00d1' }] },
+    { agentType: 't', agentId: 'ab0000002', changed: 1, baseRef: 'f'.repeat(40), results: [{ id: 'c4-y-ab0000-p1', no: 4, iter: 2, code: 1, verdict: 'FAIL', base: 'c4-y-ab0000', part: [1, 2], ledger: 'l' }, { id: 'c4-y-ab0000-p2', no: 4, iter: 1, code: 0, verdict: 'PASS', base: 'c4-y-ab0000', part: [2, 2], ledger: 'l2' }] }]
+  const seed = () => { fs.mkdirSync(pend, { recursive: true }); recs.forEach((r, i) => fs.writeFileSync(path.join(pend, `100${i}-x.json`), JSON.stringify(r))); fs.writeFileSync(path.join(pend, 'note.txt'), 'json 아님') }
+  try {
+    for (const input of [{ hook_event_name: 'PostToolUse' }, { hook_event_name: 'UserPromptSubmit' }, {}, 'not json']) {
+      seed(); const a = run('codex-gate.mjs', ['--flush'], input)
+      seed(); const b = run('codex-flush.mjs', [], input)
+      assert.equal(a.status, 0); assert.equal(b.status, 0); assert.ok(a.stdout.length > 0, JSON.stringify(input))
+      assert.ok(Buffer.from(b.stdout).equals(Buffer.from(a.stdout)), `${JSON.stringify(input)}\n${a.stdout}\n${b.stdout}`)
+      assert.deepEqual(fs.readdirSync(pend), ['note.txt'])   // 둘 다 pending → sent
+    }
+    // 침묵 3종 : 서브에이전트 안 · 훅 프로세스 안(pending 그대로) · pending 없음(폴더 없음 포함)
+    seed()
+    assert.equal(run('codex-flush.mjs', [], { hook_event_name: 'PostToolUse', agent_id: 'a999' }).stdout, '')
+    assert.equal(run('codex-flush.mjs', [], { hook_event_name: 'PostToolUse' }, { ...env, CODEX_GATE_ACTIVE: '1' }).stdout, '')
+    assert.equal(fs.readdirSync(pend).filter(f => f.endsWith('.json')).length, 2)
+    fs.rmSync(path.join(st, 'codex-gate'), { recursive: true, force: true })
+    for (const f of ['codex-flush.mjs', 'codex-gate.mjs']) { const r = run(f, f === 'codex-gate.mjs' ? ['--flush'] : [], { hook_event_name: 'PostToolUse' }); assert.equal(r.status, 0); assert.equal(r.stdout, '', f) }
+  } finally { fs.rmSync(st, { recursive: true, force: true }) }
+})
+
+test('같은 내용 재판정 건너뜀(P6) : 브리프만 바뀌어도 다시 판정 · 같은 해시 + 마지막 PASS = 건너뜀(새 회차 없음) · FAIL·BLOCKED 원장은 건너뛰지 않음 · 묶음 AND 에 건너뛴 PASS 반영', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-same-')), dir = path.join(process.env.CODEX_GATE_STATE, 'loop', `c4-same-${process.pid}`)
+  try {
+    fs.writeFileSync(path.join(r, 'a.md'), 'A1')
+    const job = { no: 4, id: path.basename(dir), files: ['a.md'] }, ctx = { type: 'anakin_phase-build', agentId: 'a1b2c3d4', brief: '브리프 B1', request: '마스터 원문 R', root: r }
+    const h = cg.judgeHash(job, ctx, r)
+    assert.match(h, /^[0-9a-f]{40}$/); assert.equal(cg.judgeHash(job, { ...ctx, baseRef: 'f'.repeat(40), own: ['a.md'] }, r), h, '계약 머리(기준선·귀속 줄) = 해시 밖')
+    // ① 브리프만 · 원문만 · 파일 내용만 바뀜 = 다른 해시(다시 판정)
+    assert.notEqual(cg.judgeHash(job, { ...ctx, brief: '브리프 B2' }, r), h)
+    assert.notEqual(cg.judgeHash(job, { ...ctx, request: '마스터 원문 R2' }, r), h)
+    fs.writeFileSync(path.join(r, 'a.md'), 'A2'); assert.notEqual(cg.judgeHash(job, ctx, r), h); fs.writeFileSync(path.join(r, 'a.md'), 'A1')
+    // ② 같은 해시 + 마지막 판정 PASS = 건너뜀 : Codex·새 회차·증거 없음, 이전 회차 PASS 를 돌려줌
+    fs.mkdirSync(dir, { recursive: true })
+    const led = (iters, blocked = []) => fs.writeFileSync(path.join(dir, 'ledger.json'), JSON.stringify({ id: job.id, iters, blocked }))
+    led([{ iter: 1, at: '2026-11-11T01:00:00Z', verdict: 'FAIL' }, { iter: 2, at: '2026-11-11T02:00:00Z', verdict: 'PASS' }]); fs.writeFileSync(path.join(dir, 'gate.json'), JSON.stringify({ no: 4, passHash: { hash: h, iter: 1 } }))
+    assert.equal(cg.passedSame(dir, h), null, 'passHash 회차 ≠ 마지막 PASS 회차(2) = 다시 판정')
+    fs.writeFileSync(path.join(dir, 'gate.json'), JSON.stringify({ no: 4, passHash: { hash: h, iter: 2 } }))
+    assert.equal(cg.passedSame(dir, h), 2)
+    const res = await cg.judgeOne(job, ctx, Date.now() + 60e3)
+    assert.deepEqual([res.iter, res.code, res.verdict, res.reason], [2, 0, 'PASS', '변경 없음 — 이전 PASS 유지'])
+    assert.deepEqual(fs.readdirSync(dir).sort(), ['gate.json', 'ledger.json'])   // 계약·증거·회차 파일 안 생김
+    assert.equal(cg.passedSame(dir, cg.judgeHash(job, { ...ctx, brief: '브리프 B2' }, r)), null)   // 브리프만 바뀜 = 판정
+    // ③ FAIL 원장 · PASS 뒤 BLOCKED · 해시 없음 = 건너뛰지 않음
+    led([{ iter: 1, at: '2026-11-11T01:00:00Z', verdict: 'PASS' }, { iter: 2, at: '2026-11-11T02:00:00Z', verdict: 'FAIL' }]); assert.equal(cg.passedSame(dir, h), null)
+    led([{ iter: 1, at: '2026-11-11T01:00:00Z', verdict: 'PASS' }], [{ iter: 2, at: '2026-11-11T02:00:00Z', reason: 'lock' }]); assert.equal(cg.passedSame(dir, h), null)
+    led([{ iter: 1, at: '2026-11-11T01:00:00Z', verdict: 'PASS' }]); fs.writeFileSync(path.join(dir, 'gate.json'), JSON.stringify({ no: 4 })); assert.equal(cg.passedSame(dir, h), null)
+    // ④ 묶음 : 건너뛴 p1 PASS + 판정한 p2 PASS = AND Y, 결과 글에 '변경 없음 — 이전 PASS 유지'
+    const msg = cg.summarize({ agentType: 'anakin_phase-build', agentId: 'a1b2c3d4', baseRef: 'x', results: [{ ...res, id: 'c4-y-a1b2c3-p1', base: 'c4-y-a1b2c3', part: [1, 2], ledger: 'l1' }, { id: 'c4-y-a1b2c3-p2', iter: 1, code: 0, verdict: 'PASS', base: 'c4-y-a1b2c3', part: [2, 2], ledger: 'l2' }] })
+    assert.match(msg, /c4-y-a1b2c3-p1 2회차 PASS\(종료 0\) — 변경 없음 — 이전 PASS 유지[\s\S]*c4-y-a1b2c3 묶음 2개 AND → Y[\s\S]*전부 PASS\(Y\)/)
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('c4-build-a8915f D-001 : 판정 시도 중 잠금으로 판정·BLOCKED 기록이 모두 실패한 내용은 다음 실행에서 이전 PASS 로 재사용하지 않는다(해시 = 확정 PASS 회차와 결합해서만 저장)', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-lock-')), dir = path.join(process.env.CODEX_GATE_STATE, 'loop', `c4-lock-${process.pid}`), js0 = process.env.CODEX_JS
+  const fake = path.join(r, 'fake-codex.mjs'); fs.writeFileSync(fake, "process.exit(3)\n"); process.env.CODEX_JS = fake   // 안전 : 잠금이 안 걸려도 실제 Codex 호출 없음
+  try {
+    fs.writeFileSync(path.join(r, 'a.md'), '판정받은 내용 A1')
+    const job = { no: 4, id: path.basename(dir), files: ['a.md'] }, ctx = { type: 'anakin_phase-build', agentId: 'a1b2c3d4', brief: 'B', request: 'R', root: r }
+    fs.mkdirSync(dir, { recursive: true })
+    fs.writeFileSync(path.join(dir, 'ledger.json'), JSON.stringify({ id: job.id, startedAt: '2026-11-11T00:00:00Z', iters: [{ iter: 1, at: '2026-11-11T01:00:00Z', verdict: 'PASS' }], blocked: [] }))
+    fs.writeFileSync(path.join(dir, 'gate.json'), JSON.stringify({ no: 4, passHash: { hash: cg.judgeHash(job, ctx, r), iter: 1 } }))   // A1 = 1회차 PASS 로 확정
+    const before = fs.readFileSync(path.join(dir, 'ledger.json'), 'utf8')
+    fs.writeFileSync(path.join(r, 'a.md'), '판정 안 받은 내용 A2'); fs.writeFileSync(path.join(dir, 'ledger.lock'), '{}')   // 다른 실행이 잡은 잠금 = --init·--ingest 모두 실패
+    const r1 = await cg.judgeOne(job, ctx, Date.now() + 60e3)
+    assert.equal(r1.verdict, 'BLOCKED'); assert.match(r1.reason, /원장 기록 실패/); assert.equal(fs.readFileSync(path.join(dir, 'ledger.json'), 'utf8'), before, '원장 그대로(마지막 = 1회차 PASS)')
+    const r2 = await cg.judgeOne(job, ctx, Date.now() + 60e3)   // 같은 A2 로 다시 실행
+    assert.notEqual(r2.reason, '변경 없음 — 이전 PASS 유지', '판정 안 받은 A2 를 이전 PASS 로 재사용')   // 고치기 전 : 1회차 PASS(건너뜀)
+    assert.equal(r2.verdict, 'BLOCKED')
+    fs.rmSync(path.join(dir, 'ledger.lock')); fs.writeFileSync(path.join(r, 'a.md'), '판정받은 내용 A1')
+    assert.equal(cg.passedSame(dir, cg.judgeHash(job, ctx, r)), null, '실패한 시도가 gate.json 을 다시 써 옛 확정 해시는 사라짐(보수적 — 다시 판정)')
+  } finally { if (js0 === undefined) delete process.env.CODEX_JS; else process.env.CODEX_JS = js0; fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(dir, { recursive: true, force: true }) }
 })
