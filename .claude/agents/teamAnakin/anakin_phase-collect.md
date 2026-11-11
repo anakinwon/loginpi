@@ -1,6 +1,6 @@
 ---
 name: anakin_phase-collect
-description: Use for the collection phase inside a turn - bulk reading, searching, counting, or aggregating many files, work-history logs, or statistics before the decide or build members decide or write anything (the main session only reviews). Read-only.
+description: Use for the collection phase inside a turn - bulk reading, searching, counting, or aggregating many files, work-history logs, or statistics before anything is decided or written. Delegated only for bulk collection; small lookups are done by the main session directly (master rule R1 2026-11-12). Read-only.
 tools: Read, Grep, Glob, Bash, Skill
 model: sonnet
 effort: medium

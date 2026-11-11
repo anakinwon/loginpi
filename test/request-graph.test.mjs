@@ -277,9 +277,7 @@ test('C-8 (b) 프롬프트·컨텍스트·그래프 SA 는 모든 요청에 표�
   assert.equal(node(ns, '1.1.5').statusLabel, '생성기 자동 갱신(Stop 훅)'); assert.equal(fmtSpan(node(ns, '1.1.5'), 0), '생성기 자동 갱신(Stop 훅)')
   assert.equal(ns[0].check.viol, 0); assert.equal(ns[0].alertN, 0)
   assert.equal(node(ns, '1').eng, 3); assert.equal(node(ns, '1').engEst, 1)
-  assert.deepEqual(SLOT_MAP['1.1.2'].agents, ['anakin_phase-collect']); assert.deepEqual(SLOT_MAP['1.1.5'].agents, ['anakin_phase-graph'])
-  const g = buildRequestGraph(turn({ agents_detail: [ag('anakin_phase-graph', '2026-11-08T10:20:00+09:00')] }), [])
-  assert.equal(node(g, '1.1.5').status, 'done'); assert.equal(AL(g).find(n => n.label === 'anakin_phase-graph').parent, '1.1.5')
+  assert.deepEqual(SLOT_MAP['1.1.2'].agents, ['anakin_phase-collect']); assert.equal(SLOT_MAP['1.1.5'].agents, undefined)   // 2026-11-12 graph 에이전트 삭제 — 칸 = 생성기 자동 갱신
 })
 
 test('C-8 (a)·C-9 (a) 하네스 SA = tool_use·훅 주입 1건 이상일 때만 — 0건 요청에서만 숨김, CDX-하네스 칸 없음(루프에 흡수)', () => {
@@ -385,16 +383,16 @@ test('C-7 ①·C-8 (e) SA 가 없으면 CDX 도 없다 — 과거 c1·c3·c6 원
   assert.deepEqual(PAIRS, ['1.1.1', '1.1.2', '1.1.3', '1.1.4'])
 })
 
-test('C-5 에이전트 = 칸 안 줄(독립 노드 0) : collect·build·graph·admin·commit·일반 → 대응 칸, 반복 회차·실패·장시간 표식, verify(폐지) 숨김', () => {
+test('C-5 에이전트 = 칸 안 줄(독립 노드 0) : collect·build·admin·commit·일반 → 대응 칸, 반복 회차·실패·장시간 표식, verify(폐지) 숨김', () => {
   const t0 = P('2026-11-08T10:01:00+09:00'), rounds = [0, 1, 2, 3].map(i => ({ t0: t0 + i * 5 * 60e3, t1: t0 + (i * 5 + 3) * 60e3, run: false, errors: 0 }))
   const ns = buildRequestGraph(turn({ agents_detail: [
     ag('anakin_phase-collect', '2026-11-08T10:00:30+09:00', { ts_end: '2026-11-08T10:33:00+09:00' }), ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:19:00+09:00', rounds, errors: 2 }),
-    ag('anakin_phase-verify', '2026-11-08T10:20:00+09:00'), ag('anakin_phase-commit', '2026-11-08T10:22:00+09:00', { ts_end: null }), ag('teamanakin-admin', '2026-11-08T10:24:00+09:00'), ag('teamanakin-admin', '2026-11-08T10:26:00+09:00'), ag('anakin_phase-graph', '2026-11-08T10:25:00+09:00'),
+    ag('anakin_phase-verify', '2026-11-08T10:20:00+09:00'), ag('anakin_phase-commit', '2026-11-08T10:22:00+09:00', { ts_end: null }), ag('teamanakin-admin', '2026-11-08T10:24:00+09:00'), ag('teamanakin-admin', '2026-11-08T10:26:00+09:00'),
   ] }), [])
   assert.ok(ns.every(n => n.slot), '에이전트 독립 노드 0')
   const at = l => AL(ns).filter(n => n.label === l).map(n => n.parent)
-  assert.deepEqual([at('anakin_phase-collect'), at('anakin_phase-build'), at('anakin_phase-graph'), at('teamanakin-admin'), at('anakin_phase-commit'), at('anakin_phase-verify')], [['1.1.2'], ['1.1.4'], ['1.1.5'], ['1.2', '1.2'], ['1.1'], []])
-  assert.equal(ns[0].agentN, 6)
+  assert.deepEqual([at('anakin_phase-collect'), at('anakin_phase-build'), at('teamanakin-admin'), at('anakin_phase-commit'), at('anakin_phase-verify')], [['1.1.2'], ['1.1.4'], ['1.2', '1.2'], ['1.1'], []])
+  assert.equal(ns[0].agentN, 5)
   const txt = id => node(ns, id).chips.map(c => `${c.tone}|${c.txt}`)
   assert.ok(txt('1.1.2').includes('|collect ×1 · 33m') && txt('1.1.2').includes('warn|⚠ 장시간'))
   assert.ok(txt('1.1.4').includes('|build ×4 (회송 3) · 12m') && txt('1.1.4').includes('bad|✖ 도구 오류 2'))   // 반복 회차 = ×n·회송, 실패 = 빨강
@@ -646,7 +644,7 @@ test('C-10 컨텍스트 칸 = 출처 머리 + 전·후(같은 세션 앞뒤 요�
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-sum-'))
   try {
     assert.equal(summaryId(b), 's1_2')
-    fs.writeFileSync(path.join(dir, 's1_2.json'), JSON.stringify({ before: ['11-09 게이트 경로 결정'], after: [], related: ['CLAUDE.md teamAnakin 절'], points: ['요점 A', 'PI_API_KEY=abc'], by: 'anakin_phase-graph', at: '2026-11-10T08:00' }))
+    fs.writeFileSync(path.join(dir, 's1_2.json'), JSON.stringify({ before: ['11-09 게이트 경로 결정'], after: [], related: ['CLAUDE.md teamAnakin 절'], points: ['요점 A', 'PI_API_KEY=abc'], by: 'main', at: '2026-11-10T08:00' }))
     b.summary = loadSummary(dir, b, s => s.replace(/PI_API_KEY=\w+/, 'PI_API_KEY=***'))
     const c = tx(buildRequestGraph(b, []))
     assert.deepEqual(c, ['출처 : 주입 훅 2 · 읽기 0 · collect 1', '앞 요청 원문입니다', '11-09 게이트 경로 결정', '뒤 요청 원문입니다', 'CLAUDE.md teamAnakin 절', '요점 A', 'PI_API_KEY=***', 'collect ×1 · 4m'])
@@ -735,10 +733,10 @@ test('승인 4 출처(후속 과제 3) : 창 뒤 판정이 요청 B(FAIL)·C(PAS
   assert.match(cx(buildRequestGraph(A, [L2], { peers })).statusLabel, /^검증 Y · 이어받은 원장\(요청 98\)/)
 })
 
-// ── 2026-11-10 개정 : 턴 묶음 판정 폐지(과거 원장 무시) · 종료 승인 줄 = 기록용(Stop 훅 turn-gate.mjs 기록기) ──
+// ── 2026-11-10 개정 : 턴 묶음 판정 폐지(과거 원장 무시) · 종료 승인 줄 = 기록용(옛 Stop 훅 기록기, 2026-11-12 삭제) ──
 test('과거 원장 무시(2026-11-10 개정) : c1·c2·c3·c5·c6·c*-turn-*·비대상 에이전트 원장을 넣어도 노드·집계 불변, loadLoops = bundle- 제외 + gate.json agentType', () => {
   const key = 'f7dc16-1108100000'
-  assert.ok(TURN_ID_RE.test(`c1-turn-${key}`)); assert.ok(!TURN_ID_RE.test('c4-turn-gate-a1b2c3'))   // 에이전트 설명 슬러그 'turn-…' 과 구분
+  assert.ok(TURN_ID_RE.test(`c1-turn-${key}`)); assert.ok(!TURN_ID_RE.test('c4-turn-guard-a1b2c3'))   // 에이전트 설명 슬러그 'turn-…' 과 구분
   const at = '2026-11-08T01:20:00Z', old = [...[1, 2, 3, 4, 5, 6].map(no => KL(`c${no}-turn-${key}`, at, no === 3 ? 'FAIL' : 'PASS')), KL('c2-collect-a0b1c2', at, 'FAIL'), KL('c5-graph-a0b1c2', at, 'FAIL'), { ...KL('c4-x-decide-a0b1c2', at, 'FAIL'), agentType: 'anakin_phase-decide' }]
   const t = () => turn({ tools: { Read: 2 }, agents_detail: [ag('anakin_phase-build', '2026-11-08T10:01:00+09:00', { ts_end: '2026-11-08T10:05:00+09:00', agent_id: 'a0b1c2d3e4' })] })
   assert.equal(JSON.stringify(buildRequestGraph(t(), old)), JSON.stringify(buildRequestGraph(t(), [])))

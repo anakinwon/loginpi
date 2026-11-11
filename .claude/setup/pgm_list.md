@@ -321,9 +321,8 @@ Git Bash 에서 `loginpi` 폴더 기준으로 실행한다.
 - [ ] (P0) `node -v` → v24.x
 - [ ] (P0) `pnpm -v` → 11.4.0
 - [ ] (P0) `pnpm install && pnpm build` 통과
-- [ ] (P0) 훅 selftest 4종 통과
+- [ ] (P0) 훅 selftest 3종 통과 (`turn-gate.mjs` 는 2026-11-12 폐지 — 점검 항목 삭제)
   - `node .claude/hooks/codex-gate.mjs --selftest`
-  - `node .claude/hooks/turn-gate.mjs --selftest`
   - `node .claude/hooks/model-advisor.mjs --selftest`
   - `node .claude/subagent-statusline.mjs --selftest`
 - [ ] (P0) `code --list-extensions` 결과가 39개이고 B-1 표(또는 10절에서 내보낸 `vscode-extensions.txt`)와 같다

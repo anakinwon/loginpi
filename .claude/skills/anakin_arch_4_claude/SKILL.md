@@ -5,6 +5,8 @@ description: loginpi 에서 만든 Claude Code 작업 아키텍처(5단계 엔�
 
 # anakin_arch_4_claude — Claude Code 작업 아키텍처
 
+> **2026-11-12 개정(마스터 R1~R5) — 아래 본문·references 보다 우선** : 그래프 분석 단계(`anakin_phase-graph`)·자동 그래프 갱신·Stop 훅 `turn-gate`·응답 끝 '종료 승인' 줄·간소 절차·일감 크기 상한(build 1회 3파일)은 폐지. 소규모 변경(파일 1~3개, 인증·결제·페이지 라우트·SQL·env 아님)과 조회는 메인이 직접 하고, 팀장 승인은 고위험 변경만, Codex c4 판정은 유지(FAIL = 실제 결함만), 하네스 동결 2026-11-12 ~ 2026-11-26. 요청 그래프 생성기 `scripts/request-graph.mjs` 는 수동 실행용. 정본 루트 `CLAUDE.md` '하네스: teamAnakin' 절.
+
 > 작성 2026-11-10(마스터 지시 "요청한 엔지니어링 아키텍처를 skill로 구성해 줘! 5단계 엔지니어링과 그래프 엔지니어링 with obsidian, Codex검증").
 > 갱신 2026-11-11 — 간소 절차, 묶음 판정 코드 삭제, 셸 2차 귀속 실행 시각 조건, 연관 군집 `-pN` 분할, 그래프 면제·이어받은 원장·상세 창 접기 반영.
 > 이 스킬은 **요약과 지도**다. 규칙 정본은 저장소 파일이고, 서로 다르면 정본이 이긴다(우선순위 : 루트 `CLAUDE.md` → `.claude/engineering/10. prompt/anakins_prompt.md` 0절 → 각 장표, Codex 세부는 `codex_procedure.md`).

@@ -24,10 +24,10 @@ const PATHS = {
   roundsCache: '.omc/state/request-graph/rounds-cache.json',         // 팀원 에이전트 회차 캐시(agent_id → 기록 크기·mtime·회차, gitignore)
   harnessCache: '.omc/state/request-graph/harness-cache.json',
   lockDir: '.omc/state/request-graph',                               // 단일 실행 잠금 run.lock(pid·시각) + 재실행 예약 run.dirty(runOnce, gitignore)
-  summaries: '.omc/state/request-graph/summaries',                  // SA-컨텍스트 요약 캐시 <요청 id>.json = { before, after, related, points, by, at } — anakin_phase-graph 가 판독 때 작성(gitignore)
+  summaries: '.omc/state/request-graph/summaries',                  // SA-컨텍스트 요약 캐시 <요청 id>.json = { before, after, related, points, by, at } — 과거 graph 에이전트(2026-11-12 삭제)가 작성한 캐시만 읽음(gitignore)
   toolCache: '.omc/state/request-graph/tool-cache.json',            // 하네스 사용 기록 캐시(기록 파일 → 크기·mtime·[시각, 도구명], gitignore — 입력값 없음)       // 산출 실행 하네스 변경 감지 캐시(agent_id → 기록 크기·mtime·결과, gitignore)
   wfCache: '.omc/state/request-graph/workflow-cache.json',           // 워크플로 에이전트 캐시(agent_id → 기록 크기·mtime·시작·끝·모델, gitignore)
-  approvals: '.omc/state/codex-gate/approvals.jsonl',                 // Stop 훅 turn-gate.mjs 종료 승인 줄 기록기(비차단, 2026-11-10 개정 — 승인·보류, gitignore) — 과거 '승인 강제 실패' 이력만 1.2 에 읽음
+  approvals: '.omc/state/codex-gate/approvals.jsonl',                 // 옛 Stop 훅 종료 승인 줄 기록기(2026-11-12 삭제, gitignore) — 과거 '승인 강제 실패' 이력만 1.2 에 읽음
 }
 /** 과거 턴 묶음 판정 원장 id(c<N>-turn-<세션 6자>-<KST MMDDHHmmss> — Stop 훅 턴 묶음 판정은 2026-11-10 개정으로 폐지) : 집계 제외용(isLoopLedger) */
 export const TURN_ID_RE = /-turn-[0-9a-z]{1,6}-\d{10}$/
@@ -99,7 +99,7 @@ const LEGACY_VERIFY = 'anakin_phase-verify'
  * Codex 루프 판정 비대상 에이전트(2026-11-10 마스터 "프롬프트+컨텍스트+그래프+총괄=>제거, 루프 유지+하네스는 루프에 흡수" — 훅 codex-gate.mjs NO_GATE 와 같은 값, 훅 selftest 가 일치 확인)
  *   이 밖의 실행은 파일을 바꿨을 때만(wrote) c4 원장 하나(c4-<주제>-<agentId 앞 6자>)로 판정 — 하네스 파일도 같은 원장
  */
-export const NO_GATE = new Set(['anakin_phase-collect', 'anakin_phase-decide', 'anakin_phase-review', 'anakin_phase-graph', 'anakin_phase-commit', 'teamanakin-admin'])
+export const NO_GATE = new Set(['anakin_phase-collect', 'anakin_phase-decide', 'anakin_phase-review', 'anakin_phase-commit', 'teamanakin-admin'])
 /** 하네스 경로(훅·settings·에이전트 정의·운용 기준서 + 40. loop 절차) — 산출 실행의 Write·Edit 대상이 여기면 SA-하네스 표식, 판정은 CDX-루프(c4) 원장에 포함(2026-11-10 개정). 하위 앱 .claude/ 도 포함 */
 export const HARNESS_RE = /(^|[\\/])\.claude[\\/](hooks|agents|skills|engineering[\\/]40\. loop)[\\/]|(^|[\\/])\.claude[\\/]settings[^\\/]*\.json$/
 const WRITE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit'])
@@ -122,8 +122,8 @@ export const SLOT_MAP = {
   // Codex 칸(2026-11-10 개정 — CDX-루프 하나) : 원장 id 접두 c4- = '매핑 연결'. 과거 c1·c2·c3·c5·c6·턴 묶음 원장은 집계 제외(isLoopLedger)
   //   (원장 id 규칙 40. loop/codex_procedure.md 3절). 접두 없는 과거 원장(first-call·loop-docs·loop-cap5) = legacy → Codex4 턴 시간창 추정(기존 동작)
   '1.1.4.1': { codex: 4, legacy: true },
-  // 마스터 확정 2026-11-08 "그래프 분석의 담당 서브에이전트 추가" → anakin_phase-graph 신설(.claude/agents/teamAnakin/anakin_phase-graph.md, 산출 턴의 검증 뒤·승인 앞)
-  '1.1.5': { agents: ['anakin_phase-graph'], show: 'graph' },   // graph 미실행 = '생성기 자동 갱신(Stop 훅)'
+  // 2026-11-12 마스터 "1번부터 5번까지 모두 지금 적용" : graph 에이전트 삭제 → 이 칸 = 생성기 자동 갱신(Stop 훅), 과거 graph 실행 기록은 2 접수(1.1) 줄
+  '1.1.5': { show: 'graph' },
 }
 
 const CODEX = { role: '외부 판정자(Codex, read-only)가 상위 분석 결과를 교차 검수', criteria: 'verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 결함 있음 → FAIL / 입력 결손 등 판정 불가 → BLOCKED', docs: ['40. loop/codex_procedure.md', '60. nodes/codex-judge.md'] }
@@ -132,7 +132,7 @@ const CODEX = { role: '외부 판정자(Codex, read-only)가 상위 분석 결�
  *   2026-11-10 개정 — CDX 칸은 CDX-루프(c4) 하나 : 파일을 바꾼 에이전트만 판정, 하네스 파일 변경도 같은 원장(계약 AC-4)
  */
 export const CODEX_SLOTS = {
-  4: ['파일을 바꾼 에이전트의 산출물(하네스 파일 포함) — 브리프 AC-n 충족 / 하네스 변경 = 규칙 정합·우회·회귀 없음·selftest 근거 / 비밀 없음', '파일 변경 에이전트 종료 때 SubagentStop 훅 자동'],
+  4: ['파일을 바꾼 에이전트의 산출물(하네스 파일 포함) — 브리프 AC-n 충족 / 하네스 변경 = 규칙 정합·우회·회귀 없음 / 비밀 없음', '파일 변경 에이전트 종료 때 SubagentStop 훅 자동'],
 }
 const codexSlot = n => ({ ...CODEX, role: `Codex${n} 검수 대상 : ${CODEX_SLOTS[n][0]} (외부 판정자 Codex read-only 교차 검수)`, criteria: `${CODEX.criteria} · 호출 : ${CODEX_SLOTS[n][1]} · 원장 id 접두 c${n}-` })
 /** 마스터 설계 트리 · 라벨 단축 2026-11-09 마스터 지시(서브에이전트N → SA-, CodexN → CDX-) · 2026-11-10 개정 : CDX 칸은 CDX-루프 하나(프롬프트·컨텍스트·하네스·그래프·총괄 CDX 칸 폐지) */
@@ -145,7 +145,7 @@ export const SLOTS = [
   { id: '1.1.4', parent: '1.1', kind: 'sub', label: 'SA-루프', role: '되돌아가는 엣지 점검 — build → Codex(SubagentStop 훅 자동) → 회송 → 승인', criteria: '40장 A절 완료 기준 · C절 금지와 멈춤', docs: ['40. loop/anakins_loop.md', '40. loop/codex_procedure.md'] },
   { id: '1.1.4.1', parent: '1.1.4', kind: 'codex', label: 'CDX-루프 검수', ...codexSlot(4) },
   { id: '1.1.5', parent: '1.1', kind: 'sub', label: 'SA-그래프', role: '노드·엣지·파일 계약으로 작업 흐름 전체 점검 — 병렬·직렬·합류', criteria: '50장 A절 그래프 설계 체크리스트 10', docs: ['50. graph/anakins_graph.md'] },
-  { id: '1.2', parent: '1', kind: 'approve', label: '파다완 아소카 승인', role: '아소카가 직접 종료 승인 — 팀장(teamanakin-admin) 판정은 근거로 함께', criteria: "메인 응답 끝 '종료 승인 : <승인|보류> — <근거>' 줄 = 완료(기록용 — Stop 훅 turn-gate.mjs 는 적기만 하고 막지 않음), 팀장 판정은 근거로 · 팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)", docs: ['60. nodes/아소카.md', '60. nodes/teamanakin-admin.md'] },
+  { id: '1.2', parent: '1', kind: 'approve', label: '파다완 아소카 승인', role: '아소카가 직접 종료 승인 — 팀장(teamanakin-admin) 판정은 근거로 함께', criteria: "메인 응답 끝 '종료 승인 : <승인|보류> — <근거>' 줄 = 완료(기록용), 팀장 판정은 근거로 · 팀원이 1명이라도 실행된 턴은 팀장 승인 생략 불가(조회·커밋 단독 턴 제외)", docs: ['60. nodes/아소카.md', '60. nodes/teamanakin-admin.md'] },
 ]
 
 // ── 순수 함수(시험 대상 — fmtSpan·roundSummary 는 화면 스크립트에도 원문 그대로 인라인되므로 바깥 이름 참조 금지) ──
@@ -529,8 +529,7 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
         chips: [...backs.map(y => ({ txt: y.txt, tone: 'bad' })), ...(repeats.length ? [{ txt: repeats.join(' · '), tone: '' }] : []), ...(backs.length || repeats.length ? [] : [{ txt: judged ? `Codex 판정 ${jN}건 — 되돌림 0` : '파일 변경 실행 — 판정 전', tone: '' }])],
         lines: [...backs.map(y => `되돌림 — ${y.txt}`), ...(repeats.length ? [`반복 — ${repeats.join(' · ')}`] : []), ...(backs.length || repeats.length ? [] : [judged ? `Codex 판정 ${jN}건 — 되돌림 0` : '파일 변경 실행 — 판정 전'])] })
     } else if (m.show === 'graph') {
-      if (kids.length) Object.assign(n, ks, kRun ? sty('running') : sty('done'), { lines: [`에이전트 ${kids.length}건`] })
-      else Object.assign(n, sty('estimated'), { statusLabel: '생성기 자동 갱신(Stop 훅)', tmNote: '생성기 자동 갱신(Stop 훅)', lines: ['graph 에이전트 실행 없음 — 생성기 자동 갱신(Stop 훅·SubagentStart/Stop 훅)'] })
+      Object.assign(n, sty('estimated'), { statusLabel: '생성기 자동 갱신(Stop 훅)', tmNote: '생성기 자동 갱신(Stop 훅)', lines: ['생성기 자동 갱신(Stop 훅)'] })
     }
   }
   // CDX-루프(유일한 Codex 칸, 2026-11-10 개정) = 검증 결과 : 원장별 마지막 판정의 AND — 전부 PASS = Y · 하나라도 FAIL = N · 진행 중 원장 = 진행 · 그 밖 = 보류
@@ -1503,7 +1502,7 @@ export function writeRequestMd(dir, items, now) {
     const lk = s => by(s.id) ? `[[${slotFile(s)}|${ttl(by(s.id))}]]` : `[[${slotFile(s)}|${s.label}]] (숨김)`   // 하네스·루프 쌍은 증거 없으면 숨김(C-8)
     const rounds = [...r.nodes, ...agentsOf(r.nodes)].filter(n => n.rounds).flatMap(n => n.rounds.map(g => ({ n, g }))), log = pathLog(r.nodes), tl = r.nodes.find(n => n.toolLog)?.toolLog || []
     const body = [`# ${r.head}`, '', `> 요청 노드(실데이터 — gitignore) · 생성기 \`scripts/request-graph.mjs --md\` · ${r.when} · ${r.catLabel || '-'} · 상태 ${r.statusLabel} · 엔지니어링 ${engTxt(by('1').eng, by('1').engEst)} 수행${by('1').check ? ` · 검증 Y ${by('1').check.y} / 누락 ${by('1').check.miss} / 위반 ${by('1').check.viol}` : ''} · 묶음 누적 ${by('1').cum.n}/${by('1').cum.cap}${r.alert ? ` · ⚠ ${r.alert}` : ''}`, '',
-      ...by('1').lines.slice(1).map(l => `- ${l}`), `- 요약 캐시 id \`${r.sumId || '-'}\` (\`${PATHS.summaries}/<id>.json\` — anakin_phase-graph 작성)`, '',
+      ...by('1').lines.slice(1).map(l => `- ${l}`), `- 요약 캐시 id \`${r.sumId || '-'}\` (\`${PATHS.summaries}/<id>.json\` — 과거 graph 에이전트 작성분)`, '',
       '## 요청 원문', '', ...(by('1.1.1')?.lines || []).filter(l => l.startsWith('요청 원문')).map(l => `- ${l}`), '',
       `${fmtSpan(by('1'), now)}`, '',
       `흐름 : ${lk(SLOTS[0])} → ${lk(SLOTS[1])} → ${lk(SLOTS.at(-1))}`, '',
@@ -1607,7 +1606,7 @@ function generate(attr = {}) {
       for (const ag of t.agents_detail || []) if (ag.report) ag.report = ag.report.map(x => redact(x))
       t.summary = loadSummary(path.join(ROOT, PATHS.summaries), t, redact)
     }
-    // 승인 강제 실패(Stop 훅 turn-gate 연속 차단 상한) : 같은 세션·턴 창 안 기록을 붙인다(종료 승인 줄 자체는 loadToolEvents 가 세션 기록에서 읽음)
+    // 승인 강제 실패(옛 Stop 훅 연속 차단 상한 — 2026-11-12 훅 삭제, 과거 기록만) : 같은 세션·턴 창 안 기록을 붙인다(종료 승인 줄 자체는 loadToolEvents 가 세션 기록에서 읽음)
     let apv = []; try { apv = fs.readFileSync(path.join(ROOT, PATHS.approvals), 'utf8').split('\n').flatMap(l => { try { const j = l ? JSON.parse(l) : null; return j?.kind === '강제 실패' ? [j] : [] } catch { return [] } }) } catch { /* 기록 없음 */ }
     for (const t of all) { const a = ms(t.ts_req), b = t.ts_res ? ms(t.ts_res) : now, xs = apv.filter(x => x.sid === t.session_id && ms(x.at) >= a && ms(x.at) <= b + RUN_GRACE_MS); if (xs.length) t.forced = xs }
     linkContext(all, now)

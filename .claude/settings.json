@@ -59,8 +59,7 @@
             "timeout": 20
           }
         ]
-      },
-      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/turn-gate.mjs\"", "timeout": 300 }] }
+      }
     ],
     "SessionEnd": [
       {
@@ -96,11 +95,9 @@
           }
         ]
       },
-      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] },
       { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\" --base", "timeout": 15 }] }
     ],
     "SubagentStop": [
-      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/request-graph-refresh.mjs\"", "timeout": 5 }] },
       { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/codex-gate.mjs\"", "timeout": 600 }] }
     ],
     "PostToolUse": [
