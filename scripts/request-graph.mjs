@@ -389,7 +389,7 @@ export function codexChips(lr) {
  */
 /** 집계 대상 원장(2026-11-10 개정) : c4(또는 접두 없는 과거 원장) + 턴 묶음 아님 + 비대상(NO_GATE) 에이전트 원장 아님 — 과거 c1·c2·c3·c5·c6·c*-turn-* 원장은 디스크에 두고 집계만 뺀다 */
 export const isLoopLedger = l => { const b = partBase(l.id); return !TURN_ID_RE.test(b) && (codexNo(b) ?? 4) === 4 && !NO_GATE.has(l.agentType) }
-export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Date.now() } = {}) {
+export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Date.now(), peers = [] } = {}) {
   loops = loops.filter(isLoopLedger)
   const ts = turnStatus(t), a = ms(t.ts_req), turnRunning = ts.key === 'running'
   // 시작 시각순(2026-11-09 그래프 분석 ① : 로거 ts_start = '+09:00' 지역 시각, 생성기 = 'Z' — 문자열 비교면 회차 번호가 시간순이 아니었음 → 숫자 비교, 시각 없음은 뒤로)
@@ -414,6 +414,19 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
     return mergeParts(loops.map(l => ({ l, h: how(l) })).filter(x => x.h).map(({ l, h }) => ({ id: l.id, est: h === 'est', rows: rowsOf(l) }))).filter(x => x.rows.length)
   }
   const cl = Object.fromEntries(SLOTS.filter(s => s.kind === 'codex').map(s => [s.id, loopsOf(slotMap[s.id])]))
+  // 이어받은 원장(승인 4 · 2026-11-11 — build 가 요청 A 에서 시작해 SendMessage 로 요청 B 까지 이어 처리, 원장은 B 창에만 생겨 A 가 '검증 누락' 오탐) :
+  //   이 요청 파일 변경 실행(wrote)의 agentId 앞 6자 = 원장 id 끝 접미인 c4 원장이 이 창엔 판정이 없고 창 뒤(lb 이후)에만 있으면 판정 결과만 CDX-루프·실행 상세에 반영
+  //   회차·되돌림·묶음 누적은 원장이 생긴 요청에서만 센다(cl 에 넣지 않음). 창 앞에만 판정이 있는 원장·접미 불일치·파일 변경 없음 = 이어받지 않음(검증 누락 유지)
+  const sfxOf = id => /-(a[0-9a-f]{5})$/.exec(partBase(id))?.[1], latest = rs => rs.slice().sort((p, q) => (p.run ? Infinity : p.t1) - (q.run ? Infinity : q.t1)).at(-1)
+  const wr6 = new Set(agents.filter(ag => ag.wrote === true).map(ag => String(ag.agent_id || '').slice(0, 6)).filter(Boolean)), have = new Set(cl['1.1.4.1'].map(x => x.id))
+  const ssn = peers.filter(p => p.session_id === t.session_id).sort((x, y) => ms(x.ts_req) - ms(y.ts_req))
+  const srcOf = r => { const at = (r.run ? r.t0 : r.t1) ?? lb, h = ssn.filter(p => ms(p.ts_req) <= at).at(-1); return h && h !== t && h.turn != null ? `요청 ${h.turn}` : `${kstOf(at).slice(5, 16)} 판정` }
+  //   D-002(c4-build-4-a609bd) : 창 안에도 판정이 있는 원장(예 앞 FAIL)도 창 뒤 판정이 있으면 최종 결과(fin)만 이 칸·실행 상세에 반영 — 회차·되돌림은 창 안 행만(각 귀속 요청)
+  const aft = mergeParts(loops.filter(l => (codexNo(l.id) ?? 4) === 4 && wr6.has(sfxOf(l.id))).map(l => ({ id: l.id, rows: loopRounds(l, lb + 1, Infinity) })))
+    .filter(x => x.rows.length).map(x => ({ ...x, src: srcOf(x.rows[0]), last: latest(x.rows) }))
+  const inh = aft.filter(x => !have.has(x.id)), fin = new Map(aft.filter(x => have.has(x.id)).map(x => [x.id, x]))
+  const vOf = r => r.run ? 'run' : r.verdict === 'PASS' ? 'Y' : r.verdict === 'FAIL' ? 'N' : 'hold', ihV = new Map(aft.map(x => [sfxOf(x.id), vOf(x.last)]))
+  const lastOf = x => fin.get(x.id)?.last ?? latest(x.rows)   // 원장의 최종 행 = 창 뒤 판정 있으면 그것
   // 반복(2026-11-10 마스터 C-8 ③ "어떤 프로세스든 2회 이상 반복되었다면 루프도 반드시") : 같은 에이전트 종류 실행(재전달 회차 포함) 2회 이상 · 같은 원장 판정(BLOCKED·진행 제외) 2회 이상
   const byType = new Map(); for (const ag of agents) { const k = ag.type || ag.name || '에이전트'; byType.set(k, (byType.get(k) || 0) + ((ag.rounds || []).length || 1)) }
   const repAg = [...byType].filter(([, n]) => n >= 2).map(([k, n]) => `${shortType(k)} ×${n}`)
@@ -421,8 +434,8 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   // 되돌림(2026-11-10 마스터 C-13 "어떤 단계 프로세스에든지 되돌림이 있으면 루프가 발생했다는 말이고, 그러면 루프 노드를 표현해야지") : 어느 CDX 칸이든 N 판정 1회 이상 = 루프(반복 2회+ 와 OR, 진행 중 요청도 N 즉시)
   //   글 = '<CDX 칸> N k회(<회차>회차 결함 n …) → 재작업 대기 | 재판정 진행 | <회차>회차 Y | 보류(사유)' — 마지막 기록 기준
   const backs = SLOTS.filter(s => s.kind === 'codex').flatMap(s => { const xs = (cl[s.id] || []).filter(x => x.rows.some(r => r.verdict === 'FAIL')); return xs.map(x => {
-    const ns = x.rows.filter(r => r.verdict === 'FAIL'), last = x.rows.at(-1)
-    const next = last.run ? '재판정 진행' : last.verdict === 'PASS' ? `${last.iter}회차 Y${last.waived ? '(면제)' : ''}` : last.verdict === 'FAIL' ? '재작업 대기' : `보류(${reasonTxt(last.reason)})`
+    const ns = x.rows.filter(r => r.verdict === 'FAIL'), f = fin.get(x.id), last = f?.last ?? x.rows.at(-1), src = f ? `(${f.src})` : ''
+    const next = last.run ? `재판정 진행${src}` : last.verdict === 'PASS' ? `${last.iter}회차 Y${last.waived ? '(면제)' : ''}${src}` : last.verdict === 'FAIL' ? `재작업 대기${src}` : `보류(${reasonTxt(last.reason)})${src}`
     return { s, x, txt: `${s.label.replace(/ 검수$/, '')}${xs.length > 1 ? `(${x.id})` : ''} N ${ns.length}회(${ns.map(r => `${r.iter}회차${r.open != null ? ` 결함 ${r.open}` : ''}`).join(' · ')}) → ${next}` }
   }) })
   // 2026-11-10 개정 : CDX-루프가 유일한 판정 칸 — c4 판정 1회 이상(judged) 또는 파일 변경 실행 1건 이상(target)이면 루프 쌍 표시(1회 Y 로 끝난 산출 턴·판정 누락 턴도 보이게)
@@ -488,21 +501,24 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   //   회차 = 원장 iter 번호(BLOCKED 는 회차 미소모), verdict = { yn, fails } — N 되돌림 화살표 근거(buildPath), chips = 칸 안 회차 줄(codexChips)
   for (const s of SLOTS.filter(s => s.kind === 'codex')) {
     const m = slotMap[s.id]; if (!m?.loops && !m?.codex) continue
-    const lr = cl[s.id], hzN = all.filter(n => n.harness === true).length, hzLine = hzN ? [`하네스 파일 변경 ${hzN}건 포함(SA-하네스 귀속)`] : []
-    if (!lr.length) {
+    const lr = cl[s.id], ih = s.id === '1.1.4.1' ? inh : [], hzN = all.filter(n => n.harness === true).length, hzLine = hzN ? [`하네스 파일 변경 ${hzN}건 포함(SA-하네스 귀속)`] : []
+    if (!lr.length && !ih.length) {
       const st = !target ? { ...sty('notrun'), statusLabel: '판정 대상 없음' } : anyRun ? { status: 'notrun', statusLabel: '검증 대기 — 판정 전', verdict: { yn: null, fails: 0, wait: true } } : { status: 'error', statusLabel: '검증 누락', alerts: ['검증 누락'], verdict: { yn: null, fails: 0, miss: true } }
       Object.assign(byId[s.id], st, { lines: [target ? '파일 변경 실행이 있는데 이 턴 시간창 안 Codex 판정 기록 없음' : '파일 변경 실행 없음 — 판정 대상 없음', ...hzLine] }); continue
     }
     const rows = lr.flatMap(x => x.rows), fails = rows.filter(r => r.verdict === 'FAIL').length
-    const lasts = lr.map(x => x.rows.slice().sort((p, q) => (p.run ? Infinity : p.t1) - (q.run ? Infinity : q.t1)).at(-1)), last = lasts.slice().sort((p, q) => (p.run ? Infinity : p.t1) - (q.run ? Infinity : q.t1)).at(-1)
-    const k = last.iter, many = lr.length > 1, nN = lasts.filter(r => !r.run && r.verdict === 'FAIL').length
-    const v = lasts.some(r => r.run) ? { ...sty('running'), statusLabel: `검증 진행 · ${k}회차 (${k}/${LOOP_CAP})`, yn: null }
-      : lasts.every(r => r.verdict === 'PASS') ? { status: 'done', statusLabel: (many ? `검증 Y · 원장 ${lr.length}개 전부 Y` : `검증 Y · ${k}회 만에 완료`) + waivedTxt(lasts), yn: 'Y', yAt: Math.max(...lasts.map(r => r.t1)) }
-        : nN ? { status: 'error', statusLabel: many ? `검증 N · 원장 ${nN}/${lr.length} N` : `검증 N · ${k}회차 진행 (${k}/${LOOP_CAP})`, yn: 'N' }
-          : { status: 'blocked', statusLabel: `검증 보류(${reasonTxt(lasts.find(r => r.verdict === 'BLOCKED')?.reason)}) · ${k}회차`, yn: null }
+    // 회차 번호(k)는 이 요청에 생긴 원장만 — 이어받은 원장(ih)은 판정 결과(lasts)와 출처 글자(ihTxt)만
+    const lasts = [...lr.map(lastOf), ...ih.map(x => x.last)], own = lr.length ? latest(lr.map(lastOf)) : null
+    const k = own?.iter, nL = lr.length + ih.length, many = nL > 1, nN = lasts.filter(r => !r.run && r.verdict === 'FAIL').length
+    const fl = s.id === '1.1.4.1' ? lr.filter(x => fin.has(x.id)).map(x => fin.get(x.id)) : []
+    const ihTxt = fl.map(x => ` · 최종 판정 이어받음(${x.src})`).join('') + ih.map(x => ` · 이어받은 원장(${x.src})`).join('')
+    const v = lasts.some(r => r.run) ? { ...sty('running'), statusLabel: (own ? `검증 진행 · ${k}회차 (${k}/${LOOP_CAP})` : '검증 진행') + ihTxt, yn: null }
+      : lasts.every(r => r.verdict === 'PASS') ? { status: 'done', statusLabel: (many ? `검증 Y · 원장 ${nL}개 전부 Y` : own ? `검증 Y · ${k}회 만에 완료` : '검증 Y') + ihTxt + waivedTxt(lasts), yn: 'Y', yAt: Math.max(...lasts.map(r => r.t1)) }
+        : nN ? { status: 'error', statusLabel: (many ? `검증 N · 원장 ${nN}/${nL} N` : own ? `검증 N · ${k}회차 진행 (${k}/${LOOP_CAP})` : '검증 N') + ihTxt, yn: 'N' }
+          : { status: 'blocked', statusLabel: `검증 보류(${reasonTxt(lasts.find(r => r.verdict === 'BLOCKED')?.reason)})${own ? ` · ${k}회차` : ''}` + ihTxt, yn: null }
     // 실행별 원장 대조(2026-11-10 c4-build-loop-only-aef4b3-p3 D-001 — A 원장 PASS 가 B 원장 누락을 Y 로 덮음) : 파일 변경 실행(wrote)마다 자기 접미(-<agentId 앞 6자>) c4 원장이 있어야 함
     //   접미 없는 과거 원장 = 파일 변경 실행이 하나뿐일 때만 그 실행 몫 · agent id 없는 실행 = 대조 불가(건너뜀). 누락 있으면 끝난 요청 = 경보 '검증 누락'(N 은 유지), 진행 중 요청의 Y = 대기
-    const sfx = new Set(lr.map(x => /-(a[0-9a-f]{5})$/.exec(x.id)?.[1]).filter(Boolean)), bare = lr.some(x => !/-a[0-9a-f]{5}$/.test(x.id)), wr = agents.filter(ag => ag.wrote === true)
+    const sfx = new Set([...lr, ...ih].map(x => /-(a[0-9a-f]{5})$/.exec(x.id)?.[1]).filter(Boolean)), bare = lr.some(x => !/-a[0-9a-f]{5}$/.test(x.id)), wr = agents.filter(ag => ag.wrote === true)
     const unc = wr.filter(ag => { const k = String(ag.agent_id || '').slice(0, 6); return k && !sfx.has(k) && !(bare && wr.length === 1) })
     const uncLine = unc.length ? [`원장 없는 파일 변경 실행 ${unc.length}건 — ${unc.map(ag => `${ag.type || '에이전트'}(${String(ag.agent_id).slice(0, 6)}${ag.wroteEst ? ' · 추정' : ''})`).join(' · ')}`] : []
     let vd = { yn: v.yn, fails, ...(v.yAt != null ? { yAt: v.yAt } : {}) }, missAl = null
@@ -513,8 +529,9 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
     if (unc.length && !anyRun) missAl = { alerts: ['검증 누락'] }
     Object.assign(byId[s.id], spanOf(rows), { status: v.status, statusLabel: v.statusLabel }, missAl || {}, {
       badge: lr.some(x => x.est) ? EST_BADGE : '매핑 연결', verdict: vd,
-      lines: [...lr.map(x => `원장 ${x.id}${x.parts ? ` = 묶음 ${x.parts.join(' · ')} AND(전부 PASS 일 때만 Y)` : ''} · 판정 ${x.rows.length}건`), ...uncLine, ...(fails ? [`N 되돌림 ${fails}회 — 검증 대상 ${byId[s.parent].label} 재작업`] : []), ...hzLine],
-      rounds: lr.map(x => ({ name: `Codex 판정 ${x.id}`, cap: LOOP_CAP, rows: x.rows })), chips: codexChips(lr),
+      lines: [...lr.map(x => `원장 ${x.id}${x.parts ? ` = 묶음 ${x.parts.join(' · ')} AND(전부 PASS 일 때만 Y)` : ''} · 판정 ${x.rows.length}건`), ...ih.map(x => `이어받은 원장 ${x.id}(${x.src}) — 같은 에이전트(${sfxOf(x.id)})가 뒤 요청에서 이어 처리, 판정 결과만 반영(회차·되돌림은 그 요청에서 집계)`), ...fl.map(x => `최종 판정 ${x.id} ${x.last.iter}회(${x.src}) — 창 뒤 판정, 결과만 반영(뒤 회차·되돌림은 그 요청에서 집계)`), ...uncLine, ...(fails ? [`N 되돌림 ${fails}회 — 검증 대상 ${byId[s.parent].label} 재작업`] : []), ...hzLine],
+      rounds: lr.map(x => ({ name: `Codex 판정 ${x.id}`, cap: LOOP_CAP, rows: x.rows })),
+      chips: [...codexChips(lr), ...[...fl, ...ih].map(x => { const c = vOf(x.last); return { txt: `${fl.includes(x) ? '최종 판정' : '이어받은 원장'} ${x.id}(${x.src}) ${fl.includes(x) ? `${x.last.iter}회 ` : ''}${c === 'run' ? '진행' : c === 'hold' ? 'BLOCKED' : c}${x.last.waived ? '(면제)' : ''}`, tone: c === 'Y' ? 'ok' : c === 'N' ? 'bad' : c === 'run' ? 'run' : 'warn' } })],
     })
   }
   // 서브에이전트 실행 회차별 Codex 판정(2026-11-09 마스터 "모든 서브에이전트 프로세스는 Codex 승인 OK 후 다음 진행", 정본 40. loop/codex_procedure.md 13절) — 상세·md 글자용(경로는 막지 않음, 2026-11-10)
@@ -535,7 +552,10 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
   for (const x of steps) {
     x.nx = x.t0 == null ? undefined : steps.find(y => y.t0 != null && y.t0 > x.t0); x.end = x.nx ? x.nx.t0 : Infinity; x.done = x.run ? null : x.t1 ?? x.t0
     const mine = x.n.aid ? x.n.aid.slice(0, 6) : null
-    x.inWin = x.done == null ? [] : judg.filter(j => j.t >= x.done && j.t < x.end); x.need = x.n.wrote === true || (mine && x.inWin.some(j => tag(j) === mine)) ? [4] : []
+    // 자기 접미 원장 판정(승인 4 형제 — agentId 매칭) = 창 [실행 시작, 같은 실행 다음 회차 시작) : 판정은 SubagentStop 훅 안에서 기록되고 종료 기록은 훅 뒤라 판정 시각 < 종료 시각(실사례 요청 96 PASS .629 < 종료 .673),
+    //   병렬로 다른 실행이 먼저 시작해도 자기 판정은 자기 것(실사례 요청 91 ae440b — 다음 실행 시작 전 FAIL 만 잡혀 N 으로 오판). 접미 없는·다른 접미 판정 = 종전 창 [종료, 다음 실행 시작)
+    const ownEnd = x.t0 == null ? Infinity : steps.find(y => y.n === x.n && y.t0 != null && y.t0 > x.t0)?.t0 ?? Infinity
+    x.inWin = x.done == null ? [] : judg.filter(j => mine && tag(j) === mine ? j.t >= (x.t0 ?? x.done) && j.t < ownEnd : j.t >= x.done && j.t < x.end); x.need = x.n.wrote === true || (mine && x.inWin.some(j => tag(j) === mine)) ? [4] : []
     x.lo = x.done ?? x.t0 ?? -Infinity
   }
   const shared = (x, no) => steps.some(y => y !== x && y.n !== x.n && y.need.includes(no) && y.lo < x.end && x.lo < y.end)   // 같은 칸 필요 + 창 겹침(같은 에이전트 재전달 회차는 순차라 제외)
@@ -544,8 +564,9 @@ export function buildRequestGraph(t, loops = [], { slotMap = SLOT_MAP, now = Dat
     // 칸별 독립 판정 → AND : 필수 칸마다 그 칸 마지막 판정(대상 규약 적용), 모두 Y 여야 Y. 아니면 N > 보류 > 보류(대상 불명) > 진행 > (판정 없는 칸) 누락·대기 순으로 대표
     const per = x.need.map(no => {
       const w = x.inWin.filter(j => j.no === no), many = shared(x, no), cand = w.filter(j => tag(j) === mine && mine != null || (!many && tag(j) == null))
-      const j = cand.at(-1)
-      return { no, v: j ? (j.v === 'PASS' ? 'Y' : j.v === 'FAIL' ? 'N' : j.v === 'BLOCKED' ? 'hold' : 'run') : many && w.some(k => tag(k) == null) ? 'unk' : null }
+      // 자기 접미 원장의 창 뒤 판정(승인 4 · D-002) = 창 안 판정이 없거나 자기 원장 판정일 때 그 최종 결과
+      const j = cand.at(-1), fv = mine ? ihV.get(mine) : null, iv = fv && (!j || tag(j) === mine) ? fv : null
+      return { no, v: iv || (j ? (j.v === 'PASS' ? 'Y' : j.v === 'FAIL' ? 'N' : j.v === 'BLOCKED' ? 'hold' : 'run') : many && w.some(k => tag(k) == null) ? 'unk' : null) }
     })
     const vs = per.map(p => p.v), st = !per.length ? 'na' : vs.every(v => v === 'Y') ? 'Y' : ['N', 'hold', 'unk', 'run'].find(v => vs.includes(v)) || (x.run || (!x.nx && anyRun) ? 'wait' : 'miss')
     const brk = per.length > 1 ? ` (${per.map(p => `c${p.no} ${p.v ? GATE_TXT[p.v].replace('검증 ', '') : (st === 'wait' ? '대기' : '누락')}`).join(' · ')})` : ''
@@ -941,14 +962,15 @@ export const wroteFiles = recs => recs.some(j => j?.type === 'assistant' && Arra
  *     추정값은 단조 — 한 번 true 면 이후 재계산에서 파일 시각이 바뀌어도 false 로 내리지 않는다
  *     기록 우선(c4-fail-5-aeb16d-p2 iter-2 D-001) : 캐시 키 = 기록 크기·mtime + 훅 기록 mtime(recordAt, 없음 0) — 기록이 생기거나 다시 쓰이면 캐시값(옛 추정 false·옛 기록값)을 버리고 기록을 읽는다
  */
-export function loadAgentHarness(turns, sessDir, cacheFile, { attribute, recordAt } = {}) {
+export function loadAgentHarness(turns, sessDir, cacheFile, { attribute, recordAt, ver } = {}) {
   let cache = {}; try { cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8')) } catch { /* 캐시 없음 = 전부 읽기 */ }
   const next = {}
   for (const t of turns) for (const ag of t.agents_detail || []) {
     if (!ag.agent_id || !t.session_id || ag.type === LEGACY_VERIFY || NO_GATE.has(ag.type)) continue
     const dir = ag.workflow ? path.join(sessDir, t.session_id, 'subagents', 'workflows', ag.workflow) : path.join(sessDir, t.session_id, 'subagents'), f = path.join(dir, `agent-${ag.agent_id}.jsonl`)
     let st; try { st = fs.statSync(f) } catch { continue }
-    const v = attribute ? 2 : 1, sig = `${st.size}:${Math.round(st.mtimeMs)}`, old = cache[ag.agent_id]
+    // ver = 훅 귀속 규칙 판(RULES_VER) — 바뀌면 옛 캐시(옛 기록값·단조 true)를 이어받지 않음(c4-d-002-a5870f-p2 D-001)
+    const v = attribute ? (ver ? `2:${ver}` : 2) : 1, sig = `${st.size}:${Math.round(st.mtimeMs)}`, old = cache[ag.agent_id]
     const judge = recs => { if (!attribute) return { wrote: wroteFiles(recs) }; const r = attribute({ recs, tp: f, mainTp: path.join(sessDir, `${t.session_id}.jsonl`), agentId: ag.agent_id, closed: !!ag.ts_end }); return { wrote: r.files.length > 0, ...(r.est ? { est: true } : {}) } }
     const ra = (attribute && recordAt?.(ag.agent_id)) || 0, same = old?.v === v && typeof old.wrote === 'boolean', reuse = same && old.sig === sig && (old.ra || 0) === ra
     const c = reuse ? old : (recs => { const w = judge(recs); return { v, sig, ra, harness: harnessTouched(recs), wrote: w.wrote || (!!w.est && same && old.wrote === true), ...(w.est ? { est: true } : {}) } })(tailJsonl(f, Infinity))
@@ -1015,7 +1037,7 @@ export function loadToolEvents(turns, sessDir, cacheFile, now = Date.now()) {
   if (cacheFile) try { fs.mkdirSync(path.dirname(cacheFile), { recursive: true }); fs.writeFileSync(cacheFile, JSON.stringify(next)) } catch { /* 캐시 저장 실패 = 다음 실행에서 다시 읽음 */ }
 }
 
-function loadAgentRounds(turns, sessDir, cacheFile) {
+export function loadAgentRounds(turns, sessDir, cacheFile) {
   let cache = {}; try { cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8')) } catch { /* 캐시 없음 = 전부 읽기 */ }
   const next = {}
   for (const t of turns) for (const ag of t.agents_detail || []) {
@@ -1487,7 +1509,7 @@ function main(attr = {}) {
     linkContext(all, now)
     splitAgentRounds(all)
     requests = all.map(t => {
-      const nodes = buildRequestGraph(t, loops, { now }), n1 = nodes[0], ag = n1.agentN, p = buildPath(nodes), ck = n1.check, when = new Date(ms(t.ts_req)).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)
+      const nodes = buildRequestGraph(t, loops, { now, peers: all }), n1 = nodes[0], ag = n1.agentN, p = buildPath(nodes), ck = n1.check, when = new Date(ms(t.ts_req)).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)
       const cost = t.live ? null : (t.cost_usd || 0) + (t.cost_agents_usd || 0)
       const head = redact(t.req_head || '').replace(/<\/?[a-z_-]+(?:\s[^>]*)?>/gi, '').trim().slice(0, SIZE.headCut) || '(요청문 없음)'
       return { sumId: summaryId(t), key: t.key, sid: `${t.session || ''}-${t.turn ?? ''}`, date: when.slice(0, 10), when, head, cat: t.category || '', catLabel: catLabel[t.category] || t.category || (t.live ? '진행 중(기록 전)' : ''), st: n1.status, statusLabel: n1.statusLabel, running: n1.run, path: p, meta: `에이전트 ${ag} · ${cost == null ? '$—' : '$' + cost.toFixed(2)} · 엔지니어링 ${engTxt(n1.eng, n1.engEst)} · 검증 Y ${ck.y} / 누락 ${ck.miss} / 위반 ${ck.viol} · 묶음 ${n1.cum.n}/${n1.cum.cap} ·`, alert: n1.alertN ? `경보 ${n1.alertN}${n1.cum.level ? ' · ' + n1.cum.level : ''}` : '', nodes }
@@ -1502,6 +1524,6 @@ function main(attr = {}) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // 변경 귀속 = 훅과 같은 함수(D-002) — 불러오기 실패 시 Write·Edit 폴백(생성은 계속)
-  let attr = {}; try { const cg = await import('../.claude/hooks/codex-gate.mjs'); attr = { attribute: cg.attributionFor, recordAt: cg.attribAt } } catch (e) { console.error(`변경 귀속 함수 불러오기 실패(Write·Edit 폴백) : ${e.message}`) }
+  let attr = {}; try { const cg = await import('../.claude/hooks/codex-gate.mjs'); attr = { attribute: cg.attributionFor, recordAt: cg.attribAt, ver: cg.RULES_VER } } catch (e) { console.error(`변경 귀속 함수 불러오기 실패(Write·Edit 폴백) : ${e.message}`) }
   main(attr)
 }

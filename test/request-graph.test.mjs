@@ -924,3 +924,84 @@ test('c4-fail-5-aeb16d-p2 D-001 캐시·귀속 : 수정 전 판이 만든 {v:2, 
     b = B(); loadAgentHarness([{ session_id: 's1', agents_detail: [b] }], ses, cache, opts); assert.equal(calls, 1, '기록 삭제 = 재판단'); assert.equal(b.wrote, true, '삭제 뒤에도 true'); assert.equal(b.wroteEst, true); assert.deepEqual(alarm(b), ['검증 누락'])
   } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }); fs.rmSync(fA, { force: true }); fs.rmSync(path.join(path.dirname(fA), `${other}.json`), { force: true }) }
 })
+
+test('c4-d-002-a5870f-p2 D-001 그래프 캐시 : 옛 귀속 규칙 판 기록으로 만든 캐시(ra = 기록 mtime)는 규칙 판이 바뀌면 다시 계산 — 오귀속 파일 대신 실제 귀속', async () => {
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-ver-')), ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-ses-')), g = (...a) => spawnSyncGit(r, a)
+  const id = 'averg001', fA = path.join(process.env.CODEX_GATE_STATE, 'codex-gate', 'attrib', `${id}.json`)
+  try {
+    g('init', '-q'); g('config', 'user.email', 't@t'); g('config', 'user.name', 't'); fs.writeFileSync(path.join(r, 'base.md'), 'b'); g('add', '-A'); g('commit', '-qm', 'b')
+    const now = Date.now(), iso = t => new Date(t).toISOString()
+    const sub = path.join(ses, 's1', 'subagents'); fs.mkdirSync(sub, { recursive: true })
+    const tp = path.join(sub, `agent-${id}.jsonl`); fs.writeFileSync(tp, JSON.stringify({ type: 'assistant', timestamp: iso(now - 60e3), message: { content: [{ type: 'tool_use', name: 'Read', input: { file_path: 'x' } }] } }) + '\n')   // 파일 변경 없음
+    fs.mkdirSync(path.dirname(fA), { recursive: true }); fs.writeFileSync(fA, JSON.stringify({ wrote: true, files: ['test/codex-verify.test.mjs'], at: iso(now) }))   // 옛 판 기록 = 오귀속
+    const st = fs.statSync(tp), ra = Math.round(fs.statSync(fA).mtimeMs), cache = path.join(r, 'cache.json')
+    fs.writeFileSync(cache, JSON.stringify({ [id]: { v: 2, sig: `${st.size}:${Math.round(st.mtimeMs)}`, ra, harness: false, wrote: true } }))   // 수정 전 판이 옛 기록으로 만든 캐시
+    let calls = 0; const opts = { attribute: o => { calls++; return cg.attributionFor({ ...o, root: r }) }, recordAt: cg.attribAt, ver: cg.RULES_VER }
+    const b = { agent_id: id, type: 'anakin_phase-build', ts_start: iso(now - 60e3), ts_end: iso(now - 50e3) }
+    loadAgentHarness([{ session_id: 's1', agents_detail: [b] }], ses, cache, opts)
+    assert.equal(calls, 1, '규칙 판 변경 = 캐시 버리고 다시 계산'); assert.equal(b.wrote, false, '오귀속 기록 대신 실제(변경 없음)')   // 고치기 전 : calls 0 · wrote true(캐시 재사용)
+  } finally { fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(ses, { recursive: true, force: true }); fs.rmSync(fA, { force: true }) }
+})
+
+test('승인 4 이어받은 원장 : 요청 A 에서 시작한 build X 가 요청 B 에서 끝나고 원장 c4-…-X6 이 B 창에 생기면 A·B 모두 검증 Y(A = 결과만·출처 표기, 회차·되돌림 집계는 B 만), 원장 없는 다른 실행·앞 요청 원장 = 검증 누락 유지', () => {
+  const X = 'a9b49e0001', bx = (s, e, extra = {}) => ag('anakin_phase-build', Z(s), { agent_id: X, ts_end: Z(e), wrote: true, ...extra })
+  const A = { session_id: 's', turn: 96, ts_req: Z('01:00'), ts_res: Z('01:20'), req_head: 'A', agents_detail: [bx('01:01', '01:10')] }
+  const B = { session_id: 's', turn: 97, ts_req: Z('01:30'), ts_res: Z('02:00'), req_head: 'B', agents_detail: [bx('01:31', '01:50', { cont: true })] }
+  const L = loop('c4-build-a9b49e', [{ iter: 1, at: Z('01:45'), verdict: 'FAIL', open: 1 }, { iter: 2, at: Z('01:52'), verdict: 'PASS', open: 0 }], { startedAt: Z('01:40') })
+  const peers = [A, B], cx = ns => node(ns, '1.1.4.1')
+  // A : 판정 결과만(Y) + 출처 '이어받은 원장(요청 97)' · 회차표·되돌림·N 화살표 없음 · 실행 상세도 Y
+  const nA = buildRequestGraph(A, [L], { peers }), a = cx(nA)
+  assert.equal(a.verdict.yn, 'Y'); assert.equal(a.alerts, undefined); assert.equal(a.verdict.fails, 0); assert.match(a.statusLabel, /^검증 Y · 이어받은 원장\(요청 97\)/)
+  assert.deepEqual(a.rounds, []); assert.ok(!a.chips.some(c => /회 [YN]/.test(c.txt)), '회차 줄은 원장이 생긴 요청에만'); assert.ok(a.chips.some(c => c.txt === '이어받은 원장 c4-build-a9b49e(요청 97) Y'))
+  assert.ok(!node(nA, '1.1.4').chips.some(c => c.tone === 'bad'), '되돌림 집계 없음'); assert.ok(!buildPath(nA).edges.some(e => e.seq === 'N'))
+  assert.deepEqual([nA[0].check.y, nA[0].check.miss], [1, 0]); assert.ok(agentsOf(nA)[0].lines.includes('Codex 판정 : 검증 Y'))
+  // B : 원장이 생긴 요청 = 회차 2·되돌림 1 그대로
+  const b = cx(buildRequestGraph(B, [L], { peers }))
+  assert.equal(b.verdict.yn, 'Y'); assert.equal(b.verdict.fails, 1); assert.deepEqual(b.rounds.map(g => g.rows.length), [2]); assert.match(b.statusLabel, /^검증 Y · 2회 만에 완료$/)
+  // 원장 없는 다른 실행(Y) = 검증 누락 유지(N 아님 · 경보)
+  const A2 = { ...A, agents_detail: [...A.agents_detail, ag('general-purpose', Z('01:05'), { agent_id: 'a77777f00d', ts_end: Z('01:08'), wrote: true })] }
+  const m = cx(buildRequestGraph(A2, [L], { peers }))
+  assert.equal(m.statusLabel, '검증 누락'); assert.deepEqual(m.alerts, ['검증 누락']); assert.match(m.lines.join(' '), /원장 없는 파일 변경 실행 1건 — general-purpose\(a77777\)/)
+  // 다른 에이전트 접미 원장 = 이어받지 않음 · 앞 요청에만 판정이 있는 원장 = 뒤 요청에 이어받지 않음(완화 금지)
+  assert.equal(cx(buildRequestGraph(A, [loop('c4-build-a12345', L.events, { startedAt: L.startedAt })], { peers })).statusLabel, '검증 누락')
+  const C = { session_id: 's', turn: 98, ts_req: Z('02:10'), ts_res: Z('02:30'), req_head: 'C', agents_detail: [bx('02:11', '02:20', { cont: true })] }
+  assert.equal(cx(buildRequestGraph(C, [L], { peers: [A, B, C] })).statusLabel, '검증 누락')
+  // 파일 변경 없는 실행 = 이어받기 대상 아님(판정 대상 없음 → 숨김)
+  assert.equal(cx(buildRequestGraph({ ...A, agents_detail: [bx('01:01', '01:10', { wrote: false })] }, [L], { peers })), undefined)
+})
+
+test('승인 4 D-002(c4-build-4-a609bd) : 앞 요청 창에 같은 원장 판정(FAIL)이 있어도 뒤 요청 최종 판정(PASS)을 앞 칸·실행 상세에 반영, 회차·되돌림 집계는 각 귀속 요청에만', () => {
+  const X = 'a9b49e0001', bx = (s, e, extra = {}) => ag('anakin_phase-build', Z(s), { agent_id: X, ts_end: Z(e), wrote: true, ...extra })
+  const A = { session_id: 's', turn: 96, ts_req: Z('01:00'), ts_res: Z('01:20'), req_head: 'A', agents_detail: [bx('01:01', '01:10')] }
+  const B = { session_id: 's', turn: 97, ts_req: Z('01:30'), ts_res: Z('02:00'), req_head: 'B', agents_detail: [bx('01:31', '01:50', { cont: true })] }
+  const L = loop('c4-build-a9b49e', [{ iter: 1, at: Z('01:09'), verdict: 'FAIL', open: 1 }, { iter: 2, at: Z('01:45'), verdict: 'PASS', open: 0 }], { startedAt: Z('01:08') })
+  const peers = [A, B], cx = ns => node(ns, '1.1.4.1')
+  const nA = buildRequestGraph(A, [L], { peers }), a = cx(nA)
+  assert.equal(a.verdict.yn, 'Y', a.statusLabel)   // 고치기 전 : N(앞 창 FAIL 이 최종으로 남음)
+  assert.match(a.statusLabel, /^검증 Y · 2회 만에 완료 · 최종 판정 이어받음\(요청 97\)/)
+  assert.equal(a.verdict.fails, 1); assert.deepEqual(a.rounds.map(g => g.rows.map(r => r.iter)), [[1]])   // A 회차·되돌림 = 자기 창 1회차 FAIL 만
+  assert.ok(a.chips.some(c => c.txt === '최종 판정 c4-build-a9b49e(요청 97) 2회 Y' && c.tone === 'ok'))
+  assert.match(node(nA, '1.1.4').chips.map(c => c.txt).join('\n'), /N 1회\(1회차 결함 1\) → 2회차 Y\(요청 97\)/)   // 되돌림 줄 = 재작업 대기 아님
+  assert.ok(agentsOf(nA)[0].lines.includes('Codex 판정 : 검증 Y'))   // 실행 상세(형제)
+  const b = cx(buildRequestGraph(B, [L], { peers }))
+  assert.equal(b.verdict.yn, 'Y'); assert.equal(b.verdict.fails, 0); assert.deepEqual(b.rounds.map(g => g.rows.map(r => r.iter)), [[2]])   // B = 2회차만
+  // 뒤 판정도 FAIL = 앞 칸 N 유지(완화 아님) · 다른 접미 원장 = 반영 안 함
+  const LN = loop('c4-build-a9b49e', [{ iter: 1, at: Z('01:09'), verdict: 'FAIL', open: 1 }, { iter: 2, at: Z('01:45'), verdict: 'FAIL', open: 1 }], { startedAt: Z('01:08') })
+  assert.equal(cx(buildRequestGraph(A, [LN], { peers })).verdict.yn, 'N')
+  const LO = loop('c4-build-a12345', L.events, { startedAt: L.startedAt })
+  assert.notEqual(cx(buildRequestGraph(A, [LO], { peers })).verdict?.yn, 'Y')
+})
+
+test('승인 4 형제(R-P0) : 실행 상세 Codex 판정 — 자기 접미 원장 판정이 기록된 종료 시각보다 앞서도(SubagentStop 훅 안에서 판정 → 종료 기록이 훅 뒤) 그 실행 판정, 실행 전·다른 접미 판정 = 검증 누락 유지', () => {
+  const X = 'a9b49e2bf3', bx = ag('anakin_phase-build', Z('01:01'), { agent_id: X, ts_end: Z('01:10'), wrote: true }), t = turn({ ts_req: Z('01:00'), ts_res: Z('01:20'), agents_detail: [bx] })
+  const line = lp => agentsOf(buildRequestGraph(t, lp)).find(n => n.aid === X).lines.at(-1)
+  assert.equal(line([KL('c4-build-a9b49e', '2026-11-08T01:09:59Z', 'PASS')]), 'Codex 판정 : 검증 Y')   // 실사례 요청 96 : PASS 10:32:47.629 < 종료 기록 .673
+  assert.equal(line([KL('c4-build-a9b49e', '2026-11-08T01:00:30Z', 'PASS')]), 'Codex 판정 : 검증 누락')   // 실행 시작 전 판정 = 불인정(c4 iter1 D-001)
+  assert.equal(line([KL('c4-build-a12345', '2026-11-08T01:09:59Z', 'PASS')]), 'Codex 판정 : 검증 누락')   // 다른 실행 접미 = 불인정
+  // 병렬 : 다른 실행 Y(01:03 시작)가 X 종료 전에 시작해도 X 자기 판정(FAIL 01:05 → PASS 01:09:59) = Y, Y 는 자기 원장 Y(실사례 요청 91 ae440b)
+  const Y = ag('general-purpose', Z('01:03'), { agent_id: 'a77777f00d', ts_end: Z('01:08'), wrote: true }), tp = turn({ ts_req: Z('01:00'), ts_res: Z('01:20'), agents_detail: [bx, Y] })
+  const LX = loop('c4-build-a9b49e', [{ iter: 1, at: '2026-11-08T01:05:00Z', verdict: 'FAIL', open: 1 }, { iter: 2, at: '2026-11-08T01:09:59Z', verdict: 'PASS', open: 0 }], { startedAt: '2026-11-08T01:04:30Z' })
+  const ps = agentsOf(buildRequestGraph(tp, [LX, KL('c4-gp-a77777', '2026-11-08T01:08:30Z', 'PASS')]))
+  assert.deepEqual(ps.map(n => n.lines.at(-1)), ['Codex 판정 : 검증 Y', 'Codex 판정 : 검증 Y'])
+})
