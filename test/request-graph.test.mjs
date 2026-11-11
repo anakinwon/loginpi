@@ -680,6 +680,52 @@ test('원장 묶음 AND(codex-gate 파일 묶음 -p<N>) : 전부 PASS 일 때만
   assert.deepEqual(mergeParts([{ id: 'c4-a', rows: [] }]), [{ id: 'c4-a', rows: [] }])   // 묶음 없음 = 그대로
 })
 
+test('원장 묶음 이월(후속 과제 1 · c4-1-3-a6a80f D-001·D-002) : 묶음 합성 행 = 판정 실행(시각 묶음)마다 1행, 묶음마다 기준 시각 T(+허용오차) 시점 최신 확정 행 — 회차 번호·창 안팎 무관, 미래 행 금지, 이월 FAIL 은 N 유지, 확정 행 없으면 보류', () => {
+  const at = m => `2026-11-08T01:${m}:00Z`, L = (id, evs) => loop(id, evs.map(([iter, v, m]) => ({ iter, at: at(m), verdict: v, open: v === 'FAIL' ? 1 : 0 })), { startedAt: at('02') })
+  const Ls = (id, evs) => loop(id, evs.map(([iter, v, s]) => ({ iter, at: `2026-11-08T${s}Z`, verdict: v, open: v === 'FAIL' ? 1 : v === 'BLOCKED' ? null : 0, ...(v === 'BLOCKED' ? { reason: 'scope-missing' } : {}) })), { startedAt: '2026-11-08T01:02:00Z' })
+  const bd = ag('anakin_phase-build', '2026-11-08T10:01:00+09:00')
+  const run = loops => node(buildRequestGraph(turn({ agents_detail: [bd] }), loops), '1.1.4.1')
+  // (a) 실데이터 c4-d-002-a5870f 형태(시각 = 실측 간격) : p1 [1 BLOCKED, 1 PASS, 2 PASS] · p2 [1 FAIL, 2 PASS, 3 PASS] — 같은 판정 실행의 묶음끼리 1~3초 차
+  //     고치기 전 : 3회차 p1 '판정 없음' → BLOCKED 가 최종(검증 보류)
+  const c = run([Ls('c4-d-002-a5870f-p1', [[1, 'BLOCKED', '01:05:11'], [1, 'PASS', '01:15:21'], [2, 'PASS', '01:24:25']]), Ls('c4-d-002-a5870f-p2', [[1, 'FAIL', '01:05:14'], [2, 'PASS', '01:15:22'], [3, 'PASS', '01:24:27']])])
+  assert.deepEqual(c.rounds[0].rows.map(r => [r.iter, r.verdict]), [[1, 'FAIL'], [2, 'PASS'], [3, 'PASS']]); assert.equal(c.statusLabel, '검증 Y · 3회 만에 완료'); assert.equal(c.verdict.yn, 'Y'); assert.equal(c.verdict.fails, 1)
+  assert.ok(!JSON.stringify(c).includes('판정 없음')); assert.match(c.rounds[0].rows[0].state, /p1 BLOCKED · p2 FAIL/)
+  assert.equal(c.rounds[0].rows[2].t1, Date.parse('2026-11-08T01:24:27Z')); assert.equal(c.rounds[0].rows[2].t0, Date.parse('2026-11-08T01:15:21Z'))   // 시각 = 그 실행의 실제 판정 행 기준
+  // (b) 반대 : p1 [1 FAIL] · p2 [1 FAIL, 2 PASS] → 2회차 = p1 이월 FAIL(완화 아님) — 고치기 전 : BLOCKED
+  const n = run([L('c4-x-a1b2c3-p1', [[1, 'FAIL', '10']]), L('c4-x-a1b2c3-p2', [[1, 'FAIL', '11'], [2, 'PASS', '21']])])
+  assert.deepEqual(n.rounds[0].rows.map(r => r.verdict), ['FAIL', 'FAIL']); assert.equal(n.verdict.yn, 'N'); assert.match(n.rounds[0].rows[1].state, /p1 FAIL\(이월\) · p2 PASS/)
+  // (d) 창 밖 이월 : 요청 A 창(10:00~10:30) = p1 1 PASS · p2 1 FAIL, 요청 B 창(10:40~10:59) = p2 2 PASS 만 → B = 2회차 Y(회차 집계는 B 창 2회차만), A = 1회차 N 그대로 — 고치기 전 : B 보류
+  const ps = [L('c4-x-a1b2c3-p1', [[1, 'PASS', '10']]), L('c4-x-a1b2c3-p2', [[1, 'FAIL', '11'], [2, 'PASS', '45']])]
+  const B = node(buildRequestGraph(turn({ ts_req: '2026-11-08T10:40:00+09:00', ts_res: '2026-11-08T10:59:00+09:00', agents_detail: [ag('anakin_phase-build', '2026-11-08T10:41:00+09:00', { wrote: true })] }), ps), '1.1.4.1')
+  assert.equal(B.verdict.yn, 'Y', B.statusLabel); assert.deepEqual(B.rounds[0].rows.map(r => [r.iter, r.verdict]), [[2, 'PASS']]); assert.equal(B.verdict.fails, 0)
+  const A = run(ps); assert.deepEqual(A.rounds[0].rows.map(r => [r.iter, r.verdict]), [[1, 'FAIL']]); assert.equal(A.verdict.yn, 'N')
+  // (e) D-001 미래 반영 금지 : p1 은 이 요청 창 안에서 FAIL 뒤 BLOCKED 만, PASS 는 창 뒤(01:45) — 01:20 실행 시점 p1 최신 확정 = FAIL → N
+  //     고치기 전 : 회차 번호 이월(iter < 3)이 미래 PASS(01:45)를 집어 Y
+  const e = run([Ls('c4-x-a1b2c3-p1', [[1, 'FAIL', '01:05:00'], [2, 'BLOCKED', '01:15:00'], [2, 'BLOCKED', '01:20:00'], [2, 'PASS', '01:45:00']]), Ls('c4-x-a1b2c3-p2', [[1, 'FAIL', '01:05:01'], [2, 'PASS', '01:15:01'], [3, 'PASS', '01:20:01']])])
+  assert.equal(e.verdict.yn, 'N', e.statusLabel); assert.equal(e.rounds[0].rows.at(-1).verdict, 'FAIL'); assert.match(e.rounds[0].rows.at(-1).state, /p1 FAIL\(이월\) · p2 PASS/)
+  assert.ok(e.rounds[0].rows.every(r => r.t1 <= Date.parse('2026-11-08T01:30:00Z')))
+  // (f) D-002 같은 실행의 창 밖 확정 행 = 시각 대조 : p1 2 PASS(01:29:59 창 안) · p2 2 PASS(01:30:30 창 밖, 허용오차 안) → 2회차 PASS
+  //     고치기 전 : p2 2회차 행이 창 밖이라 앞 FAIL 이월 → N. 허용오차 밖(01:33:00) 행은 쓰지 않음 → N 유지
+  const f = t2 => run([Ls('c4-x-a1b2c3-p1', [[1, 'FAIL', '01:05:00'], [2, 'PASS', '01:29:59']]), Ls('c4-x-a1b2c3-p2', [[1, 'FAIL', '01:05:01'], [2, 'PASS', t2]])])
+  const f1 = f('01:30:30'); assert.equal(f1.verdict.yn, 'Y', f1.statusLabel); assert.deepEqual(f1.rounds[0].rows.map(r => [r.iter, r.verdict]), [[1, 'FAIL'], [2, 'PASS']])
+  const f2 = f('01:33:00'); assert.equal(f2.verdict.yn, 'N', f2.statusLabel); assert.match(f2.rounds[0].rows.at(-1).state, /p1 PASS · p2 FAIL\(이월\)/)
+})
+
+test('승인 4 출처(후속 과제 3) : 창 뒤 판정이 요청 B(FAIL)·C(PASS)에 걸치면 최종 판정 출처 = 최종 행이 있는 요청 C', () => {
+  const X = 'a9b49e0001', bx = (s, e, extra = {}) => ag('anakin_phase-build', Z(s), { agent_id: X, ts_end: Z(e), wrote: true, ...extra })
+  const A = { session_id: 's', turn: 96, ts_req: Z('01:00'), ts_res: Z('01:20'), req_head: 'A', agents_detail: [bx('01:01', '01:10')] }
+  const B = { session_id: 's', turn: 97, ts_req: Z('01:30'), ts_res: Z('02:00'), req_head: 'B', agents_detail: [bx('01:31', '01:50', { cont: true })] }
+  const C = { session_id: 's', turn: 98, ts_req: Z('02:10'), ts_res: Z('02:30'), req_head: 'C', agents_detail: [bx('02:11', '02:20', { cont: true })] }
+  const ev = (i, m, v) => ({ iter: i, at: Z(m), verdict: v, open: v === 'FAIL' ? 1 : 0 }), peers = [A, B, C], cx = ns => node(ns, '1.1.4.1')
+  // 창 안 판정 있음(최종 판정 이어받음) — 고치기 전 : '(요청 97)'
+  const L = loop('c4-build-a9b49e', [ev(1, '01:09', 'FAIL'), ev(2, '01:45', 'FAIL'), ev(3, '02:15', 'PASS')], { startedAt: Z('01:08') })
+  const a = cx(buildRequestGraph(A, [L], { peers }))
+  assert.equal(a.verdict.yn, 'Y'); assert.match(a.statusLabel, /최종 판정 이어받음\(요청 98\)/); assert.ok(a.chips.some(c => c.txt === '최종 판정 c4-build-a9b49e(요청 98) 3회 Y'))
+  // 창 안 판정 없음(이어받은 원장) — 같은 규칙
+  const L2 = loop('c4-build-a9b49e', [ev(1, '01:45', 'FAIL'), ev(2, '02:15', 'PASS')], { startedAt: Z('01:40') })
+  assert.match(cx(buildRequestGraph(A, [L2], { peers })).statusLabel, /^검증 Y · 이어받은 원장\(요청 98\)/)
+})
+
 // ── 2026-11-10 개정 : 턴 묶음 판정 폐지(과거 원장 무시) · 종료 승인 줄 = 기록용(Stop 훅 turn-gate.mjs 기록기) ──
 test('과거 원장 무시(2026-11-10 개정) : c1·c2·c3·c5·c6·c*-turn-*·비대상 에이전트 원장을 넣어도 노드·집계 불변, loadLoops = bundle- 제외 + gate.json agentType', () => {
   const key = 'f7dc16-1108100000'
@@ -1004,4 +1050,138 @@ test('승인 4 형제(R-P0) : 실행 상세 Codex 판정 — 자기 접미 원�
   const LX = loop('c4-build-a9b49e', [{ iter: 1, at: '2026-11-08T01:05:00Z', verdict: 'FAIL', open: 1 }, { iter: 2, at: '2026-11-08T01:09:59Z', verdict: 'PASS', open: 0 }], { startedAt: '2026-11-08T01:04:30Z' })
   const ps = agentsOf(buildRequestGraph(tp, [LX, KL('c4-gp-a77777', '2026-11-08T01:08:30Z', 'PASS')]))
   assert.deepEqual(ps.map(n => n.lines.at(-1)), ['Codex 판정 : 검증 Y', 'Codex 판정 : 검증 Y'])
+})
+
+// ── 지연 분석 P3 : 생성기 단일 실행 잠금(runOnce) · 하네스 캐시 중간 저장 ─────────────────────────
+// RG = 네임스페이스 import(고치기 전 = 내보내기 없음 → 해당 시험만 실패), 실행 시험 = 격리 루트(WORKSPACE_ROOT·WORK_HISTORY_DIR·TOOLDASH_HOME)에서 생성기를 실제로 띄움
+import * as RG from '../scripts/request-graph.mjs'
+const RG_JS = fileURLToPath(new URL('../scripts/request-graph.mjs', import.meta.url))
+const rgWs = () => { const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-lock-')), lockDir = path.join(ws, 'loginpi', '.omc', 'state', 'request-graph'); fs.mkdirSync(lockDir, { recursive: true }); return { ws, lockDir, lock: path.join(lockDir, 'run.lock'), dirty: path.join(lockDir, 'run.dirty'), out: path.join(ws, 'o.html') } }
+const rgRun = (w, args = [], extra = {}) => { const env = { ...process.env, WORKSPACE_ROOT: w.ws, WORK_HISTORY_DIR: path.join(w.ws, 'wh'), TOOLDASH_HOME: path.join(w.ws, 'home'), ...extra }; if (!extra.CODEX_GATE_ACTIVE) delete env.CODEX_GATE_ACTIVE; return spawnSync(process.execPath, [RG_JS, '--out', w.out, ...args], { encoding: 'utf8', env, windowsHide: true }) }
+const holdLock = (w, pid = process.pid, ageMs = 0) => { fs.writeFileSync(w.lock, JSON.stringify({ pid, at: new Date().toISOString() })); if (ageMs) { const t = new Date(Date.now() - ageMs); fs.utimesSync(w.lock, t, t) } return fs.readFileSync(w.lock, 'utf8') }
+
+test('P3 잠금 : 살아 있는 잠금이면 두 번째 실행은 run.dirty 만 남기고 즉시 종료 0(산출물 안 씀·잠금 그대로)', () => {
+  const w = rgWs()
+  try {
+    const body = holdLock(w), r = rgRun(w)
+    assert.equal(r.status, 0, r.stderr); assert.match(r.stdout, /다른 생성기 실행 중/)
+    assert.ok(fs.existsSync(w.dirty), 'dirty 예약'); assert.ok(!fs.existsSync(w.out), '계산·쓰기 안 함'); assert.equal(fs.readFileSync(w.lock, 'utf8'), body, '남의 잠금 유지')
+  } finally { fs.rmSync(w.ws, { recursive: true, force: true }) }
+})
+
+test('P3 잠금 : 5분 넘은 잠금·죽은 pid 잠금은 무시하고 실행, 끝나면 잠금 삭제', () => {
+  const dead = spawnSync(process.execPath, ['-e', 'process.stdout.write(String(process.pid))'], { encoding: 'utf8' }).stdout
+  for (const [pid, age, why] of [[process.pid, RG.LOCK_STALE_MS + 60e3, '5분 초과'], [+dead, 0, '죽은 pid']]) {
+    const w = rgWs()
+    try {
+      holdLock(w, pid, age); const r = rgRun(w)
+      assert.equal(r.status, 0, r.stderr); assert.ok(fs.existsSync(w.out), `${why} = 실행`); assert.ok(!fs.existsSync(w.lock), `${why} = 끝나면 잠금 삭제`); assert.ok(!fs.existsSync(w.dirty))
+    } finally { fs.rmSync(w.ws, { recursive: true, force: true }) }
+  }
+})
+
+test('P3 잠금 : --design-only·CODEX_GATE_ACTIVE(판정 증거) 는 잠금이 있어도 실행하고 잠금·dirty 를 건드리지 않는다', () => {
+  for (const [args, extra] of [[['--design-only'], {}], [[], { CODEX_GATE_ACTIVE: '1' }]]) {
+    const w = rgWs()
+    try {
+      const body = holdLock(w), r = rgRun(w, args, extra)
+      assert.equal(r.status, 0, r.stderr); assert.ok(fs.existsSync(w.out), `${args.join(' ') || 'CODEX_GATE_ACTIVE'} = 실행`)
+      assert.equal(fs.readFileSync(w.lock, 'utf8'), body); assert.ok(!fs.existsSync(w.dirty))
+    } finally { fs.rmSync(w.ws, { recursive: true, force: true }) }
+  }
+})
+
+test('P3 runOnce : 실행 중 dirty 가 생기면 1회만 다시 실행(두 번째 실행 중 또 생겨도 1회), 잠금은 끝나면 삭제', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-once-')), dirty = path.join(dir, 'run.dirty')
+  try {
+    assert.equal(typeof RG.runOnce, 'function', 'runOnce 내보내기')
+    let n = 0; assert.equal(RG.runOnce(() => { if (++n === 1) fs.writeFileSync(dirty, '') }, dir), 2); assert.equal(n, 2)
+    assert.ok(!fs.existsSync(path.join(dir, 'run.lock'))); assert.ok(!fs.existsSync(dirty))
+    n = 0; assert.equal(RG.runOnce(() => { n++; fs.writeFileSync(dirty, '') }, dir), 2); assert.equal(n, 2, '1회만')
+    n = 0; assert.equal(RG.runOnce(() => n++, dir), 1); assert.equal(n, 1, '앞 실행이 남긴 dirty = 이번 실행이 반영(연쇄 재실행 없음)')
+    fs.writeFileSync(path.join(dir, 'run.lock'), JSON.stringify({ pid: process.pid })); n = 0
+    assert.equal(RG.runOnce(() => n++, dir), 0); assert.equal(n, 0); assert.ok(fs.existsSync(dirty))
+    assert.equal(RG.runOnce(() => n++, dir, { skip: true }), 1); assert.equal(n, 1, 'skip = 잠금 무관')
+  } finally { fs.rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('P3 하네스 캐시 중간 저장 : 새로 계산 10개마다 저장 — 23번째에서 끊겨도 저장분 20개는 다음 실행이 재사용(5개만 계산)', () => {
+  const ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-mid-')), sub = path.join(ses, 's1', 'subagents'), cache = path.join(ses, 'cache.json')
+  try {
+    fs.mkdirSync(sub, { recursive: true })
+    const ids = Array.from({ length: 25 }, (_, i) => `a${String(i).padStart(3, '0')}`)
+    for (const id of ids) fs.writeFileSync(path.join(sub, `agent-${id}.jsonl`), JSON.stringify({ type: 'assistant', message: { content: [] } }) + '\n')
+    const T = () => [{ session_id: 's1', agents_detail: ids.map(agent_id => ({ agent_id, type: 'anakin_phase-build' })) }]
+    let calls = 0
+    assert.throws(() => loadAgentHarness(T(), ses, cache, { attribute: () => { if (++calls === 23) throw new Error('끊김(Stop 60초 모사)'); return { files: [] } } }))
+    calls = 0; loadAgentHarness(T(), ses, cache, { attribute: () => { calls++; return { files: [] } } })
+    assert.equal(calls, 25 - 2 * (RG.HARNESS_SAVE_EVERY ?? Infinity), '저장분 재사용')
+    assert.equal(Object.keys(JSON.parse(fs.readFileSync(cache, 'utf8'))).length, 25, '마지막 = 전체 저장')
+  } finally { fs.rmSync(ses, { recursive: true, force: true }) }
+})
+
+// c4-build-aec463 회송 : D-001 낡은 잠금 동시 회수 · D-002 잠금 생성 오류 = 계산 안 함
+// D-001 기대(메인 지시 변경 — 잠금 = 성능용 최선 노력) : 낡은 잠금 동시 회수 경합에서는 계산 2회까지 허용(결과 = 같은 파일 같은 내용 덮어쓰기, 캐시 원자 쓰기,
+//   판정 증거 실행 CODEX_GATE_ACTIVE 는 잠금 무관 → 정확성 무관). 지키는 것 = 계산 ≤ 2회 · 끝난 뒤 잠금·stale 잔존 없음
+// 순서 강제 = 공유 fs 객체의 unlinkSync·rmSync·renameSync 를 감싸 '낡음 판단 뒤 첫 회수 동작' 직전에 끼어든 실행을 돌린다
+const deadPid = () => +spawnSync(process.execPath, ['-e', 'process.stdout.write(String(process.pid))'], { encoding: 'utf8' }).stdout
+const cutIn = (lock, fire) => {
+  const ks = ['unlinkSync', 'rmSync', 'renameSync'], o = Object.fromEntries(ks.map(k => [k, fs[k]])); let done = false
+  const hit = p => { if (!done && path.resolve(String(p)) === path.resolve(lock)) { done = true; fire() } }
+  for (const k of ks) fs[k] = (p, ...a) => { hit(p); return o[k](p, ...a) }
+  return () => { for (const k of ks) fs[k] = o[k] }
+}
+
+test('D-001 낡은 잠금 동시 회수(최선 노력) : 회수 직전에 다른 실행이 끼어들어도(끝까지 실행 / 새 잠금을 잡고 실행 중) 계산 ≤ 2회, 끝난 뒤 잠금·stale 잔존 없음', () => {
+  for (const mode of ['끝까지 실행', '잡고 실행 중']) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-race-')), lock = path.join(dir, 'run.lock')
+    let calls = 0
+    fs.writeFileSync(lock, JSON.stringify({ pid: deadPid(), at: '2026-11-11T00:00:00Z' }))   // 죽은 pid = 낡은 잠금
+    const undo = cutIn(lock, () => {
+      if (mode === '끝까지 실행') RG.runOnce(() => calls++, dir)
+      else { fs.rmSync(lock, { force: true }); fs.writeFileSync(lock, JSON.stringify({ pid: process.pid, at: new Date().toISOString() })); calls++ }   // 다른 실행이 회수해 잡고 계산 중
+    })
+    try {
+      const n = RG.runOnce(() => calls++, dir)
+      assert.ok(n >= 0 && calls >= 1 && calls <= 2, `${mode} : 계산 ${calls}회(≤ 2)`)
+      assert.deepEqual(fs.readdirSync(dir).filter(f => f === 'run.lock' || f.includes('.stale-')), [], `${mode} : 잠금·stale 잔존 없음`)
+    } finally { undo(); fs.rmSync(dir, { recursive: true, force: true }) }
+  }
+})
+
+test('D-002 잠금 생성 오류(EEXIST 밖) : 계산 0회 — runOnce -1·stderr 한 줄, 생성기 실행은 종료 0(산출물 안 씀)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-err-')), blocker = path.join(dir, 'blocker')
+  try {
+    fs.writeFileSync(blocker, '')   // 상태 폴더 자리를 파일로 막음 → mkdir·openSync ENOTDIR
+    let calls = 0; assert.equal(RG.runOnce(() => calls++, path.join(blocker, 'rg')), -1); assert.equal(calls, 0)
+    assert.equal(typeof RG.takeLock, 'function'); assert.equal(RG.takeLock(path.join(blocker, 'run.lock')), 'error')   // openSync ENOTDIR
+    const w = rgWs(); try {
+      fs.rmSync(path.join(w.ws, 'loginpi', '.omc', 'state'), { recursive: true, force: true }); fs.writeFileSync(path.join(w.ws, 'loginpi', '.omc', 'state'), '')
+      const r = rgRun(w)
+      assert.equal(r.status, 0, r.stderr); assert.match(r.stderr, /잠금 획득 실패/); assert.ok(!fs.existsSync(w.out), '계산 안 함')
+    } finally { fs.rmSync(w.ws, { recursive: true, force: true }) }
+  } finally { fs.rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('c4-build-aec463-p1 D-001 캐시 원자 저장 : 저장 도중 중단(rename 직전 throw · 쓰기 도중 절반만 쓰고 throw)돼도 직전 확정 캐시가 그대로 남아 다음 실행이 재사용, 임시 파일 잔존 없음', () => {
+  const ses = fs.mkdtempSync(path.join(os.tmpdir(), 'rg-atom-')), sub = path.join(ses, 's1', 'subagents'), cache = path.join(ses, 'cache.json')
+  try {
+    fs.mkdirSync(sub, { recursive: true })
+    const mk = n => Array.from({ length: n }, (_, i) => `a${String(i).padStart(3, '0')}`), body = JSON.stringify({ type: 'assistant', message: { content: [] } }) + '\n'
+    for (const id of mk(35)) fs.writeFileSync(path.join(sub, `agent-${id}.jsonl`), body)
+    const T = ids => [{ session_id: 's1', agents_detail: ids.map(agent_id => ({ agent_id, type: 'anakin_phase-build' })) }]
+    let calls = 0; const attribute = () => { calls++; return { files: [] } }
+    loadAgentHarness(T(mk(25)), ses, cache, { attribute }); const done = fs.readFileSync(cache, 'utf8')   // 직전 확정 캐시(25개)
+    const o = { mv: fs.renameSync, wr: fs.writeFileSync }, isTmp = p => String(p).startsWith(cache)
+    for (const [why, patch] of [
+      ['rename 직전 throw', () => { fs.renameSync = (p, ...a) => { if (isTmp(p)) throw new Error('중단(rename 직전)'); return o.mv(p, ...a) } }],
+      ['쓰기 도중 중단', () => { fs.writeFileSync = (p, d, ...a) => { if (isTmp(p)) { o.wr(p, String(d).slice(0, 20)); throw new Error('중단(쓰기 도중)') } return o.wr(p, d, ...a) } }],
+    ]) {
+      patch()
+      try { loadAgentHarness(T(mk(35)), ses, cache, { attribute }) } finally { fs.renameSync = o.mv; fs.writeFileSync = o.wr }   // 새 10개 = 중간 저장 + 최종 저장 모두 중단
+      assert.equal(fs.readFileSync(cache, 'utf8'), done, `${why} : 직전 확정 캐시 그대로`)
+      calls = 0; loadAgentHarness(T(mk(25)), ses, cache, { attribute }); assert.equal(calls, 0, `${why} : 확정분 재사용`)
+      assert.deepEqual(fs.readdirSync(ses).filter(f => f.endsWith('.tmp')), [], `${why} : 임시 파일 잔존 없음`)
+    }
+  } finally { fs.rmSync(ses, { recursive: true, force: true }) }
 })
