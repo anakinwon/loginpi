@@ -739,6 +739,27 @@ test('도구 기록 번호·toolsMd : scope 파일 Edit #3 뒤 Bash #4 → 머�
   assert.deepEqual(sh.at(-1).writes, ['docs/scope.md']); assert.match(cg.toolsMd(sh, ['docs/scope.md']), /마지막 쓰기 = #6\n/)
 })
 
+test('toolsMd 실행 증거 출력 확대(2026-11-12 c4-build-a9fc9b) : #K 이후 40줄 = 생략 없음·400자 보존, #K 이전 40줄 = 앞 2 + 끝 8, 150줄 초과 = 앞 30 + 끝 120, 비밀 가림 유지', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs'), cv = await import('../scripts/codex-verify.mjs')
+  const T = '2026-11-12T01:00:00Z', use = (id, name, input) => ({ type: 'assistant', timestamp: T, message: { content: [{ type: 'tool_use', id, name, input }] } })
+  const res = (id, lines) => ({ type: 'user', timestamp: T, message: { content: [{ type: 'tool_result', tool_use_id: id, content: lines.join('\n') }] } })
+  const sec = 'ghp_' + 'B'.repeat(30), L = (p, n, w = 397) => Array.from({ length: n }, (_, i) => `${p}${i + 1} ` + 'y'.repeat(w))
+  const after = L('후', 40); after[20] = `비밀 ${sec}`
+  const recs = [use('t1', 'Bash', { command: 'echo before' }), res('t1', L('전', 40)), use('t2', 'Edit', { file_path: 'docs/scope.md' }),
+    use('t3', 'Bash', { command: 'node --test' }), res('t3', after), use('t4', 'Bash', { command: 'node big.mjs' }), res('t4', L('큰', 200, 10))]   // 전체 C.toolsMax(60000자) 안
+  const md = cg.toolsMd(cg.toolEntries(recs, 'build'), ['docs/scope.md'])
+  const outOf = n => md.split(/\n(?=#\d+ )/).find(s => s.startsWith(`#${n} `)).split('\n    → ').slice(1)
+  assert.match(md, /마지막 쓰기 = #2\n/)
+  const b = outOf(1); assert.equal(b.length, 11); assert.deepEqual(b.slice(0, 3), [('전1 ' + 'y'.repeat(397)).slice(0, 200), ('전2 ' + 'y'.repeat(397)).slice(0, 200), '…(가운데 30줄 생략)'])   // #K 이전 = 앞 2 + 끝 8, 200자
+  const a = outOf(3); assert.equal(a.length, 40); assert.ok(!a.some(l => l.includes('생략')) && a[0] === '후1 ' + 'y'.repeat(397) && a[0].length === 400)   // #K 이후 = 생략 없음·400자 보존
+  assert.ok(!md.includes(sec) && a[20].includes('[REDACTED'), a[20])   // 비밀 가림
+  const g = outOf(4); assert.equal(g.length, 151); assert.equal(g[30], '…(가운데 50줄 생략)'); assert.equal(g[29].slice(0, 4), '큰30 '); assert.equal(g[31].slice(0, 4), '큰81 '); assert.equal(g.at(-1).slice(0, 5), '큰200 ')   // 150줄 초과 = 앞 30 + 끝 120
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-tm2-'))
+  try { fs.writeFileSync(path.join(d, 'tools.md'), md); const ix = cv.execIndex(d); assert.ok(ix.refs.has('tools.md#3') && ix.refs.has('tools.md#4') && !ix.refs.has('tools.md#1')) } finally { fs.rmSync(d, { recursive: true, force: true }) }
+})
+
 test('deployMd(임시 git 저장소) : \'pitel/\' + scope 라우트 pitel/page.tsx = 제외 1건 · \'/pitel/\' = 업로드 제외 0건 · .vercelignore scope = 앱 빌드 경로 전수 · 앱 파일 없음 = 빈 글 / blobsOf = git hash-object · 없는 파일 = ZERO / 정적 import 0건', async () => {
   const fs = (await import('node:fs')).default, os = (await import('node:os')).default
   process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))

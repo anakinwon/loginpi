@@ -39,6 +39,7 @@ const C = {
   budgetMs: 560e3,          // 훅 timeout 600초 안 — --init·export·판정 전부
   minJudgeMin: 1,           // 남은 시간이 이보다 짧으면 판정하지 않고 BLOCKED(judge-unavailable) 기록
   briefMax: 20000, reportMax: 40000, srcMax: 30000,   // 증거 글자 상한(넘으면 앞뒤 보존·가운데 생략 — 래퍼 파일 본문 상한과 같은 규칙)
+  toolsMax: 60000,          // tools.md 글자 상한(2026-11-12 실행 증거 출력 확대) — 최악 3바이트/자 180KB + checks·deploy(실측 ≤ 13KB) < 래퍼 증거 상한 200KB, 적재 순서 checks → deploy → tools 라 잘리지 않음
   genMs: 90e3,              // 생성기 재실행(증거) 시간 상한
   envFlag: 'CODEX_GATE_ACTIVE',   // 훅이 띄운 프로세스 표식 — 재진입 금지
   legacy: 'anakin_phase-verify',  // 폐지된 판정 실행자 — 과거 실행이 끝나도 판정하지 않음(재판정 금지)
@@ -108,9 +109,12 @@ export const redact = x => scrub(String(x ?? '')).text.replace(ENV_RE, '$1[REDAC
 const SHELL = new Set(['Bash', 'PowerShell']), PATHS = new Set(['Read', 'Write', 'Edit', 'MultiEdit', 'NotebookEdit']), WRITE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit'])
 /**
  * 도구 사용 기록 줄(2026-11-10 c3-turn-f7dc16 AC-2 · c2-collect-ac25ad AC-2 — 이름만으로는 금지 행위·근거 명령을 판정할 수 없음) : 시각순 'HH:MM:SS 도구 [누구] : 상세'
- *   Bash·PowerShell = 명령 문자열(redact, 500자) + 출력 앞 2줄 + 끝 8줄(빈 줄 제외·겹치면 합침·가운데 생략 표식, redact, 줄당 200자 — 2026-11-11 P4 : 끝의 시험 요약·종료 줄이 증거에서 빠짐) / Read·Write·Edit = 경로만(본문·바꾼 글 제외) / Agent = 종류·설명 / SendMessage = 받는 쪽 / Grep·Glob = 패턴·경로 / 그 밖 = 이름만
+ *   Bash·PowerShell = 명령 문자열(redact, 500자) + 출력 발췌(빈 줄 제외·겹치면 합침·가운데 생략 표식, 모든 줄 redact)
+ *     line = 앞 2줄 + 끝 8줄·줄당 200자(2026-11-11 P4 : 끝의 시험 요약·종료 줄이 증거에서 빠짐)
+ *     long = 앞 30줄 + 끝 120줄·줄당 500자 — toolsMd 가 scope 마지막 쓰기 #K 이후(실행 증거로 인정되는 n ≥ K) 항목에만 씀(2026-11-12 c4-build-a9fc9b : 짧은 발췌로 실행 증거가 잘려 unverifiable 13·5회 FAIL)
+ *   Read·Write·Edit = 경로만(본문·바꾼 글 제외) / Agent = 종류·설명 / SendMessage = 받는 쪽 / Grep·Glob = 패턴·경로 / 그 밖 = 이름만
  */
-const outExcerpt = x => { const ls = redact(x).split('\n').filter(l => l.trim()).map(l => l.slice(0, 200)); return ls.length <= 10 ? ls : [...ls.slice(0, 2), `…(가운데 ${ls.length - 10}줄 생략)`, ...ls.slice(-8)] }
+const excerpt = (x, head, tail, w) => { const ls = redact(x).split('\n').filter(l => l.trim()).map(l => l.slice(0, w)); return ls.length <= head + tail ? ls : [...ls.slice(0, head), `…(가운데 ${ls.length - head - tail}줄 생략)`, ...ls.slice(-tail)] }
 /**
  * 번호 붙은 도구 기록(2026-11-12 실행 증거 규칙 — 판정자가 exec_ref 'tools.md#N' 으로 근거 명령을 가리킴) → [{ n, line, writes }]
  *   n = 1부터 tool_use 기록 순서 · line = '#<n> HH:MM:SS 도구 [누구] : 상세'(상세 = 위 규칙) · tool_result.is_error = 출력 첫 줄 앞 '[오류] '(래퍼가 met 근거에서 뺌)
@@ -123,20 +127,25 @@ export function toolEntries(recs, who = 'main', root = ROOT) {
   let n = 0
   return recs.flatMap(j => j?.type === 'assistant' && Array.isArray(j.message?.content) ? j.message.content.filter(b => b?.type === 'tool_use').map(b => {
     const t = Date.parse(j.timestamp), at = Number.isFinite(t) ? kst(t).slice(11) : '--:--:--', i = b.input || {}
-    const ex = out.has(b.id) ? outExcerpt(out.get(b.id)) : null, o = ex && (ex.length ? ex : ['(출력 없음)'])
-    if (o && err.has(b.id)) o[0] = `[오류] ${o[0]}`
-    const d = SHELL.has(b.name) ? `$ ${redact(String(i.command ?? '')).replace(/\s*\n\s*/g, ' ⏎ ').slice(0, 500)}${o ? `\n    → ${o.join('\n    → ')}` : ''}`
+    const sh = (head, tail, w) => {
+      const ex = out.has(b.id) ? excerpt(out.get(b.id), head, tail, w) : null, o = ex && (ex.length ? ex : ['(출력 없음)'])
+      if (o && err.has(b.id)) o[0] = `[오류] ${o[0]}`
+      return `$ ${redact(String(i.command ?? '')).replace(/\s*\n\s*/g, ' ⏎ ').slice(0, 500)}${o ? `\n    → ${o.join('\n    → ')}` : ''}`
+    }
+    const pre = `#${n + 1} ${at} ${b.name} [${who}]`
+    const d = SHELL.has(b.name) ? sh(2, 8, 200)
       : PATHS.has(b.name) ? String(i.file_path || i.notebook_path || '') : b.name === 'Agent' || b.name === 'Task' ? `${i.subagent_type || 'general-purpose'} — ${String(i.description || '').slice(0, 80)}`
         : b.name === 'SendMessage' ? `→ ${i.to || '?'}` : b.name === 'Grep' || b.name === 'Glob' ? redact(`${i.pattern || ''} ${i.path || ''}`).trim().slice(0, 200) : ''
     const ws = WRITE_TOOLS.has(b.name) ? [String(i.file_path || i.notebook_path || '')] : SHELL.has(b.name) ? [...shellWrites(i.command, root)] : []
-    return { n: ++n, line: `#${n} ${at} ${b.name} [${who}]${d ? ' : ' + d : ''}`, writes: [...new Set(ws.map(p => p && relOf(p, root)).filter(Boolean))] }
+    return { n: ++n, line: `${pre}${d ? ' : ' + d : ''}`, ...(SHELL.has(b.name) ? { long: `${pre} : ${sh(30, 120, 500)}` } : {}), writes: [...new Set(ws.map(p => p && relOf(p, root)).filter(Boolean))] }
   }) : [])
 }
 export const toolLines = (recs, who = 'main') => toolEntries(recs, who).map(e => e.line)
-/** 증거 tools.md 본문 — 머리 끝 'scope 파일 마지막 쓰기 = #K'(K = writes 가 scope 파일과 겹치는 항목 번호 최댓값, 없으면 0 — 래퍼 execIndex 가 N ≥ K 셸 항목만 실행 증거로 인정) */
+/** 증거 tools.md 본문 — 머리 끝 'scope 파일 마지막 쓰기 = #K'(K = writes 가 scope 파일과 겹치는 항목 번호 최댓값, 없으면 0 — 래퍼 execIndex 가 N ≥ K 셸 항목만 실행 증거로 인정)
+ *   n ≥ K 셸 항목 = long(앞 30·끝 120줄·500자), 그 전 = line(앞 2·끝 8줄·200자) — 전체는 C.toolsMax 앞뒤 보존 */
 export function toolsMd(entries = [], files = []) {
   const set = new Set(files), k = Math.max(0, ...entries.filter(e => e.writes.some(w => set.has(w))).map(e => e.n))
-  return `## 도구 사용 기록(시각순 — Bash·PowerShell = 명령 + 출력 앞 2줄·끝 8줄, 비밀 가림 / 파일 도구 = 경로만) — scope 파일 마지막 쓰기 = #${k}\n${capMid(entries.map(e => e.line).join('\n') || '(도구 사용 없음)', C.srcMax)}\n`
+  return `## 도구 사용 기록(시각순 — Bash·PowerShell = 명령 + 출력(#${k} 이후 = 앞 30줄·끝 120줄·줄당 500자, 그 전 = 앞 2줄·끝 8줄·줄당 200자), 비밀 가림 / 파일 도구 = 경로만) — scope 파일 마지막 쓰기 = #${k}\n${capMid(entries.map(e => e.n >= k && e.long ? e.long : e.line).join('\n') || '(도구 사용 없음)', C.toolsMax)}\n`
 }
 /** 상한 넘는 글 = 앞뒤 보존·가운데 생략(래퍼 fileBlock 과 같은 분할 규칙 — 첫 지시·마지막 응답을 둘 다 남긴다) */
 export const capMid = (x, n) => { x = String(x || ''); if (x.length <= n) return x; const h = Math.floor(n / 2); return x.slice(0, h) + `\n…[가운데 ${x.length - n}자 생략 — 상한 ${n}자, 앞뒤 보존]…\n` + x.slice(-h) }
@@ -443,7 +452,7 @@ export function costOf(f, ref, root = ROOT) {
  */
 export const budgetOf = ({ contract = 0, evidence = W.evidence } = {}) => Math.max(C.minBudget, W.prompt - HEAD_BYTES - contract - Math.min(evidence + C.refMax * 3, W.evidence) - C.reserve)
 /** 첫 판정 증거 추정(writeEvidence 와 같은 상한) = 보고 + 도구 기록 + 파일 목록·diff stat(2만)·생성물 */
-const evidenceBytesOf = ctx => Buffer.byteLength(capMid(ctx.report || '', C.reportMax)) + Buffer.byteLength(capMid((ctx.toolLog || []).map(e => e.line).join('\n'), C.srcMax)) + 24e3
+const evidenceBytesOf = ctx => Buffer.byteLength(capMid(ctx.report || '', C.reportMax)) + Buffer.byteLength(toolsMd(ctx.toolLog || [])) + 24e3   // files 없음 = K 0 = 전 항목 long(상한 쪽 추정)
 /** 재판정 고정 구획 실측 = 원장 계약 + 마지막 증거 폴더 */
 const lastEvidence = d => { try { return fs.readdirSync(d).filter(f => /^evidence-\d+$/.test(f)).sort((a, b) => +b.slice(9) - +a.slice(9))[0] || null } catch { return null } }
 export function sizesOf(dir) {
