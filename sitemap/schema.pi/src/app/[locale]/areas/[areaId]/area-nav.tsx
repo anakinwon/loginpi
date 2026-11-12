@@ -14,7 +14,7 @@
 //     서브 메뉴 = 메인 메뉴 바로 위, 묶음 기준 정렬(마스터 지시 2026-10-18) : 표준사전 = 묶음 왼쪽 끝에 맞춤, 모델·설정 = 묶음 오른쪽 끝에 맞춤(화면 끝 안쪽으로)
 //   · 요금제 = 설정 오른쪽 독립 메인 메뉴, 권한 무관(멤버면 항상 — 결제 전에도 들어가야 함, 마스터 지시 2026-10-19)
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
-//  접기·펼치기 = 화면 아래 가운데 같은 자리의 작은 화살표 탭(마스터 2026-11-12) — 접힘 = 탭만 살짝, 펼침 = 같은 탭 + 메뉴 알약만(나머지 투명·클릭 통과, 마스터 2026-11-12). 접힘 탭은 맨 아래에서 12px 띄움(2026-11-02 Pi Browser 하단 제스처 바 가림 사고)
+//  접기·펼치기 = 화면 아래 가운데 같은 자리의 작은 화살표 탭(마스터 2026-11-12) — 접힘 = 탭만 살짝, 펼침 = 같은 탭 + 서브 바 + 플로팅 메뉴 카드(나머지 투명·클릭 통과, 본문이 메뉴 뒤로 스크롤 — 마스터 2026-11-12). 접힘 탭은 맨 아래에서 12px 띄움(2026-11-02 Pi Browser 하단 제스처 바 가림 사고)
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -155,8 +155,8 @@ const REST: Item[] = [
 // 요금제 — 권한 무관 독립 메뉴(설정 오른쪽)
 const PLAN_ITEM: Item = { seg: 'plan', nm: 'plan', icon: I.plan }
 
-// 메뉴 묶음 — 묶음마다 반투명 알약 바탕, 묶음 밖은 투명·클릭 통과(마스터 2026-11-12 — 펼침도 접힘처럼 메뉴만 보이게)
-const group = 'pointer-events-auto flex shrink-0 gap-0.5 rounded-lg border border-line bg-surface/85 p-0.5 shadow-1'
+// 메뉴 묶음 — 플로팅 카드 안에서 묶음 사이 헤어라인만
+const group = 'flex shrink-0 gap-0.5 [&+&]:border-s [&+&]:border-line [&+&]:ps-2'
 // ?tab= 이 없을 때 화면별 기본 탭
 const DEF_TAB: Record<string, string> = {
   model: 'prj',
@@ -166,8 +166,6 @@ const DEF_TAB: Record<string, string> = {
 // 메인 메뉴 = 3D 키캡 아이콘 위 + 작은 글씨 아래, 현재 메뉴 = 남색 키 + 진한 글자
 const tab = (on: boolean) =>
   `group flex min-w-14 flex-col items-center gap-1 rounded-control px-1.5 pt-1.5 pb-1 text-xs transition-colors ${on ? 'font-medium text-ink' : 'text-ink-2 hover:text-ink'}`
-// 접기·펼치기 탭 눌림 높이(px) = 단추 h-8(32, Pi Browser 터치 최소) — 보이는 탭은 아래 20px, 위 12px 는 투명 눌림 영역
-const TAB_HIT = 32
 
 export default function AreaNav() {
   const { areaId } = useParams<{ areaId: string }>()
@@ -259,14 +257,14 @@ export default function AreaNav() {
       ro.disconnect()
     }
   }, [pathname, curTab, perms, active?.seg, fold])
-  // 메뉴 높이(서브 바 유무·화면 폭에 따라 바뀜) → :root --area-nav-h. 펼침 = nav 위로 튀어나온 가운데 탭(눌림 영역 TAB_HIT)까지 더해 본문(페이지네이션)이 탭에 가리지 않게, 접힘 = 0(본문이 화면 맨 아래까지 — 탭만 본문 위에 뜸, 마스터 2026-11-12)
+  // 메뉴 높이(탭·서브 바·카드, 화면 폭에 따라 바뀜) → :root --area-nav-h = 본문 틀의 아래 여백(layout — 틀은 화면 맨 아래까지, 끝 내용·페이지네이션만 메뉴 위로 스크롤돼 올라옴), 접힘 = 0(탭만 본문 위에 뜸, 마스터 2026-11-12)
   useEffect(() => {
     const nav = navRef.current
     if (!nav) return
     const set = () =>
       document.documentElement.style.setProperty(
         '--area-nav-h',
-        `${fold ? 0 : nav.offsetHeight + TAB_HIT}px`,
+        `${fold ? 0 : nav.offsetHeight}px`,
       )
     set()
     const ro = new ResizeObserver(set)
@@ -295,23 +293,23 @@ export default function AreaNav() {
     <nav
       ref={navRef}
       aria-label={t('label')}
-      className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 ${fold ? 'flex justify-center pb-[max(12px,env(safe-area-inset-bottom))]' : 'touch-manipulation pb-[max(4px,env(safe-area-inset-bottom))]'}`}
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex touch-manipulation flex-col items-center pb-[max(12px,env(safe-area-inset-bottom))]"
     >
-      {/* 접기·펼치기 탭 = 화면 아래 가운데 같은 자리(마스터 2026-11-12) — 접힘 = 탭만 본문 위에 뜸(nav 는 투명·클릭 통과·본문 예약 0, 탭 바탕 85% 불투명, 맨 아래에서 12px 띄워 Pi Browser 하단 제스처 바에 가리지 않게 — 2026-11-02), 펼침 = 메뉴 위 가운데 같은 모양 탭(nav 바탕·테두리 없음 — 메뉴 묶음·서브 바만 반투명 바탕). 단추 = 56×32 눌림 영역, 보이는 탭 = 아래 56×20 */}
+      {/* 플로팅 메뉴(마스터 2026-11-12) — nav 는 투명·클릭 통과, 보이는 것 = 접기·펼치기 탭·서브 바·메뉴 카드만(각자 반투명 바탕), 맨 아래에서 12px 띄움(Pi Browser 하단 제스처 바 — 2026-11-02). 접힘 = 탭만, 펼침 = 같은 탭 아래 서브 바·메뉴 카드. 단추 = 56×32 눌림 영역, 보이는 탭 = 아래 56×20 */}
       <button
         type="button"
         onClick={toggle}
         aria-expanded={!fold}
         aria-label={fold ? (cur ? t('expandWith', { menu: t(cur.nm) }) : t('expand')) : t('collapse')}
         title={fold ? t('expand') : t('collapse')}
-        className={`group pointer-events-auto flex h-8 w-14 touch-manipulation items-end justify-center ${fold ? '' : 'absolute bottom-full left-1/2 -translate-x-1/2'}`}
+        className="group pointer-events-auto flex h-8 w-14 touch-manipulation items-end justify-center"
       >
         <span className="flex h-5 w-14 items-center justify-center rounded-lg border border-line bg-surface/85 text-ink-2 shadow-1 transition-colors group-hover:bg-raised group-hover:text-ink">
           {fold ? <ChevronUp className="h-4 w-4" aria-hidden /> : <ChevronDown className="h-4 w-4" aria-hidden />}
         </span>
       </button>
       {!fold && active?.subs && (
-        <div className="relative h-10">
+        <div className="relative h-10 self-stretch">
           <ul
             ref={subRef}
             aria-label={t('subOf', { menu: t(active.nm) })}
@@ -336,10 +334,9 @@ export default function AreaNav() {
         </div>
       )}
       {!fold && (
-        <div className="flex items-center">
-          {/* 스크롤 영역 = 줄 전체 폭, 오른쪽 끝 24px 페이드 = 뒤에 메뉴가 더 있음 표시(pe-6 여백이라 끝까지 밀면 메뉴는 안 흐려짐) */}
-          <div ref={rowRef} className="min-w-0 flex-1 overflow-x-auto px-2 pt-1 pb-1 pe-6 [scrollbar-width:none] [mask-image:linear-gradient(to_right,black_calc(100%_-_24px),transparent)] rtl:[mask-image:linear-gradient(to_left,black_calc(100%_-_24px),transparent)]">
-            <div className="mx-auto flex w-max items-stretch gap-2 whitespace-nowrap">
+        // 메뉴 카드 = 내용 폭만큼 가운데, 좁으면 화면 양끝 8px 안쪽까지 넓어지고 카드 안에서 가로 스크롤
+        <div ref={rowRef} className="pointer-events-auto max-w-[calc(100%-16px)] overflow-x-auto rounded-xl border border-line bg-surface/85 px-2 py-1 shadow-2 [scrollbar-width:none]">
+            <div className="flex w-max items-stretch gap-2 whitespace-nowrap">
               {visible(SQLED).length > 0 && (
                 <ul aria-label={t('groupTech')} data-sub-align="item" className={group}>
                   {visible(SQLED).map(item)}
@@ -365,7 +362,6 @@ export default function AreaNav() {
                 {item(PLAN_ITEM)}
               </ul>
             </div>
-          </div>
         </div>
       )}
     </nav>
