@@ -135,6 +135,7 @@ const REST: Item[] = [
       // 설정 서브메뉴 × 요금제(마스터 표 2026-10-19) : 개발자 설정·이력 / 표준담당자 + 금칙어·일괄 / 모델러 + 표준 점검·리버스 / DA + 멤버·승인
       { seg: 'settings', nm: 'settings', perm: 'SET_VIEW' },
       { seg: 'history', nm: 'history', perm: 'SET_VIEW' },
+      { seg: 'pitel', nm: 'pitelCase', perm: 'SET_VIEW' }, // 스키마 생성 사례(Pi통신 과금 8단계 요약, 본문 = SET_VIEW API)
       { seg: 'forbidden', nm: 'forbidden', perm: 'BAN_VIEW' },
       {
         seg: 'bulk',

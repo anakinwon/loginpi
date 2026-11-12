@@ -142,6 +142,7 @@
     "sql": "SQL 편집기",
     "settings": "설정",
     "history": "이력",
+    "pitelCase": "생성 사례",
     "forbidden": "금칙어",
     "banBulk": "금칙어 일괄등록",
     "check": "표준 점검",
