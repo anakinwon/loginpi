@@ -259,14 +259,14 @@ export default function AreaNav() {
       ro.disconnect()
     }
   }, [pathname, curTab, perms, active?.seg, fold])
-  // 메뉴 높이(서브 바 유무·화면 폭에 따라 바뀜) → :root --area-nav-h. 펼침 = nav 위로 튀어나온 가운데 탭(눌림 영역 TAB_HIT)까지 더해 본문(페이지네이션)이 탭에 가리지 않게, 접힘 = 탭이 nav 안이라 nav 높이 그대로
+  // 메뉴 높이(서브 바 유무·화면 폭에 따라 바뀜) → :root --area-nav-h. 펼침 = nav 위로 튀어나온 가운데 탭(눌림 영역 TAB_HIT)까지 더해 본문(페이지네이션)이 탭에 가리지 않게, 접힘 = 0(본문이 화면 맨 아래까지 — 탭만 본문 위에 뜸, 마스터 2026-11-12)
   useEffect(() => {
     const nav = navRef.current
     if (!nav) return
     const set = () =>
       document.documentElement.style.setProperty(
         '--area-nav-h',
-        `${nav.offsetHeight + (fold ? 0 : TAB_HIT)}px`,
+        `${fold ? 0 : nav.offsetHeight + TAB_HIT}px`,
       )
     set()
     const ro = new ResizeObserver(set)
@@ -297,7 +297,7 @@ export default function AreaNav() {
       aria-label={t('label')}
       className={`fixed inset-x-0 bottom-0 z-40 ${fold ? 'pointer-events-none flex justify-center pb-[max(12px,env(safe-area-inset-bottom))]' : 'touch-manipulation border-t border-line bg-surface pb-[max(4px,env(safe-area-inset-bottom))]'}`}
     >
-      {/* 접기·펼치기 탭 = 화면 아래 가운데 같은 자리(마스터 2026-11-12) — 접힘 = 탭만 살짝(nav 는 투명·클릭 통과, 맨 아래에서 12px 띄워 Pi Browser 하단 제스처 바에 가리지 않게 — 2026-11-02), 펼침 = nav 윗 테두리 가운데에 붙은 탭(-mb-px 로 테두리와 이음). 단추 = 56×32 눌림 영역, 보이는 탭 = 아래 56×20 */}
+      {/* 접기·펼치기 탭 = 화면 아래 가운데 같은 자리(마스터 2026-11-12) — 접힘 = 탭만 본문 위에 뜸(nav 는 투명·클릭 통과·본문 예약 0, 탭 바탕 85% 불투명, 맨 아래에서 12px 띄워 Pi Browser 하단 제스처 바에 가리지 않게 — 2026-11-02), 펼침 = nav 윗 테두리 가운데에 붙은 탭(-mb-px 로 테두리와 이음). 단추 = 56×32 눌림 영역, 보이는 탭 = 아래 56×20 */}
       <button
         type="button"
         onClick={toggle}
@@ -306,7 +306,7 @@ export default function AreaNav() {
         title={fold ? t('expand') : t('collapse')}
         className={`group pointer-events-auto flex h-8 w-14 touch-manipulation items-end justify-center ${fold ? '' : 'absolute bottom-full left-1/2 -mb-px -translate-x-1/2'}`}
       >
-        <span className={`flex h-5 w-14 items-center justify-center border border-line bg-surface text-ink-2 transition-colors group-hover:bg-raised group-hover:text-ink ${fold ? 'rounded-lg shadow-1' : 'rounded-t-lg border-b-0'}`}>
+        <span className={`flex h-5 w-14 items-center justify-center border border-line text-ink-2 transition-colors group-hover:bg-raised group-hover:text-ink ${fold ? 'rounded-lg bg-surface/85 shadow-1' : 'rounded-t-lg border-b-0 bg-surface'}`}>
           {fold ? <ChevronUp className="h-4 w-4" aria-hidden /> : <ChevronDown className="h-4 w-4" aria-hidden />}
         </span>
       </button>
