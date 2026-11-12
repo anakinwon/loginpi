@@ -19,7 +19,9 @@ const C = {
   badRatio: 0.01, // 고아 1% 초과 FK 목록 기준
   top: 10,
 }
-const F = { state: path.join(ROOT, 'database/verify_state.json'), log: path.join(ROOT, 'database/verify.log') }
+// 컨테이너 — 기본 pitel-pg, 다른 컨테이너(환경변수 PITEL_CONTAINER, rebuild.mjs 가 넘김)는 진행 기록·로그를 따로(datagen/state = gitignore)
+const CT = process.env.PITEL_CONTAINER || 'pitel-pg'
+const F = CT === 'pitel-pg' ? { state: path.join(ROOT, 'database/verify_state.json'), log: path.join(ROOT, 'database/verify.log') } : { state: path.join(ROOT, `datagen/state/verify_${CT}.json`), log: path.join(ROOT, `database/verify_${CT}.log`) }
 const schema = arg('schema', 'chk_gen')
 const env = fs.readFileSync(path.join(ROOT, '.env.local'), 'utf8')
 const db = new URL(env.match(new RegExp(`^${arg('db', 'dev') === 'prod' ? 'PITEL_DB_URL' : 'PITEL_DEV_DB_URL'}=(.+)$`, 'm'))[1].trim()).pathname.slice(1)
@@ -27,7 +29,7 @@ const db = new URL(env.match(new RegExp(`^${arg('db', 'dev') === 'prod' ? 'PITEL
 // psql 1회 = 쿼리 1건(비동기 — 동시 실행용). -q 로 SET 출력 없음
 const psql = sql =>
   new Promise((res, rej) => {
-    const p = spawn('docker', ['exec', '-i', 'pitel-pg', 'psql', '-U', 'postgres', '-d', db, '-At', '-F', '|', '-q', '-v', 'ON_ERROR_STOP=1'], { windowsHide: true })
+    const p = spawn('docker', ['exec', '-i', CT, 'psql', '-U', 'postgres', '-d', db, '-At', '-F', '|', '-q', '-v', 'ON_ERROR_STOP=1'], { windowsHide: true })
     let out = ''
     let err = ''
     p.stdout.on('data', d => (out += d))

@@ -10,6 +10,9 @@ import { fileURLToPath } from 'node:url'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(HERE, '..')
+// 컨테이너 — 기본 pitel-pg, 재구축 시험 등 다른 컨테이너는 환경변수 PITEL_CONTAINER(rebuild.mjs 가 넘김). 다른 컨테이너의 state 파일은 이름 앞에 컨테이너명
+const CT = process.env.PITEL_CONTAINER || 'pitel-pg'
+const ST_PRE = CT === 'pitel-pg' ? '' : CT + '_'
 
 // 상수 — 볼륨·편향 기준(docs/06_datagen.md 와 같은 값)
 const C = {
@@ -270,7 +273,7 @@ function dbName(which) {
 
 function psql(db, sql) {
   return new Promise((res, rej) => {
-    const p = spawn('docker', ['exec', '-i', 'pitel-pg', 'psql', '-U', 'postgres', '-d', db, '-v', 'ON_ERROR_STOP=1', '-q', '-At'])
+    const p = spawn('docker', ['exec', '-i', CT, 'psql', '-U', 'postgres', '-d', db, '-v', 'ON_ERROR_STOP=1', '-q', '-At'])
     let out = ''
     let err = ''
     p.stdout.on('data', d => (out += d))
@@ -302,13 +305,29 @@ async function run() {
 
   const stDir = path.join(HERE, 'state')
   fs.mkdirSync(stDir, { recursive: true })
-  const stFile = path.join(stDir, `${db}_${schema}_${scale}.json`)
+  const stFile = path.join(stDir, `${ST_PRE}${db}_${schema}_${scale}.json`)
   const done = new Set(fs.existsSync(stFile) ? JSON.parse(fs.readFileSync(stFile, 'utf8')) : [])
   const queue = plans.flatMap(p => chunks(p).map(c => ({ ...c, p }))).filter(c => !done.has(c.id))
   const total = queue.length
   const fails = []
   const t0 = Date.now()
   let fin = 0
+  // state 원자적 쓰기(정지 중 반쯤 쓴 state 방지) — Windows 일시 잠금(EPERM·EBUSY·EACCES, Defender·색인기)은 짧게 쉬고 재시도, 끝내 실패하면 경고만
+  async function saveState() {
+    for (let i = 0; ; i++) {
+      try {
+        fs.writeFileSync(stFile + '.tmp', JSON.stringify([...done]))
+        fs.renameSync(stFile + '.tmp', stFile)
+        return true
+      } catch (e) {
+        if (!['EPERM', 'EBUSY', 'EACCES'].includes(e.code) || i >= 4) {
+          console.log(`경고 : state 기록 보류(${e.code || e.message}) — 다음 기록에 반영`)
+          return false
+        }
+        await new Promise(r => setTimeout(r, 200 * (i + 1)))
+      }
+    }
+  }
   console.log(`조각 ${total}개(완료 건너뜀 ${done.size}) · 테이블 ${plans.length} · 목표 ${plans.reduce((s, p) => s + p.n, 0).toLocaleString()}행 · 동시 ${jobs}`)
   async function worker() {
     while (queue.length) {
@@ -319,8 +338,7 @@ async function run() {
       try {
         await psql(db, sql)
         done.add(c.id)
-        fs.writeFileSync(stFile + '.tmp', JSON.stringify([...done])) // 원자적 쓰기 — 정지 중 반쯤 쓴 state 방지
-        fs.renameSync(stFile + '.tmp', stFile)
+        await saveState() // 기록 실패는 조각 실패가 아님(적재는 이미 커밋) — done 은 다음 기록에 반영
         console.log(`완료 ${c.id} ${new Date().toISOString()}`)
       } catch (e) {
         fails.push({ id: c.id, err: e.message })
@@ -331,7 +349,9 @@ async function run() {
     }
   }
   await Promise.all(Array.from({ length: jobs }, worker))
-  fs.writeFileSync(path.join(stDir, `${db}_${schema}_${scale}_fails.json`), JSON.stringify(fails, null, 2))
+  // 마지막 확정 기록 — 보류된 기록이 남지 않게. 이것도 실패하면 재실행 때 커밋된 조각을 다시 넣을 수 있으므로 실패 처리
+  if (total && !(await saveState())) { console.log('state 최종 기록 실패 — 재실행 전 state 파일 잠금 확인'); process.exitCode = 1 }
+  fs.writeFileSync(path.join(stDir, `${ST_PRE}${db}_${schema}_${scale}_fails.json`), JSON.stringify(fails, null, 2))
   console.log(`끝 · 성공 ${total - fails.length} · 실패 ${fails.length} · ${((Date.now() - t0) / 1000).toFixed(0)}초`)
   if (fails.length) process.exitCode = 1
 }
