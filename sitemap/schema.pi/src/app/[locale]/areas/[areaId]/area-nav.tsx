@@ -14,7 +14,7 @@
 //     서브 메뉴 = 메인 메뉴 바로 위, 묶음 기준 정렬(마스터 지시 2026-10-18) : 표준사전 = 묶음 왼쪽 끝에 맞춤, 모델·설정 = 묶음 오른쪽 끝에 맞춤(화면 끝 안쪽으로)
 //   · 요금제 = 설정 오른쪽 독립 메인 메뉴, 권한 무관(멤버면 항상 — 결제 전에도 들어가야 함, 마스터 지시 2026-10-19)
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
-//  접힘 = 전체 폭 44px 접힘 바(마스터 2026-11-02 Pi Browser 접힘 손잡이 가림 — 화면 맨 아래 16px 손잡이가 Android WebView 하단 제스처 바·브라우저 UI 에 덮임), 펼침 손잡이 눌림 영역 32×64px
+//  접기·펼치기 = 화면 아래 가운데 같은 자리의 작은 화살표 탭(마스터 2026-11-12) — 접힘 = 탭만 살짝, 펼침 = nav 윗 테두리 가운데 탭. 접힘 탭은 맨 아래에서 12px 띄움(2026-11-02 Pi Browser 하단 제스처 바 가림 사고)
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -166,6 +166,8 @@ const DEF_TAB: Record<string, string> = {
 // 메인 메뉴 = 3D 키캡 아이콘 위 + 작은 글씨 아래, 현재 메뉴 = 남색 키 + 진한 글자
 const tab = (on: boolean) =>
   `group flex min-w-14 flex-col items-center gap-1 rounded-control px-1.5 pt-1.5 pb-1 text-xs transition-colors ${on ? 'font-medium text-ink' : 'text-ink-2 hover:text-ink'}`
+// 접기·펼치기 탭 눌림 높이(px) = 단추 h-8(32, Pi Browser 터치 최소) — 보이는 탭은 아래 20px, 위 12px 는 투명 눌림 영역
+const TAB_HIT = 32
 
 export default function AreaNav() {
   const { areaId } = useParams<{ areaId: string }>()
@@ -257,14 +259,14 @@ export default function AreaNav() {
       ro.disconnect()
     }
   }, [pathname, curTab, perms, active?.seg, fold])
-  // 메뉴 높이(서브 바 유무·화면 폭에 따라 바뀜) → :root --area-nav-h
+  // 메뉴 높이(서브 바 유무·화면 폭에 따라 바뀜) → :root --area-nav-h. 펼침 = nav 위로 튀어나온 가운데 탭(눌림 영역 TAB_HIT)까지 더해 본문(페이지네이션)이 탭에 가리지 않게, 접힘 = 탭이 nav 안이라 nav 높이 그대로
   useEffect(() => {
     const nav = navRef.current
     if (!nav) return
     const set = () =>
       document.documentElement.style.setProperty(
         '--area-nav-h',
-        `${nav.offsetHeight}px`,
+        `${nav.offsetHeight + (fold ? 0 : TAB_HIT)}px`,
       )
     set()
     const ro = new ResizeObserver(set)
@@ -273,7 +275,7 @@ export default function AreaNav() {
       ro.disconnect()
       document.documentElement.style.removeProperty('--area-nav-h')
     }
-  }, [])
+  }, [fold])
 
   const item = (m: Item) => (
     <li key={m.seg}>
@@ -293,23 +295,21 @@ export default function AreaNav() {
     <nav
       ref={navRef}
       aria-label={t('label')}
-      className={`fixed inset-x-0 bottom-0 z-40 touch-manipulation border-t border-line bg-surface ${fold ? 'pb-[max(12px,env(safe-area-inset-bottom))]' : 'pb-[max(4px,env(safe-area-inset-bottom))]'}`}
+      className={`fixed inset-x-0 bottom-0 z-40 ${fold ? 'pointer-events-none flex justify-center pb-[max(12px,env(safe-area-inset-bottom))]' : 'touch-manipulation border-t border-line bg-surface pb-[max(4px,env(safe-area-inset-bottom))]'}`}
     >
-      {/* 접힘 = 전체 폭 접힘 바(44px, 바 전체가 눌림 영역) — 화면 맨 아래에서 띄워 Pi Browser 하단 제스처 바·브라우저 UI 에 가리지 않게(마스터 2026-11-02) */}
-      {fold && (
-        <button
-          type="button"
-          onClick={toggle}
-          aria-expanded={false}
-          aria-label={cur ? t('expandWith', { menu: t(cur.nm) }) : t('expand')}
-          title={t('expand')}
-          className="flex min-h-11 w-full items-center justify-center gap-2 px-3 text-xs text-ink-2 transition-colors hover:bg-raised hover:text-ink focus-visible:outline-offset-[-2px]"
-        >
-          {cur && <Icon3D icon={cur.icon} size="sm" on />}
-          <span className="truncate">{cur ? t(cur.nm) : t('expand')}</span>
-          <ChevronUp className="h-4 w-4 shrink-0" aria-hidden />
-        </button>
-      )}
+      {/* 접기·펼치기 탭 = 화면 아래 가운데 같은 자리(마스터 2026-11-12) — 접힘 = 탭만 살짝(nav 는 투명·클릭 통과, 맨 아래에서 12px 띄워 Pi Browser 하단 제스처 바에 가리지 않게 — 2026-11-02), 펼침 = nav 윗 테두리 가운데에 붙은 탭(-mb-px 로 테두리와 이음). 단추 = 56×32 눌림 영역, 보이는 탭 = 아래 56×20 */}
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={!fold}
+        aria-label={fold ? (cur ? t('expandWith', { menu: t(cur.nm) }) : t('expand')) : t('collapse')}
+        title={fold ? t('expand') : t('collapse')}
+        className={`group pointer-events-auto flex h-8 w-14 touch-manipulation items-end justify-center ${fold ? '' : 'absolute bottom-full left-1/2 -mb-px -translate-x-1/2'}`}
+      >
+        <span className={`flex h-5 w-14 items-center justify-center border border-line bg-surface text-ink-2 transition-colors group-hover:bg-raised group-hover:text-ink ${fold ? 'rounded-lg shadow-1' : 'rounded-t-lg border-b-0'}`}>
+          {fold ? <ChevronUp className="h-4 w-4" aria-hidden /> : <ChevronDown className="h-4 w-4" aria-hidden />}
+        </span>
+      </button>
       {!fold && active?.subs && (
         <div className="relative h-10">
           <ul
@@ -337,7 +337,7 @@ export default function AreaNav() {
       )}
       {!fold && (
         <div className="flex items-center">
-          {/* 스크롤 영역 = 접기 단추와 나란히(겹치지 않음), 오른쪽 끝 24px 페이드 = 뒤에 메뉴가 더 있음 표시(pe-6 여백이라 끝까지 밀면 메뉴는 안 흐려짐) */}
+          {/* 스크롤 영역 = 줄 전체 폭, 오른쪽 끝 24px 페이드 = 뒤에 메뉴가 더 있음 표시(pe-6 여백이라 끝까지 밀면 메뉴는 안 흐려짐) */}
           <div ref={rowRef} className="min-w-0 flex-1 overflow-x-auto px-2 pt-1 pb-1 pe-6 [scrollbar-width:none] [mask-image:linear-gradient(to_right,black_calc(100%_-_24px),transparent)] rtl:[mask-image:linear-gradient(to_left,black_calc(100%_-_24px),transparent)]">
             <div className="mx-auto flex w-max items-stretch gap-2 whitespace-nowrap">
               {visible(SQLED).length > 0 && (
@@ -366,17 +366,6 @@ export default function AreaNav() {
               </ul>
             </div>
           </div>
-          {/* 접기 단추 — 메인 줄 오른쪽 끝, 스크롤 영역 밖 형제(메뉴 타일을 덮지 않음, 2026-11-12 — 선 위 손잡이 폐지) */}
-          <button
-            type="button"
-            onClick={toggle}
-            aria-expanded
-            aria-label={t('collapse')}
-            title={t('collapse')}
-            className="btn-ghost btn-icon btn-sm me-1 shrink-0"
-          >
-            <ChevronDown aria-hidden />
-          </button>
         </div>
       )}
     </nav>
