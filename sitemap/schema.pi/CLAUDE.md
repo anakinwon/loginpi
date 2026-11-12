@@ -2,7 +2,7 @@
 
 데이터 표준사전 메타시스템(표준분류체계·표준단어·표준도메인·표준용어·승인·변경 이력). **loginpi 워크스페이스 멤버**(`sitemap/schema.pi`, 2026-10-16 dr-project에서 승계)이며, 루트 `loginpi/CLAUDE.md`의 규칙(Pi Browser 핵심가치·쿠키 OR `X-Pi-Token` 이중 경로·`redirect` 금지·DA 표준)을 먼저 적용한다. 배포 : Vercel 프로젝트 `schema`(Root Directory `sitemap/schema.pi`, 운영 브랜치 master, https://schem.vercel.app — Vercel 운영 브랜치 = master : 2026-11-04 확인, 2026-11-11 dpl 대조에서 schem 이 master `92f48233` 서빙)
 
-- 상위 7단계 계획(METAPi→ModelPi→PiErd→물리 구축→PiMig→PiCDC/PipeLine→PiAnal) : `docs/MASTER_ROADMAP.md`(단계별 앱 분리, METAPi = 이 앱) / 요구사항 정본 : `docs/PRD.md` / 일정·진행 현황 : `docs/ROADMAP.md` / 출발 근거 : `docs/requirement/reqst.md`(DA Wordict 분석서)
+- 상위 8단계 계획(METAPi→ModelPi→PiErd→물리 구축→QCPi→PiMig→PiCDC/PipeLine→PiAnal, 1~4단계 = schema.pi·5~8단계 = dbms.pi 주관, 2026-11-12) : `docs/MASTER_ROADMAP.md`(단계별 앱 분리, METAPi = 이 앱) / 요구사항 정본 : `docs/PRD.md` / 일정·진행 현황 : `docs/ROADMAP.md` / 출발 근거 : `docs/requirement/reqst.md`(DA Wordict 분석서)
 - 기능·규칙을 바꾸면 ROADMAP 해당 단계에 진행 기록 1줄을 같은 커밋으로 남긴다
 - 고객(마스터 아나킨)·서비스(파다완 아소카) R&R·재발 방지 정본 : `docs/RNR.md` / 장애 원인·결과 기록 : `docs/TROUBLESHOOT.md`
 

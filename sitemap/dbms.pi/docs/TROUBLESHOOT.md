@@ -83,7 +83,7 @@
 |---|---|---|---|
 | L36 | `/` ↔ `/en` 무한 왕복(57e26d3f), hreflang 헤더 16KB 로 미리보기 실패(726eb0d9) | 쿠키 미저장 환경에서 언어 감지 켬, locale 219개 × 응답 헤더 | `@pi/i18n` `createRouting` 그대로(언어 감지·쿠키·alternateLinks 끔) |
 | L37 | 셸 명령 큰따옴표 안 백틱이 명령으로 실행돼 문서 2줄 공백·빈 파일 3개(2026-11-01 dbms.pi 착수 중) | 문서 편집을 `node -e "..."` 로 하며 경로를 백틱으로 감쌈 | 문서·코드 편집은 Edit 도구 또는 작은따옴표 heredoc, 편집 뒤 `git status` 로 예상 밖 파일 확인 |
-| L38 | "Replica형(CDC) 배제" 판정을 파이프라인에도 적용할 뻔(MASTER_ROADMAP §4.6 주의) | DR 동기화와 ETL 적재 맥락 혼동 | PipeLine 설계 때 DR 판정을 근거로 쓰지 않는다 |
+| L38 | "Replica형(CDC) 배제" 판정을 파이프라인에도 적용할 뻔(MASTER_ROADMAP §4.7 주의 — 2026-11-12 8단계 개정 전 §4.6) | DR 동기화와 ETL 적재 맥락 혼동 | PipeLine 설계 때 DR 판정을 근거로 쓰지 않는다 |
 
 ## 2. 장애 기록
 
