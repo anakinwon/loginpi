@@ -13,3 +13,5 @@
 | 2026-11-11 | build 보고 형식 — 자동 증거 첨부 반영 뒤 재검토 | `.claude/agents/teamAnakin/` build 정의 | |
 | 2026-11-11 | 브리프 조건마다 판정 가능한 정의(기준·예시·시험)를 함께 적는 규칙 — 근거 c4-build-ad8596 1회차 FAIL(메인 브리프의 '이의 인정 표식' 정의 누락) | 운용 기준서 '일감 크기·위임 규칙' 절(2026-11-12 삭제) · anakin_phase-build 정의 [확인중 : 변경 창에서 대상 확정] | |
 | 2026-11-11 | gitignore 런타임 상태·로그 파일은 본문 대신 기준선 대비 차이(추가 줄·바뀐 키)·해시·결정적 비밀 검사 결과로 증거를 만든다 — 원인 : gitignore 파일 본문이 written-files.md 상한 30000자로 잘려 구조적 BLOCKED(c4-pitel-verify-a7d45a). 판정 결함 성격 | .claude/hooks/codex-gate.mjs fileExcerpt | |
+| 2026-11-12 | [결함] 감사 장치 1단계(c41470fc) 결함 7건 — ① 세션 전체 마스터 메시지를 요구로 편입(다른 작업 요구 섞임) ② 병렬 작업 파일 오귀속(리디자인 D-001 6건) ③ codex-audit 시험 동시 실행 취약 ④ request 가 메인에서도 CLAUDE_CODE_CHILD_SESSION 으로 거부 ⑤ 판정 훅 도구 기록 중간 생략 → 금지 규칙(인라인 쓰기·커밋 안 함) 증명 불가, 도구 기록 결정적 스캔으로 대체 ⑥ 파일 변경 없는 재종료에도 재판정 ⑦ codex-audit check 가 원장 waived.all 미인식 | `.claude/hooks/codex-gate.mjs`·`scripts/codex-audit.mjs`·`scripts/codex-verify.mjs`·`test/` | 결함 수정 — 동결 중 처리 가능 |
+| 2026-11-12 | 요청 흐름 그래프 갱신 방식(수동 실행 vs Stop 자동) — R3 로 자동 갱신 폐지 뒤 새 요청 미표시 문의 | `scripts/request-graph.mjs`·settings | 마스터 결정 대기 |

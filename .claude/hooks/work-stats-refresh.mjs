@@ -14,6 +14,10 @@ if (!process.argv.includes('--now')) {
   process.exit(0)
 }
 
+// 작업별 시간제한(ms) : request-graph 실측 약 90초인데 60초 고정 제한이라 ETIMEDOUT 64건(2026-11-09~11-12, %TEMP%/work-stats-refresh.err) → 그래프 300초 · 나머지 120초
+// 겹쳐 실행(Stop 이 90초 안에 또 옴)은 request-graph.mjs 자체 잠금(runOnce : .omc/state/request-graph/run.lock + run.dirty 재실행 예약)이 처리 — 이 훅엔 잠금 없음
+const TIMEOUT_MS = { 'scripts/request-graph.mjs': 300_000, default: 120_000 }
+
 const JOBS = [
   ['scripts/work-history-report.mjs', '--period', 'all'],   // 일·주·월·년 통계 + main-dashboard HTML (실측 약 0.8초)
   ['scripts/model-change-dashboard.mjs'],                   // mywork : 요청별 모델·effort 변경이력 (약 0.4초)
@@ -22,6 +26,6 @@ const JOBS = [
 ]
 
 for (const [script, ...args] of JOBS) {
-  const r = spawnSync(process.execPath, [path.join(ROOT, script), ...args], { cwd: ROOT, encoding: 'utf8', timeout: 60_000 })
+  const r = spawnSync(process.execPath, [path.join(ROOT, script), ...args], { cwd: ROOT, encoding: 'utf8', timeout: TIMEOUT_MS[script] ?? TIMEOUT_MS.default })
   if (r.status !== 0) fs.appendFileSync(path.join(os.tmpdir(), 'work-stats-refresh.err'), `${new Date().toISOString()} ${script} exit=${r.status} ${(r.stderr || r.error?.message || '').slice(0, 500)}\n`)
 }
