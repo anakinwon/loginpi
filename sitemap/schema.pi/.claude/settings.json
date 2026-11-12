@@ -11,6 +11,9 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/../../.claude/hooks/push-guard.mjs\" --from-prompt", "timeout": 10 }] }
     ]
   }
 }
