@@ -10485,6 +10485,13 @@
          "n": "SET_VIEW"
         },
         {
+         "k": "nav.pitelCase",
+         "p": "/areas/[areaId]/pitel",
+         "h": "/",
+         "a": "plan",
+         "n": "SET_VIEW"
+        },
+        {
          "k": "nav.forbidden",
          "p": "/areas/[areaId]/forbidden",
          "h": "/",
@@ -12348,6 +12355,9 @@
      "uz": "Fizik model",
      "vi": "Mô hình vật lý",
      "zh": "物理模型"
+    },
+    "nav.pitelCase": {
+     "ko": "생성 사례"
     },
     "nav.plan": {
      "ko": "결제",
