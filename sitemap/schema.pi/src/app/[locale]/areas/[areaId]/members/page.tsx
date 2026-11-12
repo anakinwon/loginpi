@@ -172,7 +172,7 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
                     <td className="min-w-60 border-b px-3 py-1.5 text-ink-2">{ROLE_DESC[r]}</td>
                     {PERM_COLS.map(([k, , has]) => (
                       <td key={k} className="border-b px-3 py-1.5 text-center">
-                        {has(ROLE_PERMS[r]) && <Check className="mx-auto h-3.5 w-3.5 text-ink-2" strokeWidth={2} aria-label="있음" />}
+                        {has(ROLE_PERMS[r]) && <Check className="mx-auto h-3.5 w-3.5 text-ok" strokeWidth={2} aria-label="있음" />}
                       </td>
                     ))}
                   </tr>
@@ -183,7 +183,7 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
                     <td className="min-w-60 border-b px-3 py-1.5 text-ink-2">{PLAN_NM[pl]}</td>
                     {PERM_COLS.map(([k, , has]) => (
                       <td key={k} className="border-b px-3 py-1.5 text-center">
-                        {has(PLAN_PERMS[pl]) && <Check className="mx-auto h-3.5 w-3.5 text-ink-2" strokeWidth={2} aria-label="있음" />}
+                        {has(PLAN_PERMS[pl]) && <Check className="mx-auto h-3.5 w-3.5 text-ok" strokeWidth={2} aria-label="있음" />}
                       </td>
                     ))}
                   </tr>

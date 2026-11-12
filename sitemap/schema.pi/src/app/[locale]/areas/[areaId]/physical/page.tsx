@@ -352,7 +352,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
       {/* 이미 전환된 엔터티의 논리 변경(속성·FK 추가 등)은 전환이 아니라 동기화로 반영 — 위에서 바로 보이게(2026-10-20 마스터 "추가했는데 반영이 안 돼") */}
       {diffN > 0 && (
         <p className="mt-3 flex flex-wrap items-center gap-2 rounded-control bg-warn-soft px-3 py-2 text-dense text-warn">
-          <TriangleAlert className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+          <TriangleAlert className="h-4 w-4 shrink-0" aria-hidden />
           반영 안 된 논리 변경 {diffN}건 · 동기화로 반영
           {editor && (
             <button type="button" className="btn-key btn-sm ms-auto" disabled={busy} onClick={() => void sync()}>
@@ -503,7 +503,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                             <td className={TDP}>
                               {c.pk_yn === 'Y' && (
                                 <span className="inline-flex items-center gap-1 text-ink-2 tabular-nums">
-                                  <KeyRound className="h-3.5 w-3.5" strokeWidth={1.75} aria-label="PK" />
+                                  <KeyRound className="h-3.5 w-3.5 text-warn" aria-label="PK" />
                                   {c.pk_seq}
                                 </span>
                               )}
@@ -554,7 +554,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                             <span className="font-mono text-xs text-ink-2">({x.col_nms.join(', ')})</span>
                             {x.invalid && (
                               <span className="inline-flex items-center gap-1 text-xs">
-                                <TriangleAlert className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                                <TriangleAlert className="h-3.5 w-3.5 text-warn" aria-hidden />
                                 {x.why ?? '삭제된 칼럼 참조'} · DDL 에서 생략, 삭제 후 다시 생성
                               </span>
                             )}
@@ -569,7 +569,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                     )}
                     {tbl.phy_sts_cd === 'CMPTN' ? (
                       <p className="hint mt-2 flex items-center gap-1">
-                        <Lock className="h-3 w-3" strokeWidth={1.75} aria-hidden />
+                        <Lock className="h-3 w-3 text-tone-std" aria-hidden />
                         작성완료 테이블 · 완료 취소 후 편집
                       </p>
                     ) : (

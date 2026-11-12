@@ -40,7 +40,7 @@ const OBJ_MAX = 20
 // 객체 종류 → 선 아이콘(테이블·분할·외부 = 표, 뷰 = 눈, 물리 뷰 = 겹)
 const OBJ_ICON: Record<string, LucideIcon> = { r: Table2, p: Table2, v: Eye, m: Layers, f: Table2 }
 // 펼침 표시(탐색기) — 펼침 = 아래, 접힘 = 오른쪽, 없음 = 같은 폭 빈칸
-const Caret = ({ on, none }: { on?: boolean; none?: boolean }) => (none ? <span className="inline-block w-3.5 shrink-0" aria-hidden /> : on ? <ChevronDown className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.5} aria-hidden /> : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-3 rtl:rotate-180" strokeWidth={1.5} aria-hidden />)
+const Caret = ({ on, none }: { on?: boolean; none?: boolean }) => (none ? <span className="inline-block w-3.5 shrink-0" aria-hidden /> : on ? <ChevronDown className="h-3.5 w-3.5 shrink-0 text-ink-3" aria-hidden /> : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-3 rtl:rotate-180" aria-hidden />)
 
 const SqlEditor = dynamic(() => import('./sql-editor'), { ssr: false, loading: () => <p className="p-2 text-sm text-ink-3">편집기 불러오는 중…</p> })
 
@@ -656,7 +656,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                 <li key={s.name}>
                   <button type="button" {...nameProps(sk, qi(s.name, dialect === 'ORA'))} className={`flex w-full items-center gap-1 rounded-chip px-1 py-0.5 text-start hover:bg-raised ${s.name === schema ? 'font-semibold text-ink' : 'text-ink-2'} ${pick === sk ? 'bg-accent-soft' : ''}`} onClick={() => toggle(sk, () => void loadObjs(s.name))} aria-expanded={open.has(sk)}>
                     <Caret on={open.has(sk)} />
-                    <Database className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.5} aria-hidden /> <Drag t={qi(s.name, dialect === 'ORA')}>{s.name}</Drag>
+                    <Database className="h-3.5 w-3.5 shrink-0 text-ink-3" aria-hidden /> <Drag t={qi(s.name, dialect === 'ORA')}>{s.name}</Drag>
                   </button>
                   {open.has(sk) && (
                     <ul className="ps-3">
@@ -670,7 +670,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                             <li key={ks}>
                               <button type="button" className={`flex w-full items-center gap-1 rounded-chip px-1 py-0.5 text-start font-sans hover:bg-raised ${items.length ? 'text-ink-2' : 'text-ink-off'}`} onClick={() => items.length && toggle(gk)} aria-expanded={open.has(gk)}>
                                 <Caret none={!items.length} on={open.has(gk) || !!kwl} />
-                                <Folder className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.5} aria-hidden /> {nm} <span className="font-mono text-ink-3 tabular-nums">({items.length})</span>
+                                <Folder className="h-3.5 w-3.5 shrink-0 text-ink-3" aria-hidden /> {nm} <span className="font-mono text-ink-3 tabular-nums">({items.length})</span>
                               </button>
                               {(open.has(gk) || kwl) && (
                                 <ul className="ps-3">
@@ -693,7 +693,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                                               cl.map((c) => (
                                                 <li key={c.name} className="truncate" title={c.type}>
                                                   <button type="button" {...nameProps(`k:${ok}.${c.name}`, qi(c.name, dialect === 'ORA'))} className={`inline-flex max-w-full items-center gap-1 rounded-chip px-1 py-0.5 text-start hover:bg-raised ${pick === `k:${ok}.${c.name}` ? 'bg-accent-soft' : ''}`} onClick={() => ed.current?.insert(qi(c.name, dialect === 'ORA'))}>
-                                                    {c.pk ? <KeyRound className="h-3 w-3 shrink-0 text-warn" strokeWidth={1.75} aria-label="PK" /> : <span className="inline-block w-3 shrink-0" aria-hidden />} <Drag t={qi(c.name, dialect === 'ORA')}>{c.name}</Drag> <span className="text-ink-3">{c.type}{c.nn ? ' NN' : ''}</span>
+                                                    {c.pk ? <KeyRound className="h-3 w-3 shrink-0 text-warn"aria-label="PK" /> : <span className="inline-block w-3 shrink-0" aria-hidden />} <Drag t={qi(c.name, dialect === 'ORA')}>{c.name}</Drag> <span className="text-ink-3">{c.type}{c.nn ? ' NN' : ''}</span>
                                                   </button>
                                                 </li>
                                               ))}
@@ -726,11 +726,11 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
               return (
                 <span key={t.key} className={`flex shrink-0 items-center rounded-t-control border border-line ${on ? '-mb-px border-b-surface bg-surface font-medium text-ink' : 'bg-raised text-ink-2 hover:bg-surface'}`}>
                   <button type="button" role="tab" aria-selected={on} onClick={() => (!objCur && void tabs.saveTab(tabs.cur), setObjCur(t.key))} title={`${t.schema}.${t.rel} — 객체 편집기`} className="inline-flex items-center gap-1 py-1 ps-2 font-mono whitespace-nowrap">
-                    <OI className="h-3.5 w-3.5 text-ink-3" strokeWidth={1.5} aria-hidden />
+                    <OI className="h-3.5 w-3.5 text-ink-3" aria-hidden />
                     {t.rel}
                   </button>
                   <button type="button" onClick={() => closeObj(t.key)} className="inline-flex min-h-6 min-w-6 items-center justify-center px-1 text-ink-3 hover:text-danger" aria-label={`${t.rel} 객체 탭 닫기`} title="객체 탭 닫기">
-                    <X className="h-3 w-3" strokeWidth={1.75} aria-hidden />
+                    <X className="h-3 w-3"aria-hidden />
                   </button>
                 </span>
               )

@@ -229,7 +229,7 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
                   <td className="px-3 py-1.5 whitespace-nowrap">
                     {r.pr_url ? (
                       <a href={r.pr_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-accent-ink hover:underline">
-                        <GitPullRequest className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />#{r.pr_no}
+                        <GitPullRequest className="h-3.5 w-3.5" aria-hidden />#{r.pr_no}
                       </a>
                     ) : (
                       <span className="text-ink-off">-</span>

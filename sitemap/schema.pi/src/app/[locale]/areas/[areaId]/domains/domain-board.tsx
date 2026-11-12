@@ -298,7 +298,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
           </div>
           {keyWords.length === 0 && (
             <p className="mt-3 flex items-center gap-1.5 text-xs text-danger">
-              <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
+              <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />
               <span>
                 속성 분류어 표준단어가 없습니다 :{' '}
                 <Link href={`/areas/${areaId}/words`} className="underline">
@@ -310,7 +310,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
           )}
           {groups.length === 0 && (
             <p className="mt-3 flex items-center gap-1.5 text-xs text-danger">
-              <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
+              <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />
               등록된 도메인그룹이 없습니다 : 설정 화면에서 먼저 등록하십시오
             </p>
           )}

@@ -365,7 +365,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
                         <ul className="space-y-0.5">
                           {cs.map((c) => (
                             <li key={c.rvs_col_id} className="flex flex-wrap items-center gap-x-1.5">
-                              {c.pk_seq ? <KeyRound className="h-3 w-3 text-ink-2" aria-label="주키" /> : <span className="inline-block w-3 text-center text-ink-3">·</span>}
+                              {c.pk_seq ? <KeyRound className="h-3 w-3 text-warn" aria-label="주키" /> : <span className="inline-block w-3 text-center text-ink-3">·</span>}
                               <span className="font-mono">{c.col_nm}</span>
                               <span className={MAP_CLS[c.map_cd]}>{MAP_NM[c.map_cd]}</span>
                               {c.cand_nm && <span className="text-ink-3">→ {c.cand_nm}</span>}

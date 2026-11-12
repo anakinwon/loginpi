@@ -35,7 +35,7 @@ export function PageHead({ title, sub, info, actions, back = true, dense = false
       <div className='min-w-0'>
         {back && (
           <Link href='/' className='inline-flex items-center gap-1 text-xs text-ink-3 transition-colors hover:text-ink'>
-            <ChevronLeft className='h-3.5 w-3.5 rtl:rotate-180' strokeWidth={1.5} aria-hidden />
+            <ChevronLeft className='h-3.5 w-3.5 rtl:rotate-180' aria-hidden />
             분류체계 목록
           </Link>
         )}

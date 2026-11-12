@@ -307,7 +307,7 @@ export default function AreaNav() {
         >
           {cur && <Icon3D icon={cur.icon} size="sm" on />}
           <span className="truncate">{cur ? t(cur.nm) : t('expand')}</span>
-          <ChevronUp className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+          <ChevronUp className="h-4 w-4 shrink-0" aria-hidden />
         </button>
       )}
       {!fold && active?.subs && (

@@ -143,7 +143,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
             {/* 계산식 = 접힘(기본 닫힘) */}
             <details className="group border-t border-line px-4 py-2 text-xs text-ink-2">
               <summary className="flex cursor-pointer list-none items-center gap-1 text-ink-3 hover:text-ink [&::-webkit-details-marker]:hidden">
-                <ChevronRight className="h-3.5 w-3.5 transition-transform group-open:rotate-90 rtl:-scale-x-100" strokeWidth={1.5} aria-hidden />
+                <ChevronRight className="h-3.5 w-3.5 transition-transform group-open:rotate-90 rtl:-scale-x-100" aria-hidden />
                 계산 방법
               </summary>
               <p className="mt-2">
@@ -155,7 +155,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
 
         {msg && (
           <p role={msg.ok ? 'status' : 'alert'} className={`flex items-center gap-1.5 text-dense ${msg.ok ? 'text-ok' : 'text-danger'}`}>
-            {msg.ok ? <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden /> : <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />}
+            {msg.ok ? <Check className="h-3.5 w-3.5 shrink-0" aria-hidden /> : <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />}
             {msg.text}
           </p>
         )}
@@ -194,7 +194,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                     <ul className="mt-3 flex-1 space-y-1 text-dense text-ink-2">
                       {COLS.map(([k, nm]) => (
                         <li key={k} className={(PLAN_PERMS[cd] as readonly string[]).includes(k) ? 'flex items-center gap-1.5' : 'hidden'}>
-                          <Check className="h-3.5 w-3.5 shrink-0 text-ok" strokeWidth={1.75} aria-hidden />
+                          <Check className="h-3.5 w-3.5 shrink-0 text-ok" aria-hidden />
                           {nm}
                         </li>
                       ))}

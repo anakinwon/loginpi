@@ -15,7 +15,7 @@ export default function LinkPage() {
       <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
         {/* 뒤로 = 홈(번역 문구) — PageHead 기본 뒤로 링크는 '분류체계 목록' 고정 한국어라 back={false} 로 끄고 여기서 표시 */}
         <Link href="/" className="inline-flex items-center gap-1 text-xs text-ink-3 transition-colors hover:text-ink">
-          <ChevronLeft className="h-3.5 w-3.5 rtl:rotate-180" strokeWidth={1.5} aria-hidden />
+          <ChevronLeft className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden />
           {t('common.home')}
         </Link>
         <PageHead back={false} title={t('link.title')} info={t('link.desc')} />

@@ -362,7 +362,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
                         논리
                       </span>
                     )}
-                    {c?.pk ? <KeyRound className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.75} aria-label="주식별자 있음" /> : <TriangleAlert className="h-3.5 w-3.5 shrink-0 text-warn" strokeWidth={1.75} aria-label="주식별자 없음" />}
+                    {c?.pk ? <KeyRound className="h-3.5 w-3.5 shrink-0 text-warn" aria-label="주식별자 있음" /> : <TriangleAlert className="h-3.5 w-3.5 shrink-0 text-warn" aria-label="주식별자 없음" />}
                     <span className="badge tabular-nums" data-tone={c?.must === 4 ? 'ok' : 'danger'} title="필수 4종">
                       {c?.must}/4
                     </span>
@@ -425,7 +425,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
                       })}
                     {!m.rels.some((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id) && (
                       <li className="flex items-center gap-1 text-warn">
-                        <TriangleAlert className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                        <TriangleAlert className="h-3.5 w-3.5" aria-hidden />
                         고아 엔터티 · 아래 관계 편집에서 등록
                       </li>
                     )}
@@ -462,7 +462,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
                               <span className="font-medium">{g.term_log_nm}</span>
                               <span className="text-ink-3">({g.prnt_nm})</span>
                               <span className="inline-flex items-center gap-1 text-xs text-ink-2">
-                                {g.pk && <KeyRound className="h-3 w-3" strokeWidth={1.75} aria-hidden />}
+                                {g.pk && <KeyRound className="h-3 w-3 text-warn" aria-hidden />}
                                 {g.pk ? '식별(자식 PK 포함)' : '비식별 FK'} · {g.esntl ? '필수' : '선택'}
                               </span>
                               {g.role && (

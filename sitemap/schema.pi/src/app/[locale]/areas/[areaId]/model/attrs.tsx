@@ -225,7 +225,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
       />
       <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
         <span className="inline-flex items-center gap-1 font-medium">
-          {c.role === 'PK' && <KeyRound className="h-3.5 w-3.5 text-ink-3" strokeWidth={1.75} aria-label="주식별자" />}
+          {c.role === 'PK' && <KeyRound className="h-3.5 w-3.5 text-warn" aria-label="주식별자" />}
           {c.term_log_nm}
         </span>
         {(c.role === 'PK' || c.must) && (
@@ -300,7 +300,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
               </button>
             ) : a.pk_yn === 'Y' ? (
               <span className="inline-flex items-center gap-1 text-ink-2 tabular-nums">
-                <KeyRound className="h-3.5 w-3.5" strokeWidth={1.75} aria-label="주식별자" />
+                <KeyRound className="h-3.5 w-3.5 text-warn" aria-label="주식별자" />
                 {a.pk_seq}
               </span>
             ) : (
@@ -448,7 +448,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
                 </td>
                 <td className={`${TDA} font-medium`}>
                   <span className="inline-flex items-center gap-1">
-                    {a.pk_yn === 'Y' && !cols.includes('pk') && <KeyRound className="h-3.5 w-3.5 text-ink-3" strokeWidth={1.75} aria-label="주식별자" />}
+                    {a.pk_yn === 'Y' && !cols.includes('pk') && <KeyRound className="h-3.5 w-3.5 text-warn" aria-label="주식별자" />}
                     {a.std_term?.term_log_nm}
                     {a.fk_rel_id && !cols.includes('fk') && <span className="font-normal text-ink-3">(상속)</span>}
                   </span>
@@ -464,7 +464,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
                       <span className="field-label mb-0">용어</span>
                       {a.fk_rel_id ? (
                         <span className="inline-flex items-center gap-1 text-ink-2" title="관계로 상속된 속성은 부모 식별자와 같아야 합니다">
-                          <Lock className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                          <Lock className="h-3.5 w-3.5 text-tone-std" aria-hidden />
                           {a.std_term?.term_log_nm} · 상속 속성은 관계·부모 식별자에서 변경
                         </span>
                       ) : (
@@ -533,7 +533,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
       )}
       {sug.warn.map((w) => (
         <p key={w} className="flex items-center gap-1 text-warn">
-          <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+          <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {w}
         </p>
       ))}

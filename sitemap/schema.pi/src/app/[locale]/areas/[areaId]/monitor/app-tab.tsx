@@ -409,7 +409,7 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
   if (err)
     return (
       <p role="status" className="flex items-center gap-1.5 text-dense text-danger">
-        <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+        <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />
         {err}
       </p>
     )

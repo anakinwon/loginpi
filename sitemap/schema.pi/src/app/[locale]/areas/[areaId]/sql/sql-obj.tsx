@@ -41,9 +41,9 @@ const NET: Res = { ok: false, message: '요청이 실패했습니다(네트워�
 // 칼럼 형식 아이콘(DBeaver 처럼) — PK KeyRound / 불리언 SquareCheck / 날짜·시각 Clock / 숫자 123 / 그 밖 AZ
 const typeIcon = (it: Record<string, Cell>) => {
   const t = String(it.type ?? '')
-  if (it.pk) return <KeyRound className="inline h-3 w-3 text-warn" strokeWidth={1.75} />
-  if (/bool/i.test(t)) return <SquareCheck className="inline h-3 w-3" strokeWidth={1.75} />
-  if (/date|time|interval/i.test(t)) return <Clock className="inline h-3 w-3" strokeWidth={1.75} />
+  if (it.pk) return <KeyRound className="inline h-3 w-3 text-warn" />
+  if (/bool/i.test(t)) return <SquareCheck className="inline h-3 w-3" />
+  if (/date|time|interval/i.test(t)) return <Clock className="inline h-3 w-3" />
   if (/int|numeric|decimal|float|double|real|money|serial|NUMBER|BINARY_(FLOAT|DOUBLE)/i.test(t)) return '123'
   return 'AZ'
 }
@@ -273,7 +273,7 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
             <nav aria-label="섹션" className="hidden w-40 shrink-0 overflow-y-auto border-e border-line bg-canvas p-1 md:block">
               {SECS.map(([k, nm, Ic]) => (
                 <button key={k} type="button" aria-current={sec === k} onClick={() => setSec(k)} className={`flex w-full items-center gap-2 rounded-control px-2 py-1 text-start transition-colors ${sec === k ? 'bg-accent-soft font-medium text-accent-ink' : 'text-ink-2 hover:bg-raised hover:text-ink'}`}>
-                  <Ic className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
+                  <Ic className="h-3.5 w-3.5 shrink-0" aria-hidden />
                   {nm}
                 </button>
               ))}

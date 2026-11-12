@@ -228,7 +228,7 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
                 {dirty.has(t.sql_tab_id) && <span className="h-1.5 w-1.5 rounded-full bg-warn" role="img" aria-label="저장 안 된 변경" />}
               </button>
               <button type="button" onClick={() => void close(t)} className="inline-flex min-h-6 min-w-6 items-center justify-center px-1 text-ink-3 hover:text-danger" aria-label={`${t.tab_nm} 탭 닫기`} title="탭 닫기">
-                <X className="h-3 w-3" strokeWidth={1.75} aria-hidden />
+                <X className="h-3 w-3" aria-hidden />
               </button>
             </span>
           )

@@ -33,6 +33,10 @@
   --color-warn-soft: var(--warn-soft);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
+  --color-tone-std: var(--tone-std);
+  --color-tone-mdl: var(--tone-mdl);
+  --color-tone-tech: var(--tone-tech);
+  --color-tone-ops: var(--tone-ops);
   --font-sans: var(--font-ui);
   --font-mono: var(--font-code);
   /* 반경 — 맨 rounded = 컨트롤 6, rounded-xl = 카드 10, rounded-2xl = 시트 14 */
@@ -112,8 +116,11 @@
   --key-rim: rgba(16, 24, 40, 0.12);
   --key-edge: #cfd5de;
   --key-cast: rgba(16, 24, 40, 0.18);
-  --key-glyph: #344054;
-  --key-glyph-hl: rgba(255, 255, 255, 0.9);
+  /* 글리프 묶음 색(src/lib/menu-icons MENU_TONE) — 색은 글리프에만(바탕 다색 금지). 대비(비텍스트 ≥ 3:1) key-lo #eceff3 기준 : std 7.34 · mdl 4.75 · tech 4.35 · ops 6.16 */
+  --tone-std: #2b4c86;
+  --tone-mdl: #0f766e;
+  --tone-tech: #b45309;
+  --tone-ops: #6d28d9;
   /* shadcn 토큰 — 공용 @pi/i18n 언어 콤보·π 시세칩을 패키지 수정 없이 램프에 맞춤 */
   --background: var(--surface);
   --foreground: var(--ink);
@@ -125,8 +132,8 @@
   --r-control: 6px;
   --r-card: 10px;
   --r-sheet: 14px;
-  /* 글꼴 — next/font 변수(<html> 클래스)가 없으면 시스템 한글 글꼴 */
-  --font-ui: var(--font-plex-kr, 'IBM Plex Sans KR'), 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  /* 글꼴 — UI = Pretendard Variable(layout <head> CDN 링크), 못 받으면 시스템 한글 글꼴 / 코드 = next/font 변수(<html> 클래스) */
+  --font-ui: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
   --font-code: var(--font-plex-mono, 'IBM Plex Mono'), ui-monospace, 'D2Coding', Consolas, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --dur-1: 120ms;
@@ -136,7 +143,8 @@
   --area-head-h: 3rem;
 }
 
-/* ⑤ 밝은 섬 — 테마 무관 밝은 종이. .paper = SQL 편집기·DDL 미리보기, .erd-sheet = .paper + 시스템 글꼴(ERD 캔버스·인쇄 미리보기 포털 — 내보내기 skipFonts 와 같은 글꼴) */
+/* ⑤ 밝은 섬 — 테마 무관 밝은 종이. .paper = SQL 편집기·DDL 미리보기, .erd-sheet = .paper + 코드 글꼴만 시스템(ERD 캔버스·인쇄 미리보기 포털)
+   UI 글꼴은 화면과 같은 Pretendard — 이미지 내보내기(skipFonts)에는 웹 글꼴이 안 실려 그림 속 제목은 시스템 한글 글꼴로 나옴(허용) */
 .paper,
 .erd-sheet {
   color-scheme: light;
@@ -153,7 +161,6 @@
   color: var(--ink);
 }
 .erd-sheet {
-  --font-ui: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
   --font-code: ui-monospace, 'D2Coding', Consolas, monospace;
   font-family: var(--font-ui);
   background-color: #fbfbfc;
@@ -178,6 +185,11 @@
     font-family: var(--font-ui);
     font-size: 0.875rem;
     line-height: 1.25rem;
+    /* 글자 렌더링 — 회색조 안티에일리어싱·커닝, 없는 굵기·기울임을 브라우저가 흉내 내지 않음(가변 글꼴이 굵기 전부 보유) */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-synthesis: none;
     /* 한글은 낱말 안에서 끊지 않음, 긴 영문·물리명은 넘칠 때만 끊음 */
     word-break: keep-all;
     overflow-wrap: break-word;
@@ -288,7 +300,7 @@
     flex: none;
     width: 16px;
     height: 16px;
-    stroke-width: 1.75;
+    stroke-width: 2;
   }
   .btn-sm {
     --b-h: 28px;
@@ -398,7 +410,7 @@
   }
 }
 
-/* 3D 키캡 아이콘(Icon3D) — sm 28 · md 40 · lg 48, 반경 = 크기/4, 두께 2px, 글리프 = 같은 아이콘 두 겹(음각) */
+/* 3D 키캡 아이콘(Icon3D) — sm 28 · md 40 · lg 48, 반경 = 크기/4, 두께 2px, 글리프 1장(선 2·lg 1.75) + 묶음 tone 색(data-tone) */
 @layer components {
   .key3d {
     --k: 40px;
@@ -411,7 +423,7 @@
     width: var(--k);
     height: var(--k);
     border-radius: calc(var(--k) / 4);
-    color: var(--key-glyph);
+    color: var(--tone-std);
     background-image: linear-gradient(160deg, var(--key-hi) 30%, var(--key-lo) 100%);
     box-shadow: inset 0 1px 0 var(--key-bevel), inset 0 -1px 0 var(--key-shade), 0 0 0 1px var(--key-rim), 0 var(--k-e) 0 var(--key-edge), 0 calc(var(--k-e) + 2px) 8px -3px var(--key-cast);
     transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
@@ -420,22 +432,31 @@
     grid-area: 1 / 1;
     width: var(--k-g);
     height: var(--k-g);
-    stroke-width: 1.5;
+    stroke-width: 2;
   }
-  .key3d > .key3d-hl {
-    color: var(--key-glyph-hl);
-    transform: translateY(1px);
-  }
+  /* 키 − 글리프 = 짝수(28/16 · 40/20 · 48/24) → 글리프가 반 픽셀에 놓이지 않음 */
   .key3d[data-size='sm'] {
     --k: 28px;
     --k-g: 16px;
   }
-  .key3d[data-size='sm'] > svg {
-    stroke-width: 1.75;
-  }
   .key3d[data-size='lg'] {
     --k: 48px;
     --k-g: 24px;
+  }
+  .key3d[data-size='lg'] > svg {
+    stroke-width: 1.75;
+  }
+  .key3d[data-tone='std'] {
+    color: var(--tone-std);
+  }
+  .key3d[data-tone='mdl'] {
+    color: var(--tone-mdl);
+  }
+  .key3d[data-tone='tech'] {
+    color: var(--tone-tech);
+  }
+  .key3d[data-tone='ops'] {
+    color: var(--tone-ops);
   }
   /* 현재 메뉴 = 남색 키(하단 메뉴·접힌 바 전용) */
   .key3d[data-on] {
@@ -443,9 +464,6 @@
     background-image: none;
     background-color: var(--accent);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px var(--accent-edge), 0 var(--k-e) 0 var(--accent-edge), 0 calc(var(--k-e) + 2px) 8px -3px var(--key-cast);
-  }
-  .key3d[data-on] > .key3d-hl {
-    color: rgba(0, 0, 0, 0.28);
   }
   /* 키를 감싼 링크·버튼만 반응(임의 부모 :hover 금지) — 올리면 테두리 한 단 진하게, 누르면 내려앉음 */
   :is(a, button, summary):hover > .key3d {

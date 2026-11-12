@@ -16,3 +16,23 @@ export const MENU_ICON = {
   settings: Settings,
   plan: Wallet, // 결제 = 지갑(마스터 지시 2026-10-21 — 카드보다 직관적)
 } satisfies Record<string, LucideIcon>
+
+// 메뉴 묶음 → 글리프 색(tone) 단일 소스(2026-11-12 마스터 "아이콘 약간 더 눈에 띄게 색상") — 색은 글리프에만, 키 바탕은 단색 유지. 색 값 = globals.css --tone-*
+export type Tone = 'std' | 'mdl' | 'tech' | 'ops'
+export const MENU_TONE: Record<keyof typeof MENU_ICON, Tone> = {
+  words: 'std',
+  domains: 'std',
+  terms: 'std',
+  codes: 'std',
+  model: 'mdl',
+  logical: 'mdl',
+  physical: 'mdl',
+  erd: 'mdl',
+  monitor: 'tech',
+  sql: 'tech',
+  settings: 'ops',
+  plan: 'ops',
+}
+const TONE_BY_ICON = new Map<LucideIcon, Tone>((Object.keys(MENU_ICON) as (keyof typeof MENU_ICON)[]).map((k) => [MENU_ICON[k], MENU_TONE[k]]))
+// 아이콘 → 묶음 tone(메뉴 아이콘이 아니면 undefined)
+export const toneOf = (icon: LucideIcon): Tone | undefined => TONE_BY_ICON.get(icon)

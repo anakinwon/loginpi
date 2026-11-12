@@ -81,7 +81,7 @@ export default function CheckPage({ params }: { params: Promise<{ areaId: string
       />
       {msg && (
         <p role="status" className="mb-4 flex items-center gap-1.5 text-dense text-danger">
-          <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+          <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {msg}
         </p>
       )}

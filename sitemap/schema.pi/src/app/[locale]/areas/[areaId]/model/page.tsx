@@ -962,7 +962,7 @@ FK ${d.fk}
                               onChange={() => setChk((c) => (c.has(e.ent_log_nm) ? new Set([...c].filter((x) => x !== e.ent_log_nm)) : new Set([...c, e.ent_log_nm])))}
                             />
                             <button type="button" onClick={() => setEf((f) => ({ ...f, name: e.ent_log_nm }))} className="inline-flex items-center gap-1 hover:underline">
-                              {e.src === 'industry' && <Star className="h-3 w-3 text-ink-3" strokeWidth={1.75} aria-label="업종 추천" />}
+                              {e.src === 'industry' && <Star className="h-3 w-3 text-ink-3" aria-label="업종 추천" />}
                               {e.ent_log_nm}
                             </button>
                             <span className="chip-phy">{e.tbl_phy_nm}</span>

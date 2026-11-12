@@ -9,7 +9,7 @@ import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import AreaHome from './area-home'
 import type { MbrRole, Perm, PlanCd } from '@/lib/roles'
-import { MENU_ICON as I } from '@/lib/menu-icons'
+import { MENU_ICON as I, type Tone } from '@/lib/menu-icons'
 import { Icon3D } from '@/components/icon-3d'
 import { PageHead } from '@/components/page-head'
 
@@ -64,10 +64,11 @@ const ago = (s: string, t: (k: string, v?: Record<string, number>) => string) =>
   return m < 1 ? t('justNow') : m < 60 ? t('minutesAgo', { n: m }) : m < 1440 ? t('hoursAgo', { n: Math.round(m / 60) }) : t('daysAgo', { n: Math.round(m / 1440) })
 }
 
-function Todo({ href, Icon, nm, val, sub }: { href: string; Icon: LucideIcon; nm: string; val: number; sub?: string }) {
+// 아이콘 색 = 해당 메뉴 묶음 tone(globals.css --tone-*) — 승인 = 표준, DDL·모델 = 모델
+function Todo({ href, Icon, tone, nm, val, sub }: { href: string; Icon: LucideIcon; tone: Tone; nm: string; val: number; sub?: string }) {
   return (
     <Link href={href} className="panel flex items-center gap-3 p-4 transition-colors hover:bg-raised">
-      <Icon className="h-[18px] w-[18px] shrink-0 text-ink-2" strokeWidth={1.5} aria-hidden />
+      <Icon className="h-[18px] w-[18px] shrink-0" style={{ color: `var(--tone-${tone})` }} aria-hidden />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium text-ink">{nm}</span>
         {sub && <span className="block truncate text-xs text-ink-3">{sub}</span>}
@@ -110,10 +111,10 @@ export default function Dashboard() {
   const has = (p?: Perm) => !p || !!a?.perms.includes(p)
   const todos = a
     ? [
-        a.apv !== null && <Todo key="apv" href={`${base}/approvals?sts=REQ`} Icon={ClipboardCheck} nm={t('apvWait')} val={a.apv} sub={t('apvWaitSub')} />,
-        a.ddl !== null && <Todo key="ddl" href={`${base}/ddl`} Icon={DatabaseZap} nm={t('ddlWait')} val={a.ddl} />,
-        a.mine && <Todo key="mine" href={`${base}/approvals?sts=REQ`} Icon={Send} nm={t('mineWait')} val={a.mine.wait} sub={a.mine.rjct ? t('mineRejected', { count: a.mine.rjct }) : undefined} />,
-        a.model && <Todo key="mdl" href={`${base}/model?tab=prj`} Icon={Waypoints} nm={t('model')} val={a.model.prj} sub={t('modelSub', { count: a.model.ent })} />,
+        a.apv !== null && <Todo key="apv" href={`${base}/approvals?sts=REQ`} Icon={ClipboardCheck} tone="std" nm={t('apvWait')} val={a.apv} sub={t('apvWaitSub')} />,
+        a.ddl !== null && <Todo key="ddl" href={`${base}/ddl`} Icon={DatabaseZap} tone="mdl" nm={t('ddlWait')} val={a.ddl} />,
+        a.mine && <Todo key="mine" href={`${base}/approvals?sts=REQ`} Icon={Send} tone="std" nm={t('mineWait')} val={a.mine.wait} sub={a.mine.rjct ? t('mineRejected', { count: a.mine.rjct }) : undefined} />,
+        a.model && <Todo key="mdl" href={`${base}/model?tab=prj`} Icon={Waypoints} tone="mdl" nm={t('model')} val={a.model.prj} sub={t('modelSub', { count: a.model.ent })} />,
       ].filter(Boolean)
     : []
 
@@ -236,7 +237,7 @@ export default function Dashboard() {
       <details className="panel group [&:not([open])>summary]:border-b-0" open={!res.areas.length}>
         <summary className="panel-head cursor-pointer list-none [&::-webkit-details-marker]:hidden">
           {t('areaList')}
-          <ChevronDown className="ms-auto h-4 w-4 text-ink-3 transition-transform group-open:rotate-180" strokeWidth={1.5} aria-hidden />
+          <ChevronDown className="ms-auto h-4 w-4 text-ink-3 transition-transform group-open:rotate-180" aria-hidden />
         </summary>
         <div className="panel-body">
           <AreaHome />

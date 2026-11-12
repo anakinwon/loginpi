@@ -67,7 +67,7 @@ export default function DbTab({ areaId, live, min }: { areaId: string; live: boo
       </div>
       {(err || nowErr) && (
         <p role="status" className="flex items-center gap-1.5 text-dense text-danger">
-          <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+          <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {err || `지금 값을 읽지 못했습니다 : ${nowErr}`}
         </p>
       )}

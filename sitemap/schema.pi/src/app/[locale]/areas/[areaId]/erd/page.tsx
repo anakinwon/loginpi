@@ -175,7 +175,7 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
       ))}
       <div style={{ background: c.head, color: c.text, borderBottom: `1px solid ${c.border}` }} className="flex items-center gap-1 px-2 py-1 font-semibold">
         <span className="truncate" title={title(e, isPhy(lvl, phy), nmo)}>{title(e, isPhy(lvl, phy), nmo)}</span>
-        {fix && <Pin className="h-3 w-3 shrink-0" strokeWidth={1.75} aria-label="고정(자동 배치가 옮기지 않음)" />}
+        {fix && <Pin className="h-3 w-3 shrink-0" aria-label="고정(자동 배치가 옮기지 않음)" />}
         {mk && <span className="rounded-chip px-1 text-xs font-medium text-on-accent" style={{ background: VER_C[mk] }}>{VER_NM[mk]}</span>}
         {delA > 0 && <span className="rounded-chip px-1 text-xs font-medium text-on-accent" style={{ background: VER_C.DEL }} title="기준 버전에 있던 속성이 지금은 없음">속성 삭제 {delA}</span>}
         {e.ref && <span className="ms-auto rounded-chip bg-surface/60 px-1 text-xs font-normal">참조 · {e.subj_nm}</span>}
@@ -875,7 +875,7 @@ function Erd({ areaId }: { areaId: string }) {
     try {
       const opt = {
         backgroundColor: '#ffffff',
-        skipFonts: true, // 캔버스 = 시스템 글꼴(.erd-sheet) — 웹 글꼴(Plex 한글 조각) base64 내장 생략
+        skipFonts: true, // 웹 글꼴(Pretendard 한글 조각 92개) base64 내장 생략 — 그림 속 제목은 시스템 한글 글꼴, 표(코드 글꼴)는 화면과 같은 시스템 글꼴(.erd-sheet)
         width: w,
         height: h,
         pixelRatio: kind === 'png' ? 2 : 1,
