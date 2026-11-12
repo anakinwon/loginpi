@@ -15,7 +15,9 @@ import '../globals.css'
 
 // 글꼴(2026-11-12 교체) — UI = Pretendard Variable(동적 서브셋, <head> CDN 링크 — 버전 고정), 코드·물리명 = IBM Plex Mono(칩·DDL 에만, preload 끔), 변수는 globals.css --font-ui·--font-code 가 받음
 //  Plex Sans KR 을 뺀 이유 : 한글 조각이 늦게 와 swap 전 맑은 고딕과 한 문장 안에서 섞이고, Windows 힌팅이 약해 작은 크기·확대 배율에서 글자가 깨져 보임(마스터 지적)
-const PRETENDARD_CSS = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css'
+const PRETENDARD_CSS = 'https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css'
+// SRI(공급망 방어) — 버전 바꾸면 재계산 : node -e "fetch(process.argv[1]).then(r=>r.arrayBuffer()).then(b=>console.log('sha384-'+require('crypto').createHash('sha384').update(Buffer.from(b)).digest('base64')))" <PRETENDARD_CSS>
+const PRETENDARD_SRI = 'sha384-/uC/GIvKJ/9RN6i1izHoBY9ubYo60OAsQRNQ3NRFiNsN+N/MVQJHD5OYcZz6wvwn'
 const plexMono = IBM_Plex_Mono({ weight: ['400', '500'], subsets: ['latin'], display: 'swap', preload: false, variable: '--font-plex-mono' })
 
 // 사전 렌더는 ko·en 만 — 나머지 locale 은 첫 요청 때 렌더·캐시(67개 × 전 페이지 빌드 폭증 방지, 표준 7절)
@@ -37,8 +39,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   return (
     <html lang={locale} dir={getDir(locale)} className={plexMono.variable}>
       <head>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
-        <link rel="stylesheet" href={PRETENDARD_CSS} crossOrigin="" />
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={PRETENDARD_CSS} integrity={PRETENDARD_SRI} crossOrigin="anonymous" />
       </head>
       <body className="min-h-screen antialiased">
         {/* 저장된 언어(preferred_locale) 적용 — 파싱 중 1회, 하이드레이션·Pi SDK·인증 시작 전(표준 6절) */}
