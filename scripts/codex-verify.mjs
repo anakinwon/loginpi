@@ -47,7 +47,12 @@ const C = {
   exit: { PASS: 0, FAIL: 1, BLOCKED: 2, ERROR: 3, PROMPT_ONLY: 4 },
   verdicts: ['PASS', 'FAIL', 'BLOCKED'],
   severities: ['high', 'med', 'low'],
-  criterionStatus: ['met', 'unmet', 'unverifiable'],
+  criterionStatus: ['met', 'unmet', 'unverifiable', 'na'], // na = 이 scope 몫이 아닌 기준(새 규칙 계약의 [원문 요구·[브리프 항목·[나머지 항목 표식 기준만, 2026-11-12)
+  // 실행 증거로 인정하는 증거 폴더 파일(훅이 실행한 검사·git·생성기 출력) — report.md(작성자 보고)·related-ref.md 는 아님
+  execFiles: ['checks.md', 'deploy.md', 'changed-files.txt', 'diffstat.txt', 'generated.txt'],
+  // 증거 묶음 적재 우선 순서(실행 증거가 상한에서 잘리지 않게) — audit-*.md 가 맨 앞, 목록 밖은 이름순으로 뒤
+  evidenceOrder: ['checks.md', 'deploy.md', 'tools.md', 'changed-files.txt', 'diffstat.txt', 'generated.txt', 'written-files.md', 'related-ref.md', 'report.md'],
+  minWaiveQuote: 8, // --waive-quote 마스터 원문 최소 길이(공백 제외)
   defectStatus: ['open', 'fixed', 'regressed', 'contested', 'waived'],
   liveDefect: ['open', 'regressed', 'contested'], // 아직 해결 안 된 결함
   // ledger = 원장 부재·손상·불일치, lock = 같은 --id 동시 실행 잠금(마스터 결정 2026-11-08 — 예산 초과 budget 과 분리)
@@ -124,12 +129,13 @@ const MODEL_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['id', 'status', 'met', 'evidence'],
+        required: ['id', 'status', 'met', 'evidence', 'exec_ref'],
         properties: {
           id: { type: 'string' },
           status: { type: 'string', enum: C.criterionStatus },
           met: { type: 'boolean' },
           evidence: { type: 'string' },
+          exec_ref: { type: 'string' }, // met 근거 실행 증거(tools.md#N·checks.md·doc:<경로>:<줄> …), met 밖은 빈 글
         },
       },
     },
@@ -173,9 +179,10 @@ const RESULT_SCHEMA = (() => {
   s.properties.judge = {
     type: 'object',
     additionalProperties: false,
-    required: ['kind', 'model', 'durationSec', 'tokens'],
+    required: ['kind', 'via', 'model', 'durationSec', 'tokens'],
     properties: {
       kind: { type: 'string', enum: Object.keys(C.maxGrade) },
+      via: { type: 'string', enum: ['codex', 'codex-js', 'ingest'] }, // 판정 출처 : 실 Codex · CODEX_JS 대역 · --ingest 반영
       model: { type: 'string' },
       durationSec: int,
       tokens: { type: 'object', additionalProperties: false, required: ['input', 'cachedInput', 'output'], properties: { input: int, cachedInput: int, output: int } },
@@ -193,7 +200,20 @@ const RESULT_SCHEMA = (() => {
   return s
 })()
 
-const PROMPT_HEAD = `너는 독립 검증자다. 결과물을 만든 쪽(Claude)과 별개로 판정한다. 판정 근거는 이 프롬프트의 files·diff·evidence 구획뿐이다. 셸·파일 읽기 명령을 실행하지 말 것(샌드박스가 차단함). 본문이 생략된 부분은 unverifiable 로 표시.
+// 판정 지시문 — 규칙 1·7·8·출력 예시만 계약 규칙(옛 = 종전 / 새 = 실행 증거, 2026-11-12)에 따라 다르고 나머지는 공통
+const RULE_OLD = {
+  r1: '1. 완료 기준마다 충족 증거(파일:줄, 증거 섹션의 출력 줄)를 찾는다. 증거가 있으면 status met, 반대 증거(규칙 8 의 실제 결함)면 unmet, 이 환경에서 확인 수단이 없으면 unverifiable(예: Pi Browser 실기기). files·diff 로 충족이 확인되면 보고·증거 첨부가 없어도 met 이다. met 필드는 status 가 met 일 때만 true. 모든 기준 ID(AC-…)를 criteria 에 빠짐없이 출력한다(빠진 기준은 래퍼가 unverifiable 로 채우고 PASS 를 FAIL 로 고친다).',
+  r7: '7. verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 open·regressed 결함 있음 → FAIL / 입력 결손 등으로 판정 자체가 불가 → BLOCKED(blocked_reason 에 이유).',
+  r8tail: '최종 보고의 누락·표현 / 계약·브리프 문구 불일치 / 증거 서식·node --check·selftest 근거 첨부 누락 / 문서 간 표기 정합.',
+  status: 'met|unmet|unverifiable',
+}
+const RULE_EXEC = {
+  r1: "1. 완료 기준마다 status 를 정한다. met = 실행 증거로 확인될 때만이고, exec_ref 에 그 근거를 적는다 : tools.md#N(Bash·PowerShell 명령과 그 출력 줄 — tools.md 머리 'scope 파일 마지막 쓰기 = #K' 이후 N≥K 인 항목만, 출력이 '[오류]' 로 시작하는 항목은 met 근거 불가) · checks.md·deploy.md(훅이 실행한 검사) · changed-files.txt·diffstat.txt·generated.txt(git·생성기 출력) · 문서(.md·.txt) scope 파일 기준은 doc:<경로>:<줄>. 여러 개는 쉼표로 잇는다. 이 환경은 셸을 실행할 수 없으므로 증거 구획에 기록된 출력만 근거다. files·diff 를 읽어서만 확인한 기준은 unverifiable(읽어서 결함을 찾으면 unmet)이고, report.md(작성자 보고)는 실행 증거가 아니다. 반대 증거(규칙 8 의 실제 결함)면 unmet, 이 환경에서 확인 수단이 없으면 unverifiable(예: Pi Browser 실기기). na = 기준 정의에 [원문 요구·[브리프 항목·[나머지 항목 표식이 있고 이 scope 몫이 아닐 때만 — evidence 에 어느 산출물·단계 몫인지 적는다. met 밖 기준의 exec_ref 는 빈 글. met 필드는 status 가 met 일 때만 true. 모든 기준 ID(AC-…)를 criteria 에 빠짐없이 출력한다(빠진 기준·무효 exec_ref 의 met 은 래퍼가 unverifiable 로 고치고 PASS 를 FAIL 로 고친다).",
+  r7: '7. verdict : 모든 기준이 met 또는 na(허용 기준)이고 open·regressed 결함 0 → PASS / 기준 unmet·unverifiable 또는 open·regressed 결함 있음 → FAIL / 입력 결손 등으로 판정 자체가 불가 → BLOCKED(blocked_reason 에 이유).',
+  r8tail: '최종 보고의 누락·표현 / 계약·브리프 문구 불일치 / 문서 간 표기 정합 (실행 증거 없음은 참고 지적이 아니라 규칙 1 의 unverifiable).',
+  status: 'met|unmet|unverifiable|na',
+}
+const promptHead = (R) => `너는 독립 검증자다. 결과물을 만든 쪽(Claude)과 별개로 판정한다. 판정 근거는 이 프롬프트의 files·diff·evidence 구획뿐이다. 셸·파일 읽기 명령을 실행하지 말 것(샌드박스가 차단함). 본문이 생략된 부분은 unverifiable 로 표시.
 
 ## 금지
 - 셸·파일 읽기 명령 실행, 파일 생성·수정·삭제, 패키지 설치, 네트워크 접속, git 상태 변경.
@@ -201,18 +221,20 @@ const PROMPT_HEAD = `너는 독립 검증자다. 결과물을 만든 쪽(Claude)
 - 추측 판정. 확인하지 못한 것은 확인 못 했다고 적는다.
 
 ## 판정 규칙
-1. 완료 기준마다 충족 증거(파일:줄, 증거 섹션의 출력 줄)를 찾는다. 증거가 있으면 status met, 반대 증거(규칙 8 의 실제 결함)면 unmet, 이 환경에서 확인 수단이 없으면 unverifiable(예: Pi Browser 실기기). files·diff 로 충족이 확인되면 보고·증거 첨부가 없어도 met 이다. met 필드는 status 가 met 일 때만 true. 모든 기준 ID(AC-…)를 criteria 에 빠짐없이 출력한다(빠진 기준은 래퍼가 unverifiable 로 채우고 PASS 를 FAIL 로 고친다).
+${R.r1}
 2. 테스트 약화·삭제·skip·only·assert 완화·기대값 바꿔치기·타임아웃 부풀리기로 통과시킨 흔적 = severity high 결함.
 3. 비밀(키·토큰·접속 문자열) 하드코딩·로그 출력·커밋 대상 파일 기록 = severity high 결함. [REDACTED:*] 는 래퍼가 가린 자리다 — 그 자리에 원값이 있었다는 사실 자체도 결함 후보로 본다. <repo>·<workspace>·<home> 은 래퍼가 가린 절대경로(원 저장소·워크스페이스·사용자 홈)다.
 4. 아래 프로젝트 규칙 위반 중 규칙 8 의 실제 결함에 드는 것 = 결함(영향에 따라 severity). 표기·서식만 어긋난 것은 참고 지적.
-5. 이전 회차 결함 목록이 있으면 같은 문제는 같은 id 를 유지한다 — 해결됐으면 status fixed, 해결됐다가 다시 생겼으면 regressed, 근거를 들어 결함이 아니라고 판단하면 contested. 새 결함은 기존 최대 번호 다음 D-NNN. status waived 인 이전 결함은 팀장·아소카가 근거(waiveReason)를 들어 면제한 것이다 — 같은 문제를 새 결함으로 다시 올리지 말고 같은 id·status waived 로 둔다.
+5. 이전 회차 결함 목록이 있으면 같은 문제는 같은 id 를 유지한다 — 해결됐으면 status fixed, 해결됐다가 다시 생겼으면 regressed, 근거를 들어 결함이 아니라고 판단하면 contested. 새 결함은 기존 최대 번호 다음 D-NNN. status waived 인 이전 결함은 마스터가 명시 면제(waiveReason)한 것이다 — 같은 문제를 새 결함으로 다시 올리지 말고 같은 id·status waived 로 둔다.
 6. 실기기 확인이 필요한 항목은 blocked[] 에 reason device, 마스터 권한(운영 DB·배포·로그인 등)이 필요한 항목은 master-permission 으로 적는다.
-7. verdict : 모든 기준 met 이고 open·regressed 결함 0 → PASS / 기준 unmet 또는 open·regressed 결함 있음 → FAIL / 입력 결손 등으로 판정 자체가 불가 → BLOCKED(blocked_reason 에 이유).
-8. FAIL(defects·unmet) 대상 = 실제 결함만 : 로직·동작 오류 / 보안 취약·비밀값 노출 / 회귀 / 데이터 손실 / 브리프 쓰기 범위 밖 파일 변경 / 브리프가 요구한 기능 미구현. 아래는 참고 지적이다 — defects 에 올리지 않고 기준 unmet 사유로도 쓰지 않으며, notes 에 '참고 : ' 로 시작하는 줄 하나씩만 적는다 : 최종 보고의 누락·표현 / 계약·브리프 문구 불일치 / 증거 서식·node --check·selftest 근거 첨부 누락 / 문서 간 표기 정합.
+${R.r7}
+8. FAIL(defects·unmet) 대상 = 실제 결함만 : 로직·동작 오류 / 보안 취약·비밀값 노출 / 회귀 / 데이터 손실 / 브리프 쓰기 범위 밖 파일 변경 / 브리프가 요구한 기능 미구현. 아래는 참고 지적이다 — defects 에 올리지 않고 기준 unmet 사유로도 쓰지 않으며, notes 에 '참고 : ' 로 시작하는 줄 하나씩만 적는다 : ${R.r8tail}
 
 ## 출력
 JSON 객체 하나만 출력한다(코드펜스·설명 금지). 형태 :
-{"verdict":"PASS|FAIL|BLOCKED","iter":N,"criteria":[{"id":"","status":"met|unmet|unverifiable","met":true,"evidence":""}],"defects":[{"id":"D-001","severity":"high|med|low","status":"open|fixed|regressed|contested|waived","file":"","line":0,"summary":"","repro":"","fix_hint":""}],"blocked":[{"reason":"${C.blockedReasons.join('|')}","detail":""}],"blocked_reason":"","notes":""}`
+{"verdict":"PASS|FAIL|BLOCKED","iter":N,"criteria":[{"id":"","status":"${R.status}","met":true,"evidence":"","exec_ref":""}],"defects":[{"id":"D-001","severity":"high|med|low","status":"open|fixed|regressed|contested|waived","file":"","line":0,"summary":"","repro":"","fix_hint":""}],"blocked":[{"reason":"${C.blockedReasons.join('|')}","detail":""}],"blocked_reason":"","notes":""}`
+const PROMPT_HEAD = promptHead(RULE_OLD)
+const PROMPT_HEAD_EXEC = promptHead(RULE_EXEC)
 
 // ───────── 인자 ─────────
 export function parseArgs(argv) {
@@ -232,6 +254,7 @@ export function parseArgs(argv) {
     '--scope': 'scope',
     '--waive': 'waive',
     '--waive-reason': 'waiveReason',
+    '--waive-quote': 'waiveQuote',
   }
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i]
@@ -257,10 +280,12 @@ export function parseArgs(argv) {
   if (!/^[A-Za-z0-9._/~^@{}-]{1,100}$/.test(a.diff)) throw new Error('--diff ref 형식 오류')
   if (!a.ingest && a.iter <= C.maxIter && !a.task) throw new Error('--task 필수')
   a.scopes = a.scope ? parseScope(a.scope) : null
-  // --waive D-001,D-003 --waive-reason "<근거>" — 결정 권한 팀장·아소카, 근거 필수
+  // --waive D-001,D-003 --waive-reason "<근거>" --waive-quote "<마스터 원문>" — 면제 권한 = 마스터 명시(2026-11-12), 근거·원문 인용 필수
   a.waives = a.waive ? [...new Set(a.waive.split(',').map((x) => x.trim()).filter(Boolean))] : []
   if (a.waives.some((x) => !/^D-\d{3,}$/.test(x))) throw new Error('--waive 는 결함 ID(D-NNN) 쉼표 목록')
   if (a.waives.length && !a.waiveReason?.trim()) throw new Error('--waive 에는 --waive-reason "<근거>" 필수')
+  if (a.waives.length && String(a.waiveQuote || '').replace(/\s/g, '').length < C.minWaiveQuote)
+    throw new Error(`--waive 에는 --waive-quote "<마스터 원문>"(공백 뺀 ${C.minWaiveQuote}자 이상) 필수`)
   return a
 }
 
@@ -566,11 +591,51 @@ export const realCallGate = (a, env = process.env) =>
 // 기준 ID = 계약의 정의 줄(`- AC-n :`)만 (2026-11-10 c4-build-a19b07 iter-2 : 브리프에 인용된 'AC-5' 를 기준으로 잡아 판정자 출력에 없음 → unverifiable → FAIL)
 //   ① 인용 구획 제목('## 마스터 요청 원문'·'## 브리프') 이 있으면 첫 제목 앞 글의 정의 줄 — 자동 계약은 정의가 항상 그 앞(울타리 모양과 무관 — 옛 고정 ``` 계약의 중첩 인용도, a19b07-p1 D-001)
 //   ② 없으면(또는 ① 0건) 코드 울타리 구획을 뺀 글의 정의 줄 ③ 그래도 없으면 전문의 AC-n
+const QUOTE_HEAD = /^##[ \t]+(마스터 요청 원문|브리프)/m
+// 계약 머리 = 첫 인용 구획 제목 앞 글(제목 없으면 전문) — 기준 정의·규칙 표식은 여기서만 읽는다(인용 원문이 흉내 내지 못하게)
+export const contractHead = (text) => {
+  const s = String(text || ''), h = s.search(QUOTE_HEAD)
+  return h >= 0 ? s.slice(0, h) : s
+}
 export const criteriaIds = (text) => {
-  const s = String(text || ''), h = s.search(/^##[ \t]+(마스터 요청 원문|브리프)/m), def = (t) => [...t.matchAll(/^\s*-\s*(AC-\d+)\s*:/gm)].map((m) => m[1])
-  const head = h > 0 ? def(s.slice(0, h)) : [], ids = head.length ? head : def(s.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm, ''))
+  const s = String(text || ''), def = (t) => [...t.matchAll(/^\s*-\s*(AC-\d+)\s*:/gm)].map((m) => m[1])
+  const head = QUOTE_HEAD.test(s) ? def(contractHead(s)) : [], ids = head.length ? head : def(s.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[ \t]*$/gm, ''))
   return [...new Set(ids.length ? ids : s.match(/AC-\d+/g) || [])]
 }
+
+// ───────── 실행 증거 규칙(2026-11-12 마스터 "Codex 는 사소한 것 하나라도 놓치면 안 됨") ─────────
+// 계약 머리에 이 표식 줄이 있을 때만 새 규칙 — 진행 중인 옛 계약은 종전 규칙 그대로
+export const EXEC_RULE_MARK = '- 판정 규칙 : 실행 증거(2026-11-12)'
+export const execRuleOf = (text) => contractHead(text).split(/\r?\n/).some((l) => l.trim() === EXEC_RULE_MARK)
+// na 허용 기준 = 계약 머리 정의 줄에 [원문 요구·[브리프 항목·[나머지 항목 표식이 붙은 기준
+export const naIds = (text) => [...contractHead(text).matchAll(/^\s*-\s*(AC-\d+)\s*:\s*\[(원문 요구|브리프 항목|나머지 항목)/gm)].map((m) => m[1])
+const TOOL_EXEC = /^#(\d+) \S+ (Bash|PowerShell) \[[^\]\n]*\] : \$ [^\n]*\n {4}→ ([^\n]*)/gm
+// 증거 폴더의 실행 증거 색인 — refs = 인정 파일 이름 + 'tools.md#N'(머리 K 이후·[오류] 아닌 셸 항목), docs = scope 의 문서 파일
+//   tools.md 머리에 'scope 파일 마지막 쓰기 = #K' 가 없으면 tools 항목 0건(옛 증거 fail-closed)
+export function execIndex(evDir, scopes = []) {
+  const refs = new Set(), docs = new Set()
+  if (!evDir || !fs.existsSync(evDir) || !fs.statSync(evDir).isDirectory()) return { refs, docs }
+  for (const n of C.execFiles) if (fs.existsSync(path.join(evDir, n))) refs.add(n)
+  const tf = path.join(evDir, 'tools.md')
+  if (fs.existsSync(tf)) {
+    const t = fs.readFileSync(tf, 'utf8').replace(/\r\n/g, '\n')
+    const first = t.search(/^#\d+ /m)
+    const k = (first >= 0 ? t.slice(0, first) : t).match(/scope 파일 마지막 쓰기 = #(\d+)/)
+    if (k) for (const m of t.matchAll(TOOL_EXEC)) if (Number(m[1]) >= Number(k[1]) && !m[3].startsWith('[오류]')) refs.add(`tools.md#${m[1]}`)
+  }
+  for (const s of scopes || []) if (/\.(md|txt)$/i.test(s)) docs.add(s)
+  return { refs, docs }
+}
+// exec_ref 토큰 중 하나라도 색인에 있거나 doc:<scope 문서>:<줄> 이면 true
+export const refsOk = (ref, ix) =>
+  String(ref ?? '')
+    .split(/[\s,;]+/)
+    .filter(Boolean)
+    .some((t) => {
+      if (ix.refs.has(t)) return true
+      const m = t.match(/^doc:(.+):(\d+)$/)
+      return !!m && ix.docs.has(m[1])
+    })
 
 // 대체 판정이면 notes 첫 줄을 고정 문구로
 function withJudgeNotes(notes, judge) {
@@ -579,7 +644,8 @@ function withJudgeNotes(notes, judge) {
 }
 
 // 판정자 출력 + 원장 → 최종 결과(결정적 필드는 래퍼가 계산 : seenCount·firstSeen·noProgress·escalate·maxGrade·verdict 정합)
-export function finalize(model, { iter, ledger, judge, extraNotes = [], expected = null }) {
+// exec = execIndex 결과(새 규칙) | null(옛 규칙 — 종전 판정), naOk = na 허용 기준 ID
+export function finalize(model, { iter, ledger, judge, extraNotes = [], expected = null, exec = null, naOk = [] }) {
   const r = { ...model, iter, judge, maxGrade: C.maxGrade[judge.kind] }
   const notes = [model.notes, ...extraNotes]
   for (const c of r.criteria) c.met = c.status === 'met' // 불리언은 status 에서 파생(모순 제거)
@@ -589,11 +655,27 @@ export function finalize(model, { iter, ledger, judge, extraNotes = [], expected
     const have = new Set(r.criteria.map((c) => c.id))
     for (const id of expected) {
       if (have.has(id)) continue
-      r.criteria.push({ id, status: 'unverifiable', met: false, evidence: '판정자 출력에 없음 — 래퍼가 채움' })
+      r.criteria.push({ id, status: 'unverifiable', met: false, evidence: '판정자 출력에 없음 — 래퍼가 채움', exec_ref: '' })
       missing++
     }
     if (missing) notes.push(`기준 누락 ${missing}건`)
   } else if (expected) notes.push('경고 : 완료 기준에 AC-ID 가 없어 기준 누락 검사를 하지 못함')
+  // 실행 증거 검사(새 규칙) — 실행 증거 없는 met·허용 밖 na 는 unverifiable 로 교정
+  if (exec) {
+    const naSet = new Set(naOk)
+    let fixed = 0
+    for (const c of r.criteria) {
+      let why = ''
+      if (c.status === 'met' && !refsOk(c.exec_ref, exec)) why = `실행 증거 없음·무효 — ${String(c.exec_ref ?? '').trim() || '(빈 값)'}`
+      else if (c.status === 'na' && (!naSet.has(c.id) || !String(c.evidence ?? '').trim())) why = 'na 불가 기준·근거 없음'
+      if (!why) continue
+      c.status = 'unverifiable'
+      c.met = false
+      c.evidence = `${c.evidence ?? ''} [래퍼 : ${why}]`
+      fixed++
+    }
+    if (fixed) notes.push(`실행 증거 검사 : ${fixed}건 unverifiable 로 교정`)
+  }
   // waived 유지 — 팀장·아소카가 면제한 결함은 판정자가 다시 올려도 waived
   const waived = ledger.waived || {}
   let keptWaived = 0
@@ -616,8 +698,8 @@ export function finalize(model, { iter, ledger, judge, extraNotes = [], expected
     return { ...d, firstSeen: seen.firstSeen, seenCount: seen.seenCount }
   })
   const live = r.defects.filter((d) => C.liveDefect.includes(d.status))
-  // fail-closed : PASS 주장이라도 미충족 기준·미해결 결함이 있으면 FAIL
-  const unmet = r.criteria.some((c) => c.status !== 'met')
+  // fail-closed : PASS 주장이라도 미충족 기준·미해결 결함이 있으면 FAIL(새 규칙 = met·na 밖, 옛 규칙 = met 밖 — na 포함)
+  const unmet = r.criteria.some((c) => (exec ? c.status !== 'met' && c.status !== 'na' : c.status !== 'met'))
   if (r.verdict === 'PASS' && (unmet || live.some((d) => d.status !== 'contested'))) {
     r.verdict = 'FAIL'
     notes.push(`래퍼 정합 : PASS 주장이나 미충족·누락 기준 또는 미해결 결함이 있어 FAIL 로 교정`)
@@ -703,7 +785,13 @@ export function readEvidence(p, root = ROOT, max = C.maxEvidenceBytes) {
     : [abs]
   let out = ''
   let skipped = 0
-  for (const f of files.sort()) {
+  // 우선 목록 순(audit-*.md → checks.md → … → report.md) 다음 그 밖 이름순 — 실행 증거가 상한에서 잘리지 않게
+  const rank = (f) => {
+    const n = path.basename(f).toLowerCase()
+    return /^audit-.*\.md$/.test(n) ? 0 : C.evidenceOrder.indexOf(n) + 1 || C.evidenceOrder.length + 1
+  }
+  files.sort((x, y) => rank(x) - rank(y) || (x < y ? -1 : x > y ? 1 : 0))
+  for (const f of files) {
     const rel = path.relative(root, f).replace(/\\/g, '/')
     if (isSecretPath(rel.startsWith(LOOP_REL) ? rel.slice(LOOP_REL.length) : rel)) {
       skipped++
@@ -941,7 +1029,8 @@ export function scopeText(sel, kind = 'codex') {
 }
 
 // 섹션마다 회차별 nonce 표식으로 감싼다(데이터 안 지시문이 경계를 흉내 내지 못하게)
-export function buildPrompt({ task, evidence, diffText, scope, files = '', prevDefects, iter, nonce = crypto.randomBytes(8).toString('hex') }) {
+// execRule = 계약 머리에 EXEC_RULE_MARK(새 규칙 지시문), false = 종전 지시문
+export function buildPrompt({ task, evidence, diffText, scope, files = '', prevDefects, iter, nonce = crypto.randomBytes(8).toString('hex'), execRule = false }) {
   const prev = prevDefects?.length
     ? JSON.stringify(
         prevDefects.map(({ id, severity, status, file, line, summary, waiveReason }) => ({ id, severity, status, file, line, summary, ...(waiveReason ? { waiveReason } : {}) })),
@@ -951,7 +1040,7 @@ export function buildPrompt({ task, evidence, diffText, scope, files = '', prevD
     : '(없음 — 첫 회차)'
   const sec = (name, body) => `<<<BEGIN DATA nonce=${nonce} section=${name}>>>\n${body}\n<<<END DATA nonce=${nonce} section=${name}>>>`
   return [
-    PROMPT_HEAD,
+    execRule ? PROMPT_HEAD_EXEC : PROMPT_HEAD,
     PROJECT_RULES,
     '출력 언어 : JSON 의 서술 문자열(evidence·summary·repro·fix_hint·notes·blocked detail)은 모두 한국어로 쓴다 — 파일 경로·코드·식별자·인용 원문만 그대로(2026-11-10 c4-anakin-arch-4-claude-a11648-p1 결함 설명이 중국어로 나옴).',
     `# 입력 묶음 (회차 ${iter})`,
@@ -1049,8 +1138,10 @@ export function renderPrompt(parts, files, sc) {
   return sc(buildPrompt({ ...parts, files }))
 }
 
-function collectBundle(a, prevDefects) {
-  if (!fs.existsSync(path.resolve(a.task))) throw new Error(`--task 파일 없음 : ${a.task}`)
+// taskText = runMain 이 한 번 읽은 계약 원문(없으면 여기서 읽음)
+function collectBundle(a, prevDefects, taskText = null) {
+  if (taskText === null && !fs.existsSync(path.resolve(a.task))) throw new Error(`--task 파일 없음 : ${a.task}`)
+  const taskRaw = taskText ?? fs.readFileSync(path.resolve(a.task), 'utf8')
   if (git(['rev-parse', '--verify', `${a.diff}^{commit}`]).status !== 0) throw new Error(`--diff ref 없음 : ${a.diff}`)
   // diff 본문도 scope 안만(범위 밖 변경 내용은 프롬프트에도 싣지 않음)
   const stat = git(['diff', '--stat', a.diff, ...diffSpec(a.scopes)]).stdout
@@ -1058,7 +1149,8 @@ function collectBundle(a, prevDefects) {
   const sel = selectFromRepo(a.diff, untrackedFiles(), ROOT, a.scopes)
   const { sc, hits } = makeSanitizer(pathMasks(ROOT))
   const parts = {
-    task: sc(fs.readFileSync(path.resolve(a.task), 'utf8')),
+    task: sc(taskRaw),
+    execRule: execRuleOf(taskRaw),
     evidence: sc(readEvidence(a.evidence, ROOT, C.maxEvidenceBytes)),
     diffText: sc(cap(stat + '\n' + body, C.maxDiffBytes)),
     scope: sc(scopeText(sel, a.judge === 'codex' ? 'codex' : 'claude-substitute')),
@@ -1366,6 +1458,7 @@ async function runMain(a) {
   if (!a.dryRun && !broken && ledger.iters.some((x) => x.iter === a.iter)) throw new Error(`원장에 ${a.iter}회차 판정 결과가 이미 있음(덮어쓰기 금지) — 다시 판정하려면 다음 회차 번호를 쓴다`)
   const judge = {
     kind,
+    via: a.ingest ? 'ingest' : process.env.CODEX_JS ? 'codex-js' : 'codex', // 판정 출처(blockedResult 도 같은 judge)
     model: a.model || (kind === 'codex' ? readConfigModel() || '[codex 기본값]' : '[판정 에이전트가 기입]'),
     durationSec: 0,
     tokens: { input: 0, cachedInput: 0, output: 0 },
@@ -1425,11 +1518,18 @@ async function runMain(a) {
   if (noScope) return block('scope-missing', noScope)
   if (a.judge === 'codex' && a.dryRun && !a.scopes) console.warn('⚠ --scope 없음 — 실제 실행은 BLOCKED(scope-missing). 아래는 scope 없이 잡히는 전체 변경 미리보기')
 
-  // waived 기록(결정 권한 팀장·아소카) + 기준 ID — 원장에 남긴다
-  for (const id of a.waives) ledger.waived[id] = { reason: a.waiveReason.trim(), at: new Date().toISOString(), iter: a.iter }
-  if (a.task && fs.existsSync(path.resolve(a.task))) ledger.criteriaIds = criteriaIds(fs.readFileSync(path.resolve(a.task), 'utf8'))
+  // waived 기록(면제 권한 = 마스터 명시, 원문 인용) + 기준 ID·na 허용 ID·규칙 — 원장에 남긴다
+  for (const id of a.waives) ledger.waived[id] = { reason: a.waiveReason.trim(), quote: a.waiveQuote.trim(), at: new Date().toISOString(), iter: a.iter, by: 'master' }
+  // 계약 원문은 한 번만 읽는다(기준 ID·na·규칙·프롬프트 공용)
+  const taskText = a.task && fs.existsSync(path.resolve(a.task)) ? fs.readFileSync(path.resolve(a.task), 'utf8') : null
+  if (taskText !== null) {
+    ledger.criteriaIds = criteriaIds(taskText)
+    ledger.naIds = naIds(taskText)
+    ledger.execRule = execRuleOf(taskText) // --task 없는 --ingest 도 같은 규칙으로 판정하게
+  }
   if (!a.dryRun && (a.waives.length || a.task)) writeAtomic(ledgerFile, ledger)
   const expected = ledger.criteriaIds ?? null
+  const rule = ledger.execRule === true // 이번 계약 원문 또는(--task 없는 --ingest) 원장에 남은 규칙
 
   // 이전 회차 결함 : --prev 우선, 없으면 원장의 직전 회차 결과. waived 는 사유와 함께 표시
   const prevFile = a.prev || [...ledger.iters].reverse().find((x) => x.iter < a.iter)?.out
@@ -1441,10 +1541,14 @@ async function runMain(a) {
   }
   prevDefects = prevDefects.map((d) => (ledger.waived[d.id] ? { ...d, status: 'waived', waiveReason: ledger.waived[d.id].reason } : d))
 
+  // 새 규칙이면 증거 폴더의 실행 증거 색인(폴더 아님 = 빈 색인 → met 전부 unverifiable)
+  const exec = rule ? execIndex(a.evidence ? path.resolve(a.evidence) : null, a.scopes || []) : null
   const ingest = (raw, extraNotes) => {
+    // exec_ref 없는 기준(옛 판정자·대역 출력)은 빈 글로 채운다 — 새 규칙에선 빈 exec_ref 의 met 이 unverifiable 로 교정되므로 완화 아님
+    if (raw && Array.isArray(raw.criteria)) for (const c of raw.criteria) if (c && typeof c === 'object' && !Array.isArray(c) && !('exec_ref' in c)) c.exec_ref = ''
     const errs = raw ? validate(raw) : ['JSON 추출 실패']
     if (errs.length) return { errs }
-    return { fin: finalize(raw, { iter: a.iter, ledger, judge, extraNotes, expected }) }
+    return { fin: finalize(raw, { iter: a.iter, ledger, judge, extraNotes, expected, exec, naOk: ledger.naIds || [] }) }
   }
 
   // Claude 대체 판정 결과 반영(원장은 래퍼만 쓴다)
@@ -1460,7 +1564,7 @@ async function runMain(a) {
     return finish(cutoffIfOver(fin.result, ledger), fin)
   }
 
-  const bundle = collectBundle(a, prevDefects)
+  const bundle = collectBundle(a, prevDefects, taskText)
   const { hits, sel } = bundle
   const broad = a.judge === 'codex' ? breadthGate(sel) : ''
   const act = bulkAction(broad, a)
@@ -1786,7 +1890,7 @@ async function selftest() {
   const good = {
     verdict: 'FAIL',
     iter: 1,
-    criteria: [{ id: 'C1', status: 'unmet', met: false, evidence: '' }],
+    criteria: [{ id: 'C1', status: 'unmet', met: false, evidence: '', exec_ref: '' }],
     defects: [{ id: 'D-001', severity: 'high', status: 'open', file: 'a.ts', line: 3, summary: 's', repro: 'r', fix_hint: 'f' }],
     blocked: [],
     blocked_reason: '',
@@ -1814,7 +1918,7 @@ async function selftest() {
   assert.equal(exitFor('???'), 3)
 
   // 후처리 : seenCount·escalate·noProgress·fail-closed·maxGrade
-  const judge = { kind: 'codex', model: 'm', durationSec: 1, tokens: { input: 1, cachedInput: 0, output: 1 } }
+  const judge = { kind: 'codex', via: 'codex', model: 'm', durationSec: 1, tokens: { input: 1, cachedInput: 0, output: 1 } }
   let led = emptyLedger('L')
   const step = (model, iter) => {
     const f = finalize(structuredClone(model), { iter, ledger: led, judge })
@@ -1833,7 +1937,7 @@ async function selftest() {
   assert.equal(r2.defects[0].firstSeen, 1)
   assert.equal(r2.escalate, true)
   assert.equal(r2.noProgress, true)
-  const passModel = { ...good, criteria: [{ id: 'C1', status: 'met', met: true, evidence: 'x' }], defects: [{ ...good.defects[0], status: 'fixed' }], verdict: 'PASS' }
+  const passModel = { ...good, criteria: [{ id: 'C1', status: 'met', met: true, evidence: 'x', exec_ref: '' }], defects: [{ ...good.defects[0], status: 'fixed' }], verdict: 'PASS' }
   const r3 = step(passModel, 3)
   assert.equal(r3.verdict, 'PASS')
   assert.equal(r3.escalate, false)
@@ -1842,9 +1946,9 @@ async function selftest() {
   const lie = finalize({ ...good, verdict: 'PASS' }, { iter: 1, ledger: emptyLedger('x'), judge })
   assert.equal(lie.result.verdict, 'FAIL')
   assert.match(lie.result.notes, /FAIL 로 교정/)
-  const mismatch = finalize({ ...good, criteria: [{ id: 'C1', status: 'unverifiable', met: true, evidence: '' }] }, { iter: 1, ledger: emptyLedger('x'), judge })
+  const mismatch = finalize({ ...good, criteria: [{ id: 'C1', status: 'unverifiable', met: true, evidence: '', exec_ref: '' }] }, { iter: 1, ledger: emptyLedger('x'), judge })
   assert.equal(mismatch.result.criteria[0].met, false)
-  const subJudge = { kind: 'claude-substitute', model: 'c', durationSec: 0, tokens: { input: 0, cachedInput: 0, output: 0 } }
+  const subJudge = { kind: 'claude-substitute', via: 'ingest', model: 'c', durationSec: 0, tokens: { input: 0, cachedInput: 0, output: 0 } }
   const sub = finalize({ ...passModel, notes: '판정 메모' }, { iter: 1, ledger: emptyLedger('x'), judge: subJudge })
   assert.equal(sub.result.maxGrade, 'CONDITIONAL')
   assert.equal(sub.result.notes.split('\n')[0], '검증자 : Claude 대체(Codex 미가용)')
@@ -2002,7 +2106,7 @@ async function selftest() {
   // a19b07-p1 D-001 : 옛 고정 ``` 울타리 계약 + 중첩 인용(안쪽 ``` 가 울타리를 일찍 닫음) = 제목 앞 정의만 / 제목 없는 글 = 울타리 제거 → 정의 줄
   assert.deepEqual(criteriaIds('## 완료 기준\n- AC-1 : 실제\n\n## 마스터 요청 원문\n\n```text\nR\n```\n\n## 브리프(첫 프롬프트 + 추가 지시)\n\n```text\n인용 시작\n```\n- AC-9 : 인용 기준\n```\n'), ['AC-1'])
   assert.deepEqual(criteriaIds('- AC-1 : a\n```\n- AC-7 : 예시\n```\n'), ['AC-1'])
-  const passOne = { ...good, verdict: 'PASS', defects: [], criteria: [{ id: 'AC-1', status: 'met', met: true, evidence: 'x' }] }
+  const passOne = { ...good, verdict: 'PASS', defects: [], criteria: [{ id: 'AC-1', status: 'met', met: true, evidence: 'x', exec_ref: '' }] }
   const miss = finalize(structuredClone(passOne), { iter: 1, ledger: emptyLedger('x'), judge, expected: ['AC-1', 'AC-2', 'AC-3'] })
   assert.equal(miss.result.verdict, 'FAIL', '기준 누락 PASS → FAIL')
   assert.deepEqual(miss.result.criteria.map((c) => `${c.id}:${c.status}`), ['AC-1:met', 'AC-2:unverifiable', 'AC-3:unverifiable'])
@@ -2016,9 +2120,14 @@ async function selftest() {
   assert.equal(reopened.result.defects[0].status, 'waived')
   assert.equal(reopened.result.defects[0].seenCount, 0)
   assert.match(reopened.result.notes, /waived 유지 1건/)
-  assert.deepEqual(parseArgs(['--id', 'x', '--iter', '3', '--task', 't', '--waive', 'D-001,D-003', '--waive-reason', '근거']).waives, ['D-001', 'D-003'])
+  assert.deepEqual(parseArgs(['--id', 'x', '--iter', '3', '--task', 't', '--waive', 'D-001,D-003', '--waive-reason', '근거', '--waive-quote', '마스터 원문 면제 지시']).waives, ['D-001', 'D-003'])
   assert.throws(() => parseArgs(['--id', 'x', '--iter', '3', '--task', 't', '--waive', 'D-001']), /--waive-reason/)
   assert.throws(() => parseArgs(['--id', 'x', '--iter', '3', '--task', 't', '--waive', 'AC-1', '--waive-reason', 'r']), /D-NNN/)
+  // 2026-11-12 : 면제 = 마스터 원문 인용 필수(공백 뺀 8자 이상)
+  assert.throws(() => parseArgs(['--id', 'x', '--iter', '3', '--task', 't', '--waive', 'D-001', '--waive-reason', 'r']), /--waive-quote/)
+  assert.throws(() => parseArgs(['--id', 'x', '--iter', '3', '--task', 't', '--waive', 'D-001', '--waive-reason', 'r', '--waive-quote', '짧 은 원 문 7']), /--waive-quote/)
+  assert.deepEqual(PROMPT_HEAD_EXEC.match(/"reason":"([^"]+)"/)[1].split('|'), C.blockedReasons, '새 규칙 출력 예시 사유 = blockedReasons')
+  assert.ok(PROMPT_HEAD_EXEC.includes('"status":"met|unmet|unverifiable|na"') && PROMPT_HEAD.includes('"status":"met|unmet|unverifiable"'))
   const wp = buildPrompt({ task: 'T', evidence: 'E', diffText: '', scope: '', prevDefects: [{ ...good.defects[0], id: 'D-001', status: 'waived', waiveReason: 'R-2 의도된 한계' }], iter: 3 })
   assert.ok(wp.includes('"status": "waived"') && wp.includes('"waiveReason": "R-2 의도된 한계"') && wp.includes('status waived 인 이전 결함은'))
   assert.ok(wp.includes('모든 기준 ID(AC-…)를 criteria 에 빠짐없이 출력'))
@@ -2245,7 +2354,7 @@ async function selftest() {
 
   // export 격리(.git 독립·원 경로 0·비밀 0·정션 제외·정리)
   selftestExport()
-  console.log('selftest 통과')
+  console.log('selftest ok')
 }
 
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)

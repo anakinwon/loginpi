@@ -268,12 +268,20 @@ test('재분할 계약 = 실제 묶음 파일로 하네스 목록·AC-4 재산�
   const base = { no: 4, type: 't', agentId: 'a1', part: [1, 2] }, ac4 = c => c.match(/^- AC-4 .*$/gm) || []
   const noH = cg.contractOf({ ...base, id: 'c4-x-a1b2c3-p1', files: ['a.md'] })
   const inH = cg.refreshContract(noH, { id: 'c4-x-a1b2c3-p2', files: ['.claude/hooks/x.mjs', 'a.md'], part: [2, 2] }, 'HEAD', null)
-  assert.deepEqual(ac4(inH), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/x.mjs) — 규칙 정합 / 우회·회귀 없음'])   // 들어옴(2026-11-12 : 검사 근거 첨부 요구 문구 삭제 — 근거 누락 = 참고 지적)
-  assert.ok(/^- AC-3 [^\n]*\n- AC-4 /m.test(inH), 'AC-3 바로 뒤')
+  assert.deepEqual(ac4(inH), ['- AC-4 : [하네스 정합] 하네스 파일 변경 1건(.claude/hooks/x.mjs) — 규칙 정합 / 우회·회귀 없음'])   // 들어옴(2026-11-12 : 검사 근거 첨부 요구 문구 삭제 — 근거 누락 = 참고 지적 · [하네스 정합] 표식)
+  assert.ok(/^- AC-2 [^\n]*\n- AC-4 /m.test(inH), 'AC-2 바로 뒤(앱 파일 없음 = AC-3 없음)')
   const withH = cg.contractOf({ ...base, id: 'c4-x-a1b2c3-p1', files: ['.claude/hooks/x.mjs', 'b.md'] })
   assert.deepEqual(ac4(cg.refreshContract(withH, { id: 'c4-x-a1b2c3-p1', files: ['b.md'], part: [1, 2] }, 'HEAD', null)), [])   // 빠짐
   const moved = ac4(cg.refreshContract(withH, { id: 'c4-x-a1b2c3-p1', files: ['.claude/hooks/y.mjs'], part: [1, 2] }, 'HEAD', null))
   assert.equal(moved.length, 1); assert.ok(moved[0].includes('.claude/hooks/y.mjs') && !moved[0].includes('x.mjs'))   // 옮김 = 옛 목록 안 남음
+  // 2026-11-12 AC-3(배포 업로드) = 묶음의 앱 파일로 다시 셈 — 앱·하네스 들어옴(AC-2 → AC-3 → AC-4 순서)·빠짐, 파생 AC·인용 불변
+  const ac3 = c => c.match(/^- AC-3 .*$/gm) || [], quoted = cg.contractOf({ ...base, id: 'c4-x-a1b2c3-p1', files: ['a.md'], brief: '1. 첫 요구 항목\n- AC-3 : 인용 줄' })
+  const both = cg.refreshContract(quoted, { id: 'c4-x-a1b2c3-p1', files: ['.claude/hooks/x.mjs', 'sitemap/app/src/a.ts', 'sitemap/b2/x.md'], part: [1, 2] }, 'HEAD', null)
+  assert.deepEqual(ac3(both.slice(0, both.indexOf('\n## 마스터'))), ['- AC-3 : [배포 업로드] 앱 파일 2건(sitemap/app, sitemap/b2) — 증거 deploy.md 의 업로드 제외 0건·배포 설정(.vercelignore·vercel.json·next.config)과 정합'])
+  assert.ok(/^- AC-2 [^\n]*\n- AC-3 [^\n]*\n- AC-4 [^\n]*\n- AC-5 : \[브리프 항목 #[0-9a-f]{6}\] 첫 요구 항목\n/m.test(both), both)
+  assert.ok(both.includes('- AC-3 : 인용 줄'), '인용 구획의 같은 모양 줄 보존')
+  const out = cg.refreshContract(both, { id: 'c4-x-a1b2c3-p1', files: ['a.md'], part: [1, 2] }, 'HEAD', null), outHead = out.slice(0, out.indexOf('\n## 마스터'))
+  assert.deepEqual([ac3(outHead), ac4(outHead)], [[], []]); assert.ok(/^- AC-2 [^\n]*\n- AC-5 /m.test(out), '빠짐 = AC-2 다음 파생 AC')
 })
 
 test('재분할 = 이전 회차 열린 결함 파일은 그 결함이 나온 묶음 id 에 고정, 못 들어가면 결함 함수 본문 참조 / scope 밖 짝 시험 블록 발췌(2026-11-10 c4-fail-5-aeb16d iter-3 blocked-3)', async () => {
@@ -581,13 +589,16 @@ test('자동 검사 증거(11c·11d) : 하네스 .mjs = node --check ./<경로> 
     assert.match(cg.checksOf(['.claude/settings.json'], r), /검사 대상 없음/)   // AC-4 있음(.md 아닌 하네스) + 실행할 검사 없음 = 그 사실을 기록
     assert.equal(cg.checksOf(['.claude/skills/x/SKILL.md', 'scripts/s.mjs'], r), '', '하네스 .md 뿐 = checks.md 없음(D-001 — selftest 문구와 근거 파일 조건 일치)')
     const ac4 = c => c.match(/^- AC-4 .*$/gm) || [], base = { id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1' }
-    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs', 'docs/a.md'] })), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음'])
+    assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs', 'docs/a.md'] })), ['- AC-4 : [하네스 정합] 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음'])
     // 2026-11-11 기대값 변경 : 종전 '하네스 .md 뿐 = AC-4 없음' → 팀장 지적("AC-4 를 통째로 빼면 규칙 정합·우회·회귀 기준까지 사라짐") + 마스터 선택 "selftest 요구만 빼기"
     //   = 문서뿐이어도 AC-4(규칙 정합 / 우회·회귀 없음)는 남기고 selftest·checks.md 문구만 뺀다
-    const mdOnly = '- AC-4 : 하네스 파일 변경 2건(.claude/skills/x/SKILL.md, .claude/engineering/40. loop/codex_procedure.md) — 규칙 정합 / 우회·회귀 없음'
+    const mdOnly = '- AC-4 : [하네스 정합] 하네스 파일 변경 2건(.claude/skills/x/SKILL.md, .claude/engineering/40. loop/codex_procedure.md) — 규칙 정합 / 우회·회귀 없음'
     assert.deepEqual(ac4(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md', '.claude/engineering/40. loop/codex_procedure.md', 'docs/a.md'] })), [mdOnly], '하네스 .md 뿐 = AC-4 있음·selftest 문구 없음')
-    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs'] }), { id: base.id, files: ['.claude/skills/x/SKILL.md'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/skills/x/SKILL.md) — 규칙 정합 / 우회·회귀 없음'], '재분할도 같은 규칙')
-    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md'] }), { id: base.id, files: ['.claude/hooks/h.mjs'], part: null }, 'HEAD', null)), ['- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음'], '재분할 반대 방향도 같은 줄(2026-11-12 근거 문구 삭제)')
+    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/hooks/h.mjs'] }), { id: base.id, files: ['.claude/skills/x/SKILL.md'], part: null }, 'HEAD', null)), ['- AC-4 : [하네스 정합] 하네스 파일 변경 1건(.claude/skills/x/SKILL.md) — 규칙 정합 / 우회·회귀 없음'], '재분할도 같은 규칙')
+    assert.deepEqual(ac4(cg.refreshContract(cg.contractOf({ ...base, files: ['.claude/skills/x/SKILL.md'] }), { id: base.id, files: ['.claude/hooks/h.mjs'], part: null }, 'HEAD', null)), ['- AC-4 : [하네스 정합] 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음'], '재분할 반대 방향도 같은 줄(2026-11-12 근거 문구 삭제)')
+    // 옛 계약(EXEC_RULE_MARK 없음 — 진행 중 원장 재판정) = 종전 문구·자리(AC-3 = 쓰기 범위·비밀 유지, AC-4 는 그 뒤)
+    const old = '# 자동 계약 — c4-x-a1b2c3 (옛 판)\n\n- 기준선 : 없음\n- scope = 1건\n\n## 완료 기준\n- AC-1 : a\n- AC-2 : b\n- AC-3 : scope 파일이 브리프의 쓰기 범위 안이고 비밀값이 없다\n'
+    assert.ok(cg.refreshContract(old, { id: base.id, files: ['.claude/hooks/h.mjs'], part: null }, 'HEAD', null).includes('- AC-3 : scope 파일이 브리프의 쓰기 범위 안이고 비밀값이 없다\n- AC-4 : 하네스 파일 변경 1건(.claude/hooks/h.mjs) — 규칙 정합 / 우회·회귀 없음'))
   } finally { fs.rmSync(r, { recursive: true, force: true }) }
 })
 
@@ -634,11 +645,13 @@ test('판정 범위(2026-11-12) : 계약 = N 은 실제 결함만·형식 항목
   const cg = await import('../.claude/hooks/codex-gate.mjs')
   const ct = cg.contractOf({ id: 'c4-x-a1b2c3', no: 4, type: 't', agentId: 'a1', files: ['.claude/hooks/h.mjs'] })
   const head = ct.slice(0, ct.indexOf('\n## 마스터 요청 원문'))
-  assert.match(head, /^- AC-1 : 브리프\(\+추가 지시\)가 요구한 기능 중 이 scope 에 해당하는 것이 scope 파일에 구현됐다$/m)
+  assert.match(head, /^- AC-1 : \[요구 종합\] 브리프\(\+추가 지시, 메인 직접 변경이면 마스터 요청 원문\)가 요구한 기능 중 이 scope 몫이 scope 파일에 구현됐다$/m)
   assert.ok(!/최종 보고가/.test(head) && !/checks\.md|보고 원문/.test(head), '보고·근거 첨부 요구 없음')
   for (const k of ['로직·동작 오류', '보안 취약·비밀값 노출', '회귀', '데이터 손실', '쓰기 범위 밖 파일 변경', '요구한 기능 미구현']) assert.ok(head.includes(k), `N 대상 ${k}`)
   const refLine = head.split('\n').find(l => l.includes('참고 지적(Y 유지')) || ''
-  for (const k of ['최종 보고의 누락·표현', '계약·브리프 문구 불일치', '근거 첨부 누락', '문서 간 표기 정합']) assert.ok(refLine.includes(k), `참고 지적 ${k}`)
+  for (const k of ['최종 보고의 누락·표현', '계약·브리프 문구 불일치', '문서 간 표기 정합']) assert.ok(refLine.includes(k), `참고 지적 ${k}`)
+  assert.ok(!refLine.includes('근거 첨부 누락'), '2026-11-12 실행 증거 규칙 : 근거 없음 = unverifiable(참고 지적 아님)')
+  assert.ok(head.includes('- met = 실행 증거(exec_ref) 필수 · 코드 읽기만 = unverifiable(PASS 아님) · na = [원문 요구]·[브리프 항목]·[나머지 항목] 기준이 이 scope 몫이 아닐 때만(근거)'))
   assert.deepEqual(cg.refNotes('검증자 : x\n참고 : 보고에 selftest 출력 없음\n  참고: 문서 표기 다름\n기준 누락 0건'), ['참고 : 보고에 selftest 출력 없음', '참고: 문서 표기 다름'])
   // flush 요약 : PASS 원장의 참고 지적 = 1줄 건수 요약, 판정은 PASS(Y) 그대로
   const dir = path.join(cg.stateOf(path.resolve(process.env.CODEX_GATE_STATE)).loops, 'c4-ref-a1b2c3'); fs.mkdirSync(dir, { recursive: true })
@@ -648,4 +661,170 @@ test('판정 범위(2026-11-12) : 계약 = N 은 실제 결함만·형식 항목
   assert.match(msg, /전부 PASS\(Y\).* ; 참고 지적 2건\(Y 유지 — 회송 대상 아님, 원장 notes\) : c4-ref-a1b2c3 2건$/)
   assert.equal(msg.split('\n').length, 1, '1줄')
   assert.ok(!cg.summarize({ agentType: 't', agentId: 'a1b2c3', results: [{ id: 'c4-none', iter: 1, code: 0, verdict: 'PASS', ledger: 'l' }] }).includes('참고 지적'), '참고 없음 = 줄 없음')
+})
+
+// ───── 2026-11-12 요구 단위 AC·실행 증거(마스터 "Codex 는 사소한 것 하나라도 놓치면 안 됨") ─────
+test('파생 AC(derivedAcs) : 원문 번호 항목 2 + 브리프 수용 기준 목록 2 + JSON acceptance 배열 + 원문·브리프 중복 1건 제거 + 상한 초과 → [나머지 항목] 1줄 / 수용 기준 없는 브리프 = [브리프 항목]', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const request = '1. 로그인 유지\n2) 결제 확인\n```\n3. 울타리 안 항목\n```'
+  const brief = ['작업 지시 본문', '## 수용 기준', '- `로그인 유지`', '- 결제 화면 표시', '', '그 밖 줄', '{ "acceptance": ["JSON 항목 하나", "JSON 항목 둘"] }'].join('\n')
+  assert.deepEqual(cg.acceptOf(brief), ['`로그인 유지`', '결제 화면 표시', 'JSON 항목 하나', 'JSON 항목 둘'])
+  assert.deepEqual(cg.reqItemsOf(request), ['로그인 유지', '결제 확인'])   // 울타리 안 = 항목 아님
+  const d = cg.derivedAcs({ request, brief })
+  assert.deepEqual(d.items.map(x => [x.tag, x.t]), [['수용 기준', '`로그인 유지`'], ['수용 기준', '결제 화면 표시'], ['수용 기준', 'JSON 항목 하나'], ['수용 기준', 'JSON 항목 둘'], ['원문 요구', '결제 확인']])   // 원문 '로그인 유지' = 수용 기준과 같은 해시 → 제거
+  assert.equal(d.overflow, 0); assert.match(d.lines[0], /^- AC-5 : \[수용 기준 #[0-9a-f]{6}\] `로그인 유지`$/); assert.match(d.lines[4], /^- AC-9 : \[원문 요구 #[0-9a-f]{6}\] 결제 확인$/)
+  // 여러 줄 JSON 배열 · 라벨 변형(**완료 기준:**) · 구획 여러 개 이어 붙임
+  assert.deepEqual(cg.acceptOf('{\n  "acceptance": [\n    "가 항목",\n    "나 \\"인용\\" 항목"\n  ],\n  "x": 1\n}\n**완료 기준:**\n1. 다 항목\n끝'), ['가 항목', '나 "인용" 항목', '다 항목'])
+  assert.equal(cg.acceptOf('수용 기준 없음 글\n- 목록만'), null)
+  // D-001 회귀 : 배열 닫는 ']' 뒤 같은 줄 다른 속성은 기준이 아니다(한 줄 배열·여러 줄 배열 마지막 줄·문자열 안 ']'·이스케이프 따옴표)
+  assert.deepEqual(cg.acceptOf('{ "acceptance": ["시험 통과"], "description": "일반 설명" }'), ['시험 통과'])
+  assert.deepEqual(cg.acceptOf('{\n  "acceptance": [\n    "가 \\"따옴\\" ]",\n    "나"], "description": "x"\n}'), ['가 "따옴" ]', '나'])
+  assert.deepEqual(cg.acceptOf('{ "acceptance": [], "description": "빈 배열" }'), null)
+  // 상한 초과 : 원문 17건 = 15건 + [나머지 항목] 1줄(2건)
+  const many = cg.derivedAcs({ request: Array.from({ length: 17 }, (_, i) => `${i + 1}. 원문 요구 항목 ${i + 1}`).join('\n'), brief: '' })
+  assert.equal(many.items.length, 15); assert.equal(many.overflow, 2)
+  assert.equal(many.lines.at(-1), '- AC-20 : [나머지 항목] 원문·브리프 목록 항목 2건(아래 인용 구획) — 이 scope 몫은 충족')
+  // 수용 기준 없는 브리프 = 브리프 목록 항목 → [브리프 항목], 목록 없음 = 글 전체 1건, 자리표시·빈 글 = 없음
+  assert.deepEqual(cg.derivedAcs({ request: '(요청 원문 없음)', brief: '지시\n- 첫 항목 하나\n• 둘째 항목' }).items.map(x => [x.tag, x.t]), [['브리프 항목', '첫 항목 하나'], ['브리프 항목', '둘째 항목']])
+  assert.deepEqual(cg.derivedAcs({ request: '목록 없는 마스터 요청 한 줄', brief: '(브리프 없음)' }).items.map(x => [x.tag, x.t]), [['원문 요구', '목록 없는 마스터 요청 한 줄']])
+  assert.deepEqual(cg.reqItemsOf(''), [])
+  assert.deepEqual(cg.reqItemsOf('① 동그라미 항목\n(3) 괄호 번호 항목\nR1. 식별자 항목'), ['동그라미 항목', '괄호 번호 항목', '식별자 항목'])
+})
+
+test('계약 머리 = EXEC_RULE_MARK · AC-1·2 · 앱 AC-3 · 하네스 AC-4 · 파생 AC-5~ / 래퍼 criteriaIds·naIds 기대 id / contractQuotes 되읽기 해시 = 머리 해시 / 메인 직접 변경 줄', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs'), cv = await import('../scripts/codex-verify.mjs')
+  const request = '1. 첫째 요구\n2. 둘째 요구', brief = '작업 지시\n## 수용 기준\n- 시험 통과\n- 문서 갱신\n\n```\n- AC-9 : 울타리 안 인용\n```'
+  const ct = cg.contractOf({ id: 'c4-x-a1b2c3', no: 4, type: 'anakin_phase-build', agentId: 'a1', files: ['sitemap/app/src/a.ts', '.claude/hooks/h.mjs'], request, brief })
+  const head = cv.contractHead(ct)
+  assert.ok(head.split('\n').includes(cv.EXEC_RULE_MARK) && cv.execRuleOf(ct), '실행 증거 규칙 표식')
+  assert.match(head, /^- AC-1 : \[요구 종합\] /m); assert.match(head, /^- AC-2 : \[쓰기 범위·비밀\] /m)
+  assert.match(head, /^- AC-3 : \[배포 업로드\] 앱 파일 1건\(sitemap\/app\) — 증거 deploy\.md /m); assert.match(head, /^- AC-4 : \[하네스 정합\] 하네스 파일 변경 1건\(\.claude\/hooks\/h\.mjs\)/m)
+  assert.deepEqual(cv.criteriaIds(ct), ['AC-1', 'AC-2', 'AC-3', 'AC-4', 'AC-5', 'AC-6', 'AC-7', 'AC-8'])   // 수용 기준 2 + 원문 2(브리프 항목은 수용 기준이 있어 없음), 울타리 안 AC-9 = 기준 아님
+  assert.deepEqual(cv.naIds(ct), ['AC-7', 'AC-8'])   // na 허용 = [원문 요구] 만(수용 기준은 na 불가)
+  const hs = [...head.matchAll(/^- AC-\d+ : \[[^\]#]+ #([0-9a-f]{6})\]/gm)].map(m => m[1]), q = cg.contractQuotes(ct)
+  assert.deepEqual(q, { request, brief }); assert.deepEqual(cg.derivedAcs(q).items.map(x => x.h), hs)
+  // 하네스·앱 없음 = AC-3·AC-4 없음
+  assert.deepEqual(cv.criteriaIds(cg.contractOf({ id: 'c4-y', no: 4, type: 't', agentId: 'a1', files: ['docs/a.md'], request: 'R 한 줄' })), ['AC-1', 'AC-2', 'AC-5'])
+  // 메인 직접 변경 : 판정 대상·귀속·기준선 줄, 재분할도 메인 기준선 유지
+  const m = cg.contractOf({ id: 'c4-main-x', no: 4, type: 'main', agentId: 'main-s1', files: ['docs/a.md', 'docs/b.md'], request: 'R' })
+  assert.ok(m.includes('- 판정 대상 : 메인 직접 변경(main-s1) — 판정 요청 명령 scripts/codex-audit.mjs request') && m.includes('- scope = 메인이 판정 요청한 파일 2건(생성물 제외)') && m.includes('- 기준선 : HEAD 기준(메인 직접 변경 — 커밋 대상 = HEAD 대비)'))
+  const mr = cg.refreshContract(m, { id: 'c4-main-x', files: ['docs/a.md'], part: null }, 'HEAD', 'f'.repeat(40))
+  assert.ok(mr.includes('- 기준선 : HEAD 기준(메인 직접 변경') && mr.includes('- scope = 메인이 판정 요청한 파일 1건(생성물 제외)'), mr)
+})
+
+test('도구 기록 번호·toolsMd : scope 파일 Edit #3 뒤 Bash #4 → 머리 K=3, is_error → [오류] 접두(래퍼 execIndex 가 #4 인정·[오류] 제외), 셸 쓰기도 K', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs'), cv = await import('../scripts/codex-verify.mjs')
+  const T = '2026-11-12T01:00:00Z', use = (id, name, input) => ({ type: 'assistant', timestamp: T, message: { content: [{ type: 'tool_use', id, name, input }] } })
+  const res = (id, content, is_error) => ({ type: 'user', timestamp: T, message: { content: [{ type: 'tool_result', tool_use_id: id, content, ...(is_error ? { is_error } : {}) }] } })
+  const recs = [use('t1', 'Read', { file_path: 'docs/scope.md' }), use('t2', 'Write', { file_path: 'docs/other.md' }), use('t3', 'Edit', { file_path: 'docs/scope.md' }),
+    use('t4', 'Bash', { command: 'node --test test/x.test.mjs' }), res('t4', 'ℹ pass 3\nℹ fail 0'), use('t5', 'Bash', { command: 'node bad.mjs' }), res('t5', 'Error: 실패 줄', true)]
+  const es = cg.toolEntries(recs, 'build')
+  assert.deepEqual(es.map(e => [e.n, e.writes]), [[1, []], [2, ['docs/other.md']], [3, ['docs/scope.md']], [4, []], [5, []]])
+  assert.deepEqual(cg.toolLines(recs, 'build'), es.map(e => e.line)); assert.ok(es[2].line.startsWith('#3 10:00:00 Edit [build] : docs/scope.md'))
+  assert.ok(es[4].line.includes('\n    → [오류] Error: 실패 줄') && !es[3].line.includes('[오류]'))
+  const md = cg.toolsMd(es, ['docs/scope.md']); assert.match(md, /^## 도구 사용 기록[^\n]* — scope 파일 마지막 쓰기 = #3\n#1 /)
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-tm-'))
+  try {
+    fs.writeFileSync(path.join(d, 'tools.md'), md); const ix = cv.execIndex(d)
+    assert.ok(ix.refs.has('tools.md#4') && !ix.refs.has('tools.md#5'), [...ix.refs].join(','))   // #4 = K 뒤 실행 증거, #5 = [오류]
+  } finally { fs.rmSync(d, { recursive: true, force: true }) }
+  assert.match(cg.toolsMd(es, ['docs/none.md']), /마지막 쓰기 = #0\n/)   // 겹침 없음 = 0
+  const sh = cg.toolEntries([...recs, use('t6', 'Bash', { command: 'echo x > docs/scope.md' })], 'build')
+  assert.deepEqual(sh.at(-1).writes, ['docs/scope.md']); assert.match(cg.toolsMd(sh, ['docs/scope.md']), /마지막 쓰기 = #6\n/)
+})
+
+test('deployMd(임시 git 저장소) : \'pitel/\' + scope 라우트 pitel/page.tsx = 제외 1건 · \'/pitel/\' = 업로드 제외 0건 · .vercelignore scope = 앱 빌드 경로 전수 · 앱 파일 없음 = 빈 글 / blobsOf = git hash-object · 없는 파일 = ZERO / 정적 import 0건', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-dep-')), git = (...a) => spawnSync('git', a, { cwd: r, encoding: 'utf8' }), w = (f, s) => { fs.mkdirSync(path.dirname(path.join(r, f)), { recursive: true }); fs.writeFileSync(path.join(r, f), s) }
+  try {
+    git('init', '-q'); git('config', 'user.email', 't@t'); git('config', 'user.name', 't')
+    const page = 'sitemap/app/src/app/x/pitel/page.tsx'
+    w('sitemap/app/.vercelignore', 'pitel/\n'); w(page, 'export default function P() { return null }\n'); w('sitemap/app/next.config.ts', 'export default {}\n'); git('add', '-A'); git('commit', '-qm', 'b')
+    const out = await cg.deployMd([page], r)
+    assert.match(out, /^## 배포 설정·업로드 제외 검사\(codex-gate 훅 실행 — 작업 트리 기준\)\n\n### sitemap\/app\n/)
+    assert.equal((out.match(/ — 제외\(규칙 /g) || []).length, 1); assert.ok(out.includes(`- ${page} — 제외(규칙 pitel/ 줄 1)`), out)
+    assert.ok(out.includes('#### next.config.ts\n```text\nexport default {}') && out.includes('#### vercel.json\n```text\n(없음)'), '배포 설정 본문·없음 표기')
+    w('sitemap/app/.vercelignore', '/pitel/\n')
+    assert.ok((await cg.deployMd([page], r)).includes('업로드 제외 0건'))
+    assert.equal(await cg.deployMd(['docs/a.md', '.claude/hooks/h.mjs'], r), '')
+    w('sitemap/app/.vercelignore', 'pitel/\n'); w('sitemap/app/src/new/pitel/y.ts', '1')   // 미추적도 포함
+    const vo = await cg.deployMd(['sitemap/app/.vercelignore'], r)
+    assert.ok(vo.includes('업로드 제외 2건') && vo.includes(`- ${page} — 제외`) && vo.includes('- sitemap/app/src/new/pitel/y.ts — 제외'), vo)
+    // blobsOf : git add 와 같은 해시, 없는 파일 = ZERO
+    const b = cg.blobsOf([page, 'gone.md'], r)
+    assert.deepEqual(b, { [page]: git('hash-object', page).stdout.trim(), 'gone.md': cg.ZERO }); assert.equal(cg.ZERO, '0'.repeat(40))
+  } finally { fs.rmSync(r, { recursive: true, force: true }) }
+  // 커밋 관문 순환 방지 : precommit-check 는 동적 import 만
+  assert.ok(!/^import .*precommit-check/m.test(fs.readFileSync(path.join(ROOT, '.claude', 'hooks', 'codex-gate.mjs'), 'utf8')))
+})
+
+test('judgeOne(가짜 판정자 CODEX_JS) : gate.json judged = { iter, at(원장 기록 at), verdict, blobs } · 판정 중 scope 파일 변경 = blobs null·stale / extraEvidence audit-1.md = 판정자 evidence 구획 / 허용 밖 wrapperArgs·증거 이름 = throw(부작용 없음) · 면제 인자 전달', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const r = fs.mkdtempSync(path.join(os.tmpdir(), 'cg-jd-')), git = (...a) => spawnSync('git', a, { cwd: r, encoding: 'utf8' }), dir = path.join(cg.loopsDir(), `c4-judged-${process.pid}`)
+  const env0 = { CODEX_JS: process.env.CODEX_JS, CODEX_FAKE_TOUCH: process.env.CODEX_FAKE_TOUCH, CODEX_FAKE_DUMP: process.env.CODEX_FAKE_DUMP }
+  const fake = path.join(r, 'fake-codex.mjs'), dump = path.join(r, 'prompt.txt')
+  fs.writeFileSync(fake, ["import fs from 'node:fs'", "if (process.argv.includes('login')) process.exit(0)", "let s = ''", "process.stdin.on('data', d => (s += d))",
+    "process.stdin.on('end', () => { if (process.env.CODEX_FAKE_DUMP) fs.writeFileSync(process.env.CODEX_FAKE_DUMP, s); if (process.env.CODEX_FAKE_TOUCH) fs.appendFileSync(process.env.CODEX_FAKE_TOUCH, '\\n판정 중 수정')",
+    "  const o = process.argv[process.argv.indexOf('-o') + 1], a = s.indexOf('section=task>>>'), t = s.slice(a, s.indexOf('## 마스터 요청 원문', a))",
+    "  fs.writeFileSync(o, JSON.stringify({ verdict: 'PASS', iter: 1, criteria: [...new Set([...t.matchAll(/^- (AC-\\d+) :/gm)].map(m => m[1]))].map(id => ({ id, status: 'met', met: true, evidence: 'fake', exec_ref: 'changed-files.txt' })), defects: [], blocked: [], blocked_reason: '', notes: '' })) })"].join('\n'))
+  process.env.CODEX_JS = fake; delete process.env.CODEX_FAKE_TOUCH; delete process.env.CODEX_FAKE_DUMP
+  const f = `docs/__cg-judged-${process.pid}__.md`, job = { no: 4, id: path.basename(dir), files: [f] }
+  const ctx = { type: 'anakin_phase-build', agentId: 'ajd00001', brief: '1. 요구 하나', request: 'R', root: r, toolLog: [] }
+  const gate = () => JSON.parse(fs.readFileSync(path.join(dir, 'gate.json'), 'utf8')), led = () => JSON.parse(fs.readFileSync(path.join(dir, 'ledger.json'), 'utf8'))
+  try {
+    git('init', '-q'); fs.mkdirSync(path.join(r, 'docs')); fs.writeFileSync(path.join(r, f), '판정 대상 본문\n')
+    const r1 = await cg.judgeOne(job, ctx, Date.now() + 120e3)
+    assert.equal(r1.verdict, 'PASS', JSON.stringify(r1))
+    const h = git('hash-object', f).stdout.trim(), g1 = gate()
+    assert.deepEqual(g1.judged, { iter: 1, at: led().iters[0].at, verdict: 'PASS', blobs: { [f]: h } }); assert.deepEqual(g1.blobs, { [f]: h })
+    assert.deepEqual([g1.transcript, g1.sessionId, g1.rulesVer], [null, null, cg.RULES_VER]); assert.equal(g1.passHash?.iter, 1, '종전 passHash 유지')
+    // 판정 중 scope 파일 변경 = judged.blobs null + stale(브리프를 바꿔 같은 내용 건너뜀을 피함)
+    process.env.CODEX_FAKE_TOUCH = path.join(r, f)
+    const r2 = await cg.judgeOne(job, { ...ctx, brief: '1. 요구 둘' }, Date.now() + 120e3); delete process.env.CODEX_FAKE_TOUCH
+    assert.equal(r2.iter, 2); assert.deepEqual(gate().judged, { iter: 2, at: led().iters[1].at, verdict: 'PASS', blobs: null, stale: '판정 중 내용 변경' })
+    // 감사 증거 = 판정자 evidence 구획(맨 앞), 같은 내용이어도 다시 판정
+    process.env.CODEX_FAKE_DUMP = dump
+    const r3 = await cg.judgeOne(job, { ...ctx, brief: '1. 요구 둘', extraEvidence: { 'audit-1.md': '감사 표식 AUD-7 : 요구 2 미확인' } }, Date.now() + 120e3); delete process.env.CODEX_FAKE_DUMP
+    assert.equal(r3.iter, 3); assert.ok(fs.existsSync(path.join(dir, 'evidence-3', 'audit-1.md')))
+    const p = fs.readFileSync(dump, 'utf8'), evs = p.indexOf('section=evidence>>>'), eve = p.indexOf('section=evidence>>>', evs + 1)
+    assert.ok(evs > 0 && p.indexOf('### audit-1.md\n감사 표식 AUD-7 : 요구 2 미확인') > evs && p.indexOf('### audit-1.md') < eve, '감사 증거가 evidence 구획 안')
+    assert.match(fs.readFileSync(path.join(dir, 'evidence-3', 'tools.md'), 'utf8'), /scope 파일 마지막 쓰기 = #0\n\(도구 사용 없음\)/)
+    // 허용 밖 = throw, 새 회차·증거 없음
+    const n0 = cg.nextIter(path.join(dir, 'ledger.json'))
+    for (const bad of [{ wrapperArgs: ['--scope', 'x'] }, { wrapperArgs: ['--waive', '--waive-reason'] }, { wrapperArgs: ['--waive'] }, { extraEvidence: { 'x.md': 'y' } }, { extraEvidence: { '../audit-1.md': 'y' } }])
+      await assert.rejects(cg.judgeOne(job, { ...ctx, ...bad }, Date.now() + 120e3), /wrapperArgs|extraEvidence/, JSON.stringify(bad))
+    assert.equal(cg.nextIter(path.join(dir, 'ledger.json')), n0); assert.ok(!fs.existsSync(path.join(dir, `evidence-${n0}`)))
+    // 면제 인자 짝 = 래퍼까지 전달(원장 waived 기록)
+    await cg.judgeOne(job, { ...ctx, wrapperArgs: ['--waive', 'D-001', '--waive-reason', '근거 시험', '--waive-quote', '마스터 원문 인용 시험 문장'] }, Date.now() + 120e3)
+    assert.equal(led().waived['D-001']?.reason, '근거 시험')
+  } finally {
+    for (const [k, v] of Object.entries(env0)) if (v === undefined) delete process.env[k]; else process.env[k] = v
+    fs.rmSync(r, { recursive: true, force: true }); fs.rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('메인 직접 변경 요구(requestOf opts.main) : 첫 변경 뒤 마스터 메시지 전부 = \'작업 중 들어온 마스터 메시지\' 구획(later 0) · opts 없음 = 종전 · masterTexts = 주입문·알림 제외', async () => {
+  const fs = (await import('node:fs')).default, os = (await import('node:os')).default
+  process.env.CODEX_GATE_STATE ||= fs.mkdtempSync(path.join(os.tmpdir(), 'cg-state-'))
+  const cg = await import('../.claude/hooks/codex-gate.mjs')
+  const M = (t, text, x = {}) => ({ type: 'user', timestamp: t, message: { content: text }, ...x })
+  const recs = [M('2026-11-12T01:00:00Z', '첫 요청'), M('2026-11-12T01:05:00Z', '<task-notification>x</task-notification>'), M('2026-11-12T01:06:00Z', '사이드', { isSidechain: true }),
+    M('2026-11-12T01:10:00Z', '작업 중 추가 요구 <system-reminder>주입</system-reminder>'), M('2026-11-12T01:30:00Z', 'This session is being continued … Primary Request and Intent\n1. 요약 항목', { isCompactSummary: true }),
+    M('2026-11-12T02:00:00Z', '한참 뒤 요구')]
+  assert.deepEqual(cg.masterTexts(recs).map(x => x.text), ['첫 요청', '작업 중 추가 요구', '한참 뒤 요구'])   // 대화 압축 요약 = 마스터 지시 아님(iter-1 AC-22~30)
+  assert.equal(cg.sayOf(recs[4]), null)
+  const t0 = Date.parse('2026-11-12T01:02:00Z'), m = cg.requestOf(recs, t0, t0 + 1000, Date.now(), '', { main: true })
+  assert.equal(m.later, 0); assert.equal(m.t, Date.parse('2026-11-12T01:00:00Z'))
+  assert.match(m.text, /^첫 요청\n\n=== 작업 중 들어온 마스터 메시지 2건\(첫 변경 2026-11-12 10:02:00 뒤\) — 메인 직접 변경의 요구에 포함 ===\n\n--- 작업 중 마스터 메시지 1 \(2026-11-12 10:10:00\) ---\n작업 중 추가 요구\n\n--- 작업 중 마스터 메시지 2 \(2026-11-12 11:00:00\) ---\n한참 뒤 요구$/)
+  const o = cg.requestOf(recs, t0, t0 + 1000, Date.now()); assert.equal(o.later, 2); assert.ok(!o.text.includes('작업 중 들어온'))   // 종전 = 마지막 지시 뒤 = 후속 요청
 })
