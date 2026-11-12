@@ -3,6 +3,8 @@ import { piFetch } from '@pi/auth/client'
 // 표준용어 조회·등록·수정·삭제(클라이언트) — /terms/analyze(분해 후보), /terms(목록 : page·size·상태 필터, 등록), /terms/[termId](도메인·설명 수정, 삭제 : ver_no), /domains(도메인 선택지 : 승인완료만)
 import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Pencil, Trash2 } from 'lucide-react'
+import { InfoTip } from '@/components/page-head'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, SeCell, SeFilter, SeSelect, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
 
@@ -61,7 +63,41 @@ const EMPTY_EXT: Ext = { alw_val_txt: '', disp_fmt_txt: '', adm_cd_nm: '', own_o
 // 목록 열 너비(#·논리 용어명·상태·물리 용어명·도메인·설명·작업) — 설명은 남는 폭
 // 설명 = 표 폭의 30%, 나머지 열 = 값에 맞춰 자동(table-auto + 줄바꿈 없음)
 const COL_W = ['', '', '', '', 'w-[30%]', '', '', '', '', '', '', '']
-const INPUT = 'w-full rounded border px-3 py-2'
+const INPUT = 'input'
+
+// 페이지 이동 줄(표준용어·표준코드·엔터티 분류어 공용) — 왼쪽 총 건수, 가운데 번호(최대 5개)·처음/이전/다음/끝, 오른쪽 건수 선택
+export function Pager({ page, pages, total, size, go, setSize }: { page: number; pages: number; total: number; size: number; go: (p: number) => void; setSize: (n: number) => void }) {
+  const nav = (I: typeof ChevronLeft, p: number, off: boolean, l: string) => (
+    <button key={l} type="button" onClick={() => go(p)} disabled={off} aria-label={l} title={l} className="btn-ghost btn-icon btn-sm">
+      <I className="rtl:rotate-180" aria-hidden />
+    </button>
+  )
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-3">
+      <span className="font-mono text-xs text-ink-3 tabular-nums">
+        총 {total.toLocaleString()}건 · {page}/{pages}
+      </span>
+      <div className="mx-auto flex items-center gap-1">
+        {nav(ChevronsLeft, 1, page <= 1, '처음')}
+        {nav(ChevronLeft, page - 1, page <= 1, '이전')}
+        {Array.from({ length: Math.min(5, pages) }, (_, i) => Math.min(Math.max(1, page - 2), Math.max(1, pages - 4)) + i).map((p) => (
+          <button key={p} type="button" onClick={() => go(p)} aria-current={p === page ? 'page' : undefined} className="btn-ghost btn-sm min-w-8 tabular-nums">
+            {p}
+          </button>
+        ))}
+        {nav(ChevronRight, page + 1, page >= pages, '다음')}
+        {nav(ChevronsRight, pages, page >= pages, '끝')}
+      </div>
+      <select value={size} onChange={(e) => setSize(Number(e.target.value))} className="input-sm" aria-label="페이지당 건수">
+        {[10, 20, 50, 100].map((n) => (
+          <option key={n} value={n}>
+            {n}건씩
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
 
 export default function TermBoard({ areaId }: { areaId: string }) {
   const base = `/api/areas/${areaId}/terms`
@@ -202,28 +238,41 @@ export default function TermBoard({ areaId }: { areaId: string }) {
   }
 
   return (
-    <div className="mt-6 space-y-6">
-      <form onSubmit={submit} onKeyDown={noEnterSubmit} className="overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] text-sm shadow-md">
-        <h2 className={`px-5 py-2.5 text-base font-semibold text-white ${edit ? 'bg-gradient-to-r from-[#b45309] to-[#d97706]' : 'bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e]'}`}>
-          {edit ? `용어 수정 : ${edit.term_log_nm}` : '용어 등록'}
-        </h2>
-        <fieldset disabled={!requester} className="p-5 disabled:opacity-60">
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4 [&_input:not([type=radio])]:border-[#b8c6e0] [&_input:not([type=radio])]:bg-white [&_input:not([type=radio])]:focus:outline-[#3b5f9e] [&_select]:border-[#b8c6e0] [&_select]:bg-white">
-            <div className="md:col-span-2">
+    <div className="space-y-6">
+      <form onSubmit={submit} onKeyDown={noEnterSubmit} className="panel">
+        <div className="panel-head" data-mode={edit ? 'edit' : undefined}>
+          <h2>{edit ? `용어 수정 : ${edit.term_log_nm}` : '용어 등록'}</h2>
+          <InfoTip>용어는 표준단어 2개 이상으로 구성하고 끝 단어는 속성 분류어여야 합니다. 등록 후 구성은 바꿀 수 없습니다(도메인·설명·부가 칸만 수정)</InfoTip>
+          {role && !requester && (
+            <span className="badge ms-auto" title="등록·수정·삭제는 신청 권한(역할·요금제)이 있어야 합니다">
+              조회 전용
+            </span>
+          )}
+        </div>
+        <fieldset disabled={!requester} className="panel-body disabled:opacity-60">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            <label className="md:col-span-2">
+              <span className="field-label req">용어명</span>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="용어명 입력(필수, 예 : 고객번호)"
-                className={`${INPUT} read-only:text-gray-500`}
+                placeholder="용어명"
+                aria-required="true"
+                className={`${INPUT} read-only:text-ink-3`}
                 maxLength={200}
                 readOnly={!!edit}
                 title={edit ? '용어 구성은 바꿀 수 없습니다(삭제 후 재등록)' : undefined}
               />
-              {edit && <p className="mt-1 font-mono text-gray-600">물리 용어명 : {edit.term_phy_nm}</p>}
-            </div>
+              {edit && (
+                <span className="mt-1 block">
+                  <span className="chip-phy">{edit.term_phy_nm}</span>
+                </span>
+              )}
+            </label>
             <div className="md:col-span-2">
-              <select value={domId} onChange={(e) => setDomId(e.target.value)} className={INPUT} aria-label="도메인">
-                <option value="">{lastWord ? `도메인 선택(필수, 대표도메인명 = ${lastWord})` : '용어 분해 후 도메인 선택'}</option>
+              <span className="field-label req">도메인</span>
+              <select value={domId} onChange={(e) => setDomId(e.target.value)} className={INPUT} aria-label="도메인" aria-required="true">
+                <option value="">{lastWord ? `대표도메인명 = ${lastWord}` : '용어 분해 후 선택'}</option>
                 {domChoices.map((d) => (
                   <option key={d.dom_id} value={d.dom_id}>
                     {d.dom_nm}
@@ -231,7 +280,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
                 ))}
               </select>
               {lastWord && domains.length > 0 && domChoices.length === 0 && (
-                <p className="mt-1 text-red-700">
+                <p className="hint text-danger">
                   대표도메인명이 &apos;{lastWord}&apos;인 도메인이 없습니다 :{' '}
                   <Link href={`/areas/${areaId}/domains`} className="underline">
                     표준도메인 등록
@@ -240,21 +289,20 @@ export default function TermBoard({ areaId }: { areaId: string }) {
               )}
             </div>
             {(cands.length > 0 || cur) && (
-              <div className="space-y-2 rounded border border-[#b8c6e0] bg-white p-3 md:col-span-2 lg:col-span-4">
+              <div className="space-y-3 rounded-control border border-line bg-well p-3 md:col-span-2 lg:col-span-4">
                 <fieldset className="space-y-1">
-                  <legend className="text-gray-600">단어 분해 후보</legend>
+                  <legend className="field-label">단어 분해 후보</legend>
                   {cands.map((c, i) => (
-                    <label key={i} className="flex items-start gap-2">
-                      <input type="radio" name="cand" checked={pick === i} onChange={() => setPick(i)} className="mt-1" />
-                      <span>
+                    <label key={i} className="flex items-start gap-2 text-dense">
+                      <input type="radio" name="cand" checked={pick === i} onChange={() => setPick(i)} className="mt-0.5" />
+                      <span className="flex flex-wrap gap-1">
                         {c.segments.map((s, k) =>
                           'word' in s ? (
-                            <span key={k} className="mr-1 rounded bg-gray-100 px-1">
-                              {s.word.dic_log_nm}
-                              <span className="text-gray-500">({s.word.dic_phy_nm})</span>
+                            <span key={k} className="rounded-chip bg-raised px-1.5">
+                              {s.word.dic_log_nm} <span className="font-mono text-xs text-ink-3">{s.word.dic_phy_nm}</span>
                             </span>
                           ) : (
-                            <span key={k} className="mr-1 rounded bg-red-50 px-1 text-red-700">
+                            <span key={k} className="rounded-chip bg-danger-soft px-1.5 text-danger">
                               {s.unknown}(미등록)
                             </span>
                           ),
@@ -264,7 +312,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
                   ))}
                 </fieldset>
                 {cur && !cur.complete && (
-                  <p className="text-red-700">
+                  <p className="text-dense text-danger">
                     미등록 단어가 있습니다 :{' '}
                     <Link href={`/areas/${areaId}/words`} className="underline">
                       표준단어 등록
@@ -272,47 +320,57 @@ export default function TermBoard({ areaId }: { areaId: string }) {
                   </p>
                 )}
                 {cur?.complete && (
-                  <div className="flex flex-wrap gap-x-6 gap-y-1">
-                    <p>
-                      논리 용어명 : <b>{cur.term_log_nm}</b>
-                      {cur.dup_log && <span className="text-red-700"> (이미 있음)</span>}
-                    </p>
-                    <p>
-                      물리 용어명 : <b className="font-mono">{cur.term_phy_nm}</b>
-                      {cur.dup_phy && <span className="text-red-700"> (이미 있음)</span>}
-                    </p>
-                    {cur.rule_error && <p className="text-red-700">{RULE_MSG[cur.rule_error] ?? cur.rule_error}</p>}
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <span className="flex items-center gap-2">
+                      <span className="font-medium text-ink">{cur.term_log_nm}</span>
+                      {cur.dup_log && (
+                        <span className="badge" data-tone="danger">
+                          이미 있음
+                        </span>
+                      )}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="chip-phy" data-size="lg">
+                        {cur.term_phy_nm}
+                      </span>
+                      {cur.dup_phy && (
+                        <span className="badge" data-tone="danger">
+                          이미 있음
+                        </span>
+                      )}
+                    </span>
+                    {cur.rule_error && <p className="text-dense text-danger">{RULE_MSG[cur.rule_error] ?? cur.rule_error}</p>}
                   </div>
                 )}
               </div>
             )}
-            <div className="md:col-span-2">
-              <input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="용어 설명" className={INPUT} maxLength={4000} />
-            </div>
+            <label className="md:col-span-2">
+              <span className="field-label">설명</span>
+              <input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="설명" className={INPUT} maxLength={4000} />
+            </label>
             {EXT.map(([k, label, max], i) => (
-              <div key={k} className={i === 0 ? 'md:col-span-2' : undefined}>
-                <input value={ext[k]} onChange={(e) => setExt({ ...ext, [k]: e.target.value })} placeholder={label} className={INPUT} maxLength={max} />
-              </div>
+              <label key={k} className={i === 0 ? 'md:col-span-2' : undefined}>
+                <span className="field-label">{label.replace(/\(.*\)/, '')}</span>
+                <input value={ext[k]} onChange={(e) => setExt({ ...ext, [k]: e.target.value })} placeholder={label.match(/\((.*)\)/)?.[1] ?? ''} className={INPUT} maxLength={max} />
+              </label>
             ))}
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2">
-            <p className="text-xs text-gray-500">용어는 표준단어 2개 이상으로 구성하고 끝 단어는 속성 분류어여야 합니다. 등록 후 구성은 바꿀 수 없습니다(도메인·설명·부가 칸만 수정)</p>
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
             <SeSelect value={se} onChange={setSe} />
             <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
-            <div className="ml-auto flex gap-2">
+            <div className="ms-auto flex gap-2">
               {edit && (
-                <button type="button" onClick={reset} className="rounded border bg-white px-5 py-2">
+                <button type="button" onClick={reset} className="btn-key">
                   취소
                 </button>
               )}
-              <button disabled={blocked} className="btn-3d px-8 disabled:opacity-40">
+              <button disabled={blocked} className="btn-3d">
                 {edit ? (edit.std_sts_cd === 'RJCT' ? '수정 후 재신청' : '수정 저장') : '등록'}
               </button>
             </div>
           </div>
-          {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 등록·수정·삭제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
           {msg && (
-            <p role="status" className="mt-2 font-medium text-[#1f3a68]">
+            <p role="status" className="mt-3 text-dense text-ink-2">
               {msg}
             </p>
           )}
@@ -325,18 +383,19 @@ export default function TermBoard({ areaId }: { areaId: string }) {
             e.preventDefault()
             setCond({ ...cond, kw: q.trim(), page: 1 })
           }}
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap items-center gap-2"
         >
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(논리·물리 용어명)" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색" aria-label="검색명(논리·물리 용어명)" title="논리·물리 용어명" className="input min-w-48 flex-1" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
           <SeFilter value={cond.se} onChange={(se) => setCond({ ...cond, se, page: 1 })} />
-          <button className="btn-3d">검색</button>
-          <a href={`/api/areas/${areaId}/export/terms?${new URLSearchParams({ ...(cond.kw ? { q: cond.kw } : {}), ...(cond.se ? { se: cond.se } : {}) })}`} className="btn-3d btn-3d-green" download>
-            엑셀 다운로드
+          <button className="btn-key">검색</button>
+          <a href={`/api/areas/${areaId}/export/terms?${new URLSearchParams({ ...(cond.kw ? { q: cond.kw } : {}), ...(cond.se ? { se: cond.se } : {}) })}`} className="btn-key" download>
+            <Download aria-hidden />
+            엑셀
           </a>
         </form>
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full border-collapse [&_td]:whitespace-nowrap text-[0.7rem] [&_.text-xs]:text-[0.6rem]">
+        <div className="mt-3 overflow-x-auto rounded-card border border-line bg-surface">
+          <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
             <colgroup>
               {COL_W.map((w, i) => (
                 <col key={i} className={w} />
@@ -345,7 +404,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
             <thead>
               <tr className="thead-3d text-center">
                 {['#', '논리 용어명', '물리 용어명', '도메인', '설명', '등록자', '등록일시', '구분', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
-                  <th key={i} className="whitespace-nowrap border px-2 py-2">
+                  <th key={i} className="border-b px-3 py-2">
                     {h}
                   </th>
                 ))}
@@ -354,23 +413,23 @@ export default function TermBoard({ areaId }: { areaId: string }) {
             <tbody>
               {terms.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="border px-2 py-4 text-center text-gray-500">
-                    등록된 용어가 없습니다
+                  <td colSpan={12} className="py-6 text-center text-ink-3">
+                    검색 결과 없음
                   </td>
                 </tr>
               ) : (
                 terms.map((t, i) => (
-                  <tr key={t.term_id} className={edit?.term_id === t.term_id ? 'bg-amber-50' : 'hover:bg-gray-50'}>
-                    <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
-                    <td className="border px-2 py-1 font-medium">
-                      {t.term_log_nm}
+                  <tr key={t.term_id} data-mode={edit?.term_id === t.term_id ? 'edit' : undefined}>
+                    <td className="border px-3 py-1 text-end font-mono text-xs text-ink-3 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
+                    <td className="border px-3 py-1 font-medium">{t.term_log_nm}</td>
+                    <td className="border px-3 py-1">
+                      <span className="chip-phy">{t.term_phy_nm}</span>
                     </td>
-                    <td className="border px-2 py-1 font-mono break-all">{t.term_phy_nm}</td>
-                    <td className="border px-2 py-1 break-all">{t.std_dom?.dom_nm}</td>
-                    <td className="border px-2 py-1 !whitespace-normal">
+                    <td className="border px-3 py-1">{t.std_dom?.dom_nm}</td>
+                    <td className="border px-3 py-1 text-ink-2 !whitespace-normal">
                       {t.term_desc}
                       {EXT.filter(([k]) => t[k]).map(([k, label]) => (
-                        <div key={k} className="text-xs text-gray-500">
+                        <div key={k} className="text-xs text-ink-3">
                           {label.replace(/\(.*\)/, '')} : {t[k]}
                         </div>
                       ))}
@@ -379,19 +438,19 @@ export default function TermBoard({ areaId }: { areaId: string }) {
                     <SeCell se={t.std_se_cd} />
                     <StsCell sts={t.std_sts_cd} pend={t.pend_act} apv={`/areas/${areaId}/approvals?tp=TERM`} />
                     <ActorCells nm={t.apv_nm} d={t.apv_dtm} />
-                    <td className="whitespace-nowrap border px-2 py-1 text-center">
+                    <td className="whitespace-nowrap border px-3 py-1 text-center">
                       {t.std_sts_cd === 'REQ' || t.pend_act ? (
                         <ApvLink apv={`/areas/${areaId}/approvals?tp=TERM`} />
                       ) : (
                         requester && (
-                          <>
-                            <button onClick={() => startEdit(t)} className="mr-2 text-blue-700 underline">
-                              수정
+                          <span className="inline-flex gap-1">
+                            <button onClick={() => startEdit(t)} aria-label="수정" title="수정" className="btn-ghost btn-icon btn-sm">
+                              <Pencil aria-hidden />
                             </button>
-                            <button onClick={() => remove(t)} className="text-red-700 underline">
-                              삭제
+                            <button onClick={() => remove(t)} aria-label="삭제" title="삭제" className="btn-ghost btn-icon btn-sm hover:text-danger">
+                              <Trash2 aria-hidden />
                             </button>
-                          </>
+                          </span>
                         )
                       )}
                     </td>
@@ -401,41 +460,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
             </tbody>
           </table>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-          <span className="text-gray-600">
-            총 {total.toLocaleString()}건 · {cond.page} / {pages} 페이지
-          </span>
-          <div className="mx-auto flex items-center gap-1">
-            {[
-              ['«', 1],
-              ['‹', cond.page - 1],
-            ].map(([l, p]) => (
-              <button key={l} onClick={() => go(p as number)} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-                {l}
-              </button>
-            ))}
-            {Array.from({ length: Math.min(5, pages) }, (_, i) => Math.min(Math.max(1, cond.page - 2), Math.max(1, pages - 4)) + i).map((p) => (
-              <button key={p} onClick={() => go(p)} aria-current={p === cond.page ? 'page' : undefined} className={`min-w-8 rounded border px-2 py-1 ${p === cond.page ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : ''}`}>
-                {p}
-              </button>
-            ))}
-            {[
-              ['›', cond.page + 1],
-              ['»', pages],
-            ].map(([l, p]) => (
-              <button key={l} onClick={() => go(p as number)} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-                {l}
-              </button>
-            ))}
-          </div>
-          <select value={cond.size} onChange={(e) => setCond({ ...cond, size: Number(e.target.value), page: 1 })} className="rounded border px-2 py-1" aria-label="페이지당 건수">
-            {[10, 20, 50, 100].map((n) => (
-              <option key={n} value={n}>
-                {n}건씩
-              </option>
-            ))}
-          </select>
-        </div>
+        <Pager page={cond.page} pages={pages} total={total} size={cond.size} go={go} setSize={(size) => setCond({ ...cond, size, page: 1 })} />
       </section>
     </div>
   )

@@ -1,5 +1,6 @@
 // schema.pi locale 레이아웃 — 다국어(@pi/i18n 표준 : <html lang dir>·메시지 Provider·저장 언어 적용)·전역 스타일·Pi SDK 로드·세션 Provider(Google NextAuth + Pi @pi/auth, 미완료 결제 복구 PiAuthRoot)·앱 모니터링 계측(Rum)
 import type { Metadata } from 'next'
+import { IBM_Plex_Mono, IBM_Plex_Sans_KR } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
@@ -11,6 +12,10 @@ import { routing } from '@/i18n/routing'
 import { PiAuthRoot } from './pi-auth-root'
 import Rum from './rum'
 import '../globals.css'
+
+// 글꼴(2026-11-12 디자인 개편) — UI = IBM Plex Sans KR 400·500·600, 코드·물리명 = IBM Plex Mono(칩·DDL 에만). 둘 다 preload 끔 — 켜면 한글 unicode-range 조각 187개를 미리 받음(1.7MB, Pi Browser 성능), 끄면 화면이 쓰는 조각만 받음, 변수는 globals.css --font-ui·--font-code 가 받음
+const plexKr = IBM_Plex_Sans_KR({ weight: ['400', '500', '600'], subsets: ['latin'], display: 'swap', preload: false, variable: '--font-plex-kr' })
+const plexMono = IBM_Plex_Mono({ weight: ['400', '500'], subsets: ['latin'], display: 'swap', preload: false, variable: '--font-plex-mono' })
 
 // 사전 렌더는 ko·en 만 — 나머지 locale 은 첫 요청 때 렌더·캐시(67개 × 전 페이지 빌드 폭증 방지, 표준 7절)
 export function generateStaticParams() {
@@ -29,7 +34,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   setRequestLocale(locale)
 
   return (
-    <html lang={locale} dir={getDir(locale)}>
+    <html lang={locale} dir={getDir(locale)} className={`${plexKr.variable} ${plexMono.variable}`}>
       <body className="min-h-screen antialiased">
         {/* 저장된 언어(preferred_locale) 적용 — 파싱 중 1회, 하이드레이션·Pi SDK·인증 시작 전(표준 6절) */}
         <PreferredLocaleScript locales={routing.locales} />

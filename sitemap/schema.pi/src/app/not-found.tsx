@@ -2,10 +2,12 @@
 export default function RootNotFound() {
   return (
     <html lang="ko">
-      <body style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>
-        <h1>404</h1>
-        <p>
-          <a href="/">Home</a>
+      <body style={{ margin: 0, minHeight: '100vh', padding: 24, background: '#f5f6f8', color: '#101828', fontFamily: "'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif" }}>
+        <h1 style={{ margin: 0, fontSize: 20, fontWeight: 600 }}>404</h1>
+        <p style={{ margin: '8px 0 0', fontSize: 14 }}>
+          <a href="/" style={{ color: '#2b4c86', borderRadius: 6, textUnderlineOffset: 3 }}>
+            Home
+          </a>
         </p>
       </body>
     </html>

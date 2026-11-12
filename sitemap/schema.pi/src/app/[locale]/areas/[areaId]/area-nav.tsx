@@ -9,8 +9,8 @@
 //   · 설정 묶음 = 멤버·설정·이력·표준 점검·리버스·금칙어·승인(서브 메뉴, 리버스·금칙어·승인은 마스터 지시 2026-10-17 로 이동). 설정 화면은 SETTINGS 권한자만 → 상위 버튼은 볼 수 있는 첫 서브 화면으로 이동
 //   · 서브 기능은 상위 메뉴 화면에서만 바 위 서브 탭으로 노출, 서브 화면에 있어도 상위 메뉴를 강조
 //   · 2026-10-18 메뉴 정리(마스터 지시) : 순서 = SQL 편집기 · 표준사전 · 모델 · 설정 — SQL 편집기는 물리 모델 서브에서 빼 독립 묶음(맨 왼쪽), 설정은 맨 오른쪽(같은 날 두 번째 지시로 서로 바꿈),
-//     메인 메뉴는 아이콘(lucide) + 작은 글씨, 서브 탭은 글자 그대로. 아이콘 = 가장 일반적인 기호(설정 = 톱니바퀴, 2026-10-21 마스터 지시 — src/lib/menu-icons 단일 소스), 묶음별 무채색 계열 색감(기술 슬레이트·표준사전 스톤·모델 세이지·설정 징크·결제 모브), 현재 메뉴 = 묶음의 진한 색 타일
-//     서브 바 = 현재 묶음 색의 연한 바탕, 메인 메뉴 = 화면 전체 폭 가운데(좁으면 가로 스크롤)
+//     메인 메뉴는 3D 키캡 아이콘(Icon3D sm) + 작은 글씨, 서브 탭은 글자 그대로. 아이콘 = 가장 일반적인 기호(설정 = 톱니바퀴, 2026-10-21 마스터 지시 — src/lib/menu-icons 단일 소스), 현재 메뉴 = 남색 키(2026-11-12 디자인 개편 — 묶음별 색 폐지, 묶음 사이 헤어라인)
+//     서브 바 = 세그먼트 탭(seg), 메인 메뉴 = 화면 전체 폭 가운데(좁으면 가로 스크롤)
 //     서브 메뉴 = 메인 메뉴 바로 위, 묶음 기준 정렬(마스터 지시 2026-10-18) : 표준사전 = 묶음 왼쪽 끝에 맞춤, 모델·설정 = 묶음 오른쪽 끝에 맞춤(화면 끝 안쪽으로)
 //   · 요금제 = 설정 오른쪽 독립 메인 메뉴, 권한 무관(멤버면 항상 — 결제 전에도 들어가야 함, 마스터 지시 2026-10-19)
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
@@ -22,7 +22,8 @@ import { usePathname } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronUp, type LucideIcon } from 'lucide-react'
-import { MENU_ICON as I, TONE, type Tone } from '@/lib/menu-icons'
+import { MENU_ICON as I } from '@/lib/menu-icons'
+import { Icon3D } from '@/components/icon-3d'
 import type { Perm } from '@/lib/roles'
 
 // nm = 화면 이름의 번역 키(messages nav.<nm>)
@@ -154,22 +155,17 @@ const REST: Item[] = [
 // 요금제 — 권한 무관 독립 메뉴(설정 오른쪽)
 const PLAN_ITEM: Item = { seg: 'plan', nm: 'plan', icon: I.plan }
 
-// 메뉴 묶음 박스 — 묶음별 무채색 계열 색감(마스터 지시 2026-10-21, src/lib/menu-icons TONE)
-const group = (t: Tone) =>
-  `flex shrink-0 gap-1 rounded-md border p-0.5 ${t.box}`
+// 메뉴 묶음 — 박스 없이 묶음 사이 헤어라인만(2026-11-12 디자인 개편)
+const group = 'flex shrink-0 gap-0.5 [&+&]:border-s [&+&]:border-line [&+&]:ps-2'
 // ?tab= 이 없을 때 화면별 기본 탭
 const DEF_TAB: Record<string, string> = {
   model: 'prj',
   bulk: 'words',
   monitor: 'app',
 }
-// 아이콘 = 가장 일반적인 기호(설정 = 톱니바퀴 등, 2026-10-21 — 2026-10-20 의 가는 선 기하 기호 대체), 색 = 묶음 색
-//  평소 = 흰 바탕 + 묶음 색 테두리 타일, 현재 메뉴 = 묶음의 진한 색 타일 + 흰 아이콘, 서브 바 = 현재 묶음의 연한 바탕 · 현재 서브 탭 = 진한 색
-// 메인 메뉴 = 아이콘 타일 위 + 작은 글씨 아래, 현재 메뉴는 묶음 연한 바탕
-const tab = (on: boolean, t: Tone) =>
-  `group flex min-w-[3.75rem] flex-col items-center gap-0.5 rounded-lg px-2 py-1 transition ${on ? `${t.soft} ${t.text} font-semibold ring-1` : 'text-[#5b6578] hover:bg-white hover:text-[#2c3850]'}`
-const tile = (on: boolean, t: Tone) =>
-  `flex h-7 w-7 items-center justify-center rounded-md border transition ${on ? `${t.on} text-white` : `bg-gradient-to-b ${t.tile} group-hover:-translate-y-px group-hover:border-current`}`
+// 메인 메뉴 = 3D 키캡 아이콘 위 + 작은 글씨 아래, 현재 메뉴 = 남색 키 + 진한 글자
+const tab = (on: boolean) =>
+  `group flex min-w-14 flex-col items-center gap-1 rounded-control px-1.5 pt-1.5 pb-1 text-xs transition-colors ${on ? 'font-medium text-ink' : 'text-ink-2 hover:text-ink'}`
 
 export default function AreaNav() {
   const { areaId } = useParams<{ areaId: string }>()
@@ -207,14 +203,6 @@ export default function AreaNav() {
   const active = [...REST, ...CORE, ...MODEL, ...SQLED].find(
     (m) => m.subs && isOn(m),
   )
-  // 서브 바 색 = 현재 메뉴가 속한 묶음 색
-  const subTone = SQLED.includes(active!)
-    ? TONE.tech
-    : CORE.includes(active!)
-      ? TONE.std
-      : MODEL.includes(active!)
-        ? TONE.model
-        : TONE.set
   // 지금 메뉴(서브 유무 무관 — 접은 줄 표시용)
   const cur = [...REST, ...CORE, ...MODEL, ...SQLED, PLAN_ITEM].find(isOn)
   // 서브 바를 현재 메인 메뉴 묶음 위에 — 묶음 data-sub-align(left·right) 끝에 맞추고 화면 양끝 8px 안쪽으로, 메인 줄 가로 스크롤·창 크기 바뀌면 다시 계산
@@ -287,18 +275,16 @@ export default function AreaNav() {
     }
   }, [])
 
-  const item = (tone: Tone) => (m: Item) => (
+  const item = (m: Item) => (
     <li key={m.seg}>
       <Link
         href={hrefOf(m)}
         aria-current={isOn(m) ? 'page' : undefined}
-        className={tab(isOn(m), tone)}
+        className={tab(isOn(m))}
         title={t(m.nm)}
       >
-        <span aria-hidden className={tile(isOn(m), tone)}>
-          <m.icon className="h-4 w-4" strokeWidth={1.5} />
-        </span>
-        <span className="text-[11px] leading-none">{t(m.nm)}</span>
+        <Icon3D icon={m.icon} size="sm" on={isOn(m)} />
+        <span className="max-w-20 truncate">{t(m.nm)}</span>
       </Link>
     </li>
   )
@@ -307,36 +293,25 @@ export default function AreaNav() {
     <nav
       ref={navRef}
       aria-label={t('label')}
-      className={`fixed inset-x-0 bottom-0 z-40 touch-manipulation border-t bg-white/95 backdrop-blur ${fold ? 'pb-[max(12px,env(safe-area-inset-bottom))]' : 'pb-[max(4px,env(safe-area-inset-bottom))]'}`}
+      className={`fixed inset-x-0 bottom-0 z-40 touch-manipulation border-t border-line bg-surface ${fold ? 'pb-[max(12px,env(safe-area-inset-bottom))]' : 'pb-[max(4px,env(safe-area-inset-bottom))]'}`}
     >
       {/* 접힘 = 전체 폭 접힘 바(44px, 바 전체가 눌림 영역) — 화면 맨 아래에서 띄워 Pi Browser 하단 제스처 바·브라우저 UI 에 가리지 않게(마스터 2026-11-02) */}
-      {fold ? (
+      {fold && (
         <button
           type="button"
           onClick={toggle}
           aria-expanded={false}
           aria-label={cur ? t('expandWith', { menu: t(cur.nm) }) : t('expand')}
           title={t('expand')}
-          className="flex min-h-11 w-full items-center justify-center gap-1.5 px-3 text-xs text-[#5b6578] hover:bg-gray-100 hover:text-[#2c3850] focus-visible:ring-2 focus-visible:ring-[#5b6578]/50 focus-visible:outline-none focus-visible:ring-inset"
+          className="flex min-h-11 w-full items-center justify-center gap-2 px-3 text-xs text-ink-2 transition-colors hover:bg-raised hover:text-ink focus-visible:outline-offset-[-2px]"
         >
-          <ChevronUp className="h-4 w-4 shrink-0" aria-hidden />
+          {cur && <Icon3D icon={cur.icon} size="sm" on />}
           <span className="truncate">{cur ? t(cur.nm) : t('expand')}</span>
-        </button>
-      ) : (
-        // 접기 손잡이 — 본문과 하단 메뉴 사이 선 중앙에 화살표만(마스터 지시 2026-10-20), 서브 바를 가리지 않게 선 위에 얹음. 모양 16×48 그대로, 눌림 영역 = 투명 의사요소로 32×64(아래는 4px 만 — 메인 메뉴 줄 위 여백 안)
-        <button
-          type="button"
-          onClick={toggle}
-          aria-expanded
-          aria-label={t('collapse')}
-          title={t('collapse')}
-          className="absolute bottom-full left-1/2 z-10 flex h-4 w-12 -translate-x-1/2 items-center justify-center rounded-t-md border border-b-0 bg-white text-gray-500 shadow-[0_-1px_2px_rgba(15,23,42,0.06)] before:absolute before:-inset-x-2 before:-top-3 before:-bottom-1 hover:bg-gray-100 hover:text-gray-800"
-        >
-          <ChevronDown className="h-3.5 w-3.5" aria-hidden />
+          <ChevronUp className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
         </button>
       )}
       {!fold && active?.subs && (
-        <div className="relative h-9">
+        <div className="relative h-10">
           <ul
             ref={subRef}
             aria-label={t('subOf', { menu: t(active.nm) })}
@@ -344,14 +319,14 @@ export default function AreaNav() {
               left: subX ?? 0,
               visibility: subX == null ? 'hidden' : undefined,
             }}
-            className={`absolute bottom-0 flex max-w-[calc(100vw-16px)] gap-1 overflow-x-auto rounded-t-lg border border-b-0 px-1.5 py-1 text-xs whitespace-nowrap shadow-[0_-1px_3px_rgba(15,23,42,0.08)] ${subTone.soft} ${subTone.tile}`}
+            className="seg absolute bottom-1 max-w-[calc(100vw-16px)]"
           >
             {subsOf(active).map((s) => (
               <li key={s.seg + (s.tab ?? '')}>
                 <Link
                   href={subHref(s)}
                   aria-current={subOn(s) ? 'page' : undefined}
-                  className={`block rounded px-2.5 py-1 ${subOn(s) ? `${subTone.on} font-semibold text-white` : `${subTone.text} hover:bg-white/70`}`}
+                  className="seg-item"
                 >
                   {t(s.nm)}
                 </Link>
@@ -361,49 +336,47 @@ export default function AreaNav() {
         </div>
       )}
       {!fold && (
-        <div ref={rowRef} className="w-full overflow-x-auto px-2 py-1.5">
-          <div className="mx-auto flex w-max items-center gap-2 whitespace-nowrap">
-            {visible(SQLED).length > 0 && (
-              <ul
-                aria-label={t('groupTech')}
-                data-sub-align="item"
-                className={group(TONE.tech)}
-              >
-                {visible(SQLED).map(item(TONE.tech))}
+        <div className="flex items-center">
+          {/* 스크롤 영역 = 접기 단추와 나란히(겹치지 않음), 오른쪽 끝 24px 페이드 = 뒤에 메뉴가 더 있음 표시(pe-6 여백이라 끝까지 밀면 메뉴는 안 흐려짐) */}
+          <div ref={rowRef} className="min-w-0 flex-1 overflow-x-auto px-2 pt-1 pb-1 pe-6 [scrollbar-width:none] [mask-image:linear-gradient(to_right,black_calc(100%_-_24px),transparent)] rtl:[mask-image:linear-gradient(to_left,black_calc(100%_-_24px),transparent)]">
+            <div className="mx-auto flex w-max items-stretch gap-2 whitespace-nowrap">
+              {visible(SQLED).length > 0 && (
+                <ul aria-label={t('groupTech')} data-sub-align="item" className={group}>
+                  {visible(SQLED).map(item)}
+                </ul>
+              )}
+              {/* 메뉴 묶음 = 메뉴 권한(2 표준·3 모델링·4 설정)이 있을 때만 — 역할 ∩ 요금제 */}
+              {allowed('STD_VIEW') && (
+                <ul aria-label={t('groupStd')} data-sub-align="left" className={group}>
+                  {visible(CORE).map(item)}
+                </ul>
+              )}
+              {allowed('MODEL_VIEW') && (
+                <ul aria-label={t('groupModel')} data-sub-align="right" className={group}>
+                  {visible(MODEL).map(item)}
+                </ul>
+              )}
+              {allowed('SET_VIEW') && (
+                <ul aria-label={t('groupSet')} data-sub-align="right" className={group}>
+                  {visible(REST).map(item)}
+                </ul>
+              )}
+              <ul aria-label={t('groupPlan')} className={group}>
+                {item(PLAN_ITEM)}
               </ul>
-            )}
-            {/* 메뉴 묶음 = 메뉴 권한(2 표준·3 모델링·4 설정)이 있을 때만 — 역할 ∩ 요금제 */}
-            {allowed('STD_VIEW') && (
-              <ul
-                aria-label={t('groupStd')}
-                data-sub-align="left"
-                className={group(TONE.std)}
-              >
-                {visible(CORE).map(item(TONE.std))}
-              </ul>
-            )}
-            {allowed('MODEL_VIEW') && (
-              <ul
-                aria-label={t('groupModel')}
-                data-sub-align="right"
-                className={group(TONE.model)}
-              >
-                {visible(MODEL).map(item(TONE.model))}
-              </ul>
-            )}
-            {allowed('SET_VIEW') && (
-              <ul
-                aria-label={t('groupSet')}
-                data-sub-align="right"
-                className={group(TONE.set)}
-              >
-                {visible(REST).map(item(TONE.set))}
-              </ul>
-            )}
-            <ul aria-label={t('groupPlan')} className={group(TONE.plan)}>
-              {item(TONE.plan)(PLAN_ITEM)}
-            </ul>
+            </div>
           </div>
+          {/* 접기 단추 — 메인 줄 오른쪽 끝, 스크롤 영역 밖 형제(메뉴 타일을 덮지 않음, 2026-11-12 — 선 위 손잡이 폐지) */}
+          <button
+            type="button"
+            onClick={toggle}
+            aria-expanded
+            aria-label={t('collapse')}
+            title={t('collapse')}
+            className="btn-ghost btn-icon btn-sm me-1 shrink-0"
+          >
+            <ChevronDown aria-hidden />
+          </button>
         </div>
       )}
     </nav>

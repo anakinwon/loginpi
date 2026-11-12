@@ -9,8 +9,12 @@ import { piFetch } from '@pi/auth/client'
 //  인덱스(S5, sql/063) : 테이블 상세 아래 목록·추가(칼럼을 고른 순서 = 인덱스 칼럼 순서)·삭제, 테이블 작성완료면 읽기 전용
 import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { Check, ChevronDown, ChevronUp, Download, KeyRound, Lock, Plus, RefreshCw, Trash2, TriangleAlert, Undo2 } from 'lucide-react'
 import { DBMS_PRFL, dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
 import { type MbrRole, type Perm } from '@/lib/roles'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 import StageBar, { type StageData } from '../model/stage-bar'
 import { useSubj } from '../model/use-subj'
 
@@ -71,7 +75,9 @@ const DIFF_NM: Record<keyof Diff, string> = { add_tbl: '추가 테이블', del_t
 const DBMS = dbmsList()
 const dbmsNm = (cd: string) => DBMS.find((d) => d.cd === cd)?.nm ?? cd
 const tpOf = (c: Col) => (c.data_len != null ? `${c.phy_tp_nm}(${c.data_len}${c.data_scale != null ? `,${c.data_scale}` : ''})` : c.phy_tp_nm)
-const btn = 'rounded border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-40'
+// 보조 동작 = 평면 버튼(sm), 칼럼 표 칸 = 행 헤어라인만
+const btn = 'btn-key btn-sm'
+const TDP = 'border-b px-3 py-1'
 
 export default function PhysicalPage({ params }: { params: Promise<{ areaId: string }> }) {
   const { areaId } = use(params)
@@ -256,97 +262,116 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
   const canConvert = editor && picked.size > 0 && !!pv && !pv.why.length && !pv.issues.length
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">물리 모델</h1>
-      <p className="mt-1 text-sm text-gray-600">논리 모델 점검을 통과한 프로젝트를 DBMS별 물리 모델(테이블·칼럼·FK)로 전환하고, 칼럼 순서·NULL·기본값을 다듬은 뒤 DDL을 내려받습니다(DB에 직접 실행하지 않음).</p>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="물리 모델" info="논리 모델 점검을 통과한 프로젝트를 DBMS별 물리 모델(테이블·칼럼·FK)로 전환하고, 칼럼 순서·NULL·기본값을 다듬은 뒤 DDL을 내려받습니다(DB에 직접 실행하지 않음)." />
 
-      <section className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#c7d2e6] bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-3 text-sm text-white shadow-md" aria-label="전환 설정">
-        <span className="font-semibold">프로젝트</span>
-        <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setMdlId(''), setDbms(''))} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="프로젝트 선택">
-          {prjs.length === 0 && <option value="">프로젝트가 없습니다(개념 모델에서 등록)</option>}
+      <section className="panel flex flex-wrap items-center gap-2 px-3 py-2 text-sm" aria-label="전환 설정">
+        <span className="text-xs font-medium text-ink-3">프로젝트</span>
+        <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setMdlId(''), setDbms(''))} className="input-sm w-auto max-w-60" aria-label="프로젝트 선택">
+          {prjs.length === 0 && <option value="">프로젝트 없음(개념 모델에서 등록)</option>}
           {prjs.map((p) => (
             <option key={p.prj_id} value={p.prj_id}>
               {p.prj_nm}
             </option>
           ))}
         </select>
-        <span className="font-semibold">DBMS</span>
-        <select value={dbms} onChange={(e) => setDbms(e.target.value as DbmsCd)} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="DBMS 선택">
+        <span className="mx-1 h-5 w-px bg-line" aria-hidden />
+        <span className="text-xs font-medium text-ink-3">DBMS</span>
+        <select value={dbms} onChange={(e) => setDbms(e.target.value as DbmsCd)} className="input-sm w-auto" aria-label="DBMS 선택">
           {DBMS.map((d) => (
             <option key={d.cd} value={d.cd}>
               {d.nm}
             </option>
           ))}
         </select>
-        <select value={dbms === '0014' ? 'LOWER' : ltr} disabled={dbms === '0014'} title={dbms === '0014' ? 'PostgreSQL DDL 은 항상 소문자(테이블·칼럼·PK·인덱스) — 물리 모델 이름은 대문자 그대로' : 'DDL 식별자 대소문자'} onChange={(e) => setLtr(e.target.value as '' | 'UPPER' | 'LOWER')} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900 disabled:opacity-70" aria-label="식별자 대소문자">
+        <select value={dbms === '0014' ? 'LOWER' : ltr} disabled={dbms === '0014'} title={dbms === '0014' ? 'PostgreSQL DDL 은 항상 소문자(테이블·칼럼·PK·인덱스) — 물리 모델 이름은 대문자 그대로' : 'DDL 식별자 대소문자'} onChange={(e) => setLtr(e.target.value as '' | 'UPPER' | 'LOWER')} className="input-sm w-auto disabled:text-ink-3" aria-label="식별자 대소문자">
           <option value="">대소문자 : DBMS 기본</option>
           <option value="UPPER">대문자</option>
           <option value="LOWER">소문자</option>
         </select>
-        <span className="font-semibold">주제영역</span>
-        <select value={subjId} onChange={(e) => (setSubjId(e.target.value), setEdit(new Map()))} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="주제영역 선택">
-          {subjs.length === 0 && <option value="">주제영역이 없습니다</option>}
+        <span className="mx-1 h-5 w-px bg-line" aria-hidden />
+        <span className="text-xs font-medium text-ink-3">주제영역</span>
+        <select value={subjId} onChange={(e) => (setSubjId(e.target.value), setEdit(new Map()))} className="input-sm w-auto max-w-60" aria-label="주제영역 선택">
+          {subjs.length === 0 && <option value="">주제영역 없음</option>}
           {subjs.map((x) => (
             <option key={x.subj_id} value={x.subj_id}>
               {x.subj_nm}
             </option>
           ))}
         </select>
-        <button type="button" disabled={!canConvert || busy} onClick={() => void convert()} className="ml-auto rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40">
+        <button type="button" disabled={!canConvert || busy} onClick={() => void convert()} className="btn-3d btn-sm ms-auto">
           물리 모델로 전환
         </button>
       </section>
 
       {prjId && dbms && <StageBar api={api} prjId={prjId} editor={editor} mode="PHY" dbms={dbms} picked={picked} onPick={setPicked} subjId={subjId} rev={stageRev} onChanged={() => void loadDet()} onLoad={onStage} />}
       {pv && (
-        <section className="mt-3 rounded border p-3 text-sm" aria-label="전환 미리보기">
-          <p>
-            미리보기({dbmsNm(pv.dbms_cd)}{picked.size ? ` · 선택 엔터티 ${picked.size}` : ' · 전환 가능(작성완료·미전환) 엔터티 전체'}) : 테이블 {pv.tbl_cnt} · 칼럼 {pv.col_cnt} · FK {pv.fk_cnt}
-            {!picked.size && <span className="ml-2 text-amber-700">아래에서 전환할 엔터티(작성완료)를 고르십시오</span>}
+        <section className="panel mt-3 px-4 py-3 text-sm" aria-label="전환 미리보기">
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-medium text-ink">미리보기</span>
+            <span className="text-ink-2">
+              {dbmsNm(pv.dbms_cd)}
+              {picked.size ? ` · 선택 엔터티 ${picked.size}` : ' · 전환 가능(작성완료·미전환) 엔터티 전체'}
+            </span>
+            <span className="font-mono text-xs text-ink-3 tabular-nums">
+              테이블 {pv.tbl_cnt} · 칼럼 {pv.col_cnt} · FK {pv.fk_cnt}
+            </span>
+            {!picked.size && (
+              <span className="badge" data-tone="warn">
+                전환할 엔터티 선택 필요
+              </span>
+            )}
           </p>
           {pv.why.length > 0 && (
-            <ul className="mt-1 list-disc pl-5 text-red-700">
+            <ul className="mt-2 list-disc ps-5 text-danger">
               {pv.why.map((w) => (
                 <li key={w}>
-                  {w} — <Link href={`/areas/${areaId}/logical`} className="underline">논리 모델에서 고치기</Link>
+                  {w} ·{' '}
+                  <Link href={`/areas/${areaId}/logical`} className="text-accent-ink hover:underline">
+                    논리 모델에서 고치기
+                  </Link>
                 </li>
               ))}
             </ul>
           )}
           {pv.issues.length > 0 && (
-            <ul className="mt-1 max-h-40 list-disc overflow-auto pl-5 text-red-700">
+            <ul className="mt-2 max-h-40 list-disc overflow-auto ps-5 text-danger">
               {pv.issues.map((w) => (
                 <li key={w}>{w}</li>
               ))}
             </ul>
           )}
-          {!pv.why.length && !pv.issues.length && <p className="mt-1 text-green-700">전환할 수 있습니다</p>}
+          {!pv.why.length && !pv.issues.length && (
+            <p className="mt-1 flex items-center gap-1 text-dense text-ok">
+              <Check className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
+              전환 가능
+            </p>
+          )}
         </section>
       )}
       {/* 이미 전환된 엔터티의 논리 변경(속성·FK 추가 등)은 전환이 아니라 동기화로 반영 — 위에서 바로 보이게(2026-10-20 마스터 "추가했는데 반영이 안 돼") */}
       {diffN > 0 && (
-        <p className="mt-2 flex flex-wrap items-center gap-2 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          이미 전환된 테이블에 반영되지 않은 논리 변경 {diffN}건이 있습니다 — 전환이 아니라 동기화로 반영합니다
+        <p className="mt-3 flex flex-wrap items-center gap-2 rounded-control bg-warn-soft px-3 py-2 text-dense text-warn">
+          <TriangleAlert className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+          반영 안 된 논리 변경 {diffN}건 · 동기화로 반영
           {editor && (
-            <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={busy} onClick={() => void sync()}>
-              논리 변경 반영(동기화)
+            <button type="button" className="btn-key btn-sm ms-auto" disabled={busy} onClick={() => void sync()}>
+              <RefreshCw aria-hidden />
+              동기화
             </button>
           )}
         </p>
       )}
       {msg && (
-        <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">
+        <p role="status" className="mt-2 text-dense text-ink">
           {msg}
         </p>
       )}
 
       {models.length > 0 && (
-        <nav className="mt-4 flex flex-wrap gap-2" aria-label="물리 모델 목록">
+        <nav className="seg mt-6" aria-label="물리 모델 목록">
           {models.map((m) => (
-            <button key={m.phy_mdl_id} type="button" onClick={() => setMdlId(m.phy_mdl_id)} aria-pressed={m.phy_mdl_id === mdlId} className={`rounded-full border px-3 py-1 text-sm ${m.phy_mdl_id === mdlId ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : ''}`}>
+            <button key={m.phy_mdl_id} type="button" onClick={() => setMdlId(m.phy_mdl_id)} aria-pressed={m.phy_mdl_id === mdlId} className="seg-item">
               {dbmsNm(m.dbms_cd)} · {m.dbms_cd === '0014' || m.idntfr_ltr_cd === 'LOWER' ? 'DDL 소문자' : 'DDL 대문자'}
             </button>
           ))}
@@ -357,91 +382,107 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
         <>
           <section className="mt-3 flex flex-wrap items-center gap-2 text-sm" aria-label="물리 모델 작업">
             <button type="button" className={btn} onClick={() => void down('format=ddl', 'ddl.sql')}>
-              DDL 내려받기(.sql)
+              <Download aria-hidden />
+              DDL
             </button>
             <button type="button" className={btn} onClick={() => void down('format=csv&type=tbl', '테이블정의서.csv')}>
+              <Download aria-hidden />
               테이블정의서
             </button>
             <button type="button" className={btn} onClick={() => void down('format=csv&type=col', '칼럼정의서.csv')}>
+              <Download aria-hidden />
               칼럼정의서
             </button>
             {editor && (
-              <button type="button" className={`${btn} ml-auto text-red-700`} onClick={() => void remove()}>
+              <button type="button" className="btn-danger btn-sm ms-auto" onClick={() => void remove()}>
+                <Trash2 aria-hidden />
                 물리 모델 삭제
               </button>
             )}
           </section>
           {det.diff && (
-            <details className="mt-2 rounded border p-2 text-sm" open={diffN > 0}>
-              <summary className={diffN ? 'font-semibold text-amber-700' : 'text-green-700'}>{diffN ? `논리 모델과 차이 ${diffN}건(도메인 영향 ${det.diff.dom_chg.length})` : '논리 모델과 차이 없음'}</summary>
+            <details className="panel mt-3 px-4 py-2 text-sm" open={diffN > 0}>
+              <summary className={`cursor-pointer py-1 font-medium ${diffN ? 'text-warn' : 'text-ok'}`}>{diffN ? `논리 모델과 차이 ${diffN}건(도메인 영향 ${det.diff.dom_chg.length})` : '논리 모델과 차이 없음'}</summary>
               {diffN > 0 && (
-                <p className="my-1 flex flex-wrap gap-2">
+                <p className="my-2 flex flex-wrap gap-2">
                   <button type="button" className={btn} onClick={() => void down('format=alter', '변경분DDL.sql')}>
-                    변경분 DDL(ALTER) 내려받기
+                    <Download aria-hidden />
+                    변경분 DDL(ALTER)
                   </button>
                   {editor && (
-                    <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={busy} onClick={() => void sync()}>
-                      논리 변경 반영(동기화)
+                    <button type="button" className={btn} disabled={busy} onClick={() => void sync()}>
+                      <RefreshCw aria-hidden />
+                      동기화
                     </button>
                   )}
                 </p>
               )}
-              {(Object.keys(DIFF_NM) as (keyof Diff)[])
-                .filter((k) => det.diff![k].length)
-                .map((k) => (
-                  <p key={k} className={k === 'dom_chg' ? 'text-red-700' : ''}>
-                    <b>{DIFF_NM[k]}</b> : {det.diff![k].join(', ')}
-                  </p>
-                ))}
+              <div className="space-y-1 pb-1 text-dense">
+                {(Object.keys(DIFF_NM) as (keyof Diff)[])
+                  .filter((k) => det.diff![k].length)
+                  .map((k) => (
+                    <p key={k} className={k === 'dom_chg' ? 'text-danger' : 'text-ink-2'}>
+                      <span className="font-medium text-ink">{DIFF_NM[k]}</span> : {det.diff![k].join(', ')}
+                    </p>
+                  ))}
+              </div>
             </details>
           )}
 
-          <div className="mt-3 grid gap-4 md:grid-cols-[16rem_1fr]">
-            <ul className="max-h-[32rem] overflow-auto rounded border text-sm" aria-label="테이블 목록">
-              {subjTbls.length === 0 && <li className="px-3 py-2 text-gray-500">이 주제영역에 전환된 테이블이 없습니다</li>}
+          <div className="mt-4 grid gap-4 md:grid-cols-[16rem_minmax(0,1fr)]">
+            <ul className="panel max-h-[32rem] overflow-auto p-1 text-sm" aria-label="테이블 목록">
+              {subjTbls.length === 0 && (
+                <li className="empty">
+                  <Icon3D icon={MENU_ICON.physical} />
+                  전환된 테이블 없음
+                </li>
+              )}
               {subjTbls.map((t) => (
                 <li key={t.phy_tbl_id}>
-                  <button type="button" onClick={() => (setTblId(t.phy_tbl_id), setEdit(new Map()))} aria-current={t.phy_tbl_id === tbl?.phy_tbl_id} className={`w-full px-3 py-2 text-left font-mono ${t.phy_tbl_id === tbl?.phy_tbl_id ? 'bg-[#e9eff9] font-semibold' : 'hover:bg-gray-50'}`}>
-                    {t.tbl_nm}
-                    <span className="ml-1 text-xs text-gray-500">({t.cols.length})</span>
+                  <button type="button" onClick={() => (setTblId(t.phy_tbl_id), setEdit(new Map()))} aria-current={t.phy_tbl_id === tbl?.phy_tbl_id} className={`flex w-full items-center gap-2 rounded-control px-3 py-1.5 text-start font-mono text-dense transition-colors ${t.phy_tbl_id === tbl?.phy_tbl_id ? 'bg-accent-soft font-medium text-accent-ink' : 'hover:bg-raised'}`}>
+                    <span className="min-w-0 flex-1 truncate">{t.tbl_nm}</span>
+                    <span className="text-xs text-ink-3 tabular-nums">{t.cols.length}</span>
                   </button>
                 </li>
               ))}
             </ul>
             {tbl && (
-              <section aria-label={`${tbl.tbl_nm} 칼럼`}>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-mono font-semibold text-[#1f3a68]">{tbl.tbl_nm}</h2>
-                  <span className="text-sm text-gray-600">{tbl.tbl_desc}</span>
+              <section className="min-w-0" aria-label={`${tbl.tbl_nm} 칼럼`}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="chip-phy" data-size="lg">
+                    {tbl.tbl_nm}
+                  </h2>
+                  <span className="text-dense text-ink-2">{tbl.tbl_desc}</span>
                   {(() => {
                     // 단일 PK 자동 증가(테이블별 옵션) — 화면은 단일·정수만 판정, 관계 상속 칼럼은 저장 때 서버가 거부
                     const pk = tbl.cols.filter((c) => c.pk_yn === 'Y')
                     const why = pk.length !== 1 ? (pk.length ? '복합 PK' : 'PK 없음') : !/^(NUMBER|NUMERIC|DECIMAL|INT|INTEGER|BIGINT|SMALLINT)$/i.test(pk[0].phy_tp_nm) ? '정수형 PK 아님' : pk[0].data_scale ? '소수점 있는 PK' : tbl.phy_sts_cd === 'CMPTN' ? '작성완료(완료 취소 후 변경)' : ''
                     const on = tbl.auto_inc_yn === 'Y'
                     return (
-                      <label className={`flex items-center gap-1 rounded border px-2 py-0.5 text-sm ${on ? 'border-[#3b5f9e] bg-[#e9eff9]' : ''}`} title={why ? `자동 증가 불가 : ${why}` : `단일 PK ${pk[0]?.col_nm ?? ''} 를 자동 증가로 DDL 생성 — ${DBMS_PRFL[det.mdl.dbms_cd as DbmsCd]?.autoInc ?? ''}`}>
+                      <label className={`inline-flex items-center gap-2 rounded-control border px-2 py-1 text-dense transition-colors ${on ? 'border-accent-ink/40 bg-accent-soft text-accent-ink' : 'border-line'}`} title={why ? `자동 증가 불가 : ${why}` : `단일 PK ${pk[0]?.col_nm ?? ''} 를 자동 증가로 DDL 생성 — ${DBMS_PRFL[det.mdl.dbms_cd as DbmsCd]?.autoInc ?? ''}`}>
                         <input type="checkbox" disabled={!editor || busy || (!!why && !on)} checked={on} onChange={(e) => void setAutoInc(e.target.checked)} /> 단일 PK 자동 증가
-                        {why && <span className="text-xs text-gray-500">({why})</span>}
+                        {why && <span className="text-xs text-ink-3">({why})</span>}
                       </label>
                     )
                   })()}
                   {editor && (
-                    <span className="ml-auto flex gap-2">
+                    <span className="ms-auto flex gap-2">
                       <button type="button" className={btn} disabled={!edit.size || busy} onClick={() => setEdit(new Map())}>
+                        <Undo2 aria-hidden />
                         되돌리기
                       </button>
-                      <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={!edit.size || busy} onClick={() => void save()}>
+                      <button type="button" className="btn-3d btn-sm" disabled={!edit.size || busy} onClick={() => void save()}>
                         저장
                       </button>
                     </span>
                   )}
                 </div>
-                <div className="mt-2 overflow-x-auto">
-                  <table className="w-full border-collapse text-sm">
-                    <thead className="bg-[#e9eff9]">
-                      <tr>
+                <div className="mt-2 overflow-x-auto rounded-card border border-line bg-surface">
+                  <table className="w-full border-collapse text-dense">
+                    <thead>
+                      <tr className="thead-3d text-start">
                         {['순서', '칼럼명', '타입', 'PK', 'NULL', '기본값', ''].map((h) => (
-                          <th key={h} className="border px-2 py-1 text-left">
+                          <th key={h} className="px-3 py-2 text-start">
                             {h}
                           </th>
                         ))}
@@ -452,30 +493,37 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                         const sys = c.sys_col_yn === 'Y'
                         const dirty = edit.has(c.phy_col_id)
                         return (
-                          <tr key={c.phy_col_id} className={sys ? 'bg-gray-50 text-gray-500' : dirty ? 'bg-amber-50' : ''}>
-                            <td className="border px-2 py-1">{c.col_seq}</td>
-                            <td className="border px-2 py-1 font-mono">
-                              {c.col_nm}
-                              {sys && <span className="ml-1 rounded bg-gray-200 px-1 text-xs">시스템</span>}
+                          <tr key={c.phy_col_id} data-mode={dirty && !sys ? 'edit' : undefined} className={sys ? 'bg-well text-ink-3' : ''}>
+                            <td className={`${TDP} text-right font-mono text-xs text-ink-3 tabular-nums`}>{c.col_seq}</td>
+                            <td className={TDP}>
+                              <span className="chip-phy">{c.col_nm}</span>
+                              {sys && <span className="badge ms-1">시스템</span>}
                             </td>
-                            <td className="border px-2 py-1 font-mono">{tpOf(c)}</td>
-                            <td className="border px-2 py-1">{c.pk_yn === 'Y' ? `🔑${c.pk_seq}` : ''}</td>
-                            <td className="border px-2 py-1">
+                            <td className={`${TDP} font-mono text-xs`}>{tpOf(c)}</td>
+                            <td className={TDP}>
+                              {c.pk_yn === 'Y' && (
+                                <span className="inline-flex items-center gap-1 text-ink-2 tabular-nums">
+                                  <KeyRound className="h-3.5 w-3.5" strokeWidth={1.75} aria-label="PK" />
+                                  {c.pk_seq}
+                                </span>
+                              )}
+                            </td>
+                            <td className={TDP}>
                               <input type="checkbox" checked={c.null_yn === 'Y'} disabled={!editor || sys || c.pk_yn === 'Y'} onChange={(e) => put(c.phy_col_id, { null_yn: e.target.checked ? 'Y' : 'N' })} aria-label={`${c.col_nm} NULL 허용`} />
                             </td>
-                            <td className="border px-2 py-1">
-                              <input value={c.bsc_val_txt ?? ''} disabled={!editor || sys} onChange={(e) => put(c.phy_col_id, { bsc_val_txt: e.target.value })} placeholder="예 : 0 · 'N' · CURRENT_TIMESTAMP" maxLength={200} className="w-48 rounded border px-1 font-mono text-xs disabled:bg-transparent" aria-label={`${c.col_nm} 기본값`} />
+                            <td className={TDP}>
+                              <input value={c.bsc_val_txt ?? ''} disabled={!editor || sys} onChange={(e) => put(c.phy_col_id, { bsc_val_txt: e.target.value })} placeholder="기본값" title="예 : 0 · 'N' · CURRENT_TIMESTAMP" maxLength={200} className="input-sm w-48 font-mono text-xs disabled:border-transparent disabled:bg-transparent" aria-label={`${c.col_nm} 기본값`} />
                             </td>
-                            <td className="border px-2 py-1 whitespace-nowrap">
+                            <td className={`${TDP} whitespace-nowrap`}>
                               {editor && !sys && (
-                                <>
-                                  <button type="button" className="px-1" disabled={i === 0} onClick={() => move(i, -1)} aria-label={`${c.col_nm} 위로`}>
-                                    ▲
+                                <span className="inline-flex gap-0.5">
+                                  <button type="button" className="btn-ghost btn-icon btn-sm" disabled={i === 0} onClick={() => move(i, -1)} aria-label={`${c.col_nm} 위로`} title="위로">
+                                    <ChevronUp aria-hidden />
                                   </button>
-                                  <button type="button" className="px-1" disabled={rows[i + 1]?.sys_col_yn !== 'N'} onClick={() => move(i, 1)} aria-label={`${c.col_nm} 아래로`}>
-                                    ▼
+                                  <button type="button" className="btn-ghost btn-icon btn-sm" disabled={rows[i + 1]?.sys_col_yn !== 'N'} onClick={() => move(i, 1)} aria-label={`${c.col_nm} 아래로`} title="아래로">
+                                    <ChevronDown aria-hidden />
                                   </button>
-                                </>
+                                </span>
                               )}
                             </td>
                           </tr>
@@ -484,56 +532,77 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                     </tbody>
                   </table>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">시스템 칼럼(최종수정일시·최종수정자ID·최종등록일시·최종등록자ID)은 모델에 두지 않고 DDL 내려받기 때만 테이블 맨 끝에 자동으로 붙습니다. 기본값은 숫자·작은따옴표 문자열·CURRENT_TIMESTAMP 같은 키워드만 허용합니다.</p>
-                <section className="mt-3 rounded border p-2 text-sm" aria-label={`${tbl.tbl_nm} 인덱스`}>
-                  <h3 className="font-semibold text-[#1f3a68]">인덱스</h3>
-                  {(tbl.indexes ?? []).length === 0 ? (
-                    <p className="mt-1 text-gray-500">PK 외 인덱스가 없습니다</p>
-                  ) : (
-                    <ul className="mt-1 space-y-1">
-                      {(tbl.indexes ?? []).map((x) => (
-                        <li key={x.phy_idx_id} className={`flex flex-wrap items-center gap-2 ${x.invalid ? 'text-red-700' : ''}`}>
-                          <span className="font-mono">{x.idx_nm}</span>
-                          {x.unq_yn === 'Y' && <span className="rounded bg-[#e9eff9] px-1 text-xs">유일</span>}
-                          <span className="font-mono text-xs">({x.col_nms.join(', ')})</span>
-                          {x.invalid && <span className="text-xs">⚠ {x.why ?? '삭제된 칼럼 참조'} — DDL 에서 생략, 삭제 후 다시 만드십시오</span>}
-                          {editor && tbl.phy_sts_cd !== 'CMPTN' && (
-                            <button type="button" className={`${btn} ml-auto text-red-700`} disabled={busy} onClick={() => void delIdx(x)}>
-                              삭제
-                            </button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {tbl.phy_sts_cd === 'CMPTN' ? (
-                    <p className="mt-2 text-xs text-gray-500">작성완료 테이블은 인덱스를 바꿀 수 없습니다(완료 취소 후 편집)</p>
-                  ) : (
-                    editor && (
-                      <div className="mt-2 border-t pt-2">
-                        <p className="text-xs text-gray-600">칼럼을 누른 순서가 인덱스 칼럼 순서입니다(최대 16개, 다시 누르면 빠짐). 이름은 X_테이블명_번호로 자동 생성됩니다.</p>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {rows.map((c) => {
-                            const i = idxCols.indexOf(c.phy_col_id)
-                            return (
-                              <button key={c.phy_col_id} type="button" aria-pressed={i >= 0} disabled={i < 0 && idxCols.length >= 16} onClick={() => setIdxCols((a) => (i >= 0 ? a.filter((id) => id !== c.phy_col_id) : [...a, c.phy_col_id]))} className={`rounded-full border px-2 py-0.5 font-mono text-xs disabled:opacity-40 ${i >= 0 ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : 'hover:bg-gray-50'}`}>
-                                {i >= 0 && `${i + 1}. `}
-                                {c.col_nm}
+                <div className="mt-1 flex items-center gap-1">
+                  <p className="hint mt-0">시스템 칼럼 4개는 DDL 때만 맨 끝에 추가</p>
+                  <InfoTip>시스템 칼럼(최종수정일시·최종수정자ID·최종등록일시·최종등록자ID)은 모델에 두지 않고 DDL 내려받기 때만 테이블 맨 끝에 자동으로 붙습니다. 기본값은 숫자·작은따옴표 문자열·CURRENT_TIMESTAMP 같은 키워드만 허용합니다.</InfoTip>
+                </div>
+                <section className="panel mt-4 text-sm" aria-label={`${tbl.tbl_nm} 인덱스`}>
+                  <h3 className="panel-head">인덱스</h3>
+                  <div className="px-4 py-3">
+                    {(tbl.indexes ?? []).length === 0 ? (
+                      <p className="text-ink-3">PK 외 인덱스 없음</p>
+                    ) : (
+                      <ul className="divide-y divide-line">
+                        {(tbl.indexes ?? []).map((x) => (
+                          <li key={x.phy_idx_id} className={`flex flex-wrap items-center gap-2 py-1.5 ${x.invalid ? 'text-danger' : ''}`}>
+                            <span className="chip-phy">{x.idx_nm}</span>
+                            {x.unq_yn === 'Y' && (
+                              <span className="badge" data-tone="accent">
+                                유일
+                              </span>
+                            )}
+                            <span className="font-mono text-xs text-ink-2">({x.col_nms.join(', ')})</span>
+                            {x.invalid && (
+                              <span className="inline-flex items-center gap-1 text-xs">
+                                <TriangleAlert className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                                {x.why ?? '삭제된 칼럼 참조'} · DDL 에서 생략, 삭제 후 다시 생성
+                              </span>
+                            )}
+                            {editor && tbl.phy_sts_cd !== 'CMPTN' && (
+                              <button type="button" className="btn-ghost btn-icon btn-sm ms-auto hover:text-danger" disabled={busy} onClick={() => void delIdx(x)} aria-label={`${x.idx_nm} 삭제`} title="삭제">
+                                <Trash2 aria-hidden />
                               </button>
-                            )
-                          })}
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {tbl.phy_sts_cd === 'CMPTN' ? (
+                      <p className="hint mt-2 flex items-center gap-1">
+                        <Lock className="h-3 w-3" strokeWidth={1.75} aria-hidden />
+                        작성완료 테이블 · 완료 취소 후 편집
+                      </p>
+                    ) : (
+                      editor && (
+                        <div className="mt-3 border-t border-line pt-3">
+                          <div className="flex items-center gap-1">
+                            <p className="text-xs font-medium text-ink-2">인덱스 칼럼</p>
+                            <InfoTip>칼럼을 누른 순서가 인덱스 칼럼 순서입니다(최대 16개, 다시 누르면 빠짐). 이름은 X_테이블명_번호로 자동 생성됩니다.</InfoTip>
+                          </div>
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {rows.map((c) => {
+                              const i = idxCols.indexOf(c.phy_col_id)
+                              return (
+                                <button key={c.phy_col_id} type="button" aria-pressed={i >= 0} disabled={i < 0 && idxCols.length >= 16} onClick={() => setIdxCols((a) => (i >= 0 ? a.filter((id) => id !== c.phy_col_id) : [...a, c.phy_col_id]))} className="btn-key btn-sm font-mono text-xs">
+                                  {i >= 0 && <span className="tabular-nums">{i + 1}.</span>}
+                                  {c.col_nm}
+                                </button>
+                              )
+                            })}
+                          </div>
+                          <div className="mt-3 flex items-center gap-3">
+                            <label className="inline-flex items-center gap-2">
+                              <input type="checkbox" checked={idxUnq} onChange={(e) => setIdxUnq(e.target.checked)} /> 유일(UNIQUE)
+                            </label>
+                            <button type="button" className={btn} disabled={!idxCols.length || busy} onClick={() => void addIdx()}>
+                              <Plus aria-hidden />
+                              인덱스 추가
+                            </button>
+                          </div>
                         </div>
-                        <div className="mt-2 flex items-center gap-2">
-                          <label className="flex items-center gap-1">
-                            <input type="checkbox" checked={idxUnq} onChange={(e) => setIdxUnq(e.target.checked)} /> 유일(UNIQUE)
-                          </label>
-                          <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={!idxCols.length || busy} onClick={() => void addIdx()}>
-                            인덱스 추가
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  )}
+                      )
+                    )}
+                  </div>
                 </section>
               </section>
             )}

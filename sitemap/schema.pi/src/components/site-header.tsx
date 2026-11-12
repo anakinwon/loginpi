@@ -10,10 +10,10 @@ export async function SiteHeader({ children }: { children?: React.ReactNode }) {
   // loginpi 의 시세 표시 스위치와 같은 역할 — 기본 표시, 'false' 만 숨김
   const showPiValuation = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE !== 'false'
   return (
-    <header className="sticky top-0 z-40 h-12 border-b bg-white/95 backdrop-blur">
-      <div className="flex h-full items-center justify-between gap-2 px-3 sm:px-4 lg:px-5">
-        <Link href="/" className="shrink-0 text-base font-bold">
-          schema.pi
+    <header className="sticky top-0 z-40 h-12 border-b border-line bg-surface">
+      <div className="flex h-full items-center justify-between gap-2 px-4 lg:px-6">
+        <Link href="/" className="shrink-0 text-base font-semibold text-ink">
+          schema<span className="text-ink-3">.pi</span>
         </Link>
         <nav className="flex min-w-0 items-center gap-3">
           {children}

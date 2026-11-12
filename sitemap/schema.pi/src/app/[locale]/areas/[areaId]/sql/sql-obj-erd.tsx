@@ -20,7 +20,8 @@ export interface ErdRel {
   to: { schema: string; table: string; columns: string[] }
 }
 const L = { w: 210, head: 22, row: 16, gap: 28, colGap: 110, pad: 12, maxRows: 30 } as const
-const C = { head: '#1f3a68', line: '#3b5f9e', border: '#94a3b8', self: '#fff7e0' } as const
+// 색 — 밝은 도면 종이(테마 무관, ERD 캔버스와 같음) : 머리 = 남색 강조 1색, 선 = 흑연, 대상 테이블 = 남색 옅은 바탕
+const C = { head: '#2b4c86', line: '#626d80', border: '#cdd2da', self: '#e6edf9', ink: '#101828', ink3: '#626d80', key: '#b45309' } as const
 const keyOf = (s: string, t: string) => `${s}.${t}`
 
 export default function ObjErd({ tables, rels, schema, rel, onOpen }: { tables: ErdTable[]; rels: ErdRel[]; schema: string; rel: string; onOpen: (schema: string, rel: string) => void }) {
@@ -37,7 +38,7 @@ export default function ObjErd({ tables, rels, schema, rel, onOpen }: { tables: 
     boxes.set(keyOf(t.schema, t.name), { t, x: L.pad + k * (L.w + L.colGap), y: ys[k], h, rows })
     ys[k] += h + L.gap
   }
-  if (!boxes.size) return <p className="p-3 text-xs text-gray-500">관계도에 그릴 테이블이 없습니다.</p>
+  if (!boxes.size) return <p className="p-3 text-xs text-ink-3">관계도에 그릴 테이블 없음</p>
   const W = L.pad * 2 + 3 * L.w + 2 * L.colGap
   const H = Math.max(...ys) + L.pad
   // 칼럼 행 가운데 y(못 찾으면 머리)
@@ -46,8 +47,8 @@ export default function ObjErd({ tables, rels, schema, rel, onOpen }: { tables: 
     return i < 0 ? b.y + L.head / 2 : b.y + L.head + i * L.row + L.row / 2 + 2
   }
   return (
-    <div className="h-full overflow-auto bg-[#f8fafc]">
-      <svg width={W} height={H} className="font-mono text-[10px]" role="img" aria-label={`${rel} 엔티티 관계도`}>
+    <div className="erd-sheet h-full overflow-auto">
+      <svg width={W} height={H} className="font-mono text-xs" style={{ fontSize: 10 }} role="img" aria-label={`${rel} 엔티티 관계도`}>
         <defs>
           <marker id="erd-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill={C.line} />
@@ -81,18 +82,18 @@ export default function ObjErd({ tables, rels, schema, rel, onOpen }: { tables: 
               <rect width={L.w} height={L.head} rx={3} fill={C.head} />
               {/* 안쪽 svg = 박스 너비에서 긴 이름 잘라 냄 */}
               <svg width={L.w - 4} height={b.h}>
-              <text x={6} y={15} fill="#fff" fontWeight="bold" fontSize={11}>
+              <text x={6} y={15} fill="#fff" fontWeight={600} fontSize={11}>
                 {(b.t.schema !== schema ? `${b.t.schema}.` : '') + b.t.name}
               </text>
               {b.rows.map((c, i) => (
-                <text key={c.name} x={6} y={L.head + i * L.row + 13} fill={c.pk ? '#92400e' : '#1f2937'} fontWeight={c.pk ? 'bold' : undefined}>
-                  {c.pk ? '🔑 ' : c.fk ? '↗ ' : '· '}
+                <text key={c.name} x={6} y={L.head + i * L.row + 13} fill={c.pk ? C.key : C.ink} fontWeight={c.pk ? 600 : undefined}>
+                  {c.pk ? 'PK ' : c.fk ? '↗ ' : '· '}
                   {c.name}
-                  <tspan fill="#6b7280"> {c.type}{c.nn ? ' NN' : ''}{c.fk ? ' FK' : ''}</tspan>
+                  <tspan fill={C.ink3}> {c.type}{c.nn ? ' NN' : ''}{c.fk ? ' FK' : ''}</tspan>
                 </text>
               ))}
               {b.t.cols.length > b.rows.length && (
-                <text x={6} y={L.head + b.rows.length * L.row + 13} fill="#6b7280">
+                <text x={6} y={L.head + b.rows.length * L.row + 13} fill={C.ink3}>
                   … +{b.t.cols.length - b.rows.length}
                 </text>
               )}

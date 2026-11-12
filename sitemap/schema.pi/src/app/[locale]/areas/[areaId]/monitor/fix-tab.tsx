@@ -6,6 +6,7 @@ import { piFetch } from '@pi/auth/client'
 import { GitPullRequest, RefreshCw } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { InfoTip } from '@/components/page-head'
 import { routeMenu } from '@/lib/mon'
 import type { FixSts } from '@/lib/mon-fix'
 import { Pager, STS, StepBar } from './fix-steps'
@@ -50,7 +51,7 @@ const GRP = [
   { k: 'REJ,RBK,RBK_DONE,RBK_FAIL', nm: '반려·되돌림' },
 ] as const
 const dt = (t: string | null) => (t ? new Date(t).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : '')
-const who = (nm: string | null) => nm ?? <span className="text-red-700">[확인중 : 사용자 없음]</span>
+const who = (nm: string | null) => nm ?? <span className="text-danger">[확인중 : 사용자 없음]</span>
 
 // canApv = 결재(승인·반려·되돌리기) 권한(MON_FIX_APV = DA 역할 ∩ 요금제4) — 없으면 결재 버튼 대신 상태만
 export default function FixTab({ live, canApv }: { live: boolean; canApv: boolean }) {
@@ -108,43 +109,46 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
   return (
     <section className="text-sm">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="font-semibold text-[#2c3850]">AI 수정 이력</h2>
-        <span className="text-xs text-[#5b6578]">
-          {data ? `${data.total}건` : ''} · 'PR 로 해결' 요청부터 운영 배포까지{at && ` · ${at.toLocaleTimeString('ko-KR', { hour12: false })} 기준`}
+        <h2 className="text-sm font-semibold text-ink">AI 수정 이력</h2>
+        <InfoTip>요청 주체 = 수정안을 만든 AI 모델 · 결재 요청자 = 'PR 로 해결'을 누른 사람 · 결재 = 승인(병합·운영 배포) 또는 반려(PR 닫기 — 수정 전 유지) · 배포된 수정은 '되돌리기'로 수정 전 코드로 다시 배포</InfoTip>
+        <span className="font-mono text-xs text-ink-3 tabular-nums">
+          {data ? `${data.total}건` : ''}
+          {at && ` · ${at.toLocaleTimeString('ko-KR', { hour12: false })} 기준`}
         </span>
-        <span className="ml-auto flex flex-wrap gap-1 text-xs" role="group" aria-label="상태 필터">
-          {GRP.map((g) => (
-            <button
-              key={g.k}
-              type="button"
-              aria-pressed={grp === g.k}
-              onClick={() => {
-                setGrp(g.k)
-                setPg(1)
-              }}
-              className={`rounded border px-2 py-0.5 ${grp === g.k ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : 'border-[#d6deeb] bg-white text-[#2c3850]'}`}
-            >
-              {g.nm}
-            </button>
-          ))}
-          <button type="button" onClick={() => void reload()} aria-label="다시 조회" className="rounded border border-[#d6deeb] bg-white px-1.5 py-0.5">
-            <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+        <span className="ms-auto flex max-w-full items-center gap-1">
+          <span className="seg" role="group" aria-label="상태 필터">
+            {GRP.map((g) => (
+              <button
+                key={g.k}
+                type="button"
+                aria-pressed={grp === g.k}
+                onClick={() => {
+                  setGrp(g.k)
+                  setPg(1)
+                }}
+                className="seg-item"
+              >
+                {g.nm}
+              </button>
+            ))}
+          </span>
+          <button type="button" onClick={() => void reload()} aria-label="다시 조회" title="다시 조회" className="btn-ghost btn-icon btn-sm">
+            <RefreshCw aria-hidden />
           </button>
         </span>
       </div>
-      <p className="mt-1 text-xs text-[#5b6578]">요청 주체 = 수정안을 만든 AI 모델 · 결재 요청자 = 'PR 로 해결'을 누른 사람 · 결재 = 승인(병합·운영 배포) 또는 반려(PR 닫기 — 수정 전 유지) · 배포된 수정은 '되돌리기'로 수정 전 코드로 다시 배포</p>
-      {err && <p className="mt-2 text-red-700">{err}</p>}
+      {err && <p role="status" className="mt-2 text-dense text-danger">{err}</p>}
       {msg && (
-        <p role="status" className="mt-2 text-[#2c3850]">
+        <p role="status" className="mt-2 text-dense text-ink-2">
           {msg}
         </p>
       )}
-      <div className="mt-2 overflow-x-auto rounded border border-[#d6deeb]">
-        <table className="w-full min-w-[1100px] border-collapse text-xs">
-          <thead>
-            <tr className="bg-[#1f3a68] text-left whitespace-nowrap text-white">
+      <div className="mt-2 overflow-x-auto rounded-card border border-line bg-surface">
+        <table className="w-full min-w-[1100px] border-collapse text-dense">
+          <thead className="thead-3d">
+            <tr className="text-start whitespace-nowrap">
               {['No', '요청일시', '메뉴 · API', '원인 → 해결', '진행 단계', '요청 주체(AI)', '결재 요청자', '결재(승인·반려)', 'PR', '배포 · 되돌리기'].map((h) => (
-                <th key={h} className="px-2 py-1.5 font-semibold">
+                <th key={h} className="px-3 py-2 text-start">
                   {h}
                 </th>
               ))}
@@ -153,105 +157,104 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
           <tbody>
             {!data ? (
               <tr>
-                <td colSpan={10} className="px-2 py-4 text-center text-[#5b6578]">
+                <td colSpan={10} className="py-6 text-center text-dense text-ink-3">
                   불러오는 중…
                 </td>
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-2 py-4 text-center text-[#5b6578]">
-                  기록이 없습니다 — 애플리케이션 탭의 AI 원인 분석에서 'PR 로 해결'을 누르면 여기에 남습니다
+                <td colSpan={10} className="py-6 text-center text-dense text-ink-3">
+                  기록 없음
                 </td>
               </tr>
             ) : (
               rows.map((r, i) => (
-                <tr key={r.fix_id} className="border-t border-[#e2e7ef] align-top">
-                  <td className="px-2 py-1.5 tabular-nums text-[#5b6578]">{data.total - (pg - 1) * data.size - i}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap tabular-nums">{dt(r.req_dtm)}</td>
-                  <td className="px-2 py-1.5">
-                    <div className="font-semibold text-[#2c3850]">{routeMenu(r.route_txt)}</div>
-                    <div className="font-mono text-[11px] text-[#5b6578]">{r.route_txt}</div>
+                <tr key={r.fix_id} className="border-t border-line align-top">
+                  <td className="px-3 py-1.5 text-right font-mono text-xs text-ink-3 tabular-nums">{data.total - (pg - 1) * data.size - i}</td>
+                  <td className="px-3 py-1.5 font-mono text-xs whitespace-nowrap tabular-nums">{dt(r.req_dtm)}</td>
+                  <td className="px-3 py-1.5">
+                    <div className="font-medium text-ink">{routeMenu(r.route_txt)}</div>
+                    <div className="font-mono text-xs text-ink-3">{r.route_txt}</div>
                   </td>
-                  <td className="max-w-[280px] px-2 py-1.5">
-                    <div className="text-[#2c3850]">{r.caus_txt}</div>
-                    <div className="text-emerald-800">→ {r.fix_txt}</div>
-                    {r.file_txt && <div className="font-mono text-[11px] text-[#5b6578]">{r.file_txt}</div>}
+                  <td className="max-w-[280px] px-3 py-1.5 whitespace-normal">
+                    <div className="text-ink">{r.caus_txt}</div>
+                    <div className="text-ok">→ {r.fix_txt}</div>
+                    {r.file_txt && <div className="font-mono text-xs text-ink-3">{r.file_txt}</div>}
                   </td>
-                  <td className="px-2 py-1.5">
-                    <div className="mb-1 font-semibold text-[#2c3850]">{STS[r.fix_sts_cd].nm}</div>
+                  <td className="px-3 py-1.5">
+                    <div className="mb-1 font-medium text-ink">{STS[r.fix_sts_cd].nm}</div>
                     <StepBar st={STS[r.fix_sts_cd].st} small />
-                    {r.err_txt && <div className="mt-1 max-w-[360px] text-red-700">{r.err_txt}</div>}
+                    {r.err_txt && <div className="mt-1 max-w-[360px] whitespace-normal text-xs text-danger">{r.err_txt}</div>}
                   </td>
-                  <td className="px-2 py-1.5">
+                  <td className="px-3 py-1.5">
                     <div>{r.mdl_dsp_nm}</div>
-                    <div className="font-mono text-[11px] text-[#5b6578]">{r.mdl_nm}</div>
+                    <div className="font-mono text-xs text-ink-3">{r.mdl_nm}</div>
                   </td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{who(r.req_usr_nm)}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">
+                  <td className="px-3 py-1.5 text-xs whitespace-nowrap text-ink-3">{who(r.req_usr_nm)}</td>
+                  <td className="px-3 py-1.5 whitespace-nowrap">
                     {(r.fix_sts_cd === 'PR' || r.fix_sts_cd === 'APV_FAIL') && r.head_cmt_txt && !canApv ? (
-                      <span className="text-amber-800" title="결재(승인·반려)는 DA 역할 ∩ 요금제4(DA)만">DA 결재 대기</span>
+                      <span className="badge" data-tone="warn" title="결재(승인·반려)는 DA 역할 ∩ 요금제4(DA)만">DA 결재 대기</span>
                     ) : (r.fix_sts_cd === 'PR' || r.fix_sts_cd === 'APV_FAIL') && r.head_cmt_txt ? (
                       <>
-                        <button
-                          type="button"
-                          disabled={!!busy}
-                          onClick={() => void approve(r)}
-                          className="rounded border border-violet-600 bg-violet-700 px-2 py-0.5 font-semibold text-white disabled:opacity-60"
-                        >
-                          {busy === r.fix_id ? '처리 중…' : r.fix_sts_cd === 'APV_FAIL' ? '다시 승인' : '승인(병합·운영 배포)'}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={!!busy}
-                          onClick={() => void act(r, 'reject')}
-                          className="ml-1 rounded border border-red-500 bg-white px-2 py-0.5 font-semibold text-red-700 disabled:opacity-60"
-                        >
-                          반려
-                        </button>
+                        <span className="flex gap-1">
+                          <button type="button" disabled={!!busy} onClick={() => void approve(r)} className="btn-key btn-sm">
+                            {busy === r.fix_id ? '처리 중…' : r.fix_sts_cd === 'APV_FAIL' ? '다시 승인' : '승인(병합·배포)'}
+                          </button>
+                          <button type="button" disabled={!!busy} onClick={() => void act(r, 'reject')} className="btn-danger btn-sm">
+                            반려
+                          </button>
+                        </span>
                         {r.apv_dtm && (
-                          <div className="mt-0.5 text-[11px] text-[#5b6578]">
-                            직전 시도 {who(r.apv_usr_nm)} · {dt(r.apv_dtm)}
+                          <div className="mt-1 text-xs text-ink-3">
+                            직전 시도 {who(r.apv_usr_nm)} · <span className="font-mono">{dt(r.apv_dtm)}</span>
                           </div>
                         )}
                       </>
                     ) : r.rej_dtm ? (
-                      <div className="text-red-700">
+                      <div className="text-danger">
                         <div>
-                          반려 {who(r.rej_usr_nm)} · <span className="tabular-nums">{dt(r.rej_dtm)}</span>
+                          반려 {who(r.rej_usr_nm)} · <span className="font-mono text-xs tabular-nums">{dt(r.rej_dtm)}</span>
                         </div>
-                        <div className="max-w-[220px] whitespace-normal text-[11px]">사유 : {r.rej_rsn_txt}</div>
+                        <div className="max-w-[220px] text-xs whitespace-normal">사유 : {r.rej_rsn_txt}</div>
                       </div>
                     ) : r.apv_dtm ? (
                       <>
                         <div>승인 {who(r.apv_usr_nm)}</div>
-                        <div className="tabular-nums text-[11px] text-[#5b6578]">{dt(r.apv_dtm)}</div>
+                        <div className="font-mono text-xs text-ink-3 tabular-nums">{dt(r.apv_dtm)}</div>
                       </>
                     ) : (
-                      <span className="text-[#8a93a5]">-</span>
+                      <span className="text-ink-off">-</span>
                     )}
                   </td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">
+                  <td className="px-3 py-1.5 whitespace-nowrap">
                     {r.pr_url ? (
-                      <a href={r.pr_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-emerald-800 underline">
-                        <GitPullRequest className="h-3.5 w-3.5" aria-hidden />#{r.pr_no}
+                      <a href={r.pr_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-accent-ink hover:underline">
+                        <GitPullRequest className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden />#{r.pr_no}
                       </a>
                     ) : (
-                      <span className="text-[#8a93a5]">-</span>
+                      <span className="text-ink-off">-</span>
                     )}
                   </td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">
+                  <td className="px-3 py-1.5 whitespace-nowrap">
                     {r.fix_sts_cd === 'DONE' ? (
-                      <span className="text-emerald-700">완료 {dt(r.dply_dtm)}</span>
+                      <span className="text-ok">
+                        완료 <span className="font-mono text-xs">{dt(r.dply_dtm)}</span>
+                      </span>
                     ) : r.fix_sts_cd === 'DPLY_FAIL' ? (
-                      <span className="text-red-700">실패 {dt(r.dply_dtm)}</span>
+                      <span className="text-danger">
+                        실패 <span className="font-mono text-xs">{dt(r.dply_dtm)}</span>
+                      </span>
                     ) : r.fix_sts_cd === 'DPLY' ? (
-                      <span className="text-violet-800">배포 중</span>
+                      <span className="inline-flex items-center gap-1.5 text-accent-ink">
+                        <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+                        배포 중
+                      </span>
                     ) : (
-                      <span className="text-[#8a93a5]">-</span>
+                      <span className="text-ink-off">-</span>
                     )}
-                    {r.ahead_cnt != null && <div className="text-[11px] text-[#5b6578]">함께 나간 커밋 {r.ahead_cnt}개</div>}
+                    {r.ahead_cnt != null && <div className="text-xs text-ink-3">함께 나간 커밋 {r.ahead_cnt}개</div>}
                     {r.rbk_dtm && r.fix_sts_cd.startsWith('RBK') && (
-                      <div className={`mt-0.5 whitespace-normal text-[11px] ${r.fix_sts_cd === 'RBK_DONE' ? 'text-emerald-700' : r.fix_sts_cd === 'RBK_FAIL' ? 'text-red-700' : 'text-violet-800'}`}>
+                      <div className={`mt-1 text-xs whitespace-normal ${r.fix_sts_cd === 'RBK_DONE' ? 'text-ok' : r.fix_sts_cd === 'RBK_FAIL' ? 'text-danger' : 'text-accent-ink'}`}>
                         되돌림 {r.fix_sts_cd === 'RBK_DONE' ? `완료 ${dt(r.rbk_dply_dtm)}` : r.fix_sts_cd === 'RBK_FAIL' ? '실패' : '배포 중'} · {who(r.rbk_usr_nm)} {dt(r.rbk_dtm)}
                         <div className="max-w-[220px]">사유 : {r.rbk_rsn_txt}</div>
                       </div>
@@ -261,7 +264,7 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
                         type="button"
                         disabled={!!busy}
                         onClick={() => void act(r, 'rollback')}
-                        className="mt-1 block rounded border border-amber-600 bg-white px-2 py-0.5 font-semibold text-amber-800 disabled:opacity-60"
+                        className="btn-danger btn-sm mt-1"
                       >
                         {busy === r.fix_id ? '되돌리는 중…' : r.fix_sts_cd === 'RBK_FAIL' ? '다시 되돌리기' : '되돌리기(수정 전으로)'}
                       </button>

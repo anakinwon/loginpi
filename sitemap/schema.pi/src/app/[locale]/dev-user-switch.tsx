@@ -21,10 +21,13 @@ export default function DevUserSwitch() {
     if (j.ok) location.reload()
   }
   return (
-    <form onSubmit={change} className="mt-4 flex items-center gap-2 rounded border border-dashed border-amber-500 p-2 text-xs">
-      <span className="text-amber-700">개발용 사용자 : {cur}</span>
-      <input value={nm} onChange={(e) => setNm(e.target.value)} placeholder="전환할 사용자명(영소문자·숫자·_)" className="flex-1 rounded border px-2 py-1" pattern="[a-z0-9_]{3,30}" />
-      <button className="rounded border px-2 py-1">전환</button>
+    <form onSubmit={change} className="flex flex-wrap items-center gap-2 rounded-card border border-dashed border-line-strong bg-surface px-3 py-2 text-xs text-ink-2">
+      <span className="badge" data-tone="warn">
+        개발
+      </span>
+      <span className="font-mono">{cur}</span>
+      <input value={nm} onChange={(e) => setNm(e.target.value)} placeholder="사용자명" aria-label="전환할 사용자명(영소문자·숫자·_)" title="영소문자·숫자·_ 3~30자" className="input-sm min-w-0 flex-1" pattern="[a-z0-9_]{3,30}" />
+      <button className="btn-key btn-sm">전환</button>
     </form>
   )
 }

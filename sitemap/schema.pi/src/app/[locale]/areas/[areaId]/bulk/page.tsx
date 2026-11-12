@@ -5,13 +5,17 @@ import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { useSearchParams } from 'next/navigation'
 import { use, useEffect, useRef, useState } from 'react'
+import { Download, FileUp, TriangleAlert } from 'lucide-react'
+import { Icon3D } from '@/components/icon-3d'
+import { PageHead } from '@/components/page-head'
 import { BATCH_SIZE, HEADERS, MAX_ROWS, markCrossBatchDup, parseCsv, resultsCsv, type BulkKind, type BulkResult, type BulkStatus } from '@/lib/bulk'
 
 const KIND_NM: Record<BulkKind, string> = { words: '표준단어', domains: '표준도메인', terms: '표준용어', forbidden: '금칙어', codes: '표준코드' }
 // 반영 뒤 이동 화면(승인 대상이 아닌 금칙어·표준코드는 각 목록, 나머지는 승인 화면)
 const DONE: Partial<Record<BulkKind, [string, string]>> = { forbidden: ['forbidden', '금칙어 목록으로'], codes: ['codes', '표준코드 목록으로'] }
 const ST_NM: Record<BulkStatus, string> = { OK: '정상', NSTD: '비표준 수용', SKIP: '이미 있음(건너뜀)', EXCL: '폐기 행 제외', ERR: '오류' }
-const ST_CLS: Record<BulkStatus, string> = { OK: 'text-gray-800', NSTD: 'text-amber-700', SKIP: 'text-gray-500', EXCL: 'text-gray-500', ERR: 'text-red-700' }
+// 판정 배지 색조(badge data-tone) — 정상 = ok, 비표준 수용 = warn, 오류 = danger, 건너뜀·제외 = 기본 회색
+const ST_TONE: Record<BulkStatus, string | undefined> = { OK: 'ok', NSTD: 'warn', SKIP: undefined, EXCL: undefined, ERR: 'danger' }
 const SHOW = 500
 
 export default function BulkPage({ params }: { params: Promise<{ areaId: string }> }) {
@@ -93,128 +97,144 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
   }
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">{KIND_NM[kind]} 일괄등록</h1>
-      <p className="mt-1 text-sm text-gray-600">
-        {kind === 'codes'
-          ? 'CSV(UTF-8) 한 행 = 코드상세 하나 : 코드명(~구분코드·~종류코드·~유형코드 확정 표준용어, 코드형 도메인), 코드분류, 코드값, 코드값명, 정렬순서, 사용여부(Y·N, 비우면 Y), 코드값설명. 코드기본이 없으면 첫 행의 코드분류로 함께 등록합니다. 승인 없이 바로 반영되며 이미 있는 코드값은 건너뜁니다. 같은 코드 안 코드값명은 겹칠 수 없습니다'
-          : kind === 'forbidden'
-          ? 'CSV(UTF-8) 한 행 = 표기 하나 : 구분(금칙어·이음동의어), 표기, 대체 표준단어(승인완료 논리명). 승인 없이 바로 반영되며, 반영된 표기는 표준단어로 등록할 수 없습니다. 같은 단어에 이미 있는 표기는 건너뜁니다. 데이터아키텍트·표준담당자 전용'
-          : '행안부 공공데이터 공통표준 CSV 양식(UTF-8). 단어 → 도메인 → 용어 순서로 반영하십시오. 이미 있는 이름은 건너뜁니다. 반영된 행은 승인대기로 저장됩니다. 승인 화면에서 단어 → 도메인 → 용어 순서로 승인하십시오. 데이터아키텍트·표준담당자 전용'}
-      </p>
-      {kind === 'codes' && (
-        // 엑셀 템플릿(scripts/gen-code-template.py 생성, 시트 = 표준코드·작성안내·작성예시) — 작성 뒤 CSV UTF-8 로 저장해 올림
-        <a href="/templates/std-code-bulk-template.xlsx" download="표준코드_일괄등록_템플릿.xlsx" className="mt-3 inline-block rounded border border-[#1f3a68] px-3 py-1.5 text-sm font-semibold text-[#1f3a68] hover:bg-[#f0f4fa]">
-          ⬇ 엑셀 템플릿 내려받기
-        </a>
-      )}
-      <details className="mt-3 text-xs text-gray-600">
-        <summary>CSV 헤더</summary>
-        <p className="mt-1">{Object.values(HEADERS[kind]).join(', ')}</p>
-      </details>
-      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-        {/* 파일 선택 대화창 — 버튼(또는 끌어다 놓기)으로 숨긴 기본 file input 을 연다. value 초기화 = 같은 파일을 다시 골라도 onChange 발생 */}
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".csv,text/csv"
-          className="hidden"
-          onChange={(e) => {
-            void pickFile(e.target.files?.[0])
-            e.target.value = ''
-          }}
-          aria-label="CSV 파일"
-        />
-        <button
-          type="button"
-          disabled={!!busy}
-          onClick={() => fileRef.current?.click()}
-          onDragOver={(e) => (e.preventDefault(), setDrag(true))}
-          onDragLeave={() => setDrag(false)}
-          onDrop={(e) => {
-            e.preventDefault()
-            setDrag(false)
-            void pickFile(e.dataTransfer.files?.[0])
-          }}
-          className={`rounded border-2 border-dashed px-4 py-2 font-semibold text-[#1f3a68] disabled:opacity-40 ${drag ? 'border-[#1f3a68] bg-[#e9eff9]' : 'border-[#9fb3d6] hover:bg-[#f3f6fb]'}`}
-        >
-          📂 CSV 파일 선택 <span className="font-normal text-gray-500">(또는 여기로 끌어다 놓기)</span>
-        </button>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead
+        title={`${KIND_NM[kind]} 일괄등록`}
+        info={
+          <div className="space-y-2">
+            <p>
+              {kind === 'codes'
+                ? 'CSV(UTF-8) 한 행 = 코드상세 하나 : 코드명(~구분코드·~종류코드·~유형코드 확정 표준용어, 코드형 도메인), 코드분류, 코드값, 코드값명, 정렬순서, 사용여부(Y·N, 비우면 Y), 코드값설명. 코드기본이 없으면 첫 행의 코드분류로 함께 등록합니다. 승인 없이 바로 반영되며 이미 있는 코드값은 건너뜁니다. 같은 코드 안 코드값명은 겹칠 수 없습니다'
+                : kind === 'forbidden'
+                ? 'CSV(UTF-8) 한 행 = 표기 하나 : 구분(금칙어·이음동의어), 표기, 대체 표준단어(승인완료 논리명). 승인 없이 바로 반영되며, 반영된 표기는 표준단어로 등록할 수 없습니다. 같은 단어에 이미 있는 표기는 건너뜁니다. 데이터아키텍트·표준담당자 전용'
+                : '행안부 공공데이터 공통표준 CSV 양식(UTF-8). 단어 → 도메인 → 용어 순서로 반영하십시오. 이미 있는 이름은 건너뜁니다. 반영된 행은 승인대기로 저장됩니다. 승인 화면에서 단어 → 도메인 → 용어 순서로 승인하십시오. 데이터아키텍트·표준담당자 전용'}
+            </p>
+            <p className="font-mono text-xs text-ink-3">{Object.values(HEADERS[kind]).join(', ')}</p>
+          </div>
+        }
+        actions={
+          kind === 'codes' && (
+            // 엑셀 템플릿(scripts/gen-code-template.py 생성, 시트 = 표준코드·작성안내·작성예시) — 작성 뒤 CSV UTF-8 로 저장해 올림
+            <a href="/templates/std-code-bulk-template.xlsx" download="표준코드_일괄등록_템플릿.xlsx" className="btn-key">
+              <Download aria-hidden />
+              템플릿
+            </a>
+          )
+        }
+      />
+      {/* 파일 선택 대화창 — 버튼(또는 끌어다 놓기)으로 숨긴 기본 file input 을 연다. value 초기화 = 같은 파일을 다시 골라도 onChange 발생 */}
+      <input
+        ref={fileRef}
+        type="file"
+        accept=".csv,text/csv"
+        className="hidden"
+        onChange={(e) => {
+          void pickFile(e.target.files?.[0])
+          e.target.value = ''
+        }}
+        aria-label="CSV 파일"
+      />
+      <button
+        type="button"
+        disabled={!!busy}
+        onClick={() => fileRef.current?.click()}
+        onDragOver={(e) => (e.preventDefault(), setDrag(true))}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault()
+          setDrag(false)
+          void pickFile(e.dataTransfer.files?.[0])
+        }}
+        className={`panel empty w-full border-dashed transition-colors ${drag ? 'border-accent-ink bg-accent-soft' : 'border-line-strong hover:bg-raised'}`}
+      >
+        <Icon3D icon={FileUp} />
+        CSV 파일 선택 · 끌어다 놓기
+      </button>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         {file ? (
-          <span className="text-gray-700">
-            <b>{file.name}</b> · {file.rows.length.toLocaleString()}행
+          <span className="me-auto text-dense text-ink">
+            <span className="font-medium">{file.name}</span> <span className="font-mono text-xs text-ink-3 tabular-nums">{file.rows.length.toLocaleString()}행</span>
           </span>
         ) : (
-          <span className="text-gray-500">선택한 파일 없음</span>
+          <span className="me-auto text-dense text-ink-3">선택한 파일 없음</span>
         )}
-        <button disabled={!file || !!busy} onClick={() => run('check')} className="rounded border px-4 py-1 disabled:opacity-40">
-          검증
-        </button>
-        <button disabled={!file || !!busy || mode !== 'check' || okCount === 0} onClick={() => run('apply')} className="rounded bg-gray-800 px-4 py-1 text-white disabled:opacity-40">
-          반영{mode === 'check' && okCount ? ` (${okCount.toLocaleString()}건)` : ''}
-        </button>
         {results && (
-          <button onClick={download} className="text-blue-700 underline">
-            결과 CSV 내려받기
+          <button onClick={download} className="btn-ghost btn-sm">
+            <Download aria-hidden />
+            결과 CSV
           </button>
         )}
+        <button disabled={!file || !!busy} onClick={() => run('check')} className="btn-key">
+          검증
+        </button>
+        <button disabled={!file || !!busy || mode !== 'check' || okCount === 0} onClick={() => run('apply')} className="btn-3d">
+          반영{mode === 'check' && okCount ? ` ${okCount.toLocaleString()}건` : ''}
+        </button>
       </div>
       {busy && (
-        <p role="status" className="mt-2 text-sm text-gray-700">
+        <p role="status" className="mt-2 flex items-center gap-2 text-dense text-ink-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
           {busy}
         </p>
       )}
       {msg && (
-        <p role="alert" className="mt-2 text-sm text-red-700">
+        <p role="alert" className="mt-2 flex items-center gap-1.5 text-dense text-danger">
+          <TriangleAlert className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {msg}
         </p>
       )}
       {results && (
-        <>
-          <p className="mt-4 text-sm">
-            <strong>{mode === 'apply' ? `반영 완료 ${applied?.toLocaleString()}건` : '검증 결과'}</strong>
+        <section className="mt-6">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <h2 className="text-sm font-semibold text-ink">{mode === 'apply' ? `반영 완료 ${applied?.toLocaleString()}건` : '검증 결과'}</h2>
+            {(Object.keys(ST_NM) as BulkStatus[]).map((s) => (
+              <span key={s} className="badge" data-tone={ST_TONE[s]}>
+                {ST_NM[s]} <span className="tabular-nums">{count(s).toLocaleString()}</span>
+              </span>
+            ))}
             {mode === 'apply' && (
-              <Link href={`/areas/${areaId}/${DONE[kind]?.[0] ?? 'approvals'}`} className="ml-2 text-blue-700 underline">
+              <Link href={`/areas/${areaId}/${DONE[kind]?.[0] ?? 'approvals'}`} className="ms-auto text-xs text-accent-ink hover:underline">
                 {DONE[kind]?.[1] ?? '승인 화면으로'}
               </Link>
             )}
-            {' · '}
-            {(Object.keys(ST_NM) as BulkStatus[]).map((s) => `${ST_NM[s]} ${count(s).toLocaleString()}`).join(' · ')}
-          </p>
-          <table className="mt-2 w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-gray-100 text-left">
-                {['행', '판정', '이름', '내용'].map((h) => (
-                  <th key={h} className="border px-2 py-1">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {issues.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="border px-2 py-4 text-center text-gray-500">
-                    정상 외 행이 없습니다
-                  </td>
+          </div>
+          <div className="overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense">
+              <thead>
+                <tr className="thead-3d text-start">
+                  {['행', '판정', '이름', '내용'].map((h) => (
+                    <th key={h} className="border-b px-3 py-2 text-start">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ) : (
-                issues.slice(0, SHOW).map((r) => (
-                  <tr key={r.row_no}>
-                    <td className="border px-2 py-1">{r.row_no}</td>
-                    <td className={`border px-2 py-1 ${ST_CLS[r.status]}`}>{ST_NM[r.status]}</td>
-                    <td className="border px-2 py-1">{r.name}</td>
-                    <td className="border px-2 py-1">{r.detail}</td>
+              </thead>
+              <tbody>
+                {issues.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-6 text-center text-ink-3">
+                      정상 외 행 없음
+                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-          {issues.length > SHOW && <p className="mt-1 text-xs text-gray-500">정상 외 {issues.length.toLocaleString()}행 중 {SHOW}행만 표시 : 전체는 결과 CSV</p>}
-        </>
+                ) : (
+                  issues.slice(0, SHOW).map((r) => (
+                    <tr key={r.row_no}>
+                      <td className="border px-3 py-1.5 text-end font-mono text-xs text-ink-3 tabular-nums">{r.row_no}</td>
+                      <td className="whitespace-nowrap border px-3 py-1.5">
+                        <span className="badge" data-tone={ST_TONE[r.status]}>
+                          {ST_NM[r.status]}
+                        </span>
+                      </td>
+                      <td className="border px-3 py-1.5 font-medium">{r.name}</td>
+                      <td className="border px-3 py-1.5 text-ink-2">{r.detail}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          {issues.length > SHOW && <p className="hint">정상 외 {issues.length.toLocaleString()}행 중 {SHOW}행만 표시 : 전체는 결과 CSV</p>}
+        </section>
       )}
     </main>
   )

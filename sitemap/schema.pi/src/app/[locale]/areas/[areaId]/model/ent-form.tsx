@@ -1,10 +1,11 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 엔터티 등록·수정 폼(논리 모델 화면용, sql/026 모델 단계) — 주제영역·엔터티명 → 승인 표준단어 분해 후보·물리명 미리보기(GET …/entities/analyze) → 유형·설명·단계
-// 등록 = 논리 엔터티(LGCL), 수정 = 이름(분해 후보 다시 선택)·유형·설명·주제영역(같은 프로젝트)·단계(논리 ↔ 핵심 승격). 이름은 서버가 표준단어로 다시 만든다(클라이언트 값 불신)
+// 등록 = 논리 엔터티(LGCL), 수정 = 이름(분해 후보 다시 선택)·유형·설명·주제영역(같은 프로젝트)·단계(논리·핵심 승격). 이름은 서버가 표준단어로 다시 만든다(클라이언트 값 불신)
 import { Link } from '@/i18n/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { ENT_TP, ENT_TP_DESC } from '@/lib/model-name'
+import { InfoTip } from '@/components/page-head'
 import { confirmSave } from '../words/word-board'
 
 export interface EntInit {
@@ -125,109 +126,126 @@ export default function EntForm({ api, areaId, subjs, init, onDone, onCancel }: 
   }
 
   return (
-    <form onSubmit={save} className="space-y-2 rounded-xl border border-[#1f3a68] bg-[#f8fafd] p-4 text-sm shadow-sm" aria-label={init ? '엔터티 수정' : '엔터티 추가'}>
-      <h3 className="font-semibold text-[#1f3a68]">{init ? `엔터티 수정 — ${init.ent_log_nm}` : '＋ 논리 엔터티 추가'}</h3>
-      <div className="grid gap-2 md:grid-cols-4">
-        <select value={subj} onChange={(e) => setSubj(e.target.value)} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="주제영역">
-          {subjs.length === 0 && <option value="">주제영역이 없습니다(개념 모델에서 등록)</option>}
-          {subjs.map((s) => (
-            <option key={s.subj_id} value={s.subj_id}>
-              {s.subj_nm}
-            </option>
-          ))}
-        </select>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="엔터티명(예 : 주문배송이력)" maxLength={200} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5 md:col-span-2" aria-label="엔터티명" />
-        <select value={tp} onChange={(e) => setTp(e.target.value)} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="엔터티 유형">
-          {Object.entries(ENT_TP).map(([k, v]) => (
-            <option key={k} value={k} title={ENT_TP_DESC[k as keyof typeof ENT_TP]}>
-              {v}
-            </option>
-          ))}
-        </select>
-        <input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="설명(관리하는 데이터)" maxLength={4000} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5 md:col-span-3" aria-label="설명" />
-        <input value={asst} onChange={(e) => setAsst(e.target.value)} placeholder="보조명(선택 — 약칭·영문명 등, ERD 개체명 보기옵션)" maxLength={200} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="보조명" />
-        {init && (
-          <select value={lvl} onChange={(e) => setLvl(e.target.value)} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="모델 단계">
-            <option value="LGCL">논리 엔터티</option>
-            <option value="CNCP">핵심 엔터티(개념 모델에 표시)</option>
+    <form onSubmit={save} className="panel text-sm" aria-label={init ? '엔터티 수정' : '엔터티 추가'}>
+      <h3 className="panel-head" data-mode={init ? 'edit' : undefined}>
+        <span className="truncate">{init ? `엔터티 수정 : ${init.ent_log_nm}` : '논리 엔터티 추가'}</span>
+      </h3>
+      <div className="panel-body space-y-3">
+        <div className="grid gap-3 md:grid-cols-4">
+          <select value={subj} onChange={(e) => setSubj(e.target.value)} className="input" aria-label="주제영역">
+            {subjs.length === 0 && <option value="">주제영역 없음(개념 모델에서 등록)</option>}
+            {subjs.map((s) => (
+              <option key={s.subj_id} value={s.subj_id}>
+                {s.subj_nm}
+              </option>
+            ))}
           </select>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="엔터티명" maxLength={200} className="input md:col-span-2" aria-label="엔터티명" />
+          <select value={tp} onChange={(e) => setTp(e.target.value)} className="input" aria-label="엔터티 유형">
+            {Object.entries(ENT_TP).map(([k, v]) => (
+              <option key={k} value={k} title={ENT_TP_DESC[k as keyof typeof ENT_TP]}>
+                {v}
+              </option>
+            ))}
+          </select>
+          <input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="설명" maxLength={4000} className="input md:col-span-3" aria-label="설명" />
+          <input value={asst} onChange={(e) => setAsst(e.target.value)} placeholder="보조명" title="약칭·영문명 등, ERD 개체명 보기옵션" maxLength={200} className="input" aria-label="보조명" />
+          {init && (
+            <select value={lvl} onChange={(e) => setLvl(e.target.value)} className="input" aria-label="모델 단계">
+              <option value="LGCL">논리 엔터티</option>
+              <option value="CNCP">핵심 엔터티(개념 모델에 표시)</option>
+            </select>
+          )}
+        </div>
+        {!init && subj && (
+          <div className="rounded-control border border-line bg-well p-2 text-xs" aria-label="엔터티 추천">
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1">
+                <span className="font-medium text-ink-2">엔터티 추천</span>
+                <InfoTip>누르면 이름·유형·설명을 채움. 빨강 = 표준단어 신청 필요</InfoTip>
+              </span>
+              <span className="text-ink-3">{recSrc.join(' · ')}</span>
+              <button type="button" onClick={() => void loadRecs(true)} disabled={recBusy} className="btn-key btn-sm ms-auto">
+                {recBusy ? '추천 중' : 'AI 추천'}
+              </button>
+            </div>
+            {recs.length === 0 ? (
+              <p className="py-2 text-ink-3">{recBusy ? '불러오는 중' : '추천 없음'}</p>
+            ) : (
+              <ul className="divide-y divide-line">
+                {recs.map((r) => (
+                  <li key={r.nm}>
+                    <button type="button" onClick={() => pickRec(r)} className={`flex w-full flex-wrap items-center gap-2 rounded-control px-1 py-1.5 text-start transition-colors hover:bg-raised ${r.ok ? '' : 'text-danger'}`} title={r.desc}>
+                      <span className="font-medium">{r.nm}</span>
+                      <span className="badge">
+                        {ENT_TP[r.tp as keyof typeof ENT_TP]} · {SRC_NM[r.src]}
+                      </span>
+                      {r.ok && <span className="chip-phy">{r.tbl_phy_nm}</span>}
+                      {r.missing_words.length > 0 && <span>미등록 단어 : {r.missing_words.join(', ')}</span>}
+                      {r.rule_error && <span>{RULE_MSG[r.rule_error] ?? r.rule_error}</span>}
+                      <span className="block w-full truncate text-ink-3">{r.desc}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
-      </div>
-      {!init && subj && (
-        <div className="rounded border border-[#d5ddec] bg-white p-2 text-xs" aria-label="엔터티 추천">
-          <p className="mb-1 flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-[#1f3a68]">엔터티 추천(누르면 이름·유형·설명을 채움, 빨강 = 표준단어 신청 필요)</span>
-            <span className="text-gray-500">{recSrc.join(' · ')}</span>
-            <button type="button" onClick={() => void loadRecs(true)} disabled={recBusy} className="btn-3d ml-auto px-3 py-0.5 disabled:opacity-40">
-              {recBusy ? '추천 중…' : '✨ AI 추천'}
-            </button>
-          </p>
-          {recs.length === 0 ? (
-            <p className="text-gray-500">{recBusy ? '불러오는 중…' : '추천할 엔터티가 없습니다'}</p>
-          ) : (
-            <ul className="divide-y divide-[#eef2f8]">
-              {recs.map((r) => (
-                <li key={r.nm}>
-                  <button type="button" onClick={() => pickRec(r)} className={`flex w-full flex-wrap items-center gap-2 px-1 py-1 text-left hover:bg-[#eef2f8] ${r.ok ? '' : 'text-red-700'}`} title={r.desc}>
-                    <b>{r.nm}</b>
-                    <span className="rounded bg-gray-100 px-1 text-[0.65rem] text-gray-600">
-                      {ENT_TP[r.tp as keyof typeof ENT_TP]} · {SRC_NM[r.src]}
+        {cands.length > 0 && (
+          <div className="space-y-1">
+            {cands.map((c, i) => (
+              <label key={i} className={`flex cursor-pointer flex-wrap items-center gap-2 rounded-control border px-3 py-1.5 transition-colors ${i === pick ? 'border-accent-ink/40 bg-accent-soft' : 'border-transparent hover:bg-raised'}`}>
+                <input type="radio" checked={i === pick} onChange={() => setPick(i)} />
+                {c.segments.map((s, k) =>
+                  'word' in s ? (
+                    <span key={k} className="badge">
+                      {s.word.dic_log_nm}
                     </span>
-                    {r.ok && <span className="font-mono text-[#1f3a68]">{r.tbl_phy_nm}</span>}
-                    {r.missing_words.length > 0 && <span>미등록 단어 : {r.missing_words.join(', ')}</span>}
-                    {r.rule_error && <span>{RULE_MSG[r.rule_error] ?? r.rule_error}</span>}
-                    <span className="block w-full text-gray-500">{r.desc}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-      {cands.length > 0 && (
-        <div className="space-y-1">
-          {cands.map((c, i) => (
-            <label key={i} className={`flex cursor-pointer flex-wrap items-center gap-2 rounded border px-3 py-1 ${i === pick ? 'border-[#1f3a68] bg-white' : 'border-transparent'}`}>
-              <input type="radio" checked={i === pick} onChange={() => setPick(i)} />
-              {c.segments.map((s, k) =>
-                'word' in s ? (
-                  <span key={k} className="rounded bg-[#e9eff9] px-1.5">
-                    {s.word.dic_log_nm}
+                  ) : (
+                    <span key={k} className="badge" data-tone="danger">
+                      {s.unknown} 미등록
+                    </span>
+                  ),
+                )}
+                {c.complete && (
+                  <span className="inline-flex items-center gap-1">
+                    <span className="chip-phy" data-size="lg">
+                      {c.tbl_phy_nm}
+                    </span>
+                    {c.too_long && (
+                      <span className="badge" data-tone="warn">
+                        25자 초과
+                      </span>
+                    )}
                   </span>
-                ) : (
-                  <span key={k} className="rounded bg-red-100 px-1.5 text-red-700">
-                    {s.unknown}(미등록)
-                  </span>
-                ),
-              )}
-              {c.complete && (
-                <span className="font-mono text-[#1f3a68]">
-                  → {c.tbl_phy_nm}
-                  {c.too_long && <span className="ml-1 text-amber-700">(25자 초과)</span>}
-                </span>
-              )}
-              {c.rule_error && <span className="text-red-700">{RULE_MSG[c.rule_error] ?? c.rule_error}</span>}
-              {c.dup && c.ent_log_nm !== init?.ent_log_nm && <span className="text-red-700">같은 이름의 엔터티 있음</span>}
-            </label>
-          ))}
-          {cur && !cur.complete && (
-            <p className="text-red-700">
-              미등록 단어가 있습니다 :{' '}
-              <Link href={`/areas/${areaId}/words`} className="underline">
-                표준단어 신청
-              </Link>
-            </p>
-          )}
+                )}
+                {c.rule_error && <span className="text-danger">{RULE_MSG[c.rule_error] ?? c.rule_error}</span>}
+                {c.dup && c.ent_log_nm !== init?.ent_log_nm && <span className="text-danger">같은 이름의 엔터티 있음</span>}
+              </label>
+            ))}
+            {cur && !cur.complete && (
+              <p className="text-xs text-danger">
+                미등록 단어 있음 ·{' '}
+                <Link href={`/areas/${areaId}/words`} className="text-accent-ink hover:underline">
+                  표준단어 신청
+                </Link>
+              </p>
+            )}
+          </div>
+        )}
+        {msg && (
+          <p role="status" className="text-dense text-danger">
+            {msg}
+          </p>
+        )}
+        <div className="flex justify-end gap-2">
+          <button type="button" onClick={onCancel} className="btn-key">
+            취소
+          </button>
+          <button disabled={!ok} className="btn-3d">
+            {init ? '저장' : '등록'}
+          </button>
         </div>
-      )}
-      {msg && <p className="text-red-700">{msg}</p>}
-      <div className="flex justify-end gap-2">
-        <button type="button" onClick={onCancel} className="underline">
-          취소
-        </button>
-        <button disabled={!ok} className="btn-3d px-6 disabled:opacity-40">
-          {init ? '저장' : '등록'}
-        </button>
       </div>
     </form>
   )

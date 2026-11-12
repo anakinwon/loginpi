@@ -48,43 +48,60 @@ export default function AreaForm({ areaId }: { areaId: string }) {
     if (j.ok) load()
   }
 
-  if (!orig) return <p className="text-sm text-gray-500">{msg || '불러오는 중'}</p>
+  if (!orig) return <p className="text-sm text-ink-3">{msg || '불러오는 중'}</p>
   return (
-    <form onSubmit={save} className="space-y-4 text-sm">
-      <fieldset disabled={!admin} className="space-y-4">
-        <label className="block">
-          분류체계명
-          <input value={form.area_nm ?? ''} onChange={(e) => setForm({ ...form, area_nm: e.target.value })} className="mt-1 w-full rounded border px-3 py-2" required maxLength={200} />
-        </label>
-        <label className="block">
-          설명
-          <input value={form.area_desc ?? ''} onChange={(e) => setForm({ ...form, area_desc: e.target.value })} className="mt-1 w-full rounded border px-3 py-2" maxLength={4000} />
-        </label>
+    <form onSubmit={save} className="panel text-sm">
+      <div className="panel-head">
+        <h2 className="truncate">분류체계 설정</h2>
+        {!admin && (
+          <span className="badge ms-auto" title="분류체계 관리자만 변경할 수 있습니다">
+            조회 전용
+          </span>
+        )}
+      </div>
+      <fieldset disabled={!admin} className="panel-body space-y-4">
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="block">
+            <span className="field-label req">분류체계명</span>
+            <input value={form.area_nm ?? ''} onChange={(e) => setForm({ ...form, area_nm: e.target.value })} className="input" aria-required="true" required maxLength={200} />
+          </label>
+          <label className="block">
+            <span className="field-label">설명</span>
+            <input value={form.area_desc ?? ''} onChange={(e) => setForm({ ...form, area_desc: e.target.value })} className="input" maxLength={4000} />
+          </label>
+        </div>
         <fieldset>
-          <legend>용어 물리명 구분자</legend>
-          {SEPS.map(([v, n]) => (
-            <label key={v} className="mr-4">
-              <input type="radio" name="sep" checked={(form.term_sep_txt ?? '') === v} onChange={() => setForm({ ...form, term_sep_txt: v })} /> {n}
-            </label>
-          ))}
-          <p className="mt-1 text-xs text-gray-500">등록된 용어가 있으면 바꿀 수 없습니다</p>
+          <legend className="field-label">용어 물리명 구분자</legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {SEPS.map(([v, n]) => (
+              <label key={v} className="inline-flex items-center gap-2 text-sm">
+                <input type="radio" name="sep" checked={(form.term_sep_txt ?? '') === v} onChange={() => setForm({ ...form, term_sep_txt: v })} /> {n}
+              </label>
+            ))}
+          </div>
+          <p className="hint">등록된 용어가 있으면 바꿀 수 없습니다</p>
         </fieldset>
         <fieldset>
-          <legend>사용여부</legend>
-          {FLAGS.map(([k, n]) => (
-            <label key={k} className="mr-4">
-              <input type="checkbox" checked={form[k] === 'Y'} onChange={(e) => setForm({ ...form, [k]: e.target.checked ? 'Y' : 'N' })} /> {n}
-            </label>
-          ))}
+          <legend className="field-label">사용여부</legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {FLAGS.map(([k, n]) => (
+              <label key={k} className="inline-flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={form[k] === 'Y'} onChange={(e) => setForm({ ...form, [k]: e.target.checked ? 'Y' : 'N' })} /> {n}
+              </label>
+            ))}
+          </div>
         </fieldset>
-        {admin && <button className="rounded bg-gray-800 px-4 py-2 text-white">저장</button>}
+        {admin && (
+          <div className="flex justify-end">
+            <button className="btn-3d">저장</button>
+          </div>
+        )}
+        {msg && (
+          <p role="status" className="text-dense text-ink">
+            {msg}
+          </p>
+        )}
       </fieldset>
-      {!admin && <p className="text-gray-500">분류체계 관리자만 변경할 수 있습니다</p>}
-      {msg && (
-        <p role="status" className="text-gray-700">
-          {msg}
-        </p>
-      )}
     </form>
   )
 }

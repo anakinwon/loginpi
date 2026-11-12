@@ -1,8 +1,8 @@
 'use client'
 // 설정 화면 — 분류체계 설정(이름·설명·구분자·사용여부)·도메인그룹·약어. 변경은 분류체계 관리자만, 그 외 역할은 조회
 //  AI 분석 모델 탭(2026-10-21) = schema.pi 전역 설정(전역 관리자만, 그 외는 안내 문구)
-import { Link } from '@/i18n/navigation'
 import { use, useState } from 'react'
+import { PageHead } from '@/components/page-head'
 import AiMdlForm from './ai-mdl-form'
 import AreaForm from './area-form'
 import ItemTable, { GRP_CFG as GRP, type ItemCfg } from './item-table'
@@ -30,19 +30,16 @@ export default function SettingsPage({ params }: { params: Promise<{ areaId: str
   const { areaId } = use(params)
   const [tab, setTab] = useState<(typeof TABS)[number][0]>('area')
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">설정</h1>
-      <div className="mt-4 flex gap-2 text-sm" role="tablist">
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="설정" />
+      <div className="seg" role="tablist">
         {TABS.map(([v, n]) => (
-          <button key={v} role="tab" aria-selected={tab === v} onClick={() => setTab(v)} className={`rounded border px-3 py-1 ${tab === v ? 'bg-gray-800 text-white' : ''}`}>
+          <button key={v} role="tab" aria-selected={tab === v} onClick={() => setTab(v)} className="seg-item">
             {n}
           </button>
         ))}
       </div>
-      <div className="mt-6">
+      <div className="mt-4">
         {tab === 'area' && <AreaForm areaId={areaId} />}
         {tab === 'grp' && <ItemTable areaId={areaId} cfg={GRP} />}
         {tab === 'abbr' && <ItemTable areaId={areaId} cfg={ABBR} />}

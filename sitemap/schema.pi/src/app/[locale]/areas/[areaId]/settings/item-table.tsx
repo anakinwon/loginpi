@@ -2,6 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 설정 항목 목록·등록·수정·삭제(도메인그룹·약어 공용) — /api/areas/[areaId]/{path}, /{path}/[id](ver_no 낙관적 잠금)
 import { useCallback, useEffect, useState } from 'react'
+import { RowActions, TD } from '../words/word-board'
 
 export interface ItemCfg {
   path: string
@@ -68,77 +69,84 @@ export default function ItemTable({ areaId, cfg, parent }: { areaId: string; cfg
   }
 
   return (
-    <section className="text-sm">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-100 text-left">
-            {[...cfg.fields.map((f) => f.label), ''].map((h, i) => (
-              <th key={i} className="border px-2 py-1">
-                {h}
-              </th>
+    <section className="space-y-6 text-sm">
+      <form onSubmit={submit} className="panel">
+        <div className="panel-head" data-mode={edit ? 'edit' : undefined}>
+          <h2 className="truncate">{edit ? `${cfg.title} 수정` : `${cfg.title} 등록`}</h2>
+        </div>
+        <div className="panel-body">
+          <div className="grid items-end gap-3 md:grid-cols-2 lg:grid-cols-4">
+            {cfg.fields.map((f) => (
+              <label key={f.key} className="block">
+                <span className={`field-label ${f.required ? 'req' : ''}`}>{f.label}</span>
+                <input
+                  value={form[f.key] ?? ''}
+                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                  aria-required={f.required || undefined}
+                  required={f.required}
+                  maxLength={f.max}
+                  pattern={f.pattern}
+                  className="input"
+                />
+              </label>
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.length === 0 ? (
-            <tr>
-              <td colSpan={cfg.fields.length + 1} className="border px-2 py-4 text-center text-gray-500">
-                등록된 {cfg.title}이(가) 없습니다
-              </td>
+            <div className="flex justify-end gap-2 md:col-span-2 lg:col-span-4">
+              {edit && (
+                <button type="button" onClick={reset} className="btn-key">
+                  취소
+                </button>
+              )}
+              <button className="btn-3d">{edit ? '저장' : '등록'}</button>
+            </div>
+          </div>
+          {msg && (
+            <p role="status" className="mt-3 text-dense text-ink">
+              {msg}
+            </p>
+          )}
+        </div>
+      </form>
+      <div className="overflow-x-auto rounded-card border border-line bg-surface">
+        <table className="w-full border-collapse text-dense">
+          <thead>
+            <tr className="thead-3d text-start">
+              {[...cfg.fields.map((f) => f.label), '처리'].map((h, i) => (
+                <th key={i} className="px-3 py-2">
+                  {h}
+                </th>
+              ))}
             </tr>
-          ) : (
-            items.map((it) => (
-              <tr key={String(it[cfg.pk])} className={edit?.[cfg.pk] === it[cfg.pk] ? 'bg-amber-50' : ''}>
-                {cfg.fields.map((f) => (
-                  <td key={f.key} className="border px-2 py-1">
-                    {it[f.key]}
-                  </td>
-                ))}
-                <td className="whitespace-nowrap border px-2 py-1">
-                  <button
-                    onClick={() => {
-                      setEdit(it)
-                      setForm(Object.fromEntries(cfg.fields.map((f) => [f.key, String(it[f.key] ?? '')])))
-                    }}
-                    className="mr-1 text-blue-700 underline"
-                  >
-                    수정
-                  </button>
-                  <button onClick={() => remove(it)} className="text-red-700 underline">
-                    삭제
-                  </button>
+          </thead>
+          <tbody>
+            {items.length === 0 ? (
+              <tr>
+                <td colSpan={cfg.fields.length + 1} className="px-3 py-6 text-center text-ink-3">
+                  등록된 {cfg.title}이(가) 없습니다
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-      <form onSubmit={submit} className="mt-4 flex flex-wrap items-end gap-2 rounded border p-3">
-        <span className="w-full font-semibold">{edit ? `${cfg.title} 수정` : `${cfg.title} 등록`}</span>
-        {cfg.fields.map((f) => (
-          <input
-            key={f.key}
-            value={form[f.key] ?? ''}
-            onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-            placeholder={f.label + (f.required ? '(필수)' : '')}
-            required={f.required}
-            maxLength={f.max}
-            pattern={f.pattern}
-            className="min-w-40 flex-1 rounded border px-3 py-2"
-          />
-        ))}
-        <button className="rounded bg-gray-800 px-4 py-2 text-white">{edit ? '수정 저장' : '등록'}</button>
-        {edit && (
-          <button type="button" onClick={reset} className="rounded border px-4 py-2">
-            취소
-          </button>
-        )}
-      </form>
-      {msg && (
-        <p role="status" className="mt-2 text-gray-700">
-          {msg}
-        </p>
-      )}
+            ) : (
+              items.map((it) => (
+                <tr key={String(it[cfg.pk])} data-mode={edit?.[cfg.pk] === it[cfg.pk] ? 'edit' : undefined}>
+                  {cfg.fields.map((f, i) => (
+                    <td key={f.key} className={`${TD} ${i === 0 ? 'font-medium' : 'text-ink-2'}`}>
+                      {it[f.key]}
+                    </td>
+                  ))}
+                  <td className={`${TD} w-px whitespace-nowrap`}>
+                    <RowActions
+                      onEdit={() => {
+                        setEdit(it)
+                        setForm(Object.fromEntries(cfg.fields.map((f) => [f.key, String(it[f.key] ?? '')])))
+                      }}
+                      onRemove={() => remove(it)}
+                    />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </section>
   )
 }

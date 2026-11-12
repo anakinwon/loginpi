@@ -2,7 +2,10 @@
 import { piFetch } from '@pi/auth/client'
 // 승인 요청 목록·처리(클라이언트) — /api/areas/[areaId]/approvals(목록·필터·페이징), /approvals/[reqId](건별 승인·반려·취소), /approvals/batch(선택 승인·반려)
 import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Check, TriangleAlert } from 'lucide-react'
+import { InfoTip } from '@/components/page-head'
 import { ACT_NM, APV_STS_NM } from '@/lib/roles'
+import { Pager, TD } from '../words/word-board'
 
 // 동작 표시 — 단어 수정 중 바뀐 칸이 대표도메인여부뿐이면 대표도메인 지정·해제(sql/013)
 const actNm = (r: { tgt_tp_cd: string; act_cd: string; aftr_val: Record<string, unknown> | null }) => {
@@ -59,7 +62,7 @@ const FIELD_NM: Record<string, string> = {
   use_yn: '사용여부',
   term_id: '용어',
 }
-const fmt = (d: string | null) => (d ? new Date(d).toLocaleString('ko-KR') : '')
+const fmt = (d: string | null) => (d ? new Date(d).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16) : '') // 표시 = YYYY-MM-DD HH:mm(한국 시간, 목록 화면 공용 형식)
 
 // 대상 이름 : 유형별 논리명(물리명), 대상 현재 값 위에 요청 값(바뀐 칸)을 덮어 표시
 const tgtName = (r: Req) => {
@@ -159,66 +162,65 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
   }
 
   return (
-    <div className="mt-6 space-y-4 text-sm">
+    <div className="space-y-4 text-sm">
       {/* 필터 : 처리상태 탭·대상유형·요청동작·내 신청만 */}
-      <section className="overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] shadow-md">
-        <h2 className="bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-5 py-2.5 text-base font-semibold text-white">승인 요청 조회</h2>
-        <div className="flex flex-wrap items-center gap-3 p-4">
-          <div className="flex gap-1" role="tablist">
-            {STS.map((v) => (
-              <button key={v} role="tab" aria-selected={cond.sts === v} onClick={() => pick('sts', v)} className={`rounded border px-4 py-1.5 ${cond.sts === v ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : 'bg-white'}`}>
-                {v === 'REQ' ? '대기' : v === 'APV' ? '승인' : v === 'RJCT' ? '반려' : '취소'}
-              </button>
-            ))}
-          </div>
-          <select value={cond.tp} onChange={(e) => pick('tp', e.target.value)} className="rounded border bg-white px-2 py-1.5" aria-label="대상유형">
-            <option value="">대상 전체</option>
-            {Object.entries(TGT_NM).map(([k, n]) => (
-              <option key={k} value={k}>
-                {n}
-              </option>
-            ))}
-          </select>
-          <select value={cond.act} onChange={(e) => pick('act', e.target.value)} className="rounded border bg-white px-2 py-1.5" aria-label="요청동작">
-            <option value="">동작 전체</option>
-            {Object.entries(ACT_NM).map(([k, n]) => (
-              <option key={k} value={k}>
-                {n}
-              </option>
-            ))}
-          </select>
-          {approver ? (
-            <label>
-              <input type="checkbox" checked={cond.mine} onChange={(e) => setCond({ ...cond, mine: e.target.checked, page: 1 })} /> 내 신청만
-            </label>
-          ) : (
-            <span className="text-gray-500">본인 신청만 표시됩니다</span>
-          )}
-          <span className="ml-auto text-gray-600">총 {total.toLocaleString()}건</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="seg" role="tablist">
+          {STS.map((v) => (
+            <button key={v} role="tab" aria-selected={cond.sts === v} onClick={() => pick('sts', v)} className="seg-item">
+              {v === 'REQ' ? '대기' : v === 'APV' ? '승인' : v === 'RJCT' ? '반려' : '취소'}
+            </button>
+          ))}
         </div>
-        {canSel && <p className="px-4 pb-3 text-xs text-gray-600">단어 → 도메인 → 용어 순서로 승인하십시오(용어는 승인완료 단어·도메인만 사용)</p>}
-      </section>
+        <select value={cond.tp} onChange={(e) => pick('tp', e.target.value)} className="input w-auto" aria-label="대상유형">
+          <option value="">대상 전체</option>
+          {Object.entries(TGT_NM).map(([k, n]) => (
+            <option key={k} value={k}>
+              {n}
+            </option>
+          ))}
+        </select>
+        <select value={cond.act} onChange={(e) => pick('act', e.target.value)} className="input w-auto" aria-label="요청동작">
+          <option value="">동작 전체</option>
+          {Object.entries(ACT_NM).map(([k, n]) => (
+            <option key={k} value={k}>
+              {n}
+            </option>
+          ))}
+        </select>
+        {approver ? (
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={cond.mine} onChange={(e) => setCond({ ...cond, mine: e.target.checked, page: 1 })} /> 내 신청만
+          </label>
+        ) : (
+          <span className="badge" title="본인 신청만 표시됩니다">
+            내 신청만
+          </span>
+        )}
+        {canSel && <InfoTip>단어 → 도메인 → 용어 순서로 승인하십시오(용어는 승인완료 단어·도메인만 사용)</InfoTip>}
+      </div>
 
       {/* 선택 처리 바(대기 탭·승인권자) */}
       {canSel && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[#c7d2e6] bg-[#f4f7fc] px-4 py-2">
-          <span className="font-medium">선택 {sel.size.toLocaleString()}건</span>
-          <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={2000} placeholder="승인 의견(선택) · 반려 사유(반려 시 필수)" className="min-w-64 flex-1 rounded border bg-white px-3 py-1.5" aria-label="선택 처리 의견·사유" />
+        <div className="panel flex flex-wrap items-center gap-2 px-4 py-2">
+          <span className="text-dense font-medium tabular-nums">선택 {sel.size.toLocaleString()}건</span>
+          <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={2000} placeholder="승인 의견 · 반려 사유" className="input min-w-64 flex-1" aria-label="선택 처리 의견·사유(반려 시 필수)" />
+          <button onClick={() => actSel('RJCT')} disabled={busy || sel.size === 0 || !note.trim()} className="btn-danger">
+            선택 반려
+          </button>
           <button onClick={() => actSel('APV')} disabled={busy || sel.size === 0} className="btn-3d">
             선택 승인
-          </button>
-          <button onClick={() => actSel('RJCT')} disabled={busy || sel.size === 0 || !note.trim()} className="rounded border border-red-300 bg-white px-4 py-1.5 text-red-700 disabled:opacity-40">
-            선택 반려
           </button>
         </div>
       )}
       {batch && (
-        <div role="status" className="rounded border bg-white px-4 py-2">
-          <p className="font-medium">
-            성공 {batch.done.toLocaleString()} · 실패 <span className={batch.failed ? 'text-red-700' : ''}>{batch.failed.toLocaleString()}</span>
+        <div role="status" className="panel px-4 py-2">
+          <p className="inline-flex items-center gap-1 text-dense font-medium">
+            {batch.failed ? <TriangleAlert className="h-3.5 w-3.5 text-danger" aria-hidden /> : <Check className="h-3.5 w-3.5 text-ok" aria-hidden />}
+            성공 {batch.done.toLocaleString()} · 실패 <span className={batch.failed ? 'text-danger' : ''}>{batch.failed.toLocaleString()}</span>
           </p>
           {batch.failed > 0 && (
-            <ul className="mt-1 max-h-40 list-disc overflow-y-auto pl-5 text-red-700">
+            <ul className="mt-1 max-h-40 list-disc overflow-y-auto ps-5 text-xs text-danger">
               {batch.results
                 .filter((r) => !r.ok)
                 .map((r) => (
@@ -231,17 +233,17 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
         </div>
       )}
       {msg && (
-        <p role="status" className="text-gray-700">
+        <p role="status" className="text-dense text-ink">
           {msg}
         </p>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[960px] border-collapse">
+      <div className="overflow-x-auto rounded-card border border-line bg-surface">
+        <table className="w-full min-w-[960px] border-collapse text-dense">
           <thead>
-            <tr className="thead-3d text-center">
+            <tr className="thead-3d text-start">
               {heads.map((h, i) => (
-                <th key={i} className="whitespace-nowrap border px-2 py-2">
+                <th key={i} className="px-3 py-2">
                   {i === 0 && canSel ? <input type="checkbox" checked={allSel} onChange={() => setSel(allSel ? new Set() : new Set(items.map((r) => r.apv_req_id)))} aria-label="현재 페이지 전체 선택" title="현재 페이지 전체 선택" /> : h}
                 </th>
               ))}
@@ -250,7 +252,7 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={heads.length} className="border px-2 py-4 text-center text-gray-500">
+                <td colSpan={heads.length} className="px-3 py-6 text-center text-ink-3">
                   요청이 없습니다
                 </td>
               </tr>
@@ -261,33 +263,39 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
                 const v = r.aftr_val ?? {}
                 return (
                   <Fragment key={r.apv_req_id}>
-                    <tr onClick={() => setOpen(open === r.apv_req_id ? null : r.apv_req_id)} className={`cursor-pointer ${open === r.apv_req_id ? 'bg-[#eef3fb]' : sel.has(r.apv_req_id) ? 'bg-amber-50' : 'hover:bg-gray-50'}`}>
+                    <tr onClick={() => setOpen(open === r.apv_req_id ? null : r.apv_req_id)} aria-selected={sel.has(r.apv_req_id) || undefined} aria-expanded={open === r.apv_req_id} className={`cursor-pointer ${open === r.apv_req_id ? '[&>td]:bg-raised' : ''}`}>
                       {canSel && (
-                        <td className="border px-2 py-1 text-center" onClick={(e) => e.stopPropagation()}>
+                        <td className={`${TD} w-px`} onClick={(e) => e.stopPropagation()}>
                           <input type="checkbox" checked={sel.has(r.apv_req_id)} onChange={() => toggle(r.apv_req_id)} aria-label="선택" />
                         </td>
                       )}
-                      <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
-                      <td className="whitespace-nowrap border px-2 py-1 text-center">{TGT_NM[r.tgt_tp_cd] ?? r.tgt_tp_cd}</td>
-                      <td className="whitespace-nowrap border px-2 py-1 text-center">{actNm(r)}</td>
-                      <td className="border px-2 py-1">
-                        <span className="font-medium">{String(nm ?? '')}</span>
-                        {phy ? <span className="ml-1 font-mono text-gray-600">({String(phy)})</span> : null}
+                      <td className={`${TD} text-right font-mono text-xs text-ink-3 tabular-nums`}>{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
+                      <td className={`${TD} whitespace-nowrap`}>
+                        <span className="badge">{TGT_NM[r.tgt_tp_cd] ?? r.tgt_tp_cd}</span>
                       </td>
-                      <td className="whitespace-nowrap border px-2 py-1">{r.req?.pi_usr_nm}</td>
-                      <td className="whitespace-nowrap border px-2 py-1 tabular-nums">{fmt(r.reg_dtm)}</td>
-                      <td className="border px-2 py-1">{r.req_rsn_txt}</td>
+                      <td className={`${TD} whitespace-nowrap`}>{actNm(r)}</td>
+                      <td className={TD}>
+                        <span className="font-medium">{String(nm ?? '')}</span>
+                        {phy ? <span className="chip-phy ms-1">{String(phy)}</span> : null}
+                      </td>
+                      <td className={`${TD} text-xs whitespace-nowrap text-ink-3`}>{r.req?.pi_usr_nm}</td>
+                      <td className={`${TD} font-mono text-xs whitespace-nowrap text-ink-3 tabular-nums`}>{fmt(r.reg_dtm)}</td>
+                      <td className={`${TD} text-ink-2`}>{r.req_rsn_txt}</td>
                       {done ? (
                         <>
-                          <td className="whitespace-nowrap border px-2 py-1">
+                          <td className={`${TD} text-xs whitespace-nowrap text-ink-3`}>
                             {r.apv?.pi_usr_nm}
-                            {self && <span className="ml-1 rounded bg-amber-100 px-1.5 text-xs text-amber-800">자기 승인</span>}
+                            {self && (
+                              <span className="badge ms-1" data-tone="warn">
+                                자기 승인
+                              </span>
+                            )}
                           </td>
-                          <td className="whitespace-nowrap border px-2 py-1 tabular-nums">{fmt(r.apv_dtm)}</td>
-                          <td className="border px-2 py-1">{cond.sts === 'RJCT' ? r.rjct_rsn_txt : r.apv_opn_txt}</td>
+                          <td className={`${TD} font-mono text-xs whitespace-nowrap text-ink-3 tabular-nums`}>{fmt(r.apv_dtm)}</td>
+                          <td className={`${TD} text-ink-2`}>{cond.sts === 'RJCT' ? r.rjct_rsn_txt : r.apv_opn_txt}</td>
                         </>
                       ) : (
-                        <td className="whitespace-nowrap border px-2 py-1" onClick={(e) => e.stopPropagation()}>
+                        <td className={`${TD} whitespace-nowrap`} onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center gap-1">
                             {approver && (
                               <>
@@ -296,19 +304,19 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
                                   onChange={(e) => setReason({ ...reason, [r.apv_req_id]: e.target.value })}
                                   maxLength={2000}
                                   placeholder="의견·반려사유"
-                                  className="w-32 rounded border px-1 py-0.5"
+                                  className="input-sm w-32"
                                   aria-label="의견·반려사유"
                                 />
-                                <button onClick={() => act(r.apv_req_id, 'APV')} disabled={busy} className="btn-3d !px-2 !py-0.5">
+                                <button onClick={() => act(r.apv_req_id, 'APV')} disabled={busy} className="btn-key btn-sm">
                                   승인
                                 </button>
-                                <button onClick={() => act(r.apv_req_id, 'RJCT')} disabled={busy || !reason[r.apv_req_id]?.trim()} className="rounded border border-red-300 px-2 py-0.5 text-red-700 disabled:opacity-40">
+                                <button onClick={() => act(r.apv_req_id, 'RJCT')} disabled={busy || !reason[r.apv_req_id]?.trim()} className="btn-danger btn-sm">
                                   반려
                                 </button>
                               </>
                             )}
                             {r.req_usr_id === me && (
-                              <button onClick={() => act(r.apv_req_id, 'CNCL')} disabled={busy} className="rounded border px-2 py-0.5 text-gray-700 disabled:opacity-40">
+                              <button onClick={() => act(r.apv_req_id, 'CNCL')} disabled={busy} className="btn-ghost btn-sm">
                                 취소
                               </button>
                             )}
@@ -318,17 +326,17 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
                     </tr>
                     {open === r.apv_req_id && (
                       <tr>
-                        <td colSpan={heads.length} className="border bg-[#f8fafd] px-4 py-3">
-                          <p className="mb-1 font-medium">요청 내용</p>
+                        <td colSpan={heads.length} className="border-b bg-well px-4 py-3">
+                          <p className="mb-1 text-xs font-medium text-ink-2">요청 내용</p>
                           {Object.keys(v).length === 0 ? (
-                            <p className="text-gray-500">내용 없음(삭제 요청)</p>
+                            <p className="text-ink-3">내용 없음(삭제 요청)</p>
                           ) : (
                             <table className="border-collapse text-xs">
                               <tbody>
                                 {Object.entries(v).map(([k, x]) => (
                                   <tr key={k}>
-                                    <th className="border bg-gray-100 px-2 py-1 text-left font-medium">{FIELD_NM[k] ?? k}</th>
-                                    <td className="border px-2 py-1 font-mono">{x == null || x === '' ? '(비움)' : typeof x === 'object' ? JSON.stringify(x) : String(x)}</td>
+                                    <th className="border-b px-2 py-1 text-start font-medium whitespace-nowrap text-ink-3">{FIELD_NM[k] ?? k}</th>
+                                    <td className="border-b px-2 py-1 font-mono text-ink">{x == null || x === '' ? '(비움)' : typeof x === 'object' ? JSON.stringify(x) : String(x)}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -345,42 +353,7 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
         </table>
       </div>
 
-      {/* 페이징 : « ‹ 1~5 › » + 페이지당 건수 */}
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-gray-600">
-          {total.toLocaleString()}건 · {cond.page}/{pages}쪽
-        </span>
-        <div className="mx-auto flex items-center gap-1">
-          {[
-            ['«', 1],
-            ['‹', cond.page - 1],
-          ].map(([l, p]) => (
-            <button key={l} onClick={() => go(p as number)} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-              {l}
-            </button>
-          ))}
-          {Array.from({ length: Math.min(5, pages) }, (_, i) => Math.min(Math.max(1, cond.page - 2), Math.max(1, pages - 4)) + i).map((p) => (
-            <button key={p} onClick={() => go(p)} aria-current={p === cond.page ? 'page' : undefined} className={`min-w-8 rounded border px-2 py-1 ${p === cond.page ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : ''}`}>
-              {p}
-            </button>
-          ))}
-          {[
-            ['›', cond.page + 1],
-            ['»', pages],
-          ].map(([l, p]) => (
-            <button key={l} onClick={() => go(p as number)} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-              {l}
-            </button>
-          ))}
-        </div>
-        <select value={cond.size} onChange={(e) => setCond({ ...cond, size: Number(e.target.value), page: 1 })} className="rounded border px-2 py-1" aria-label="페이지당 건수">
-          {[10, 20, 50, 100].map((n) => (
-            <option key={n} value={n}>
-              {n}건씩
-            </option>
-          ))}
-        </select>
-      </div>
+      <Pager total={total} page={cond.page} size={cond.size} go={go} setSize={(size) => setCond({ ...cond, size, page: 1 })} />
     </div>
   )
 }

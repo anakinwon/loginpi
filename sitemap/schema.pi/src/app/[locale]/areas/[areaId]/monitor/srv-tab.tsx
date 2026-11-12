@@ -1,6 +1,10 @@
 'use client'
 // 서버 모니터링 탭 — 로컬 에이전트가 설치된 PC·서버(에이전트 1.3.0 이상이 폴링 때 보고) : 서버 수·평균 CPU/메모리/디스크, 서버별 현재값·CPU 추이, CPU·메모리 TOP5
+import { TriangleAlert } from 'lucide-react'
 import { useMemo } from 'react'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 import { fmtB, Line, Meter, Spark, Tile, type Pt } from './charts'
 import { usePoll } from './use-poll'
 
@@ -38,11 +42,26 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
     return { rows, on, cpuAll, cores: on.reduce((n, r) => n + (r.l?.core_cnt ?? 0), 0) }
   }, [data])
 
-  if (err) return <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">{err}</p>
+  if (err)
+    return (
+      <p role="status" className="flex items-center gap-1.5 text-dense text-danger">
+        <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+        {err}
+      </p>
+    )
+  if (data && !v.rows.length)
+    return (
+      <div className="panel empty">
+        <Icon3D icon={MENU_ICON.monitor} />
+        <p>등록된 로컬 에이전트 없음 — 설정 › DB 접속에서 등록</p>
+      </div>
+    )
   const top = (k: 'cpu' | 'mem') => [...v.on].sort((a, b) => (b[k] ?? 0) - (a[k] ?? 0)).slice(0, 5)
   return (
     <div className="space-y-3">
-      <p className="text-xs text-[#5b6578]">이 분류체계에 등록된 로컬 에이전트(설정 → DB 접속)가 1분마다 보내는 호스트 지표입니다. 에이전트를 1.3.0 이상으로 다시 빌드해야 값이 들어옵니다.</p>
+      <div className="flex justify-end">
+        <InfoTip align="end">이 분류체계에 등록된 로컬 에이전트(설정 › DB 접속)가 1분마다 보내는 호스트 지표입니다. 에이전트 1.3.0 이상이 필요합니다.</InfoTip>
+      </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         <Tile nm="서버" val={`${v.on.length} / ${v.rows.length}`} sub="최근 3분 보고 / 등록" />
         <Tile nm="코어 합계" val={String(v.cores)} />
@@ -51,38 +70,38 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
         <Tile nm="평균 디스크" val={`${avg(v.on.map((r) => r.disk)) ?? '—'}%`} warn={(avg(v.on.map((r) => r.disk)) ?? 0) >= 90} />
       </div>
       <div className="grid gap-2 md:grid-cols-3">
-        <Line title="평균 CPU(%)" pts={v.cpuAll} unit="%" max={100} color="#f59e0b" />
+        <Line title="평균 CPU(%)" pts={v.cpuAll} unit="%" max={100} />
         {(['cpu', 'mem'] as const).map((k) => (
-          <figure key={k} className="rounded-lg border border-[#d6deeb] bg-white p-2">
-            <figcaption className="px-1 text-xs font-semibold text-[#2c3850]">{k === 'cpu' ? 'CPU' : '메모리'} TOP5</figcaption>
-            <ul className="mt-1 space-y-1.5 px-1">
+          <figure key={k} className="panel p-3">
+            <figcaption className="text-xs font-medium text-ink-2">{k === 'cpu' ? 'CPU' : '메모리'} TOP 5</figcaption>
+            <ul className="mt-2 space-y-2">
               {top(k).map((r) => (
                 <li key={r.a.agt_id} className="text-xs">
-                  <div className="flex justify-between">
-                    <span className="truncate">{r.l?.host_nm ?? r.a.agt_nm}</span>
+                  <div className="mb-1 flex justify-between gap-2">
+                    <span className="truncate text-ink">{r.l?.host_nm ?? r.a.agt_nm}</span>
                     <span className="tabular-nums">{r[k] ?? '—'}%</span>
                   </div>
                   <Meter pct={r[k]} />
                 </li>
               ))}
-              {!top(k).length && <li className="py-3 text-center text-xs text-gray-500">보고 중인 서버가 없습니다</li>}
+              {!top(k).length && <li className="py-6 text-center text-dense text-ink-3">보고 중인 서버 없음</li>}
             </ul>
           </figure>
         ))}
       </div>
       <section>
-        <h3 className="mb-1 text-sm font-bold text-[#2c3850]">서버 목록</h3>
+        <h3 className="mb-2 text-sm font-semibold text-ink">서버</h3>
         <ul className="grid gap-2 md:grid-cols-2">
           {v.rows.map((r) => (
-            <li key={r.a.agt_id} className="rounded-lg border border-[#d6deeb] bg-white p-3 text-sm">
-              <div className="flex items-center gap-2">
-                <span className={`h-2.5 w-2.5 rounded-full ${r.fresh ? 'bg-emerald-500' : 'bg-gray-300'}`} title={r.fresh ? '보고 중' : '최근 3분 보고 없음'} />
-                <span className="font-semibold">{r.a.agt_nm}</span>
-                <span className="truncate text-xs text-[#5b6578]">
+            <li key={r.a.agt_id} className="panel p-4 text-sm">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.fresh ? 'bg-ok' : 'bg-ink-off'}`} title={r.fresh ? '보고 중' : '최근 3분 보고 없음'} />
+                <span className="font-medium text-ink">{r.a.agt_nm}</span>
+                <span className="truncate text-xs text-ink-3">
                   {r.l?.host_nm ?? '—'} · {r.l?.os_nm ?? '지표 없음(1.3.0 미만?)'} · {r.l?.core_cnt ?? '—'}코어
                 </span>
               </div>
-              <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+              <div className="mt-3 grid grid-cols-3 gap-3 text-xs text-ink-2">
                 {(
                   [
                     ['CPU', r.cpu, null],
@@ -91,19 +110,18 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
                   ] as const
                 ).map(([nm, p, sub]) => (
                   <div key={nm}>
-                    <div className="flex justify-between">
+                    <div className="mb-1 flex justify-between">
                       <span>{nm}</span>
-                      <span className="tabular-nums">{p ?? '—'}%</span>
+                      <span className="tabular-nums text-ink">{p ?? '—'}%</span>
                     </div>
                     <Meter pct={p} />
-                    {sub && <div className="mt-0.5 text-[10px] text-[#5b6578]">{sub}</div>}
+                    {sub && <div className="mt-1 truncate text-xs text-ink-3 tabular-nums">{sub}</div>}
                   </div>
                 ))}
               </div>
               <Spark pts={r.cpuPts} />
             </li>
           ))}
-          {data && !v.rows.length && <li className="rounded-lg border p-4 text-center text-sm text-gray-500">등록된 로컬 에이전트가 없습니다 — 설정 → DB 접속에서 에이전트를 등록하십시오</li>}
         </ul>
       </section>
     </div>

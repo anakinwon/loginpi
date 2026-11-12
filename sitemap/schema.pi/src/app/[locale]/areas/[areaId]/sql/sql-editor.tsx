@@ -103,7 +103,7 @@ const SqlEditor = forwardRef<EdHandle, Props>(function SqlEditor(p, ref) {
           EditorView.updateListener.of((u) => {
             if (u.docChanged) cb.current.onChange(u.state.doc.toString())
           }),
-          EditorView.theme({ '&': { height: '100%', fontSize: '13px' }, '.cm-scroller': { fontFamily: 'ui-monospace, Consolas, monospace' } }),
+          EditorView.theme({ '&': { height: '100%', fontSize: '13px' }, '.cm-scroller': { fontFamily: 'var(--font-code)' } }),
         ],
       }),
     })
@@ -143,6 +143,6 @@ const SqlEditor = forwardRef<EdHandle, Props>(function SqlEditor(p, ref) {
     },
   }))
 
-  return <div ref={host} className="h-full overflow-hidden" />
+  return <div ref={host} className="paper h-full overflow-hidden bg-surface" />
 })
 export default SqlEditor

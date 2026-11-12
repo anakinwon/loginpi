@@ -9,11 +9,15 @@
 //   강제 종료(탭·브라우저 닫기·오류) = 대기 문장은 이 화면 메모리에만 있어 그대로 버려짐(Rollback, DB 변화 없음) — 브라우저 기본 경고도 띄움.
 //   DB 쪽은 요청 사이에 트랜잭션을 열어 두지 않아 잠금이 남지 않고, 요청 도중 끊겨도 idle_in_transaction_session_timeout 으로 DB 가 rollback(sql-run.ts)
 //  아래 상태줄 = 수행 시간 자세히·패치 크기·전체 패치·쪽 이동(result-grid)
-//  화면 = 위 끝부터 하단 메뉴 바로 위까지 여백 없이 100%(fixed, 메뉴 높이 = --area-nav-h), 좁은 화면(<768px)은 탐색기를 왼쪽 서랍으로(☰ 탐색기)
+//  화면 = 위 끝부터 하단 메뉴 바로 위까지 여백 없이 100%(fixed, 메뉴 높이 = --area-nav-h), 좁은 화면(<768px)은 탐색기를 왼쪽 서랍으로(PanelLeft 탐색기)
 //  패널 크기 = 손잡이 끌기(탐색기 너비·편집기 높이, 이 브라우저에 기억, 두 번 누르면 기본), 탐색기 이름 = 편집기로 끌어 놓기·Ctrl+C·오른쪽 누르기 복사(마스터 지시 2026-10-18)
 import { piFetch } from '@pi/auth/client'
+import { AlignLeft, Check, ChevronDown, ChevronRight, Database, Eye, FastForward, Folder, KeyRound, Layers, PanelLeft, Play, RotateCcw, Table2, X, type LucideIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { Icon3D } from '@/components/icon-3d'
+import { PageHead } from '@/components/page-head'
 import { Link } from '@/i18n/navigation'
+import { MENU_ICON } from '@/lib/menu-icons'
 import { useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -33,9 +37,12 @@ interface ObjTab {
   kind: string
 }
 const OBJ_MAX = 20
-const OBJ_ICON: Record<string, string> = { r: '▦', p: '▦', v: '👁', m: '◧', f: '⇄' }
+// 객체 종류 → 선 아이콘(테이블·분할·외부 = 표, 뷰 = 눈, 물리 뷰 = 겹)
+const OBJ_ICON: Record<string, LucideIcon> = { r: Table2, p: Table2, v: Eye, m: Layers, f: Table2 }
+// 펼침 표시(탐색기) — 펼침 = 아래, 접힘 = 오른쪽, 없음 = 같은 폭 빈칸
+const Caret = ({ on, none }: { on?: boolean; none?: boolean }) => (none ? <span className="inline-block w-3.5 shrink-0" aria-hidden /> : on ? <ChevronDown className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.5} aria-hidden /> : <ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-3 rtl:rotate-180" strokeWidth={1.5} aria-hidden />)
 
-const SqlEditor = dynamic(() => import('./sql-editor'), { ssr: false, loading: () => <p className="p-2 text-sm text-gray-500">편집기 불러오는 중…</p> })
+const SqlEditor = dynamic(() => import('./sql-editor'), { ssr: false, loading: () => <p className="p-2 text-sm text-ink-3">편집기 불러오는 중…</p> })
 
 interface Conn {
   conn_id: string
@@ -515,33 +522,41 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       }}
       onDoubleClick={() => setPane((p) => { const v = { ...p, [k]: PANE[k].def }; store.set('sql-pane', JSON.stringify(v)); return v })}
     >
-      <span className={`rounded-full bg-[#c7d2e6] group-hover:bg-[#3b5f9e] ${k === 'l' ? 'h-16 w-1.5' : 'h-1.5 w-16'}`} />
+      <span className={`rounded-full bg-line-strong transition-colors group-hover:bg-accent ${k === 'l' ? 'h-16 w-1' : 'h-1 w-16'}`} />
     </div>
   )
 
   if (denied)
     return (
-      <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-        <h1 className="text-2xl font-bold">SQL 편집기</h1>
-        <p className="mt-3 text-sm">SQL 편집기 권한이 없습니다(조회자 역할). 분류체계 설정 권한자에게 역할 변경을 요청하십시오.</p>
+      <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+        <PageHead title="SQL 편집기" />
+        <div className="panel empty">
+          <Icon3D icon={MENU_ICON.sql} />
+          <p>SQL 편집기 권한 없음 — 분류체계 설정 권한자에게 역할 변경 요청</p>
+        </div>
       </main>
     )
 
   const kwl = kw.trim().toLowerCase()
-  const btn = 'rounded border border-white/40 bg-white/10 px-2 py-0.5 hover:bg-white/20 disabled:opacity-40'
-  const sel = 'rounded border border-white/40 bg-[#1f3a68] px-1 py-0.5 text-white'
+  const btn = 'btn-key btn-sm'
+  const sel = 'input-sm w-auto max-w-[14rem]'
   return (
-    <main className="fixed inset-x-0 z-30 flex flex-col overflow-hidden bg-white" style={{ top: 'var(--area-head-h, 3rem)', bottom: 'var(--area-nav-h, 4rem)' }}>
-      <div className="flex shrink-0 items-center gap-2 border-b px-2 py-1">
-        <Link href="/" className="shrink-0 text-xs text-blue-700 underline">
-          ← 분류체계 목록
-        </Link>
-        <h1 className="shrink-0 text-sm font-bold">SQL 편집기</h1>
-        <span className="hidden truncate text-[11px] text-gray-500 lg:inline">Ctrl+Enter 현재 문장 · Alt+X 스크립트 · Ctrl+Shift+F 정렬 · Ctrl+Space 자동 완성 · Ctrl+/ 주석</span>
+    <main className="fixed inset-x-0 z-30 flex flex-col overflow-hidden bg-surface" style={{ top: 'var(--area-head-h, 3rem)', bottom: 'var(--area-nav-h, 4rem)' }}>
+      <div className="shrink-0 border-b border-line px-2">
+        <PageHead
+          dense
+          title="SQL 편집기"
+          info={
+            <>
+              <p>Ctrl+Enter 현재 문장 · Alt+X 스크립트 · Ctrl+Shift+F 정렬 · Ctrl+Space 자동 완성 · Ctrl+/ 주석</p>
+              <p className="mt-2">탐색기 : 이름을 편집기로 끌어 놓기 · 고르고 Ctrl+C 또는 오른쪽 누르기 = 이름 복사 · 테이블·뷰 두 번 누르기 = 객체 편집기(Properties·Data·관계도) · 칼럼 누르기 = 편집기에 넣기</p>
+            </>
+          }
+        />
       </div>
-      <section className="flex shrink-0 flex-wrap items-center gap-1.5 bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-2 py-1 text-sm text-white" aria-label="SQL 실행 도구">
+      <section className="flex shrink-0 flex-wrap items-center gap-2 border-b border-line bg-surface px-2 py-1.5 text-sm" aria-label="SQL 실행 도구">
         <button type="button" className={`${btn} md:hidden`} onClick={() => setTreeOpen((v) => !v)} aria-expanded={treeOpen} aria-controls="sql-tree">
-          ☰ 탐색기
+          <PanelLeft aria-hidden /> 탐색기
         </button>
         <select value={connId} disabled={busy} onChange={(e) => { const v = e.target.value; if (pending.length) setLeave({ why: '접속 바꾸기', go: () => setConnId(v) }); else setConnId(v) }} className={sel} aria-label="접속">
           {!conns.length && <option value="">접속이 없습니다</option>}
@@ -558,32 +573,33 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
             </option>
           ))}
         </select>
-        <button type="button" className={btn} disabled={!conn || busy} onClick={() => run(false)} title="Ctrl+Enter">
-          ▶ 실행
+        <span className="h-5 w-px bg-line" aria-hidden />
+        <button type="button" className="btn-3d btn-sm" disabled={!conn || busy} onClick={() => run(false)} title="Ctrl+Enter">
+          <Play aria-hidden /> 실행
         </button>
         <button type="button" className={btn} disabled={!conn || busy} onClick={() => run(true)} title="Alt+X">
-          ▶▶ 스크립트
+          <FastForward aria-hidden /> 스크립트
         </button>
         <button type="button" className={btn} disabled={!conn} onClick={() => ed.current?.format()} title="Ctrl+Shift+F — 선택 영역(없으면 커서 문장)을 강 정렬(키워드 끝 6열)로 다시 배치">
-          ≡ 정렬
+          <AlignLeft aria-hidden /> 정렬
         </button>
-        <span className="ml-auto flex items-center gap-2">
+        <span className="ms-auto flex items-center gap-2">
           {canWrite ? (
             <>
               {manual && (
                 <>
-                  <span className={`rounded px-2 py-0.5 text-xs ${pending.length ? 'bg-amber-300 font-semibold text-black' : 'bg-white/20'}`} title={pending.map((x, i) => `${i + 1}. ${x.slice(0, 120)}`).join('\n') || '대기 문장 없음'}>
-                    대기 {pending.length}
+                  <span className="badge" data-tone={pending.length ? 'warn' : undefined} title={pending.map((x, i) => `${i + 1}. ${x.slice(0, 120)}`).join('\n') || '대기 문장 없음'}>
+                    대기 <span className="tabular-nums">{pending.length}</span>
                   </span>
                   <button type="button" className={btn} disabled={!pending.length || busy} onClick={() => void commit()} title="대기 문장을 한 트랜잭션으로 다시 실행해 커밋">
-                    ✔ Commit
+                    <Check aria-hidden /> Commit
                   </button>
-                  <button type="button" className={btn} disabled={!pending.length || busy} onClick={rollback} title="대기 문장 버림(DB 는 아직 바뀌지 않음)">
-                    ↺ Rollback
+                  <button type="button" className="btn-danger btn-sm" disabled={!pending.length || busy} onClick={rollback} title="대기 문장 버림(DB 는 아직 바뀌지 않음)">
+                    <RotateCcw aria-hidden /> Rollback
                   </button>
                 </>
               )}
-              <span role="group" aria-label="실행 방식" className="flex overflow-hidden rounded border border-white/50 text-xs font-semibold">
+              <span role="group" aria-label="실행 방식" className="seg">
                 {(['AUTO', 'MANUAL'] as const).map((m) => (
                   <button
                     key={m}
@@ -592,52 +608,59 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                     disabled={busy}
                     onClick={() => setMode(m)}
                     title={m === 'AUTO' ? '문장마다 바로 커밋' : '미리 실행해 결과를 보고 Commit 때 반영(대기 문장 재실행)'}
-                    className={`px-2 py-0.5 ${txMode === m ? (m === 'AUTO' ? 'bg-red-100 text-red-800' : 'bg-amber-200 text-amber-900') : 'text-white/80 hover:bg-white/10'}`}
+                    className="seg-item"
+                    style={{ height: 24, paddingInline: 10 }}
                   >
-                    {m}
+                    {m === 'AUTO' ? '자동' : '수동'}
                   </button>
                 ))}
               </span>
             </>
           ) : (
-            <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800">조회 전용</span>
+            <span className="badge">조회 전용</span>
           )}
         </span>
-        {busy && <span className="text-xs">실행 중…</span>}
+        {busy && (
+          <span className="inline-flex items-center gap-1.5 text-xs text-accent-ink">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+            실행 중
+          </span>
+        )}
       </section>
       {msg && (
-        <p role="status" className="shrink-0 px-2 py-0.5 text-sm font-medium text-red-700">
+        <p role="status" className="shrink-0 px-2 py-1 text-dense text-danger">
           {msg}
         </p>
       )}
-      {note && !msg && <p className="shrink-0 px-2 py-0.5 text-xs text-gray-600" aria-live="polite">{note}</p>}
-      {!conns.some(usable) && conns.length > 0 && <p className="shrink-0 px-2 py-0.5 text-xs text-gray-600">쓸 수 있는 접속이 없습니다 — 데이터아키텍트가 &lsquo;DDL 생성 › DB 접속&rsquo;에서 서버 직접 접속을 &lsquo;조회 전용 계정&rsquo;으로 지정해야 합니다.</p>}
+      {note && !msg && <p className="shrink-0 px-2 py-1 text-xs text-ink-3" aria-live="polite">{note}</p>}
+      {!conns.some(usable) && conns.length > 0 && <p className="shrink-0 px-2 py-1 text-xs text-ink-3">쓸 수 있는 접속 없음 — 데이터아키텍트가 &lsquo;DDL 생성 › DB 접속&rsquo;에서 서버 직접 접속을 &lsquo;조회 전용 계정&rsquo;으로 지정</p>}
       {!conns.length && (
-        <p className="shrink-0 px-2 py-0.5 text-xs text-gray-600">
-          접속이 없습니다 — <Link href={`/areas/${areaId}/ddl`} className="underline">DDL 생성 › DB 접속</Link>에서 등록합니다.
+        <p className="shrink-0 px-2 py-1 text-xs text-ink-3">
+          접속 없음 — <Link href={`/areas/${areaId}/ddl`} className="text-accent-ink hover:underline">DDL 생성 › DB 접속</Link>에서 등록
         </p>
       )}
 
-      <div className="relative flex min-h-0 flex-1 border-t">
-        {treeOpen && <div className="absolute inset-0 z-10 bg-black/30 md:hidden" onClick={() => setTreeOpen(false)} aria-hidden />}
+      <div className="relative flex min-h-0 flex-1">
+        {treeOpen && <div className="absolute inset-0 z-10 bg-ink/30 md:hidden" onClick={() => setTreeOpen(false)} aria-hidden />}
         <nav
           id="sql-tree"
-          className={`${treeOpen ? 'absolute inset-y-0 left-0 z-20 flex w-[85vw] max-w-sm shadow-xl' : 'hidden'} shrink-0 flex-col overflow-hidden border-r bg-white text-xs md:static md:flex md:w-[var(--tree-w)] md:max-w-none md:shadow-none`}
+          className={`${treeOpen ? 'absolute inset-y-0 left-0 z-20 flex w-[85vw] max-w-sm shadow-2' : 'hidden'} shrink-0 flex-col overflow-hidden border-e border-line bg-canvas text-xs md:static md:flex md:w-[var(--tree-w)] md:max-w-none md:shadow-none`}
           style={{ '--tree-w': `${pane.l}px` } as React.CSSProperties}
           aria-label="데이터베이스 탐색기"
         >
-          <input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="이름 필터" className="m-1 rounded border px-2 py-0.5" aria-label="탐색기 이름 필터" />
+          <input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="이름 필터" className="input-sm m-2 w-auto" aria-label="탐색기 이름 필터" />
           <ul className="min-h-0 flex-1 overflow-auto px-1 pb-2 font-mono">
             {schemas.map((s) => {
               const sk = `s:${s.name}`, list = objs[s.name]
               return (
                 <li key={s.name}>
-                  <button type="button" {...nameProps(sk, qi(s.name, dialect === 'ORA'))} className={`w-full text-left hover:bg-gray-100 ${s.name === schema ? 'font-bold' : ''} ${pick === sk ? 'bg-blue-100' : ''}`} onClick={() => toggle(sk, () => void loadObjs(s.name))} aria-expanded={open.has(sk)}>
-                    {open.has(sk) ? '▾' : '▸'} 🗄 <Drag t={qi(s.name, dialect === 'ORA')}>{s.name}</Drag>
+                  <button type="button" {...nameProps(sk, qi(s.name, dialect === 'ORA'))} className={`flex w-full items-center gap-1 rounded-chip px-1 py-0.5 text-start hover:bg-raised ${s.name === schema ? 'font-semibold text-ink' : 'text-ink-2'} ${pick === sk ? 'bg-accent-soft' : ''}`} onClick={() => toggle(sk, () => void loadObjs(s.name))} aria-expanded={open.has(sk)}>
+                    <Caret on={open.has(sk)} />
+                    <Database className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.5} aria-hidden /> <Drag t={qi(s.name, dialect === 'ORA')}>{s.name}</Drag>
                   </button>
                   {open.has(sk) && (
-                    <ul className="pl-3">
-                      {list === 'loading' && <li className="text-gray-400">불러오는 중…</li>}
+                    <ul className="ps-3">
+                      {list === 'loading' && <li className="px-1 text-ink-3">불러오는 중…</li>}
                       {Array.isArray(list) &&
                         KIND.map(([ks, nm]) => {
                           const items = list.filter((o) => ks.includes(o.kind) && (!kwl || o.name.toLowerCase().includes(kwl)))
@@ -645,31 +668,32 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                           const gk = `${sk}:${ks}`
                           return (
                             <li key={ks}>
-                              <button type="button" className={`w-full text-left hover:bg-gray-100 ${items.length ? '' : 'text-gray-400'}`} onClick={() => items.length && toggle(gk)} aria-expanded={open.has(gk)}>
-                                {!items.length ? '·' : open.has(gk) || kwl ? '▾' : '▸'} 📁 {nm} <span className="text-gray-400">({items.length})</span>
+                              <button type="button" className={`flex w-full items-center gap-1 rounded-chip px-1 py-0.5 text-start font-sans hover:bg-raised ${items.length ? 'text-ink-2' : 'text-ink-off'}`} onClick={() => items.length && toggle(gk)} aria-expanded={open.has(gk)}>
+                                <Caret none={!items.length} on={open.has(gk) || !!kwl} />
+                                <Folder className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.5} aria-hidden /> {nm} <span className="font-mono text-ink-3 tabular-nums">({items.length})</span>
                               </button>
                               {(open.has(gk) || kwl) && (
-                                <ul className="pl-3">
+                                <ul className="ps-3">
                                   {items.map((o) => {
                                     const ok = `${s.name}.${o.name}`, cl = cols[ok], rel = 'rpvmf'.includes(o.kind)
                                     return (
                                       <li key={o.name}>
-                                        <div className="flex items-center hover:bg-amber-50" title={o.cmt ?? ''}>
-                                          <button type="button" {...nameProps(`o:${ok}`, qi(o.name, dialect === 'ORA'))} className={`min-w-0 flex-1 truncate text-left ${pick === `o:${ok}` ? 'bg-blue-100' : ''}`} onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => (rel ? (setTreeOpen(false), openObj(s.name, o.name, o.kind)) : o.kind === 'i' && o.tbl && (setTreeOpen(false), openObj(s.name, o.tbl, 'r')))}>
-                                            {rel ? (open.has(`c:${ok}`) ? '▾ ' : '▸ ') : '· '}
-                                            <Drag t={qi(o.name, dialect === 'ORA')}>{o.name}</Drag>
-                                            {o.kind === 'i' && o.tbl && <span className="text-gray-400" title="두 번 누르기 = 대상 테이블 열기"> · {o.tbl}</span>}
+                                        <div className="flex items-center rounded-chip px-1 hover:bg-raised" title={o.cmt ?? ''}>
+                                          <button type="button" {...nameProps(`o:${ok}`, qi(o.name, dialect === 'ORA'))} className={`flex min-w-0 flex-1 items-center gap-1 truncate py-0.5 text-start text-ink ${pick === `o:${ok}` ? 'bg-accent-soft' : ''}`} onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => (rel ? (setTreeOpen(false), openObj(s.name, o.name, o.kind)) : o.kind === 'i' && o.tbl && (setTreeOpen(false), openObj(s.name, o.tbl, 'r')))}>
+                                            <Caret none={!rel} on={open.has(`c:${ok}`)} />
+                                            <span className="truncate"><Drag t={qi(o.name, dialect === 'ORA')}>{o.name}</Drag></span>
+                                            {o.kind === 'i' && o.tbl && <span className="truncate text-ink-3" title="두 번 누르기 = 대상 테이블 열기"> · {o.tbl}</span>}
                                           </button>
-                                          <span className="ml-1 shrink-0 text-gray-400">{fmtSize(o.size)}</span>
+                                          <span className="ms-1 shrink-0 text-ink-3 tabular-nums">{fmtSize(o.size)}</span>
                                         </div>
                                         {open.has(`c:${ok}`) && (
-                                          <ul className="pl-4 text-gray-700">
-                                            {cl === 'loading' && <li className="text-gray-400">…</li>}
+                                          <ul className="ps-5 text-ink-2">
+                                            {cl === 'loading' && <li className="text-ink-3">…</li>}
                                             {Array.isArray(cl) &&
                                               cl.map((c) => (
                                                 <li key={c.name} className="truncate" title={c.type}>
-                                                  <button type="button" {...nameProps(`k:${ok}.${c.name}`, qi(c.name, dialect === 'ORA'))} className={`text-left ${pick === `k:${ok}.${c.name}` ? 'bg-blue-100' : ''}`} onClick={() => ed.current?.insert(qi(c.name, dialect === 'ORA'))}>
-                                                    {c.pk ? '🔑' : '·'} <Drag t={qi(c.name, dialect === 'ORA')}>{c.name}</Drag> <span className="text-gray-400">{c.type}{c.nn ? ' NN' : ''}</span>
+                                                  <button type="button" {...nameProps(`k:${ok}.${c.name}`, qi(c.name, dialect === 'ORA'))} className={`inline-flex max-w-full items-center gap-1 rounded-chip px-1 py-0.5 text-start hover:bg-raised ${pick === `k:${ok}.${c.name}` ? 'bg-accent-soft' : ''}`} onClick={() => ed.current?.insert(qi(c.name, dialect === 'ORA'))}>
+                                                    {c.pk ? <KeyRound className="h-3 w-3 shrink-0 text-warn" strokeWidth={1.75} aria-label="PK" /> : <span className="inline-block w-3 shrink-0" aria-hidden />} <Drag t={qi(c.name, dialect === 'ORA')}>{c.name}</Drag> <span className="text-ink-3">{c.type}{c.nn ? ' NN' : ''}</span>
                                                   </button>
                                                 </li>
                                               ))}
@@ -689,7 +713,6 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
               )
             })}
           </ul>
-          <p className="border-t px-1 py-0.5 text-[10px] text-gray-500">이름을 편집기로 끌어 놓기 · 고르고 Ctrl+C 또는 오른쪽 누르기 = 이름 복사 · 테이블·뷰 두 번 누르기 = 객체 편집기(Properties·Data·관계도) ·칼럼 누르기 = 편집기에 넣기</p>
         </nav>
         {splitter('l')}
 
@@ -699,14 +722,15 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
             onPick: () => setObjCur(''),
             extra: objTabs.map((t) => {
               const on = t.key === objCur
+              const OI = OBJ_ICON[t.kind] ?? Table2
               return (
-                <span key={t.key} className={`flex shrink-0 items-center rounded-t border ${on ? '-mb-px border-b-white bg-white font-semibold' : 'bg-gray-100 hover:bg-white'}`}>
-                  <button type="button" role="tab" aria-selected={on} onClick={() => (!objCur && void tabs.saveTab(tabs.cur), setObjCur(t.key))} title={`${t.schema}.${t.rel} — 객체 편집기`} className="py-0.5 pl-2 font-mono whitespace-nowrap">
-                    <span aria-hidden className="mr-1 text-[#3b5f9e]">{OBJ_ICON[t.kind] ?? '▦'}</span>
+                <span key={t.key} className={`flex shrink-0 items-center rounded-t-control border border-line ${on ? '-mb-px border-b-surface bg-surface font-medium text-ink' : 'bg-raised text-ink-2 hover:bg-surface'}`}>
+                  <button type="button" role="tab" aria-selected={on} onClick={() => (!objCur && void tabs.saveTab(tabs.cur), setObjCur(t.key))} title={`${t.schema}.${t.rel} — 객체 편집기`} className="inline-flex items-center gap-1 py-1 ps-2 font-mono whitespace-nowrap">
+                    <OI className="h-3.5 w-3.5 text-ink-3" strokeWidth={1.5} aria-hidden />
                     {t.rel}
                   </button>
-                  <button type="button" onClick={() => closeObj(t.key)} className="min-h-6 min-w-6 px-1.5 py-0.5 text-gray-500 hover:text-red-700" aria-label={`${t.rel} 객체 탭 닫기`} title="객체 탭 닫기">
-                    ×
+                  <button type="button" onClick={() => closeObj(t.key)} className="inline-flex min-h-6 min-w-6 items-center justify-center px-1 text-ink-3 hover:text-danger" aria-label={`${t.rel} 객체 탭 닫기`} title="객체 탭 닫기">
+                    <X className="h-3 w-3" strokeWidth={1.75} aria-hidden />
                   </button>
                 </span>
               )
@@ -732,26 +756,28 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
             {connId && tabs.cur && <SqlEditor key={`${connId}-${tabs.cur}`} ref={ed} initial={tabs.text(tabs.cur)} dialect={dialect} tables={tables} schema={schema || undefined} onChange={(t) => tabs.edit(tabs.cur, t)} onRun={(s) => void run(s)} />}
           </div>
           {splitter('e')}
-          <div className="flex min-h-20 flex-1 flex-col border-t">
-            <div role="tablist" className="flex gap-1 border-b bg-gray-50 px-1 pt-1 text-xs">
-              <button role="tab" aria-selected={tab === 'res'} onClick={() => setTab('res')} className={`rounded-t border px-2 py-0.5 ${tab === 'res' ? 'bg-white font-semibold' : ''}`}>
-                결과
-              </button>
-              <button role="tab" aria-selected={tab === 'hist'} onClick={() => (setTab('hist'), void loadHist(hist.page))} className={`rounded-t border px-2 py-0.5 ${tab === 'hist' ? 'bg-white font-semibold' : ''}`}>
-                실행 이력{histAll ? '(분류체계 전체)' : ''}
-              </button>
+          <div className="flex min-h-20 flex-1 flex-col border-t border-line">
+            <div role="tablist" className="flex shrink-0 items-center border-b border-line bg-canvas px-2 py-1">
+              <span className="seg">
+                <button role="tab" aria-selected={tab === 'res'} onClick={() => setTab('res')} className="seg-item" style={{ height: 24 }}>
+                  결과
+                </button>
+                <button role="tab" aria-selected={tab === 'hist'} onClick={() => (setTab('hist'), void loadHist(hist.page))} className="seg-item" style={{ height: 24 }}>
+                  실행 이력{histAll ? '(분류체계 전체)' : ''}
+                </button>
+              </span>
             </div>
             <div className="min-h-0 flex-1">
               {tab === 'res' ? (
-                out ? <ResultPanel results={out.results} ms={out.ms} at={out.at} mode={out.mode} dialect={dialect} fetch={{ limit, sizes: SIZES, all: ALL, setLimit, busy, canAll: !!last, fetchAll: () => void (last ? run(false, last, false, ALL, true) : setMsg('먼저 실행하십시오')) }} /> : <p className="p-3 text-sm text-gray-500">문장에 커서를 두고 Ctrl+Enter 를 누르십시오.</p>
+                out ? <ResultPanel results={out.results} ms={out.ms} at={out.at} mode={out.mode} dialect={dialect} fetch={{ limit, sizes: SIZES, all: ALL, setLimit, busy, canAll: !!last, fetchAll: () => void (last ? run(false, last, false, ALL, true) : setMsg('먼저 실행하십시오')) }} /> : <p className="p-3 text-dense text-ink-3">문장에 커서를 두고 Ctrl+Enter</p>
               ) : (
                 <div className="flex h-full flex-col">
                   <div className="min-h-0 flex-1 overflow-auto">
                     <table className="w-full border-collapse text-xs">
-                      <thead className="sticky top-0 bg-[#e9eff9]">
+                      <thead className="thead-3d sticky top-0 z-10">
                         <tr>
                           {['시각', '실행자', '접속', '방식', '결과', '행', 'ms', 'SQL(누르면 편집기에 넣기)'].map((h) => (
-                            <th key={h} className="border px-2 py-1 text-left">
+                            <th key={h} className="px-3 py-2 text-start">
                               {h}
                             </th>
                           ))}
@@ -759,18 +785,18 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                       </thead>
                       <tbody>
                         {hist.items.map((h) => (
-                          <tr key={h.sql_exec_id} className="hover:bg-amber-50">
-                            <td className="border px-2 whitespace-nowrap">{new Date(h.reg_dtm).toLocaleString('ko-KR')}</td>
-                            <td className="border px-2">{h.usr_nm}</td>
-                            <td className="border px-2">{h.conn_nm}</td>
-                            <td className={`border px-2 ${h.exec_mode_cd === 'WRITE' || h.exec_mode_cd === 'CMIT' ? 'text-red-700' : h.exec_mode_cd === 'TRY' ? 'text-amber-700' : ''}`}>{MODE_NM[h.exec_mode_cd] ?? h.exec_mode_cd}</td>
-                            <td className={`border px-2 ${h.rslt_cd === 'OK' ? 'text-green-700' : 'text-red-700'}`}>
+                          <tr key={h.sql_exec_id} className="border-b border-line">
+                            <td className="px-3 py-1 font-mono whitespace-nowrap text-ink-2 tabular-nums">{new Date(h.reg_dtm).toLocaleString('ko-KR')}</td>
+                            <td className="px-3 py-1 text-ink-3">{h.usr_nm}</td>
+                            <td className="px-3 py-1">{h.conn_nm}</td>
+                            <td className={`px-3 py-1 ${h.exec_mode_cd === 'WRITE' || h.exec_mode_cd === 'CMIT' ? 'text-danger' : h.exec_mode_cd === 'TRY' ? 'text-warn' : ''}`}>{MODE_NM[h.exec_mode_cd] ?? h.exec_mode_cd}</td>
+                            <td className={`px-3 py-1 ${h.rslt_cd === 'OK' ? 'text-ok' : 'text-danger'}`}>
                               {h.rslt_cd === 'OK' ? '성공' : h.rslt_cd === 'PART' ? '일부' : h.err_cd === 'RUN' ? '중단' : '오류'}
                             </td>
-                            <td className="border px-2 text-right">{h.row_cnt ?? ''}</td>
-                            <td className="border px-2 text-right">{h.elapsed_ms ?? ''}</td>
-                            <td className="max-w-[40rem] truncate border px-2 font-mono">
-                              <button type="button" className="w-full truncate text-left" title={h.sql_txt} onClick={() => ed.current?.insert(h.sql_txt + ';\n')}>
+                            <td className="px-3 py-1 text-right tabular-nums">{h.row_cnt ?? ''}</td>
+                            <td className="px-3 py-1 text-right tabular-nums">{h.elapsed_ms ?? ''}</td>
+                            <td className="max-w-[40rem] truncate px-3 py-1 font-mono">
+                              <button type="button" className="w-full truncate text-start hover:text-accent-ink" title={h.sql_txt} onClick={() => ed.current?.insert(h.sql_txt + ';\n')}>
                                 {h.sql_txt}
                               </button>
                             </td>
@@ -779,13 +805,13 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                       </tbody>
                     </table>
                   </div>
-                  <div className="flex items-center gap-2 border-t px-2 py-1 text-xs">
-                    <button type="button" disabled={hist.page <= 1} onClick={() => loadHist(hist.page - 1)} className="rounded border px-2 disabled:opacity-40">
-                      ‹ 이전
+                  <div className="flex items-center gap-2 border-t border-line px-2 py-1 font-mono text-xs text-ink-3 tabular-nums">
+                    <button type="button" disabled={hist.page <= 1} onClick={() => loadHist(hist.page - 1)} aria-label="이전" title="이전" className="btn-ghost btn-icon btn-sm">
+                      <ChevronRight className="rotate-180 rtl:rotate-0" aria-hidden />
                     </button>
-                    {hist.page} / {Math.max(1, Math.ceil(hist.total / HSIZE))} · {hist.total}건
-                    <button type="button" disabled={hist.page * HSIZE >= hist.total} onClick={() => loadHist(hist.page + 1)} className="rounded border px-2 disabled:opacity-40">
-                      다음 ›
+                    {hist.page} / {Math.max(1, Math.ceil(hist.total / HSIZE))} · 총 {hist.total}건
+                    <button type="button" disabled={hist.page * HSIZE >= hist.total} onClick={() => loadHist(hist.page + 1)} aria-label="다음" title="다음" className="btn-ghost btn-icon btn-sm">
+                      <ChevronRight className="rtl:rotate-180" aria-hidden />
                     </button>
                   </div>
                 </div>
@@ -797,12 +823,12 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       </div>
       {bind &&
         createPortal(
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onKeyDown={(e) => e.key === 'Escape' && setBind(null)}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" onKeyDown={(e) => e.key === 'Escape' && setBind(null)}>
             <form
               role="dialog"
               aria-modal="true"
               aria-labelledby="bind-title"
-              className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl bg-white p-4 text-sm shadow-xl"
+              className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-sheet border border-line bg-surface p-5 text-sm shadow-2"
               onSubmit={(e) => {
                 e.preventDefault()
                 const empty = bind.names.filter((n) => !bind.vals[n].trim())
@@ -812,29 +838,29 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                 setBind(null), bind.go(t)
               }}
             >
-              <h2 id="bind-title" className="text-base font-bold text-[#1f3a68]">
+              <h2 id="bind-title" className="text-base font-semibold text-ink">
                 바인드 변수 {bind.names.length}개
               </h2>
-              <div className="mt-2 max-h-56 overflow-auto rounded border">
+              <div className="mt-3 max-h-56 overflow-auto rounded-card border border-line">
                 <table data-grid className="w-full border-collapse text-xs">
-                  <thead className="sticky top-0 bg-gray-100">
+                  <thead className="thead-3d sticky top-0">
                     <tr>
-                      <th className="w-10 border px-2 py-1">#</th>
-                      <th className="w-40 border px-2 py-1 text-left">Name</th>
-                      <th className="border px-2 py-1 text-left">Value</th>
+                      <th className="w-10 px-2 py-1.5">#</th>
+                      <th className="w-40 px-2 py-1.5 text-start">Name</th>
+                      <th className="px-2 py-1.5 text-start">Value</th>
                     </tr>
                   </thead>
                   <tbody>
                     {bind.names.map((n, i) => (
-                      <tr key={n}>
-                        <td className="border px-2 py-1 text-center text-gray-500">{i + 1}</td>
-                        <td className="border px-2 py-1 font-mono">:{n}</td>
-                        <td className="border p-0.5">
+                      <tr key={n} className="border-b border-line">
+                        <td className="px-2 py-1 text-center font-mono text-ink-3">{i + 1}</td>
+                        <td className="px-2 py-1 font-mono">:{n}</td>
+                        <td className="p-1">
                           <input
                             autoFocus={i === 0}
                             value={bind.vals[n]}
                             onChange={(e) => setBind({ ...bind, err: '', vals: { ...bind.vals, [n]: e.target.value } })}
-                            className="w-full rounded border border-transparent px-1.5 py-1 font-mono focus:border-blue-400 focus:outline-none"
+                            className="input-sm w-full font-mono"
                             aria-label={`:${n} 값`}
                             placeholder="예 : 1 · 'abc' · now() · NULL"
                           />
@@ -844,24 +870,24 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                   </tbody>
                 </table>
               </div>
-              <pre className="mt-2 max-h-48 min-h-16 overflow-auto rounded border bg-gray-50 p-2 font-mono text-xs whitespace-pre" aria-label="실행할 SQL">
+              <pre className="mt-2 max-h-48 min-h-16 overflow-auto rounded-control border border-line bg-well p-2 font-mono text-xs whitespace-pre" aria-label="실행할 SQL">
                 {applyBinds(bind.text, dialect, Object.fromEntries(Object.entries(bind.vals).filter(([, v]) => v.trim())))}
               </pre>
-              <p className="mt-2 text-xs text-gray-600">Tab 으로 칸 이동, Enter = 확인. 값은 SQL 식 그대로 들어갑니다 — 문자열은 &apos;따옴표&apos;로, 식(now()·1+1) 사용 가능. 값은 이름별로 기억합니다.</p>
+              <p className="hint">값은 SQL 식 그대로(문자열은 &apos;따옴표&apos;, now()·1+1 가능) · 이름별로 기억</p>
               {bind.err && (
-                <p role="alert" className="mt-1 text-xs font-medium text-red-700">
+                <p role="alert" className="mt-1 text-xs text-danger">
                   {bind.err}
                 </p>
               )}
-              <div className="mt-3 flex flex-wrap justify-end gap-2">
-                <button type="button" className="rounded border px-3 py-1" title="값을 넣지 않고 :이름 그대로 실행" onClick={() => (setBind(null), bind.go(bind.text))}>
+              <div className="mt-4 flex flex-wrap justify-end gap-2">
+                <button type="button" className="btn-key" title="값을 넣지 않고 :이름 그대로 실행" onClick={() => (setBind(null), bind.go(bind.text))}>
                   무시
                 </button>
-                <button type="submit" className="rounded bg-[#1f3a68] px-4 py-1 font-semibold text-white">
-                  확인
-                </button>
-                <button type="button" className="rounded border px-3 py-1" onClick={() => setBind(null)}>
+                <button type="button" className="btn-key" onClick={() => setBind(null)}>
                   취소
+                </button>
+                <button type="submit" className="btn-3d">
+                  확인
                 </button>
               </div>
             </form>
@@ -871,41 +897,41 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       {/* 확인 창은 body 로 — fixed main(z-30) 쌓임 맥락 밖이라 하단 메뉴(z-40)까지 덮음 */}
       {leave &&
         createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onKeyDown={(e) => e.key === 'Escape' && (leave.cancel?.(), setLeave(null))}>
-          <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title" className="w-full max-w-xl rounded-xl bg-white p-4 text-sm shadow-xl">
-            <h2 id="leave-title" className="text-base font-bold text-red-800">
-              커밋하지 않은 대기 문장 {pending.length}개 — {leave.why} 전에 처리하십시오
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" onKeyDown={(e) => e.key === 'Escape' && (leave.cancel?.(), setLeave(null))}>
+          <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title" className="w-full max-w-xl rounded-sheet border border-line bg-surface p-5 text-sm shadow-2">
+            <h2 id="leave-title" className="text-base font-semibold text-danger">
+              커밋하지 않은 대기 문장 {pending.length}개 — {leave.why} 전에 처리
             </h2>
-            <p className="mt-1 text-xs text-gray-600">아직 DB 에 반영되지 않았습니다(MANUAL 미리 실행). Commit = 한 트랜잭션으로 다시 실행해 반영, Rollback = 버림. 탭·브라우저를 그냥 닫으면 모두 Rollback 됩니다.</p>
-            <ol className="mt-2 max-h-48 list-decimal overflow-auto rounded border bg-gray-50 py-1 pr-2 pl-7 font-mono text-xs">
+            <p className="mt-1 text-xs text-ink-3">아직 DB 에 반영되지 않음(수동 미리 실행) · Commit = 한 트랜잭션으로 다시 실행해 반영 · Rollback = 버림 · 탭을 그냥 닫으면 Rollback</p>
+            <ol className="mt-3 max-h-48 list-decimal overflow-auto rounded-control border border-line bg-well py-1 ps-7 pe-2 font-mono text-xs">
               {pending.map((x, i) => (
                 <li key={i} className="truncate" title={x}>
                   {x}
                 </li>
               ))}
             </ol>
-            <div className="mt-3 flex flex-wrap justify-end gap-2">
+            <div className="mt-4 flex flex-wrap justify-end gap-2">
               <button
                 type="button"
                 disabled={busy}
-                className="rounded bg-[#1f3a68] px-3 py-1 font-semibold text-white disabled:opacity-50"
+                className="btn-3d"
                 onClick={async () => {
                   const go = leave.go
                   if (await commit(false)) setLeave(null), go()
                 }}
               >
-                ✔ Commit 후 {leave.why}
+                <Check aria-hidden /> Commit 후 {leave.why}
               </button>
-              <button type="button" disabled={busy} className="rounded border border-red-300 bg-red-50 px-3 py-1 font-semibold text-red-800 disabled:opacity-50" onClick={() => (setPending([]), setLeave(null), leave.go())}>
-                ↺ Rollback 후 {leave.why}
+              <button type="button" disabled={busy} className="btn-danger" onClick={() => (setPending([]), setLeave(null), leave.go())}>
+                <RotateCcw aria-hidden /> Rollback 후 {leave.why}
               </button>
-              <button type="button" autoFocus disabled={busy} className="rounded border px-3 py-1" onClick={() => (leave.cancel?.(), setLeave(null))}>
+              <button type="button" autoFocus disabled={busy} className="btn-key" onClick={() => (leave.cancel?.(), setLeave(null))}>
                 취소
               </button>
             </div>
-            {busy && <p className="mt-2 text-xs text-gray-500">커밋 중…</p>}
+            {busy && <p className="mt-2 text-xs text-ink-3">커밋 중…</p>}
             {msg && !busy && (
-              <p role="alert" className="mt-2 text-xs font-medium text-red-700">
+              <p role="alert" className="mt-2 text-xs text-danger">
                 {msg}
               </p>
             )}

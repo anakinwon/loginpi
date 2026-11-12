@@ -3,11 +3,13 @@
 // LIVE(10초 갱신, 일시정지 가능)·기간(30분~24시간). 권한 = 모니터링 보기(요금제1~ 기술 메뉴), URL 등록·삭제 = 모니터링 편집, 애플리케이션·AI 수정 이력 = MON_AI(요금제1~ SQL 쓰기 역할), 결재 = MON_FIX_APV(DA 역할 ∩ 요금제4) — 2026-10-22
 //  앱 경계상 dbms.pi 영역 — 마스터 선택으로 schema.pi 에 두고 dbms.pi 가 생기면 이전(MASTER_ROADMAP §3-10)
 import { piFetch } from '@pi/auth/client'
-import { Activity, AppWindow, Database, GitPullRequest, Globe, Pause, Play, Server } from 'lucide-react'
-import { Link } from '@/i18n/navigation'
+import { Pause, Play } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { use, useEffect, useState } from 'react'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 import type { Perm } from '@/lib/roles'
 import AppTab from './app-tab'
 import DbTab from './db-tab'
@@ -16,18 +18,30 @@ import SrvTab from './srv-tab'
 import UrlTab from './url-tab'
 
 const TABS = [
-  { k: 'app', nm: '애플리케이션', Icon: AppWindow },
-  { k: 'srv', nm: '서버', Icon: Server },
-  { k: 'db', nm: '데이터베이스', Icon: Database },
-  { k: 'url', nm: 'URL', Icon: Globe },
-  { k: 'fix', nm: 'AI 수정 이력', Icon: GitPullRequest }, // 2026-10-22 — PR 로 해결 진행 보고서(MON_AI)
+  { k: 'app', nm: '애플리케이션' },
+  { k: 'srv', nm: '서버' },
+  { k: 'db', nm: '데이터베이스' },
+  { k: 'url', nm: 'URL' },
+  { k: 'fix', nm: 'AI 수정 이력' }, // 2026-10-22 — PR 로 해결 진행 보고서(MON_AI)
 ] as const
 type Tab = (typeof TABS)[number]['k']
 const MINS = [30, 60, 360, 1440]
 
+// 권한 없음 빈 상태 — 3D 키 + 한 줄, 규칙 문장은 InfoTip(2026-11-12 디자인 개편)
+function NoPerm({ line, rule }: { line: string; rule: string }) {
+  return (
+    <div className="panel empty">
+      <Icon3D icon={MENU_ICON.monitor} />
+      <p className="flex items-center gap-1">
+        {line}
+        <InfoTip>{rule}</InfoTip>
+      </p>
+    </div>
+  )
+}
 // 애플리케이션·AI 수정 이력 = MON_AI(요금제1 개발자~ SQL 쓰기 역할, 2026-10-22 마스터 지시) — 없으면 안내
 function NoAi() {
-  return <p className="text-sm text-gray-600">애플리케이션 모니터링·AI 원인 분석·AI 수정 이력은 요금제1(개발자) 이상 분류체계의 SQL 쓰기 역할(시스템담당자·데이터아키텍트·표준담당자·모델러·품질담당자·이행담당자)만 볼 수 있습니다. 결재(승인·반려·되돌리기)는 데이터아키텍트 역할 + 요금제4(DA)만 할 수 있습니다.</p>
+  return <NoPerm line="조회 권한 없음" rule="애플리케이션 모니터링·AI 원인 분석·AI 수정 이력은 요금제1(개발자) 이상 분류체계의 SQL 쓰기 역할(시스템담당자·데이터아키텍트·표준담당자·모델러·품질담당자·이행담당자)만 볼 수 있습니다. 결재(승인·반려·되돌리기)는 데이터아키텍트 역할 + 요금제4(DA)만 할 수 있습니다." />
 }
 
 export default function MonitorPage({ params }: { params: Promise<{ areaId: string }> }) {
@@ -55,51 +69,41 @@ export default function MonitorPage({ params }: { params: Promise<{ areaId: stri
 
   if (perms && !perms.includes('MON_VIEW'))
     return (
-      <main className="p-4">
-        <Link href="/" className="text-sm text-blue-700 underline">
-          ← 분류체계 목록
-        </Link>
-        <p className="mt-4 text-sm text-gray-600">모니터링은 요금제 1(개발자) 이상의 기술 역할(SQL 편집기 메뉴)이 볼 수 있습니다.</p>
+      <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+        <PageHead title="모니터링" />
+        <NoPerm line="조회 권한 없음" rule="모니터링은 요금제 1(개발자) 이상의 기술 역할(SQL 편집기 메뉴)이 볼 수 있습니다." />
       </main>
     )
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 flex items-center gap-2 text-2xl font-bold">
-        <Activity className="h-6 w-6 text-[#3b4a66]" strokeWidth={1.5} aria-hidden /> 모니터링
-      </h1>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <nav className="flex gap-1 rounded-lg border border-gray-300 bg-gray-50 p-0.5" aria-label="모니터링 종류">
-          {TABS.map(({ k, nm, Icon }) => (
-            <button
-              key={k}
-              type="button"
-              aria-current={tab === k}
-              onClick={() => router.replace(`/areas/${areaId}/monitor?tab=${k}`)}
-              className={`flex items-center gap-1 rounded-md px-3 py-1.5 text-sm transition ${tab === k ? 'bg-[#3b4a66] font-semibold text-white' : 'text-[#2c3850] hover:bg-[#e2e7ef]'}`}
-            >
-              <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden /> {nm}
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="모니터링" />
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <nav className="seg" aria-label="모니터링 종류">
+          {TABS.map(({ k, nm }) => (
+            <button key={k} type="button" aria-current={tab === k ? 'page' : undefined} onClick={() => router.replace(`/areas/${areaId}/monitor?tab=${k}`)} className="seg-item">
+              {nm}
             </button>
           ))}
         </nav>
-        <button type="button" onClick={() => setLive(!live)} className="flex items-center gap-1.5 rounded border border-[#c9d1df] bg-white px-2 py-1 text-sm" aria-pressed={live}>
-          {live ? <Pause className="h-3.5 w-3.5" aria-hidden /> : <Play className="h-3.5 w-3.5" aria-hidden />}
-          <span className={`rounded px-1 text-xs font-bold ${live ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>LIVE</span>
-          <span className="tabular-nums">{clock}</span>
+        <span className="ms-auto flex items-center gap-2">
+        <button type="button" onClick={() => setLive(!live)} className="btn-key btn-sm" aria-pressed={live} aria-label={live ? '실시간 갱신 멈춤' : '실시간 갱신 시작'} title={live ? '10초마다 갱신 중 — 누르면 멈춤' : '멈춤 — 누르면 10초마다 갱신'}>
+          {live ? <Pause aria-hidden /> : <Play aria-hidden />}
+          <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-ok' : 'bg-ink-off'}`} aria-hidden />
+          실시간
+          <span className="font-mono text-xs tabular-nums">{clock}</span>
         </button>
-        <select className="rounded border px-2 py-1 text-sm" value={min} onChange={(e) => setMin(Number(e.target.value))} aria-label="조회 기간">
+        <select className="input-sm w-auto" value={min} onChange={(e) => setMin(Number(e.target.value))} aria-label="조회 기간">
           {MINS.map((m) => (
             <option key={m} value={m}>
               최근 {m < 60 ? `${m}분` : `${m / 60}시간`}
             </option>
           ))}
         </select>
+        </span>
       </div>
-      <div className="mt-3 pb-6">
+      <div className="pb-6">
         {!perms ? (
-          <p className="text-sm text-gray-500">불러오는 중…</p>
+          <p className="text-sm text-ink-3">불러오는 중…</p>
         ) : tab === 'app' ? (
           !perms.includes('MON_AI') ? (
             <NoAi />

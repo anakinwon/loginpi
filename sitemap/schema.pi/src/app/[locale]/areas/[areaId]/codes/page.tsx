@@ -5,16 +5,17 @@
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
+import { Pencil, Trash2 } from 'lucide-react'
+import { PageHead } from '@/components/page-head'
 import { CD_KIND, cdKind, type CdKind } from '@/lib/std-code-rule'
 import { ApvFields, ApvLink, StsCell, StsFilter } from '../words/word-board'
+import { Pager } from '../terms/term-board'
 import CodeDtl, { type BasOpt } from './code-dtl'
 
 type Code = { cd_id: string; term_id: string; cd_cls_nm: string | null; cd_desc: string | null; use_yn: 'Y' | 'N'; ver_no: number; std_sts_cd: string; pend_act: string | null; std_term: { term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null } | null }
 type Term = { term_id: string; term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null }
 type Cond = { kind: CdKind | 'ALL'; kw: string; sts: string; page: number; size: number }
 
-// 코드 구분 배지 색(구분 = 고정 회색, 종류 = 늘어남 파랑, 유형 = 묶음 보라)
-const KIND_TONE: Record<CdKind, string> = { DIV: 'bg-slate-100 text-slate-700', KND: 'bg-sky-100 text-sky-800', TYP: 'bg-violet-100 text-violet-800' }
 const kindOf = (c: Code) => cdKind(c.std_term?.term_log_nm)
 
 export default function CodesPage({ params }: { params: Promise<{ areaId: string }> }) {
@@ -131,94 +132,98 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
   const go = (p: number) => setCond({ ...cond, page: Math.min(Math.max(1, p), pages) })
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">표준코드</h1>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead
+        title="표준코드"
+        info={
+          <div className="space-y-2">
+            <p>공통코드는 3가지 이름만 씁니다. 코드기본 : 코드상세 = 1 : N, 코드기본 주식별자 = 코드 영문 표준용어(예 SEX_DIV_CD)</p>
+            <ul className="space-y-1">
+              {(Object.keys(CD_KIND) as CdKind[]).map((k) => (
+                <li key={k}>
+                  <span className="badge me-1">{CD_KIND[k].nm}</span>
+                  {CD_KIND[k].desc} (예 {CD_KIND[k].ex})
+                </li>
+              ))}
+            </ul>
+            <p>그 외 코드(예 : ~상태코드·은행코드)는 공통코드가 아닙니다. 별도 기본테이블(기준 엔터티)로 관리합니다.</p>
+            <p>코드상세 설계 원칙 : 성격 동일 · 상호 배타(코드값·코드값명 중복 불가) · 전체 합집합 · 상세화 수준 유사. 코드값·코드값명 외 속성이 있거나, 외부에서 받거나, 자주 바뀌거나, 이력이 필요하면 개별 엔터티로 관리합니다.</p>
+          </div>
+        }
+      />
 
-      {/* 공통코드 명명법·설계 원칙(노트 4장 p141·142·145) */}
-      <section className="mt-3 grid gap-3 rounded border border-[#d5ddec] bg-[#f6f8fc] p-3 text-sm lg:grid-cols-[2fr_1fr]">
-        <div>
-          <p className="font-semibold">공통코드는 3가지 이름만 씁니다 — 코드기본 : 코드상세 = 1 : N, 코드기본 주식별자 = 코드 영문 표준용어(예 SEX_DIV_CD)</p>
-          <ul className="mt-1 space-y-0.5">
-            {(Object.keys(CD_KIND) as CdKind[]).map((k) => (
-              <li key={k}>
-                <span className={`mr-1 rounded px-1.5 py-0.5 text-xs font-semibold ${KIND_TONE[k]}`}>{CD_KIND[k].nm}</span>
-                {CD_KIND[k].desc} <span className="text-gray-500">예) {CD_KIND[k].ex}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-1 text-gray-600">그 외 코드(예 : ~상태코드·은행코드)는 공통코드가 아닙니다 — 별도 기본테이블(기준 엔터티)로 관리하십시오.</p>
-        </div>
-        <div className="text-gray-700">
-          <p className="font-semibold">코드상세 설계 원칙</p>
-          <p>성격 동일 · 상호 배타(코드값·코드값명 중복 불가) · 전체 합집합 · 상세화 수준 유사</p>
-          <p className="mt-1 text-xs text-gray-500">코드값·코드값명 외 속성이 있거나, 외부에서 받거나, 자주 바뀌거나, 이력이 필요하면 개별 엔터티로 관리합니다.</p>
-        </div>
-      </section>
-
-      <div className="mt-6 space-y-6">
+      <div className="space-y-6">
         {/* 코드기본 등록·수정 — 조회 위, 표준용어 등록 폼과 같은 모양(마스터 지시 2026-10-20) */}
-        <form onSubmit={submit} className="overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] text-sm shadow-md">
-          <h2 className={`px-5 py-2.5 text-base font-semibold text-white ${edit ? 'bg-gradient-to-r from-[#b45309] to-[#d97706]' : 'bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e]'}`}>{edit ? `코드기본 수정 : ${edit.std_term?.term_log_nm}` : '코드기본 등록'}</h2>
-          <div className="flex flex-wrap items-end gap-2 p-5 [&_input]:border-[#b8c6e0] [&_input]:bg-white [&_select]:border-[#b8c6e0] [&_select]:bg-white">
+        <form onSubmit={submit} className="panel">
+          <h2 className="panel-head" data-mode={edit ? 'edit' : undefined}>
+            {edit ? `코드기본 수정 : ${edit.std_term?.term_log_nm}` : '코드기본 등록'}
+          </h2>
+          <div className="panel-body flex flex-wrap items-center gap-2">
             {!edit && (
               <div className="flex w-full flex-wrap items-center gap-2">
-                <input value={master} onChange={(e) => setMaster(e.target.value)} placeholder="마스터코드명(예 : 남녀, 지불수단, 거래)" maxLength={200} className="min-w-48 flex-1 rounded border px-3 py-2" aria-label="마스터코드명" />
-                <select value={kind} onChange={(e) => setKind(e.target.value as CdKind)} className="rounded border px-3 py-2" aria-label="코드 구분" title={CD_KIND[kind].desc}>
+                <input value={master} onChange={(e) => setMaster(e.target.value)} placeholder="마스터코드명" maxLength={200} className="input min-w-48 flex-1" aria-label="마스터코드명" aria-required="true" title="예 : 남녀, 지불수단, 거래" />
+                <select value={kind} onChange={(e) => setKind(e.target.value as CdKind)} className="input w-auto" aria-label="코드 구분" title={CD_KIND[kind].desc}>
                   {(Object.keys(CD_KIND) as CdKind[]).map((k) => (
                     <option key={k} value={k} title={`${CD_KIND[k].desc} — 예) ${CD_KIND[k].ex}`}>
                       {CD_KIND[k].nm}
                     </option>
                   ))}
                 </select>
-                <span>
-                  = <strong>{master.trim() ? codeNm : `○○${CD_KIND[kind].nm}`}</strong>
+                <span className="text-ink-2">
+                  = <span className="font-medium text-ink">{master.trim() ? codeNm : `○○${CD_KIND[kind].nm}`}</span>
                 </span>
-                {look === 'busy' && <span className="text-xs text-gray-500">표준 확인 중…</span>}
-                {via && <span className="rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-800">마스터코드명 = {via === 'TERM' ? '표준용어' : '표준단어'}</span>}
+                {look === 'busy' && <span className="text-xs text-ink-3">확인 중</span>}
+                {via && (
+                  <span className="badge" data-tone="ok">
+                    {via === 'TERM' ? '표준용어' : '표준단어'}
+                  </span>
+                )}
                 {look === 'nostd' && (
-                  <span className="text-red-700">
-                    마스터코드명 &apos;{master.trim()}&apos; 은(는) 표준단어·표준용어가 아닙니다 —{' '}
+                  <span className="text-dense text-danger">
+                    마스터코드명 &apos;{master.trim()}&apos; 은(는) 표준단어·표준용어가 아닙니다 :{' '}
                     <Link href={`/areas/${areaId}/words?new=${encodeURIComponent(master.trim().replace(/\s+/g, ''))}`} className="underline">
                       표준단어 신청
                     </Link>
                   </span>
                 )}
                 {term && (
-                  <span className="rounded bg-amber-100 px-2 py-1">
-                    확정 표준용어 · 코드ID <span className="font-mono font-semibold">{term.term_phy_nm}</span> · {term.std_dom?.dom_nm}
+                  <span className="flex items-center gap-2" title="확정 표준용어 · 코드ID">
+                    <span className="chip-phy" data-size="lg">
+                      {term.term_phy_nm}
+                    </span>
+                    <span className="text-xs text-ink-3">{term.std_dom?.dom_nm}</span>
                   </span>
                 )}
                 {look === 'none' && (
-                  <span className="text-red-700">
-                    확정 표준용어 &apos;{codeNm}&apos; 없음 —{' '}
+                  <span className="text-dense text-danger">
+                    확정 표준용어 &apos;{codeNm}&apos; 없음 :{' '}
                     <Link href={`/areas/${areaId}/terms?new=${encodeURIComponent(codeNm)}`} className="underline">
                       표준용어 신청
                     </Link>
                   </span>
                 )}
-                <p className="w-full text-xs text-gray-500">
+                <p className="hint w-full">
                   {CD_KIND[kind].nm} : {CD_KIND[kind].desc} (예 {CD_KIND[kind].ex})
                 </p>
               </div>
             )}
-            <input value={cls} onChange={(e) => setCls(e.target.value)} placeholder="코드분류(예 : 공통·결제)" maxLength={200} className="min-w-40 flex-1 rounded border px-3 py-2" />
-            <input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="설명" maxLength={4000} className="min-w-40 flex-1 rounded border px-3 py-2" />
-            <select value={useYn} onChange={(e) => setUseYn(e.target.value as 'Y' | 'N')} className="rounded border px-3 py-2" aria-label="사용여부">
+            <input value={cls} onChange={(e) => setCls(e.target.value)} placeholder="코드분류" aria-label="코드분류" title="예 : 공통·결제" maxLength={200} className="input min-w-40 flex-1" />
+            <input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="설명" aria-label="설명" maxLength={4000} className="input min-w-40 flex-1" />
+            <select value={useYn} onChange={(e) => setUseYn(e.target.value as 'Y' | 'N')} className="input w-auto" aria-label="사용여부">
               <option value="Y">사용</option>
               <option value="N">미사용</option>
             </select>
             <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
-            <button className="btn-3d px-8">{edit ? (edit.std_sts_cd === 'RJCT' ? '수정 후 재신청' : '수정 저장') : '등록'}</button>
-            {edit && (
-              <button type="button" onClick={reset} className="btn-3d">
-                취소
-              </button>
-            )}
+            <div className="ms-auto flex gap-2">
+              {edit && (
+                <button type="button" onClick={reset} className="btn-key">
+                  취소
+                </button>
+              )}
+              <button className="btn-3d">{edit ? (edit.std_sts_cd === 'RJCT' ? '수정 후 재신청' : '수정 저장') : '등록'}</button>
+            </div>
             {msg && (
-              <p role="status" className="w-full font-medium text-[#1f3a68]">
+              <p role="status" className="w-full text-dense text-ink-2">
                 {msg}
               </p>
             )}
@@ -232,10 +237,10 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
               e.preventDefault()
               setCond({ ...cond, kw: q.trim(), page: 1 })
             }}
-            className="flex flex-wrap gap-2"
+            className="flex flex-wrap items-center gap-2"
           >
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(코드명 또는 코드ID)" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
-            <select value={cond.kind} onChange={(e) => setCond({ ...cond, kind: e.target.value as Cond['kind'], page: 1 })} className="rounded border px-2 py-2 text-sm" aria-label="조회 코드 구분">
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색" aria-label="검색명(코드명 또는 코드ID)" title="코드명 또는 코드ID" className="input min-w-48 flex-1" />
+            <select value={cond.kind} onChange={(e) => setCond({ ...cond, kind: e.target.value as Cond['kind'], page: 1 })} className="input w-auto" aria-label="조회 코드 구분">
               <option value="ALL">구분 전체 ({(cnt.ALL ?? 0).toLocaleString()})</option>
               {(Object.keys(CD_KIND) as CdKind[]).map((k) => (
                 <option key={k} value={k}>
@@ -244,14 +249,14 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
               ))}
             </select>
             <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
-            <button className="btn-3d">검색</button>
+            <button className="btn-key">검색</button>
           </form>
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full border-collapse text-[0.7rem] [&_td]:whitespace-nowrap">
+          <div className="mt-3 overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
               <thead>
                 <tr className="thead-3d text-center">
                   {['#', '코드 구분', '코드분류', '코드명(코드기본)', '코드ID(주식별자)', '도메인', '설명', '사용', '상태', '처리'].map((h) => (
-                    <th key={h} className="border px-2 py-2 whitespace-nowrap">
+                    <th key={h} className="border-b px-3 py-2">
                       {h}
                     </th>
                   ))}
@@ -260,33 +265,43 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
               <tbody>
                 {codes.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="border px-2 py-4 text-center text-gray-500">
-                      등록된 코드기본이 없습니다
+                    <td colSpan={10} className="py-6 text-center text-ink-3">
+                      검색 결과 없음
                     </td>
                   </tr>
                 ) : (
                   codes.map((c, i) => {
                     const k = kindOf(c)
                     return (
-                      <tr key={c.cd_id} className={selId === c.cd_id || edit?.cd_id === c.cd_id ? 'bg-amber-50' : 'hover:bg-gray-50'}>
-                        <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
-                        <td className="border px-2 py-1 text-center">{k ? <span className={`rounded px-1.5 py-0.5 font-semibold ${KIND_TONE[k]}`}>{CD_KIND[k].nm}</span> : <span className="text-red-700">공통코드 아님</span>}</td>
-                        <td className="border px-2 py-1">{c.cd_cls_nm}</td>
-                        <td className="border px-2 py-1 font-medium">
-                          <button onClick={() => setSelId(c.cd_id)} className="text-blue-700 underline" title="코드상세 보기·등록">
+                      <tr key={c.cd_id} aria-selected={selId === c.cd_id || undefined} data-mode={edit?.cd_id === c.cd_id ? 'edit' : undefined}>
+                        <td className="border px-3 py-1 text-end font-mono text-xs text-ink-3 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
+                        <td className="border px-3 py-1 text-center">
+                          {k ? (
+                            <span className="badge">{CD_KIND[k].nm}</span>
+                          ) : (
+                            <span className="badge" data-tone="danger">
+                              공통코드 아님
+                            </span>
+                          )}
+                        </td>
+                        <td className="border px-3 py-1">{c.cd_cls_nm}</td>
+                        <td className="border px-3 py-1 font-medium">
+                          <button onClick={() => setSelId(c.cd_id)} className="text-accent-ink hover:underline" title="코드상세 보기·등록">
                             {c.std_term?.term_log_nm}
                           </button>
                         </td>
-                        <td className="border px-2 py-1 font-mono font-semibold">{c.cd_id}</td>
-                        <td className="border px-2 py-1">{c.std_term?.std_dom?.dom_nm}</td>
-                        <td className="border px-2 py-1">{c.cd_desc}</td>
-                        <td className="border px-2 py-1 text-center">{c.use_yn}</td>
+                        <td className="border px-3 py-1">
+                          <span className="chip-phy">{c.cd_id}</span>
+                        </td>
+                        <td className="border px-3 py-1">{c.std_term?.std_dom?.dom_nm}</td>
+                        <td className="border px-3 py-1 text-ink-2">{c.cd_desc}</td>
+                        <td className="border px-3 py-1 text-center font-mono text-xs text-ink-3">{c.use_yn}</td>
                         <StsCell sts={c.std_sts_cd} pend={c.pend_act} apv={`/areas/${areaId}/approvals?tp=CD`} />
-                        <td className="border px-2 py-1 text-center">
+                        <td className="border px-3 py-1 text-center">
                           {c.std_sts_cd === 'REQ' || c.pend_act ? (
                             <ApvLink apv={`/areas/${areaId}/approvals?tp=CD`} />
                           ) : (
-                            <>
+                            <span className="inline-flex gap-1">
                               <button
                                 onClick={() => {
                                   setEdit(c)
@@ -295,14 +310,16 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
                                   setUseYn(c.use_yn)
                                   window.scrollTo({ top: 0, behavior: 'smooth' })
                                 }}
-                                className="mr-2 text-blue-700 underline"
+                                aria-label={c.std_sts_cd === 'RJCT' ? '재신청' : '수정'}
+                                title={c.std_sts_cd === 'RJCT' ? '재신청' : '수정'}
+                                className="btn-ghost btn-icon btn-sm"
                               >
-                                {c.std_sts_cd === 'RJCT' ? '재신청' : '수정'}
+                                <Pencil aria-hidden />
                               </button>
-                              <button onClick={() => void remove(c)} className="text-red-700 underline">
-                                삭제
+                              <button onClick={() => void remove(c)} aria-label="삭제" title="삭제" className="btn-ghost btn-icon btn-sm hover:text-danger">
+                                <Trash2 aria-hidden />
                               </button>
-                            </>
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -312,45 +329,14 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
               </tbody>
             </table>
           </div>
-          {/* 페이지 이동(표준용어 조회와 같음) */}
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-gray-600">
-              총 {total.toLocaleString()}건 · {cond.page} / {pages} 페이지
-            </span>
-            <div className="mx-auto flex items-center gap-1">
-              <button onClick={() => go(1)} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-                «
-              </button>
-              <button onClick={() => go(cond.page - 1)} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-                ‹
-              </button>
-              {Array.from({ length: Math.min(5, pages) }, (_, i) => Math.min(Math.max(1, cond.page - 2), Math.max(1, pages - 4)) + i).map((p) => (
-                <button key={p} onClick={() => go(p)} aria-current={p === cond.page ? 'page' : undefined} className={`min-w-8 rounded border px-2 py-1 ${p === cond.page ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : ''}`}>
-                  {p}
-                </button>
-              ))}
-              <button onClick={() => go(cond.page + 1)} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-                ›
-              </button>
-              <button onClick={() => go(pages)} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-                »
-              </button>
-            </div>
-            <select value={cond.size} onChange={(e) => setCond({ ...cond, size: Number(e.target.value), page: 1 })} className="rounded border px-2 py-1" aria-label="페이지당 건수">
-              {[10, 20, 50, 100].map((n) => (
-                <option key={n} value={n}>
-                  {n}건씩
-                </option>
-              ))}
-            </select>
-          </div>
+          <Pager page={cond.page} pages={pages} total={total} size={cond.size} go={go} setSize={(size) => setCond({ ...cond, size, page: 1 })} />
         </section>
-      </div>
 
-      {/* 코드상세(코드 인스턴스) 등록·조회 — 코드기본 1 : N */}
-      <div className="mt-6">
-        <CodeDtl areaId={areaId} opts={opts} cdId={selId} onPick={setSelId} />
-        {selId && cdKind(opts.find((o) => o.cd_id === selId)?.std_term?.term_log_nm) === 'DIV' && <p className="mt-1 text-xs text-gray-600">구분코드는 값 2~3개로 고정된 코드만 씁니다(최대 3개) — 4개 이상이거나 늘어날 수 있으면 유형코드로 정의하십시오.</p>}
+        {/* 코드상세(코드 인스턴스) 등록·조회 — 코드기본 1 : N */}
+        <div>
+          <CodeDtl areaId={areaId} opts={opts} cdId={selId} onPick={setSelId} />
+          {selId && cdKind(opts.find((o) => o.cd_id === selId)?.std_term?.term_log_nm) === 'DIV' && <p className="hint">구분코드는 값 2~3개로 고정된 코드만 씁니다(최대 3개). 4개 이상이거나 늘어날 수 있으면 유형코드로 정의하십시오.</p>}
+        </div>
       </div>
     </main>
   )

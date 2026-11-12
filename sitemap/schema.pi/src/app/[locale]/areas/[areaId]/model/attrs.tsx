@@ -2,12 +2,14 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 속성 패널(MD3, sql/025) — 등록된 속성(주식별자·필수·용어·물리명·도메인) + 주식별자·필수 속성 추천 체크 목록 → 선택 등록(반자동)
 // 추천은 저장하지 않음(GET …/attributes/suggest), 고른 것만 POST …/attributes. 용어 없는 후보는 빨강·체크 불가·용어 신청 링크(표준 선행)
-// 물리명은 물리 모델 전환 전까지 항상 대문자(PRD §2.6). 순서 = ▲▼(주식별자는 앞 묶음 안에서만, 일반 속성은 그 뒤에서만 이동, PUT …/attributes/order)
+// 물리명은 물리 모델 전환 전까지 항상 대문자(PRD §2.6). 순서 = 위·아래 버튼(주식별자는 앞 묶음 안에서만, 일반 속성은 그 뒤에서만 이동, PUT …/attributes/order)
 // 자유 추가·용어 교체 = 승인 표준용어 검색(GET /terms?q=&sts=CNFM, 2글자 이상·0.3초 지연·20건), 없으면 용어 신청. 관계 상속 속성은 용어 교체 잠금(설명만)
 // 항목설정(마스터 지시 2026-10-18, DA# 엔터티 편집 › 항목설정) : 표 칸을 주요 항목(표시·순서)/보조 항목(숨김)으로 — 순서·속성명·처리는 고정, 이 브라우저에 기억
 import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { confirmSave } from '../words/word-board'
+import { Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, KeyRound, Lock, TriangleAlert, X } from 'lucide-react'
+import { InfoTip } from '@/components/page-head'
+import { RowActions, confirmSave } from '../words/word-board'
 
 interface Attr {
   attr_id: string
@@ -46,6 +48,8 @@ const MUST_NM: Record<keyof Must, string> = { pk: '주식별자', name: '주식�
 const ROLE_NM = { PK: '주식별자', FK: '참조(FK)', REQ: '필수' } as const
 const SRC_NM = { industry: '업종', rule: '규칙', inherit: '상속' } as const
 const SEARCH = { min: 2, delay: 300, size: 20 }
+// 속성 표 칸 — 행 헤어라인만(세로선 없음)
+const TDA = 'border-b px-2 py-1'
 export type Term = { term_id: string; term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null }
 
 // 승인 표준용어 검색 선택 — 고르면 onPick, 결과 없음 = 용어 신청 링크
@@ -68,21 +72,21 @@ export function TermPick({ api, areaId, picked, onPick, label, initialQ }: { api
   if (picked)
     return (
       <span className="inline-flex items-center gap-1">
-        <b>{picked.term_log_nm}</b> <span className="font-mono text-gray-500">{picked.term_phy_nm}</span> <span className="text-gray-500">{picked.std_dom?.dom_nm}</span>
-        <button type="button" onClick={() => onPick(null)} className="underline" aria-label="용어 다시 고르기">
+        <span className="font-medium text-ink">{picked.term_log_nm}</span> <span className="chip-phy">{picked.term_phy_nm}</span> <span className="text-ink-3">{picked.std_dom?.dom_nm}</span>
+        <button type="button" onClick={() => onPick(null)} className="btn-ghost btn-sm" aria-label="용어 다시 고르기">
           다시
         </button>
       </span>
     )
   return (
     <span className="relative inline-block w-full max-w-sm">
-      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`표준용어 검색(${SEARCH.min}글자 이상, 논리명·물리명)`} className="w-full rounded border px-2 py-0.5" aria-label={label} />
+      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="표준용어" title={`${SEARCH.min}글자 이상, 논리명·물리명`} className="input-sm w-full" aria-label={label} />
       {hits && (
-        <ul className="absolute z-10 mt-0.5 max-h-56 w-full overflow-auto rounded border bg-white shadow">
+        <ul className="absolute z-30 mt-1 max-h-56 w-full overflow-auto rounded-card border border-line bg-surface py-1 shadow-2">
           {hits.length === 0 ? (
-            <li className="px-2 py-1 text-red-700">
-              승인된 용어가 없습니다 —{' '}
-              <Link href={`/areas/${areaId}/terms?new=${encodeURIComponent(q.trim())}`} className="underline">
+            <li className="px-3 py-1.5 text-danger">
+              승인된 용어 없음 ·{' '}
+              <Link href={`/areas/${areaId}/terms?new=${encodeURIComponent(q.trim())}`} className="text-accent-ink hover:underline">
                 표준용어 신청
               </Link>
             </li>
@@ -95,9 +99,9 @@ export function TermPick({ api, areaId, picked, onPick, label, initialQ }: { api
                     onPick(t)
                     setQ('')
                   }}
-                  className="w-full px-2 py-1 text-left hover:bg-[#eef2f8]"
+                  className="flex w-full items-center gap-2 px-3 py-1.5 text-start transition-colors hover:bg-raised"
                 >
-                  <b>{t.term_log_nm}</b> <span className="font-mono text-gray-500">{t.term_phy_nm}</span> <span className="text-gray-500">{t.std_dom?.dom_nm}</span>
+                  <span className="font-medium text-ink">{t.term_log_nm}</span> <span className="chip-phy">{t.term_phy_nm}</span> <span className="text-ink-3">{t.std_dom?.dom_nm}</span>
                 </button>
               </li>
             ))
@@ -210,32 +214,36 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
   }
 
   const row = (c: Cand) => (
-    <li key={`${c.role}-${c.term_log_nm}`} className={`flex items-start gap-2 py-1 ${c.missing ? 'text-red-700' : ''}`} title={c.reason}>
+    <li key={`${c.role}-${c.term_log_nm}`} className={`flex items-start gap-2 py-1.5 ${c.missing ? 'text-danger' : ''}`} title={c.reason}>
       <input
         type="checkbox"
-        className="mt-0.5"
+        className="mt-0.5 shrink-0"
         disabled={c.missing || !editor}
         checked={chk.has(c.term_log_nm)}
         onChange={() => setChk((s) => (s.has(c.term_log_nm) ? new Set([...s].filter((x) => x !== c.term_log_nm)) : new Set([...s, c.term_log_nm])))}
         aria-label={`${c.term_log_nm} 선택`}
       />
-      <span className="min-w-0 flex-1">
-        <span className="font-semibold">
-          {c.role === 'PK' && '🔑 '}
+      <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+        <span className="inline-flex items-center gap-1 font-medium">
+          {c.role === 'PK' && <KeyRound className="h-3.5 w-3.5 text-ink-3" strokeWidth={1.75} aria-label="주식별자" />}
           {c.term_log_nm}
-        </span>{' '}
-        {(c.role === 'PK' || c.must) && <span className="rounded bg-amber-200 px-1 text-[0.65rem] text-amber-900">필수 4종</span>}{' '}
-        {!c.missing && <span className="font-mono text-gray-500">{c.term_phy_nm}</span>} <span className="text-gray-500">{c.dom_nm}</span>{' '}
-        <span className="rounded bg-gray-100 px-1 text-[0.65rem] text-gray-600">
+        </span>
+        {(c.role === 'PK' || c.must) && (
+          <span className="badge" data-tone="warn">
+            필수 4종
+          </span>
+        )}
+        {!c.missing && <span className="chip-phy">{c.term_phy_nm}</span>} <span className="text-ink-3">{c.dom_nm}</span>
+        <span className="badge">
           {ROLE_NM[c.role]}
           {c.role !== 'PK' && !c.esntl ? '·선택' : ''} · {SRC_NM[c.src]}
         </span>
         {c.missing && (
-          <Link href={`/areas/${areaId}/terms?new=${encodeURIComponent(c.term_log_nm)}`} className="ml-1 underline">
+          <Link href={`/areas/${areaId}/terms?new=${encodeURIComponent(c.term_log_nm)}`} className="text-accent-ink hover:underline">
             용어 신청 필요
           </Link>
         )}
-        <span className="block truncate text-[0.65rem] text-gray-500">{c.reason}</span>
+        <span className="block w-full truncate text-xs text-ink-3">{c.reason}</span>
       </span>
     </li>
   )
@@ -271,16 +279,30 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
     const d = a.std_term?.std_dom
     switch (k) {
       case 'phy':
-        return <td key={k} className="border px-2 py-1 font-mono text-[#1f3a68]">{a.std_term?.term_phy_nm}</td>
+        return (
+          <td key={k} className={TDA}>
+            <span className="chip-phy">{a.std_term?.term_phy_nm}</span>
+          </td>
+        )
       case 'pk':
         return (
-          <td key={k} className="border px-2 py-1 text-center">
+          <td key={k} className={`${TDA} text-center`}>
             {editor ? (
-              <button type="button" onClick={() => void patch(a, { pk_yn: a.pk_yn === 'Y' ? 'N' : 'Y' })} title="주식별자 지정·해제">
-                {a.pk_yn === 'Y' ? `🔑${a.pk_seq}` : '·'}
+              <button type="button" onClick={() => void patch(a, { pk_yn: a.pk_yn === 'Y' ? 'N' : 'Y' })} title="주식별자 지정·해제" aria-label="주식별자 지정·해제" className="btn-ghost btn-sm min-w-8 tabular-nums">
+                {a.pk_yn === 'Y' ? (
+                  <>
+                    <KeyRound aria-hidden />
+                    {a.pk_seq}
+                  </>
+                ) : (
+                  <span className="text-ink-off">·</span>
+                )}
               </button>
             ) : a.pk_yn === 'Y' ? (
-              `🔑${a.pk_seq}`
+              <span className="inline-flex items-center gap-1 text-ink-2 tabular-nums">
+                <KeyRound className="h-3.5 w-3.5" strokeWidth={1.75} aria-label="주식별자" />
+                {a.pk_seq}
+              </span>
             ) : (
               ''
             )}
@@ -288,45 +310,45 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
         )
       case 'nn':
         return (
-          <td key={k} className="border px-2 py-1 text-center">
+          <td key={k} className={`${TDA} text-center`}>
             <input type="checkbox" disabled={!editor || a.pk_yn === 'Y'} checked={a.esntl_yn === 'Y'} onChange={() => void patch(a, { esntl_yn: a.esntl_yn === 'Y' ? 'N' : 'Y' })} aria-label="필수" />
           </td>
         )
       case 'tp':
-        return <td key={k} className="border px-2 py-1">{d?.std_lgc_tp?.lgc_tp_nm}</td>
+        return <td key={k} className={TDA}>{d?.std_lgc_tp?.lgc_tp_nm}</td>
       case 'len':
-        return <td key={k} className="border px-2 py-1 text-right tabular-nums">{d?.data_len ?? ''}</td>
+        return <td key={k} className={`${TDA} text-right tabular-nums`}>{d?.data_len ?? ''}</td>
       case 'scl':
-        return <td key={k} className="border px-2 py-1 text-right tabular-nums">{d?.data_scale ?? ''}</td>
+        return <td key={k} className={`${TDA} text-right tabular-nums`}>{d?.data_scale ?? ''}</td>
       case 'dom':
-        return <td key={k} className="border px-2 py-1">{d?.dom_nm}</td>
+        return <td key={k} className={`${TDA} text-ink-2`}>{d?.dom_nm}</td>
       case 'asst':
-        return <td key={k} className="border px-2 py-1">{a.attr_asst_nm}</td>
+        return <td key={k} className={TDA}>{a.attr_asst_nm}</td>
       case 'fk':
-        return <td key={k} className="border px-2 py-1 text-center">{a.fk_rel_id ? '상속' : ''}</td>
+        return <td key={k} className={`${TDA} text-center text-ink-3`}>{a.fk_rel_id ? '상속' : ''}</td>
       case 'syn':
-        return <td key={k} className="border px-2 py-1">{a.std_term?.syn_txt}</td>
+        return <td key={k} className={TDA}>{a.std_term?.syn_txt}</td>
       case 'desc':
-        return <td key={k} className="border px-2 py-1 !whitespace-normal">{a.attr_desc}</td>
+        return <td key={k} className={`${TDA} !whitespace-normal text-ink-2`}>{a.attr_desc}</td>
     }
   }
   const span = cols.length + 3
 
   return (
-    <div className="space-y-2 rounded border border-[#d5ddec] bg-[#f8fafd] p-3 text-xs">
+    <div className="space-y-2 rounded-card border border-line bg-well p-3 text-xs">
       <div className="flex justify-end">
-        <button type="button" onClick={() => (setDraft(cols), setSelL([]), setSelR([]))} className="rounded border bg-white px-2 py-0.5 hover:bg-gray-50" title="표에 보일 항목(주요 항목)과 숨길 항목(보조 항목)">
+        <button type="button" onClick={() => (setDraft(cols), setSelL([]), setSelR([]))} className="btn-key btn-sm" title="표에 보일 항목(주요 항목)과 숨길 항목(보조 항목)">
           항목설정
         </button>
       </div>
       {draft && (
-        <div className="fixed inset-0 z-[900] grid place-items-center bg-black/30" onClick={() => setDraft(null)}>
-          <div role="dialog" aria-label="항목 설정" className="w-[34rem] max-w-[95vw] rounded-lg border bg-white text-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="border-b px-3 py-2 font-semibold">항목 설정</div>
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 p-3">
-              <label className="flex flex-col gap-1">
-                <span className="font-semibold">— 주요 항목(표에 표시)</span>
-                <select multiple size={12} value={selL} onChange={(e) => setSelL([...e.target.selectedOptions].map((o) => o.value as ColKey))} className="rounded border p-1" aria-label="주요 항목">
+        <div className="fixed inset-0 z-[900] grid place-items-center bg-ink/30" onClick={() => setDraft(null)}>
+          <div role="dialog" aria-label="항목 설정" className="w-[34rem] max-w-[95vw] rounded-sheet border border-line bg-surface text-sm shadow-2" onClick={(e) => e.stopPropagation()}>
+            <div className="panel-head">항목 설정</div>
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 p-4">
+              <label className="flex flex-col">
+                <span className="field-label">주요 항목</span>
+                <select multiple size={12} value={selL} onChange={(e) => setSelL([...e.target.selectedOptions].map((o) => o.value as ColKey))} className="input h-auto px-1 py-1" aria-label="주요 항목">
                   {draft.map((k) => (
                     <option key={k} value={k}>
                       {COL_NM[k]}
@@ -335,25 +357,25 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
                 </select>
               </label>
               <div className="flex flex-col gap-2">
-                <button type="button" onClick={() => setDraft(COL_DEF)} className="rounded border px-3 py-1 hover:bg-gray-50">
+                <button type="button" onClick={() => setDraft(COL_DEF)} className="btn-key btn-sm">
                   초기화
                 </button>
-                <button type="button" disabled={!selR.length} onClick={() => (setDraft([...draft, ...selR]), setSelR([]))} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="보조 항목을 주요 항목으로" title="보조 → 주요(표시)">
-                  ◁
+                <button type="button" disabled={!selR.length} onClick={() => (setDraft([...draft, ...selR]), setSelR([]))} className="btn-key btn-sm" aria-label="보조 항목을 주요 항목으로" title="보조 → 주요(표시)">
+                  <ChevronLeft aria-hidden />
                 </button>
-                <button type="button" disabled={!selL.length} onClick={() => (setDraft(draft.filter((k) => !selL.includes(k))), setSelL([]))} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="주요 항목을 보조 항목으로" title="주요 → 보조(숨김)">
-                  ▷
+                <button type="button" disabled={!selL.length} onClick={() => (setDraft(draft.filter((k) => !selL.includes(k))), setSelL([]))} className="btn-key btn-sm" aria-label="주요 항목을 보조 항목으로" title="주요 → 보조(숨김)">
+                  <ChevronRight aria-hidden />
                 </button>
-                <button type="button" disabled={selL.length !== 1} onClick={() => upDown(-1)} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="위로" title="주요 항목 순서 위로">
-                  ▲
+                <button type="button" disabled={selL.length !== 1} onClick={() => upDown(-1)} className="btn-key btn-sm" aria-label="위로" title="주요 항목 순서 위로">
+                  <ChevronUp aria-hidden />
                 </button>
-                <button type="button" disabled={selL.length !== 1} onClick={() => upDown(1)} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="아래로" title="주요 항목 순서 아래로">
-                  ▼
+                <button type="button" disabled={selL.length !== 1} onClick={() => upDown(1)} className="btn-key btn-sm" aria-label="아래로" title="주요 항목 순서 아래로">
+                  <ChevronDown aria-hidden />
                 </button>
               </div>
-              <label className="flex flex-col gap-1">
-                <span className="font-semibold">— 보조 항목(숨김)</span>
-                <select multiple size={12} value={selR} onChange={(e) => setSelR([...e.target.selectedOptions].map((o) => o.value as ColKey))} className="rounded border p-1" aria-label="보조 항목">
+              <label className="flex flex-col">
+                <span className="field-label">보조 항목</span>
+                <select multiple size={12} value={selR} onChange={(e) => setSelR([...e.target.selectedOptions].map((o) => o.value as ColKey))} className="input h-auto px-1 py-1" aria-label="보조 항목">
                   {(Object.keys(COL_NM) as ColKey[])
                     .filter((k) => !draft.includes(k))
                     .map((k) => (
@@ -364,13 +386,13 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
                 </select>
               </label>
             </div>
-            <p className="px-3 text-xs text-gray-500">순서·속성명·처리 칸은 항상 표시. 여러 개는 Ctrl·Shift 로 함께 고름</p>
-            <div className="flex justify-end gap-2 border-t px-3 py-2">
-              <button type="button" onClick={() => saveCols(draft)} className="btn-3d px-4 py-1">
-                확인
-              </button>
-              <button type="button" onClick={() => setDraft(null)} className="rounded border px-4 py-1">
+            <p className="hint px-4">순서·속성명·처리 칸은 항상 표시, 여러 개는 Ctrl·Shift</p>
+            <div className="mt-3 flex justify-end gap-2 border-t border-line px-4 py-3">
+              <button type="button" onClick={() => setDraft(null)} className="btn-key btn-sm">
                 취소
+              </button>
+              <button type="button" onClick={() => saveCols(draft)} className="btn-3d btn-sm">
+                확인
               </button>
             </div>
           </div>
@@ -378,21 +400,22 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
       )}
       {sug.must && (
         <p className="flex flex-wrap items-center gap-1" aria-label="필수 4종 점검">
-          <span className="font-semibold text-[#1f3a68]">필수 4종 점검 :</span>
+          <span className="me-1 font-medium text-ink-2">필수 4종</span>
           {(Object.keys(MUST_NM) as (keyof Must)[]).map((k) => (
-            <span key={k} className={`rounded px-1.5 py-0.5 ${sug.must![k] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}`}>
-              {sug.must![k] ? '✓' : '✗'} {MUST_NM[k]}
+            <span key={k} className="badge" data-tone={sug.must![k] ? 'ok' : 'danger'}>
+              {sug.must![k] ? <Check className="h-3 w-3" strokeWidth={2} aria-label="충족" /> : <X className="h-3 w-3" strokeWidth={2} aria-label="누락" />}
+              {MUST_NM[k]}
             </span>
           ))}
         </p>
       )}
       {/* 좁은 패널(ERD 오른쪽)에서 칸이 늘면 가로 스크롤 — 머리글 줄바꿈 없음 */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse bg-white">
+      <div className="overflow-x-auto rounded-card border border-line bg-surface">
+        <table className="w-full border-collapse">
         <thead>
-          <tr className="thead-3d text-center">
+          <tr className="thead-3d text-start">
             {['순서', '속성명(용어)', ...cols.map((k) => COL_NM[k]), '처리'].map((h) => (
-              <th key={h} className="border px-2 py-1 whitespace-nowrap">
+              <th key={h} className="px-2 py-2 whitespace-nowrap">
                 {h}
               </th>
             ))}
@@ -401,70 +424,64 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
         <tbody>
           {items.length === 0 ? (
             <tr>
-              <td colSpan={span} className="border px-2 py-2 text-center text-gray-500">
-                등록된 속성이 없습니다 — 아래 추천에서 고르거나 표준용어를 검색해 추가하십시오
+              <td colSpan={span} className="px-2 py-6 text-center text-ink-3">
+                등록된 속성 없음
               </td>
             </tr>
           ) : (
             items.map((a, k) => [
               <tr key={a.attr_id}>
-                <td className="border px-1 py-1 text-center whitespace-nowrap">
-                  <span className="mr-1 tabular-nums text-gray-500">{k + 1}</span>
-                  {editor && (
-                    <>
-                      <button type="button" onClick={() => void move(k, -1)} disabled={k === 0 || items[k - 1].pk_yn !== a.pk_yn} className="px-0.5 disabled:opacity-20" aria-label={`${a.std_term?.term_log_nm} 위로`} title="위로">
-                        ▲
-                      </button>
-                      <button type="button" onClick={() => void move(k, 1)} disabled={k === items.length - 1 || items[k + 1].pk_yn !== a.pk_yn} className="px-0.5 disabled:opacity-20" aria-label={`${a.std_term?.term_log_nm} 아래로`} title="아래로">
-                        ▼
-                      </button>
-                    </>
-                  )}
+                <td className={`${TDA} whitespace-nowrap`}>
+                  <span className="inline-flex items-center gap-0.5">
+                    <span className="me-1 min-w-4 text-right font-mono text-ink-3 tabular-nums">{k + 1}</span>
+                    {editor && (
+                      <>
+                        <button type="button" onClick={() => void move(k, -1)} disabled={k === 0 || items[k - 1].pk_yn !== a.pk_yn} className="btn-ghost btn-icon btn-sm" aria-label={`${a.std_term?.term_log_nm} 위로`} title="위로">
+                          <ChevronUp aria-hidden />
+                        </button>
+                        <button type="button" onClick={() => void move(k, 1)} disabled={k === items.length - 1 || items[k + 1].pk_yn !== a.pk_yn} className="btn-ghost btn-icon btn-sm" aria-label={`${a.std_term?.term_log_nm} 아래로`} title="아래로">
+                          <ChevronDown aria-hidden />
+                        </button>
+                      </>
+                    )}
+                  </span>
                 </td>
-                <td className="border px-2 py-1 font-medium">
-                  {a.pk_yn === 'Y' && !cols.includes('pk') && <span title="주식별자">🔑 </span>}
-                  {a.std_term?.term_log_nm}
-                  {a.fk_rel_id && !cols.includes('fk') && <span className="ml-1 text-gray-500">(상속)</span>}
-                  {a.attr_desc && !cols.includes('desc') && <span className="block text-[0.65rem] font-normal text-gray-500">{a.attr_desc}</span>}
+                <td className={`${TDA} font-medium`}>
+                  <span className="inline-flex items-center gap-1">
+                    {a.pk_yn === 'Y' && !cols.includes('pk') && <KeyRound className="h-3.5 w-3.5 text-ink-3" strokeWidth={1.75} aria-label="주식별자" />}
+                    {a.std_term?.term_log_nm}
+                    {a.fk_rel_id && !cols.includes('fk') && <span className="font-normal text-ink-3">(상속)</span>}
+                  </span>
+                  {a.attr_desc && !cols.includes('desc') && <span className="block text-xs font-normal text-ink-3">{a.attr_desc}</span>}
                 </td>
                 {cols.map((k) => cell(k, a))}
-                <td className="border px-2 py-1 text-center">
-                  {editor && (
-                    <>
-                      <button type="button" onClick={() => setEd(ed?.id === a.attr_id ? null : { id: a.attr_id, t: null, desc: a.attr_desc ?? '', asst: a.attr_asst_nm ?? '' })} className="mr-2 underline">
-                        수정
-                      </button>
-                      <button type="button" onClick={() => void del(a)} className="text-red-700 underline">
-                        삭제
-                      </button>
-                    </>
-                  )}
-                </td>
+                <td className={`${TDA} text-center`}>{editor && <RowActions onEdit={() => setEd(ed?.id === a.attr_id ? null : { id: a.attr_id, t: null, desc: a.attr_desc ?? '', asst: a.attr_asst_nm ?? '' })} onRemove={() => void del(a)} />}</td>
               </tr>,
               ed?.id === a.attr_id && (
-                <tr key={`${a.attr_id}-ed`} className="bg-[#fffbea]">
-                  <td colSpan={span} className="border px-2 py-2">
+                <tr key={`${a.attr_id}-ed`} data-mode="edit">
+                  <td colSpan={span} className="border-b px-3 py-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold">용어</span>
+                      <span className="field-label mb-0">용어</span>
                       {a.fk_rel_id ? (
-                        <span className="text-gray-600" title="관계로 상속된 속성은 부모 식별자와 같아야 합니다">
-                          🔒 {a.std_term?.term_log_nm} (상속 — 용어 교체 불가, 관계·부모 식별자에서 바꾸십시오)
+                        <span className="inline-flex items-center gap-1 text-ink-2" title="관계로 상속된 속성은 부모 식별자와 같아야 합니다">
+                          <Lock className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                          {a.std_term?.term_log_nm} · 상속 속성은 관계·부모 식별자에서 변경
                         </span>
                       ) : (
                         <TermPick api={api} areaId={areaId} picked={ed.t} onPick={(t) => setEd({ ...ed, t })} label={`${a.std_term?.term_log_nm} 교체 용어 검색`} />
                       )}
-                      {!a.fk_rel_id && !ed.t && <span className="text-gray-500">(비우면 {a.std_term?.term_log_nm} 유지 — 자리·PK·필수는 그대로)</span>}
+                      {!a.fk_rel_id && !ed.t && <span className="text-ink-3">비우면 {a.std_term?.term_log_nm} 유지</span>}
                     </div>
-                    <div className="mt-1 flex items-center gap-2">
-                      <span className="font-semibold">설명</span>
-                      <input value={ed.desc} onChange={(e) => setEd({ ...ed, desc: e.target.value })} maxLength={4000} className="flex-1 rounded border px-2 py-0.5" aria-label="속성 설명" />
-                      <span className="font-semibold">보조명</span>
-                      <input value={ed.asst} onChange={(e) => setEd({ ...ed, asst: e.target.value })} maxLength={200} placeholder="선택" className="w-40 rounded border px-2 py-0.5" aria-label="속성 보조명" />
-                      <button type="button" onClick={() => void saveEd(a)} className="btn-3d px-3 py-0.5">
-                        저장
-                      </button>
-                      <button type="button" onClick={() => setEd(null)} className="underline">
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <span className="field-label mb-0">설명</span>
+                      <input value={ed.desc} onChange={(e) => setEd({ ...ed, desc: e.target.value })} maxLength={4000} placeholder="설명" className="input-sm min-w-40 flex-1" aria-label="속성 설명" />
+                      <span className="field-label mb-0">보조명</span>
+                      <input value={ed.asst} onChange={(e) => setEd({ ...ed, asst: e.target.value })} maxLength={200} placeholder="보조명" className="input-sm w-40" aria-label="속성 보조명" />
+                      <button type="button" onClick={() => setEd(null)} className="btn-key btn-sm">
                         취소
+                      </button>
+                      <button type="button" onClick={() => void saveEd(a)} className="btn-3d btn-sm">
+                        저장
                       </button>
                     </div>
                   </td>
@@ -475,48 +492,56 @@ export default function Attrs({ api, areaId, entId, entNm, editor: canEdit, onCh
         </tbody>
         </table>
       </div>
-      {canEdit && locked && <p className="text-xs text-red-700">작성완료 주제영역의 엔터티입니다 — 완료 취소 후 편집하십시오</p>}
+      {canEdit && locked && <p className="text-xs text-danger">작성완료 주제영역의 엔터티 · 완료 취소 후 편집</p>}
       {editor && (
-        <div className="flex flex-wrap items-center gap-2 rounded border border-[#d5ddec] bg-white p-2">
-          <span className="font-semibold text-[#1f3a68]">＋ 속성 추가</span>
+        <div className="flex flex-wrap items-center gap-2 rounded-control border border-line bg-surface p-2">
+          <span className="font-medium text-ink-2">속성 추가</span>
           <TermPick api={api} areaId={areaId} picked={nw.t} onPick={(t) => setNw({ ...nw, t })} label="추가할 표준용어 검색" />
-          <label className="inline-flex items-center gap-1">
+          <label className="inline-flex items-center gap-2">
             <input type="checkbox" checked={nw.pk} onChange={() => setNw({ ...nw, pk: !nw.pk })} /> 주식별자
           </label>
-          <label className="inline-flex items-center gap-1">
+          <label className="inline-flex items-center gap-2">
             <input type="checkbox" checked={nw.pk || nw.es} disabled={nw.pk} onChange={() => setNw({ ...nw, es: !nw.es })} /> 필수
           </label>
-          <button type="button" onClick={() => void addOne()} disabled={busy || !nw.t} className="btn-3d ml-auto px-4 py-0.5 disabled:opacity-40">
+          <button type="button" onClick={() => void addOne()} disabled={busy || !nw.t} className="btn-key btn-sm ms-auto">
             추가
           </button>
         </div>
       )}
       {all.length > 0 && (
-        <div className="rounded border border-[#d5ddec] bg-white p-2">
-          <p className="mb-1 font-semibold text-[#1f3a68]">주식별자·필수 속성 추천(체크 후 선택 등록, 빨강 = 표준용어 신청 필요, 행에 마우스를 올리면 근거)</p>
-          {sug.pk.length > 0 && <ul className="divide-y divide-[#eef2f8]">{sug.pk.map(row)}</ul>}
-          {sug.required.length > 0 && <ul className="mt-1 divide-y divide-[#eef2f8] border-t border-[#d5ddec]">{sug.required.map(row)}</ul>}
+        <div className="rounded-control border border-line bg-surface p-2">
+          <div className="mb-1 flex items-center gap-1">
+            <span className="font-medium text-ink-2">주식별자·필수 속성 추천</span>
+            <InfoTip>체크 후 선택 등록. 빨강 = 표준용어 신청 필요, 행에 마우스를 올리면 근거</InfoTip>
+          </div>
+          {sug.pk.length > 0 && <ul className="divide-y divide-line">{sug.pk.map(row)}</ul>}
+          {sug.required.length > 0 && <ul className="mt-1 divide-y divide-line border-t border-line">{sug.required.map(row)}</ul>}
           {editor && (
             <div className="mt-2 flex items-center gap-2">
-              <button type="button" onClick={() => setChk(new Set(all.filter((c) => !c.missing).map((c) => c.term_log_nm)))} className="underline">
+              <button type="button" onClick={() => setChk(new Set(all.filter((c) => !c.missing).map((c) => c.term_log_nm)))} className="btn-ghost btn-sm">
                 전체 선택
               </button>
-              <button type="button" onClick={() => setChk(new Set())} className="underline">
+              <button type="button" onClick={() => setChk(new Set())} className="btn-ghost btn-sm">
                 선택 해제
               </button>
-              <button type="button" onClick={() => void addSel()} disabled={busy || !all.some((c) => !c.missing && chk.has(c.term_log_nm))} className="btn-3d ml-auto px-4 py-0.5 disabled:opacity-40">
-                선택 등록({all.filter((c) => !c.missing && chk.has(c.term_log_nm)).length})
+              <button type="button" onClick={() => void addSel()} disabled={busy || !all.some((c) => !c.missing && chk.has(c.term_log_nm))} className="btn-key btn-sm ms-auto tabular-nums">
+                선택 등록 {all.filter((c) => !c.missing && chk.has(c.term_log_nm)).length}
               </button>
             </div>
           )}
         </div>
       )}
       {sug.warn.map((w) => (
-        <p key={w} className="text-amber-700">
-          ⚠ {w}
+        <p key={w} className="flex items-center gap-1 text-warn">
+          <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+          {w}
         </p>
       ))}
-      {msg && <p className="text-[#1f3a68]">{msg}</p>}
+      {msg && (
+        <p role="status" className="text-ink">
+          {msg}
+        </p>
+      )}
     </div>
   )
 }

@@ -2,8 +2,10 @@
 import { piFetch } from '@pi/auth/client'
 // 멤버 화면 — 분류체계 참여자 목록·역할 즉시 변경(PATCH), 멤버 추가(가입된 Pi 사용자명 기준), 역할·요금제 권한표(2026-10-18 마스터 표)
 //  변경·추가 = 설정 권한(역할 ∩ 요금제), 본인 역할보다 권한이 많은 역할은 고를 수 없음(canAssign)
-import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
+import { Check } from 'lucide-react'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { TD } from '../words/word-board'
 import { canAssign, PLAN_NM, PLAN_PERMS, PLANS, ROLE_DESC, ROLE_NM, ROLE_PERMS, ROLES, type MbrRole, type Perm } from '@/lib/roles'
 
 interface Mbr {
@@ -75,107 +77,120 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
   }
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">멤버</h1>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="멤버" />
 
-      <div className="mt-6 space-y-6">
+      <div className="space-y-6">
         {manage && (
-          <form onSubmit={add} className="overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] text-sm shadow-md">
-            <h2 className="bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-5 py-2.5 text-base font-semibold text-white">멤버 추가</h2>
-            <div className="flex flex-wrap items-center gap-2 p-5">
-              <input value={nm} onChange={(e) => setNm(e.target.value)} placeholder="Pi 사용자명(가입자)" className="flex-1 rounded border border-[#b8c6e0] bg-white px-3 py-2" required maxLength={100} />
-              <select value={role} onChange={(e) => setRole(e.target.value as MbrRole)} className="rounded border border-[#b8c6e0] bg-white px-2 py-2" aria-label="역할">
-                {ROLES.map((r) => (
-                  <option key={r} value={r} disabled={!canAssign(myRole, r)}>
-                    {ROLE_NM[r]}
-                  </option>
-                ))}
-              </select>
-              <button className="btn-3d px-8">추가</button>
+          <form onSubmit={add} className="panel text-sm">
+            <div className="panel-head">
+              <h2 className="truncate">멤버 추가</h2>
+            </div>
+            <div className="panel-body flex flex-wrap items-end gap-3">
+              <label className="block min-w-48 flex-1">
+                <span className="field-label req">Pi 사용자명</span>
+                <input value={nm} onChange={(e) => setNm(e.target.value)} placeholder="사용자명" className="input" aria-required="true" required maxLength={100} />
+              </label>
+              <label className="block">
+                <span className="field-label req">역할</span>
+                <select value={role} onChange={(e) => setRole(e.target.value as MbrRole)} className="input w-auto">
+                  {ROLES.map((r) => (
+                    <option key={r} value={r} disabled={!canAssign(myRole, r)}>
+                      {ROLE_NM[r]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button className="btn-3d">추가</button>
             </div>
           </form>
         )}
         {msg && (
-          <p role="status" className="text-sm text-gray-700">
+          <p role="status" className="text-dense text-ink">
             {msg}
           </p>
         )}
 
         <section>
-          <h2 className="text-lg font-semibold">멤버 목록 {mbrs.length.toLocaleString()}명</h2>
-          <table className="mt-2 w-full border-collapse text-sm">
-            <thead>
-              <tr className="thead-3d text-center">
-                <th className="w-16 border px-2 py-2">번호</th>
-                <th className="border px-2 py-2">사용자명</th>
-                <th className="border px-2 py-2">표시명</th>
-                <th className="w-48 border px-2 py-2">역할</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mbrs.map((m, i) => (
-                <tr key={m.mbr_id} className="odd:bg-white even:bg-[#f4f7fc]">
-                  <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{i + 1}</td>
-                  <td className="border px-2 py-1 font-medium">{m.sys_user.pi_usr_nm}</td>
-                  <td className="border px-2 py-1">{m.sys_user.dsp_nm}</td>
-                  <td className="border px-2 py-1 text-center">
-                    <select value={m.mbr_role_cd} onChange={(e) => changeRole(m, e.target.value)} disabled={!manage || !canAssign(myRole, m.mbr_role_cd)} className="w-full rounded border bg-white px-2 py-1 disabled:bg-gray-100" aria-label={`${m.sys_user.pi_usr_nm} 역할`}>
-                      {ROLES.map((r) => (
-                        <option key={r} value={r} disabled={!canAssign(myRole, r)}>
-                          {ROLE_NM[r]}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
+          <h2 className="mb-2 flex items-baseline gap-2 text-sm font-semibold text-ink">
+            멤버 목록 <span className="font-mono text-xs font-normal text-ink-3 tabular-nums">{mbrs.length.toLocaleString()}명</span>
+          </h2>
+          <div className="overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense">
+              <thead>
+                <tr className="thead-3d text-start">
+                  <th className="w-12 px-3 py-2">#</th>
+                  <th className="px-3 py-2">사용자명</th>
+                  <th className="px-3 py-2">표시명</th>
+                  <th className="w-48 px-3 py-2">역할</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {mbrs.map((m, i) => (
+                  <tr key={m.mbr_id}>
+                    <td className={`${TD} text-right font-mono text-xs text-ink-3 tabular-nums`}>{i + 1}</td>
+                    <td className={`${TD} font-medium`}>{m.sys_user.pi_usr_nm}</td>
+                    <td className={`${TD} text-ink-2`}>{m.sys_user.dsp_nm}</td>
+                    <td className={TD}>
+                      <select value={m.mbr_role_cd} onChange={(e) => changeRole(m, e.target.value)} disabled={!manage || !canAssign(myRole, m.mbr_role_cd)} className="input-sm w-full disabled:bg-raised disabled:text-ink-2" aria-label={`${m.sys_user.pi_usr_nm} 역할`}>
+                        {ROLES.map((r) => (
+                          <option key={r} value={r} disabled={!canAssign(myRole, r)}>
+                            {ROLE_NM[r]}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold">역할·요금제 권한표</h2>
-          <p className="mt-1 text-xs text-gray-600">실제 권한 = 멤버 역할 ∩ 분류체계 요금제. CRUD = SQL 편집기 DML·DDL(SELECT·INSERT·UPDATE·DELETE·CREATE·ALTER·RENAME) 실행. 요금제 없음·만료 = 표준사전 조회만</p>
-          <table className="mt-2 w-full border-collapse text-sm">
-            <thead>
-              <tr className="thead-3d text-center">
-                <th className="w-36 border px-2 py-2">역할</th>
-                <th className="border px-2 py-2">설명</th>
-                {PERM_COLS.map(([k, label]) => (
-                  <th key={k} className="w-20 border px-2 py-2">
-                    {label}
-                  </th>
+          <div className="mb-2 flex items-center gap-1">
+            <h2 className="text-sm font-semibold text-ink">역할·요금제 권한표</h2>
+            <InfoTip>실제 권한 = 멤버 역할 ∩ 분류체계 요금제. CRUD = SQL 편집기 DML·DDL(SELECT·INSERT·UPDATE·DELETE·CREATE·ALTER·RENAME) 실행. 요금제 없음·만료 = 표준사전 조회만</InfoTip>
+          </div>
+          <div className="overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense">
+              <thead>
+                <tr className="thead-3d text-start">
+                  <th className="px-3 py-2">역할</th>
+                  <th className="px-3 py-2">설명</th>
+                  {PERM_COLS.map(([k, label]) => (
+                    <th key={k} className="px-3 py-2 text-center">
+                      {label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {ROLES.map((r) => (
+                  <tr key={r}>
+                    <td className="border-b px-3 py-1.5 font-medium whitespace-nowrap">{ROLE_NM[r]}</td>
+                    <td className="min-w-60 border-b px-3 py-1.5 text-ink-2">{ROLE_DESC[r]}</td>
+                    {PERM_COLS.map(([k, , has]) => (
+                      <td key={k} className="border-b px-3 py-1.5 text-center">
+                        {has(ROLE_PERMS[r]) && <Check className="mx-auto h-3.5 w-3.5 text-ink-2" strokeWidth={2} aria-label="있음" />}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {ROLES.map((r) => (
-                <tr key={r} className="odd:bg-white even:bg-[#f4f7fc]">
-                  <td className="border px-2 py-1 font-medium">{ROLE_NM[r]}</td>
-                  <td className="border px-2 py-1">{ROLE_DESC[r]}</td>
-                  {PERM_COLS.map(([k, , has]) => (
-                    <td key={k} className="border px-2 py-1 text-center">
-                      {has(ROLE_PERMS[r]) ? '●' : ''}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-              {PLANS.map((pl) => (
-                <tr key={pl} className="bg-[#f3f8ee]">
-                  <td className="border px-2 py-1 font-medium">요금제 {pl === 'FREE' ? '없음' : pl.slice(1)}</td>
-                  <td className="border px-2 py-1">{PLAN_NM[pl]}</td>
-                  {PERM_COLS.map(([k, , has]) => (
-                    <td key={k} className="border px-2 py-1 text-center">
-                      {has(PLAN_PERMS[pl]) ? '●' : ''}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                {PLANS.map((pl, i) => (
+                  <tr key={pl} className={`bg-well ${i === 0 ? '[&>td]:border-t [&>td]:border-t-line-strong' : ''}`}>
+                    <td className="border-b px-3 py-1.5 font-medium whitespace-nowrap">요금제 {pl === 'FREE' ? '없음' : pl.slice(1)}</td>
+                    <td className="min-w-60 border-b px-3 py-1.5 text-ink-2">{PLAN_NM[pl]}</td>
+                    {PERM_COLS.map(([k, , has]) => (
+                      <td key={k} className="border-b px-3 py-1.5 text-center">
+                        {has(PLAN_PERMS[pl]) && <Check className="mx-auto h-3.5 w-3.5 text-ink-2" strokeWidth={2} aria-label="있음" />}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </main>

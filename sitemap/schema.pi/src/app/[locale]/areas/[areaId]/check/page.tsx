@@ -1,8 +1,11 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 표준 점검 화면(P17~P19) — 점검 실행 → 대상 유형별 준수율·등급별·규칙별 건수, 위반 목록(등급·규칙 필터, 100건씩), CSV 내려받기
-import { Link } from '@/i18n/navigation'
+import { ChevronLeft, ChevronRight, Download, TriangleAlert } from 'lucide-react'
 import { use, useMemo, useState } from 'react'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 
 interface Rule {
   id: string
@@ -28,7 +31,8 @@ interface Res {
   violations: Viol[]
 }
 const TP_NM: Record<string, string> = { DIC: '단어', DOM: '도메인', TERM: '용어' }
-const GRADE_CLS: Record<string, string> = { P1: 'bg-red-100 text-red-700 border-red-300', P2: 'bg-orange-100 text-orange-800 border-orange-300', P3: 'bg-gray-100 text-gray-600 border-gray-300' }
+// 등급 → 배지 색조(P1 치명 = danger, P2 중대 = warn, P3 경미 = 기본)
+const GRADE_TONE: Record<string, 'danger' | 'warn' | undefined> = { P1: 'danger', P2: 'warn', P3: undefined }
 const PAGE = 100
 
 export default function CheckPage({ params }: { params: Promise<{ areaId: string }> }) {
@@ -50,45 +54,62 @@ export default function CheckPage({ params }: { params: Promise<{ areaId: string
   const list = useMemo(() => (res?.violations ?? []).filter((v) => (!flt.grade || v.grade === flt.grade) && (!flt.rule || v.rule === flt.rule)), [res, flt.grade, flt.rule])
   const pages = Math.max(1, Math.ceil(list.length / PAGE))
   const rn = Object.fromEntries((res?.by_rule ?? []).map((r) => [r.id, r.nm]))
-  const badge = (g: string) => <span className={`rounded border px-1.5 py-0.5 text-xs font-medium ${GRADE_CLS[g] ?? ''}`}>{g}</span>
+  const badge = (g: string) => (
+    <span className="badge font-mono" data-tone={GRADE_TONE[g]}>
+      {g}
+    </span>
+  )
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">표준 점검</h1>
-      <p className="mt-1 text-sm text-gray-600">승인완료 단어·도메인·용어를 규칙 13종으로 전수 검사합니다. 등급은 품질관리 지침(안) 별표 2(P1 치명·P2 중대·P3 경미), 준수율은 P1·P2 위반이 없는 대상의 비율입니다.</p>
-      <div className="mt-4 flex items-center gap-3">
-        <button onClick={run} disabled={busy} className="btn-3d px-8 disabled:opacity-40">
-          {busy ? '점검 중…' : res ? '다시 점검' : '점검 실행'}
-        </button>
-        {res && (
-          <a href={`/api/areas/${areaId}/check?format=csv`} className="btn-3d btn-3d-green" download>
-            위반 목록 엑셀 다운로드
-          </a>
-        )}
-        {res && <span className="text-xs text-gray-500">점검일시 {new Date(res.at).toLocaleString('ko-KR')}</span>}
-        {msg && <span className="text-sm text-red-700">{msg}</span>}
-      </div>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead
+        title="표준 점검"
+        info="승인완료 단어·도메인·용어를 규칙 13종으로 전수 검사합니다. 등급은 품질관리 지침(안) 별표 2(P1 치명·P2 중대·P3 경미), 준수율은 P1·P2 위반이 없는 대상의 비율입니다."
+        sub={res ? <span className="font-mono">점검 {new Date(res.at).toLocaleString('ko-KR')}</span> : undefined}
+        actions={
+          <>
+            {res && (
+              <a href={`/api/areas/${areaId}/check?format=csv`} className="btn-key" download>
+                <Download aria-hidden /> 엑셀
+              </a>
+            )}
+            <button onClick={run} disabled={busy} className="btn-3d">
+              {busy ? '점검 중…' : res ? '다시 점검' : '점검 실행'}
+            </button>
+          </>
+        }
+      />
+      {msg && (
+        <p role="status" className="mb-4 flex items-center gap-1.5 text-dense text-danger">
+          <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+          {msg}
+        </p>
+      )}
+
+      {!res && (
+        <div className="panel empty">
+          <Icon3D icon={MENU_ICON.settings} />
+          <p>점검 결과 없음</p>
+        </div>
+      )}
 
       {res && (
-        <>
-          <section className="mt-6 grid gap-3 md:grid-cols-4">
+        <div className="space-y-6">
+          <section className="grid grid-cols-2 gap-2 md:grid-cols-4">
             {res.summary.map((s) => (
-              <div key={s.tp} className="rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] p-4 shadow-sm">
-                <p className="text-sm text-gray-600">{TP_NM[s.tp]} 준수율</p>
-                <p className="mt-1 text-3xl font-bold text-[#1f3a68] tabular-nums">{s.rate}%</p>
-                <p className="text-xs text-gray-500 tabular-nums">
+              <div key={s.tp} className="panel min-h-22 px-4 py-3">
+                <p className="text-xs text-ink-3">{TP_NM[s.tp]} 준수율</p>
+                <p className="mt-1 text-2xl font-semibold text-ink tabular-nums">{s.rate}%</p>
+                <p className="text-xs text-ink-3 tabular-nums">
                   {s.ok.toLocaleString()} / {s.total.toLocaleString()}건{s.tp === 'TERM' && res.nstd ? ` · 비표준 수용 ${res.nstd}건 제외` : ''}
                 </p>
               </div>
             ))}
-            <div className="rounded-xl border border-[#c7d2e6] bg-white p-4 shadow-sm">
-              <p className="text-sm text-gray-600">등급별 위반</p>
-              <div className="mt-2 space-y-1 text-sm tabular-nums">
+            <div className="panel min-h-22 px-4 py-3">
+              <p className="text-xs text-ink-3">등급별 위반</p>
+              <div className="mt-1 space-y-1 text-dense tabular-nums">
                 {(['P1', 'P2', 'P3'] as const).map((g) => (
-                  <p key={g}>
+                  <p key={g} className="flex items-center gap-2">
                     {badge(g)} {res.by_grade[g].toLocaleString()}건
                   </p>
                 ))}
@@ -96,13 +117,17 @@ export default function CheckPage({ params }: { params: Promise<{ areaId: string
             </div>
           </section>
 
-          <section className="mt-6">
-            <h2 className="text-lg font-semibold">규칙별 결과</h2>
-            <table className="mt-2 w-full border-collapse text-[0.7rem] [&_td]:whitespace-nowrap">
-              <thead>
-                <tr className="thead-3d text-center">
+          <section>
+            <div className="mb-2 flex items-center gap-1">
+              <h2 className="text-sm font-semibold text-ink">규칙별 결과</h2>
+              <InfoTip>행을 누르면 그 규칙의 위반만 아래에 표시합니다. W02·W03 등급은 잠정값입니다(별표 2에 단어 약어 항목 없음).</InfoTip>
+            </div>
+            <div className="overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
+              <thead className="thead-3d">
+                <tr>
                   {['규칙', '대상', '등급', '규칙명', '위반'].map((h) => (
-                    <th key={h} className="border px-2 py-2">
+                    <th key={h} className={`px-3 py-2 ${h === '규칙명' ? 'text-start' : h === '위반' ? 'text-right' : 'text-center'}`}>
                       {h}
                     </th>
                   ))}
@@ -110,29 +135,29 @@ export default function CheckPage({ params }: { params: Promise<{ areaId: string
               </thead>
               <tbody>
                 {res.by_rule.map((r) => (
-                  <tr key={r.id} onClick={() => r.cnt && setFlt({ grade: '', rule: r.id, page: 1 })} className={r.cnt ? 'cursor-pointer hover:bg-[#e9eff9]' : ''}>
-                    <td className="border px-2 py-1 text-center font-mono">{r.id}</td>
-                    <td className="border px-2 py-1 text-center">{TP_NM[r.tp]}</td>
-                    <td className="border px-2 py-1 text-center">{badge(r.grade)}</td>
-                    <td className="w-full border px-2 py-1">{r.nm}</td>
-                    <td className={`border px-2 py-1 text-right tabular-nums ${r.cnt ? 'font-semibold text-red-700' : 'text-gray-400'}`}>{r.cnt.toLocaleString()}</td>
+                  <tr key={r.id} onClick={() => r.cnt && setFlt({ grade: '', rule: r.id, page: 1 })} aria-selected={flt.rule === r.id || undefined} className={`border-b border-line ${r.cnt ? 'cursor-pointer' : ''}`}>
+                    <td className="px-3 py-1.5 text-center font-mono text-xs">{r.id}</td>
+                    <td className="px-3 py-1.5 text-center"><span className="badge">{TP_NM[r.tp]}</span></td>
+                    <td className="px-3 py-1.5 text-center">{badge(r.grade)}</td>
+                    <td className="w-full px-3 py-1.5">{r.nm}</td>
+                    <td className={`px-3 py-1.5 text-right tabular-nums ${r.cnt ? 'font-medium text-danger' : 'text-ink-off'}`}>{r.cnt.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <p className="mt-1 text-xs text-gray-500">행을 누르면 그 규칙의 위반만 아래에 표시합니다. W02·W03 등급은 잠정값입니다(별표 2에 단어 약어 항목 없음).</p>
+            </div>
           </section>
 
-          <section className="mt-6">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold">위반 목록</h2>
-              <select value={flt.grade} onChange={(e) => setFlt({ ...flt, grade: e.target.value, page: 1 })} className="rounded border px-2 py-1 text-sm" aria-label="등급">
+          <section>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <h2 className="text-sm font-semibold text-ink">위반 목록</h2>
+              <select value={flt.grade} onChange={(e) => setFlt({ ...flt, grade: e.target.value, page: 1 })} className="input-sm w-auto" aria-label="등급">
                 <option value="">전체 등급</option>
                 {['P1', 'P2', 'P3'].map((g) => (
                   <option key={g}>{g}</option>
                 ))}
               </select>
-              <select value={flt.rule} onChange={(e) => setFlt({ ...flt, rule: e.target.value, page: 1 })} className="rounded border px-2 py-1 text-sm" aria-label="규칙">
+              <select value={flt.rule} onChange={(e) => setFlt({ ...flt, rule: e.target.value, page: 1 })} className="input-sm w-auto max-w-full" aria-label="규칙">
                 <option value="">전체 규칙</option>
                 {res.by_rule.map((r) => (
                   <option key={r.id} value={r.id}>
@@ -140,13 +165,14 @@ export default function CheckPage({ params }: { params: Promise<{ areaId: string
                   </option>
                 ))}
               </select>
-              <span className="text-sm text-gray-600 tabular-nums">{list.length.toLocaleString()}건</span>
+              <span className="ms-auto font-mono text-xs text-ink-3 tabular-nums">총 {list.length.toLocaleString()}건</span>
             </div>
-            <table className="mt-2 w-full border-collapse text-[0.7rem] [&_td]:whitespace-nowrap">
-              <thead>
-                <tr className="thead-3d text-center">
+            <div className="overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
+              <thead className="thead-3d">
+                <tr>
                   {['#', '등급', '규칙', '대상', '이름', '내용'].map((h) => (
-                    <th key={h} className="border px-2 py-2">
+                    <th key={h} className={`px-3 py-2 ${h === '#' ? 'text-right' : h === '등급' || h === '대상' ? 'text-center' : 'text-start'}`}>
                       {h}
                     </th>
                   ))}
@@ -155,39 +181,42 @@ export default function CheckPage({ params }: { params: Promise<{ areaId: string
               <tbody>
                 {list.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="border px-2 py-4 text-center text-gray-500">
-                      위반이 없습니다
+                    <td colSpan={6} className="py-6 text-center text-dense text-ink-3">
+                      위반 없음
                     </td>
                   </tr>
                 ) : (
                   list.slice((flt.page - 1) * PAGE, flt.page * PAGE).map((v, i) => (
-                    <tr key={`${v.rule}-${v.id}`} className="hover:bg-gray-50">
-                      <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((flt.page - 1) * PAGE + i + 1).toLocaleString()}</td>
-                      <td className="border px-2 py-1 text-center">{badge(v.grade)}</td>
-                      <td className="border px-2 py-1" title={rn[v.rule]}>
-                        <span className="font-mono">{v.rule}</span> {rn[v.rule]}
+                    <tr key={`${v.rule}-${v.id}`} className="border-b border-line">
+                      <td className="px-3 py-1.5 text-right font-mono text-xs text-ink-3 tabular-nums">{((flt.page - 1) * PAGE + i + 1).toLocaleString()}</td>
+                      <td className="px-3 py-1.5 text-center">{badge(v.grade)}</td>
+                      <td className="px-3 py-1.5 text-ink-2" title={rn[v.rule]}>
+                        <span className="font-mono text-xs text-ink">{v.rule}</span> {rn[v.rule]}
                       </td>
-                      <td className="border px-2 py-1 text-center">{TP_NM[v.tp]}</td>
-                      <td className="border px-2 py-1 font-medium">{v.name}</td>
-                      <td className="w-full border px-2 py-1 !whitespace-normal">{v.detail}</td>
+                      <td className="px-3 py-1.5 text-center"><span className="badge">{TP_NM[v.tp]}</span></td>
+                      <td className="px-3 py-1.5 font-medium text-ink">{v.name}</td>
+                      <td className="w-full px-3 py-1.5 !whitespace-normal text-ink-2">{v.detail}</td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
-            <div className="mt-3 flex items-center justify-center gap-2 text-sm">
-              <button onClick={() => setFlt({ ...flt, page: flt.page - 1 })} disabled={flt.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-                ‹
-              </button>
-              <span className="tabular-nums">
-                {flt.page} / {pages}
-              </span>
-              <button onClick={() => setFlt({ ...flt, page: flt.page + 1 })} disabled={flt.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-                ›
-              </button>
             </div>
+            {pages > 1 && (
+              <div className="mt-2 flex items-center justify-center gap-1">
+                <button onClick={() => setFlt({ ...flt, page: flt.page - 1 })} disabled={flt.page <= 1} aria-label="이전" title="이전" className="btn-ghost btn-icon btn-sm">
+                  <ChevronLeft className="rtl:rotate-180" aria-hidden />
+                </button>
+                <span className="px-1 font-mono text-xs text-ink-2 tabular-nums">
+                  {flt.page} / {pages}
+                </span>
+                <button onClick={() => setFlt({ ...flt, page: flt.page + 1 })} disabled={flt.page >= pages} aria-label="다음" title="다음" className="btn-ghost btn-icon btn-sm">
+                  <ChevronRight className="rtl:rotate-180" aria-hidden />
+                </button>
+              </div>
+            )}
           </section>
-        </>
+        </div>
       )}
     </main>
   )

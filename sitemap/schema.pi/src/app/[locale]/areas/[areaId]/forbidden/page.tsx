@@ -4,7 +4,9 @@ import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
-import { ActorCells, noEnterSubmit } from '../words/word-board'
+import { FileUp, Trash2 } from 'lucide-react'
+import { PageHead } from '@/components/page-head'
+import { ActorCells, noEnterSubmit, Pager, TD } from '../words/word-board'
 
 interface Item {
   rel_id: string
@@ -86,127 +88,131 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
   }
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 flex items-baseline gap-3 text-2xl font-bold">
-        금칙어 관리
-        {editor && (
-          <Link href={`/areas/${areaId}/bulk?tab=forbidden`} className="text-sm font-normal text-blue-700 underline">
-            CSV 일괄등록
-          </Link>
-        )}
-      </h1>
-      <div className="mt-3 rounded-lg border border-[#c7d2e6] bg-[#f4f7fc] p-4 text-sm leading-relaxed">
-        <p className="font-semibold text-[#1f3a68]">동의어 불허 원칙</p>
-        <ul className="mt-1 list-disc pl-5 text-gray-700">
-          <li>뜻이 같은 표기는 표준단어 하나만 등록합니다. 다른 표기는 금칙어(쓰지 않는 표기) 또는 이음동의어로 이 목록에만 둡니다.</li>
-          <li>이 목록의 표기는 표준단어로 등록·수정할 수 없고, 표준단어 이름은 이 목록에 넣을 수 없습니다. 같은 표기를 두 표준단어에 둘 수 없습니다.</li>
-          <li>같은 논리명(동음이의어)·같은 물리명(이음동의어)의 표준단어도 등록할 수 없습니다. 모두 DB에서 강제합니다.</li>
-        </ul>
-      </div>
-
-      <form onSubmit={add} onKeyDown={noEnterSubmit} className="mt-6 overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] text-sm shadow-md">
-        <h2 className="bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-5 py-2.5 text-base font-semibold text-white">금칙어 등록</h2>
-        <fieldset disabled={!editor} className="p-5 disabled:opacity-60">
-          <div className="grid gap-3 md:grid-cols-4">
-            <div>
-              <input list="std-words" value={form.word} onChange={(e) => setForm({ ...form, word: e.target.value })} placeholder="사용할 표준단어(검색)" className="w-full rounded border border-[#b8c6e0] bg-white px-3 py-2" aria-label="표준단어" />
-              <datalist id="std-words">
-                {words.map((w) => (
-                  <option key={w.dic_id} value={w.dic_log_nm}>
-                    {w.dic_phy_nm}
-                  </option>
-                ))}
-              </datalist>
-              {form.word.trim() && !target && <p className="mt-1 text-red-700">승인완료된 표준단어를 고르십시오</p>}
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead
+        title="금칙어 관리"
+        info="뜻이 같은 표기는 표준단어 하나만 등록하고, 다른 표기는 금칙어(쓰지 않는 표기)·이음동의어로 이 목록에만 둡니다. 이 목록의 표기는 표준단어로 쓸 수 없고, 같은 표기를 두 표준단어에 둘 수 없습니다. 같은 논리명·같은 물리명의 표준단어도 등록할 수 없으며 모두 DB에서 강제합니다."
+        actions={
+          editor && (
+            <Link href={`/areas/${areaId}/bulk?tab=forbidden`} className="btn-key">
+              <FileUp aria-hidden />
+              CSV 일괄등록
+            </Link>
+          )
+        }
+      />
+      <div className="space-y-6">
+        <form onSubmit={add} onKeyDown={noEnterSubmit} className="panel text-sm">
+          <div className="panel-head">
+            <h2 className="truncate">금칙어 등록</h2>
+            {role && !editor && (
+              <span className="badge ms-auto" title="금칙어 등록·삭제는 일괄등록 권한 역할(시스템담당자·데이터아키텍트·표준담당자·모델러) + 표준담당자 요금제 이상이어야 합니다">
+                조회 전용
+              </span>
+            )}
+          </div>
+          <fieldset disabled={!editor} className="panel-body disabled:opacity-60">
+            <div className="grid items-start gap-3 md:grid-cols-2 lg:grid-cols-4">
+              <label className="block">
+                <span className="field-label req">표준단어</span>
+                <input list="std-words" value={form.word} onChange={(e) => setForm({ ...form, word: e.target.value })} placeholder="표준단어" className="input" aria-required="true" />
+                <datalist id="std-words">
+                  {words.map((w) => (
+                    <option key={w.dic_id} value={w.dic_log_nm}>
+                      {w.dic_phy_nm}
+                    </option>
+                  ))}
+                </datalist>
+                {form.word.trim() && !target && <p className="mt-1 text-xs text-danger">승인완료된 표준단어를 고르십시오</p>}
+              </label>
+              <label className="block">
+                <span className="field-label req">구분</span>
+                <select value={form.tp} onChange={(e) => setForm({ ...form, tp: e.target.value })} className="input">
+                  <option value="BAN">금칙어(쓰지 않는 표기)</option>
+                  <option value="SYN">이음동의어</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="field-label req">대체 표기</span>
+                <input value={form.txt} onChange={(e) => setForm({ ...form, txt: e.target.value })} placeholder="대체 표기" maxLength={200} className="input" aria-required="true" />
+              </label>
+              <div className="flex justify-end lg:pt-5">
+                <button disabled={!target || !form.txt.trim()} className="btn-3d">
+                  등록
+                </button>
+              </div>
             </div>
-            <select value={form.tp} onChange={(e) => setForm({ ...form, tp: e.target.value })} className="rounded border border-[#b8c6e0] bg-white px-3 py-2" aria-label="구분">
-              <option value="BAN">금칙어(쓰지 않는 표기)</option>
+            {msg && (
+              <p role="status" className="mt-3 text-dense font-medium text-ink">
+                {msg}
+              </p>
+            )}
+          </fieldset>
+        </form>
+
+        <section>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              setCond({ ...cond, kw: q.trim(), page: 1 })
+            }}
+            className="flex flex-wrap items-center gap-2"
+          >
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="대체 표기" aria-label="검색어(대체 표기)" className="input min-w-48 flex-1" />
+            <select value={cond.tp} onChange={(e) => setCond({ ...cond, tp: e.target.value, page: 1 })} className="input w-auto" aria-label="구분">
+              <option value="">전체 구분</option>
+              <option value="BAN">금칙어</option>
               <option value="SYN">이음동의어</option>
             </select>
-            <input value={form.txt} onChange={(e) => setForm({ ...form, txt: e.target.value })} placeholder="대체 표기(예 : 패스)" maxLength={200} className="rounded border border-[#b8c6e0] bg-white px-3 py-2" aria-label="대체 표기" />
-            <button disabled={!target || !form.txt.trim()} className="btn-3d px-8 disabled:opacity-40">
-              등록
-            </button>
-          </div>
-          {role && !editor && <p className="mt-2 font-medium text-gray-600">조회 권한 : 금칙어 등록·삭제는 일괄등록 권한 역할(시스템담당자·데이터아키텍트·표준담당자·모델러) + 표준담당자 요금제 이상이어야 합니다</p>}
-          {msg && (
-            <p role="status" className="mt-2 font-medium text-[#1f3a68]">
-              {msg}
-            </p>
-          )}
-        </fieldset>
-      </form>
-
-      <section className="mt-6">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            setCond({ ...cond, kw: q.trim(), page: 1 })
-          }}
-          className="flex flex-wrap gap-2"
-        >
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="대체 표기 검색" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
-          <select value={cond.tp} onChange={(e) => setCond({ ...cond, tp: e.target.value, page: 1 })} className="rounded border px-2 py-2 text-sm" aria-label="구분">
-            <option value="">전체 구분</option>
-            <option value="BAN">금칙어</option>
-            <option value="SYN">이음동의어</option>
-          </select>
-          <button className="btn-3d">검색</button>
-        </form>
-        <table className="mt-3 w-full border-collapse text-[0.7rem] [&_td]:whitespace-nowrap">
-          <thead>
-            <tr className="thead-3d text-center">
-              {['#', '대체 표기', '구분', '사용할 표준단어', '물리명', '등록자', '등록일시', '처리'].map((h) => (
-                <th key={h} className="border px-2 py-2">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {items.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="border px-2 py-4 text-center text-gray-500">
-                  등록된 금칙어가 없습니다
-                </td>
-              </tr>
-            ) : (
-              items.map((it, i) => (
-                <tr key={it.rel_id} className="hover:bg-gray-50">
-                  <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
-                  <td className="border px-2 py-1 font-medium text-red-700">{it.rel_txt}</td>
-                  <td className="border px-2 py-1 text-center">{TP_NM[it.rel_tp_cd]}</td>
-                  <td className="w-full border px-2 py-1 font-medium">{it.std_dic.dic_log_nm}</td>
-                  <td className="border px-2 py-1 font-mono">{it.std_dic.dic_phy_nm}</td>
-                  <ActorCells nm={it.regr_nm} d={it.reg_dtm} />
-                  <td className="border px-2 py-1 text-center">
-                    {editor && (
-                      <button onClick={() => remove(it)} className="text-red-700 underline">
-                        삭제
-                      </button>
-                    )}
-                  </td>
+            <button className="btn-key">검색</button>
+          </form>
+          <div className="mt-3 overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
+              <thead>
+                <tr className="thead-3d text-start">
+                  {['#', '대체 표기', '구분', '사용할 표준단어', '물리명', '등록자', '등록일시', '처리'].map((h) => (
+                    <th key={h} className="px-3 py-2">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-        <div className="mt-3 flex items-center justify-center gap-2 text-sm">
-          <span className="text-gray-600">총 {total.toLocaleString()}건</span>
-          <button onClick={() => setCond({ ...cond, page: cond.page - 1 })} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-            ‹
-          </button>
-          <span className="tabular-nums">
-            {cond.page} / {pages}
-          </span>
-          <button onClick={() => setCond({ ...cond, page: cond.page + 1 })} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-            ›
-          </button>
-        </div>
-      </section>
+              </thead>
+              <tbody>
+                {items.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-3 py-6 text-center text-ink-3">
+                      등록된 금칙어가 없습니다
+                    </td>
+                  </tr>
+                ) : (
+                  items.map((it, i) => (
+                    <tr key={it.rel_id}>
+                      <td className={`${TD} text-right font-mono text-xs text-ink-3 tabular-nums`}>{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
+                      <td className={`${TD} font-medium text-danger`}>{it.rel_txt}</td>
+                      <td className={TD}>
+                        <span className="badge">{TP_NM[it.rel_tp_cd]}</span>
+                      </td>
+                      <td className={`${TD} w-full font-medium`}>{it.std_dic.dic_log_nm}</td>
+                      <td className={TD}>
+                        <span className="chip-phy">{it.std_dic.dic_phy_nm}</span>
+                      </td>
+                      <ActorCells nm={it.regr_nm} d={it.reg_dtm} />
+                      <td className={TD}>
+                        {editor && (
+                          <button type="button" onClick={() => remove(it)} aria-label="삭제" title="삭제" className="btn-ghost btn-icon btn-sm hover:text-danger">
+                            <Trash2 aria-hidden />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <Pager total={total} page={cond.page} size={cond.size} go={(p) => setCond({ ...cond, page: Math.min(Math.max(1, p), pages) })} setSize={(size) => setCond({ ...cond, size, page: 1 })} />
+        </section>
+      </div>
     </main>
   )
 }

@@ -3,6 +3,7 @@
 //  저장 = 바뀐 탭만 PATCH : 1분마다 자동 · 실행 때 · 탭 전환 직전 · 화면 떠날 때(visibilitychange hidden·pagehide·화면 이동, keepalive)
 //  충돌 = 마지막 저장 우선(서버). 내용은 ref(texts)에 두고 화면 갱신은 탭 목록·바뀜 표시·저장 상태 바뀔 때만(입력마다 다시 그리지 않음)
 import { piFetch } from '@pi/auth/client'
+import { Plus, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { PLAN_NM, type PlanCd } from '@/lib/roles'
 
@@ -216,33 +217,33 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
   const full = tabs.length >= limit
   // 탭 줄 — extra = 같은 줄 뒤에 붙는 객체 탭(sql-obj), sqlActive = false 면 SQL 탭 강조 해제, onPick = SQL 탭(·+)을 눌러 SQL 쪽으로 돌아올 때
   const bar = ({ extra, sqlActive = true, onPick }: { extra?: ReactNode; sqlActive?: boolean; onPick?: () => void } = {}) => (
-    <div className="flex shrink-0 items-end gap-2 border-b bg-gray-50 px-1 pt-1 text-xs" aria-label="SQL 탭">
+    <div className="flex shrink-0 items-end gap-2 border-b border-line bg-canvas px-2 pt-1 text-xs" aria-label="SQL 탭">
       <div role="tablist" className="flex min-w-0 flex-1 items-end gap-1 overflow-x-auto overflow-y-hidden">
         {tabs.map((t) => {
           const on = sqlActive && t.sql_tab_id === cur
           return (
-            <span key={t.sql_tab_id} className={`flex shrink-0 items-center rounded-t border ${on ? '-mb-px border-b-white bg-white font-semibold' : 'bg-gray-100 hover:bg-white'}`}>
-              <button type="button" role="tab" aria-selected={on} onClick={() => (on ? void rename(t) : (onPick?.(), switchTo(t.sql_tab_id)))} title={on ? '한 번 더 누르면 이름 바꾸기' : '탭 열기(열린 탭을 한 번 더 누르면 이름 바꾸기)'} className="py-0.5 pl-2 font-mono whitespace-nowrap">
+            <span key={t.sql_tab_id} className={`flex shrink-0 items-center rounded-t-control border border-line ${on ? '-mb-px border-b-surface bg-surface font-medium text-ink' : 'bg-raised text-ink-2 hover:bg-surface'}`}>
+              <button type="button" role="tab" aria-selected={on} onClick={() => (on ? void rename(t) : (onPick?.(), switchTo(t.sql_tab_id)))} title={on ? '한 번 더 누르면 이름 바꾸기' : '탭 열기(열린 탭을 한 번 더 누르면 이름 바꾸기)'} className="inline-flex items-center gap-1 py-1 ps-2 font-mono whitespace-nowrap">
                 {t.tab_nm}
-                {dirty.has(t.sql_tab_id) && <span className="text-amber-600" aria-label="저장 안 된 변경"> ●</span>}
+                {dirty.has(t.sql_tab_id) && <span className="h-1.5 w-1.5 rounded-full bg-warn" role="img" aria-label="저장 안 된 변경" />}
               </button>
-              <button type="button" onClick={() => void close(t)} className="min-h-6 min-w-6 px-1.5 py-0.5 text-gray-500 hover:text-red-700" aria-label={`${t.tab_nm} 탭 닫기`} title="탭 닫기">
-                ×
+              <button type="button" onClick={() => void close(t)} className="inline-flex min-h-6 min-w-6 items-center justify-center px-1 text-ink-3 hover:text-danger" aria-label={`${t.tab_nm} 탭 닫기`} title="탭 닫기">
+                <X className="h-3 w-3" strokeWidth={1.75} aria-hidden />
               </button>
             </span>
           )
         })}
         {extra}
         {failed && (
-          <button type="button" className="mb-0.5 shrink-0 text-red-700 underline" onClick={() => void load(legacyRef.current)}>
+          <button type="button" className="mb-1 shrink-0 text-danger hover:underline" onClick={() => void load(legacyRef.current)}>
             탭 다시 불러오기
           </button>
         )}
-        <button type="button" className="mb-0.5 flex h-5 w-6 shrink-0 items-center justify-center rounded border border-[#1a3159] bg-[#1f3a68] text-sm leading-none font-bold text-white shadow-sm hover:bg-[#2b4c84] disabled:cursor-not-allowed disabled:opacity-40" disabled={full || !tabs.length} onClick={() => void add().then((ok) => ok && onPick?.())} aria-label="새 탭" title={full ? `요금제(${PLAN_NM[plan]}) 상한 ${limit}개 — 탭을 닫거나 요금제를 올리십시오` : `새 탭(요금제 ${PLAN_NM[plan]} 상한 ${limit}개)`}>
-          +
+        <button type="button" className="btn-ghost btn-icon btn-sm mb-0.5 shrink-0" disabled={full || !tabs.length} onClick={() => void add().then((ok) => ok && onPick?.())} aria-label="새 탭" title={full ? `요금제(${PLAN_NM[plan]}) 상한 ${limit}개 — 탭을 닫거나 요금제를 올리십시오` : `새 탭(요금제 ${PLAN_NM[plan]} 상한 ${limit}개)`}>
+          <Plus aria-hidden />
         </button>
       </div>
-      <span className="mb-0.5 shrink-0 whitespace-nowrap text-gray-500">
+      <span className="mb-1.5 shrink-0 font-mono whitespace-nowrap text-ink-3 tabular-nums">
         <span title={`요금제(${PLAN_NM[plan]}) 상한`}>
           {tabs.length}/{limit}
         </span>
@@ -250,7 +251,7 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
         {save.st === 'saving' ? (
           '저장 중…'
         ) : save.st === 'err' ? (
-          <button type="button" className="text-red-700 underline" onClick={() => void saveAll()}>
+          <button type="button" className="font-sans text-danger hover:underline" onClick={() => void saveAll()}>
             저장 실패 — 다시 시도
           </button>
         ) : save.st === 'ok' ? (

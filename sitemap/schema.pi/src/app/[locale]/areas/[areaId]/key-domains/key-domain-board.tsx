@@ -5,7 +5,9 @@ import { piFetch } from '@pi/auth/client'
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { type MbrRole, type Perm } from '@/lib/roles'
-import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, noEnterSubmit } from '../words/word-board'
+import { Unlink } from 'lucide-react'
+import { InfoTip } from '@/components/page-head'
+import { ActorCells, ApvFields, ApvLink, Pager, StsCell, StsFilter, TD, noEnterSubmit } from '../words/word-board'
 
 interface Item {
   dic_id: string
@@ -89,27 +91,39 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   }
 
   return (
-    <div className="mt-6 space-y-6">
+    <div className="space-y-6">
       <form
         onSubmit={(e) => {
           e.preventDefault()
           if (cur && confirm(`대표도메인 ${cur.dic_log_nm} 지정을 신청하시겠습니까?`)) send(cur, 'Y')
         }}
         onKeyDown={noEnterSubmit}
-        className="overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] text-sm shadow-md"
+        className="panel text-sm"
       >
-        <h2 className="bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-5 py-2.5 text-base font-semibold text-white">대표도메인 지정</h2>
-        <fieldset disabled={!requester} className="p-5 disabled:opacity-60">
+        <div className="panel-head">
+          <h2 className="truncate">대표도메인 지정</h2>
+          <div className="ms-auto flex items-center gap-2">
+            {role && !requester && (
+              <span className="badge" title="지정·해제는 신청 권한(역할·요금제)이 있어야 합니다">
+                조회 전용
+              </span>
+            )}
+            <InfoTip align="end">
+              목록에 없는 단어는{' '}
+              <Link href={`/areas/${areaId}/words`} className="text-accent-ink hover:underline">
+                표준단어 등록
+              </Link>
+              (속성 분류어 선택) 후 승인되면 나타납니다. 도메인 등록의 대표도메인명은 지정된 대표도메인만 고를 수 있습니다
+            </InfoTip>
+          </div>
+        </div>
+        <fieldset disabled={!requester} className="panel-body disabled:opacity-60">
           <div className="grid gap-3 md:grid-cols-4">
             <div>
-              <input
-                list="key-cands"
-                value={pick}
-                onChange={(e) => setPick(e.target.value)}
-                placeholder="대표도메인명(속성 분류어 단어 검색)"
-                className="w-full rounded border border-[#b8c6e0] bg-white px-3 py-2"
-                aria-label="대표도메인명"
-              />
+              <label className="block">
+                <span className="field-label req">대표도메인명</span>
+                <input list="key-cands" value={pick} onChange={(e) => setPick(e.target.value)} placeholder="속성 분류어 단어" className="input" aria-required />
+              </label>
               <datalist id="key-cands">
                 {cands.map((w) => (
                   <option key={w.dic_id} value={w.dic_log_nm}>
@@ -117,32 +131,36 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
                   </option>
                 ))}
               </datalist>
-              {why && <p className="mt-1 text-red-700">{why}</p>}
+              {why && <p className="mt-1 text-xs text-danger">{why}</p>}
             </div>
-            <p className="rounded border border-[#d5ddec] bg-white px-3 py-2 font-mono">{cur?.dic_phy_nm ?? '물리명'}</p>
-            <p className="rounded border border-[#d5ddec] bg-white px-3 py-2 text-gray-600 md:col-span-2">{cur?.dic_desc || '단어 설명'}</p>
+            <div>
+              <span className="field-label">물리명</span>
+              {cur ? (
+                <span className="chip-phy" data-size="lg">
+                  {cur.dic_phy_nm}
+                </span>
+              ) : (
+                <p className="flex min-h-8 items-center text-ink-off">—</p>
+              )}
+            </div>
+            <div className="md:col-span-2">
+              <span className="field-label">설명</span>
+              <p className="flex min-h-8 items-center text-ink-2">{cur?.dic_desc || '—'}</p>
+            </div>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
             <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
-            <div className="ml-auto flex gap-2">
-              <button type="button" onClick={() => setPick('')} className="rounded border bg-white px-5 py-2">
+            <div className="ms-auto flex gap-2">
+              <button type="button" onClick={() => setPick('')} className="btn-key">
                 초기화
               </button>
-              <button disabled={!cur} className="btn-3d px-8 disabled:opacity-40">
-                대표도메인 지정 신청
+              <button disabled={!cur} className="btn-3d">
+                지정 신청
               </button>
             </div>
           </div>
-          <p className="mt-2 text-xs text-gray-500">
-            목록에 없는 단어는{' '}
-            <Link href={`/areas/${areaId}/words`} className="text-blue-700 underline">
-              표준단어 등록
-            </Link>
-            (속성 분류어 선택) 후 승인되면 나타납니다. 도메인 등록의 대표도메인명은 지정된 대표도메인만 고를 수 있습니다
-          </p>
-          {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 지정·해제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
           {msg && (
-            <p role="status" className="mt-2 font-medium text-[#1f3a68]">
+            <p role="status" className="mt-3 text-dense font-medium text-ink">
               {msg}
             </p>
           )}
@@ -155,23 +173,23 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
             e.preventDefault()
             setCond({ ...cond, kw: q.trim(), page: 1 })
           }}
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap items-center gap-2"
         >
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(대표도메인명·물리명)" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="대표도메인명·물리명" aria-label="검색어(대표도메인명·물리명)" className="input min-w-48 flex-1" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
-          <button className="btn-3d">검색</button>
+          <button className="btn-key">검색</button>
         </form>
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full border-collapse [&_td]:whitespace-nowrap text-[0.7rem] [&_.text-xs]:text-[0.6rem]">
+        <div className="mt-3 overflow-x-auto rounded-card border border-line bg-surface">
+          <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
             <colgroup>
               {COL_W.map((w, i) => (
                 <col key={i} className={w} />
               ))}
             </colgroup>
             <thead>
-              <tr className="thead-3d text-center">
+              <tr className="thead-3d text-start">
                 {['#', '대표도메인명', '물리명', '사용 도메인', '설명', '등록자', '등록일시', '상태', '승인자', '승인일시', '처리'].map((h) => (
-                  <th key={h} className="whitespace-nowrap border px-2 py-2">
+                  <th key={h} className="px-3 py-2">
                     {h}
                   </th>
                 ))}
@@ -180,35 +198,39 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
             <tbody>
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="border px-2 py-4 text-center text-gray-500">
+                  <td colSpan={11} className="px-3 py-6 text-center text-ink-3">
                     지정된 대표도메인이 없습니다
                   </td>
                 </tr>
               ) : (
                 items.map((w, i) => (
-                  <tr key={w.dic_id} className="hover:bg-gray-50">
-                    <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
-                    <td className="border px-2 py-1 font-medium">{w.dic_log_nm}</td>
-                    <td className="border px-2 py-1 font-mono">{w.dic_phy_nm}</td>
-                    <td className="border px-2 py-1 text-center tabular-nums">{w.dom_cnt.toLocaleString()}</td>
-                    <td className="border px-2 py-1 !whitespace-normal">{w.dic_desc}</td>
+                  <tr key={w.dic_id}>
+                    <td className={`${TD} text-right font-mono text-xs text-ink-3 tabular-nums`}>{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
+                    <td className={`${TD} font-medium`}>{w.dic_log_nm}</td>
+                    <td className={TD}>
+                      <span className="chip-phy">{w.dic_phy_nm}</span>
+                    </td>
+                    <td className={`${TD} text-right tabular-nums`}>{w.dom_cnt.toLocaleString()}</td>
+                    <td className={`${TD} min-w-60 !whitespace-normal text-ink-2`}>{w.dic_desc}</td>
                     <ActorCells nm={w.regr_nm} d={w.std_reg_dtm} />
                     <StsCell sts={w.std_sts_cd} pend={w.pend && (w.pend.to === 'N' ? 'KEY_N' : 'KEY_Y')} apv={`/areas/${areaId}/approvals?tp=DIC`} />
                     <ActorCells nm={w.apv_nm} d={w.apv_dtm} />
-                    <td className="whitespace-nowrap border px-2 py-1 text-center">
+                    <td className={TD}>
                       {w.pend || w.std_sts_cd === 'REQ' ? (
                         <ApvLink apv={`/areas/${areaId}/approvals?tp=DIC`} />
                       ) : w.std_sts_cd !== 'CNFM' ? (
-                        <span className="text-xs text-gray-500">-</span>
+                        <span className="text-xs text-ink-off">-</span>
                       ) : (
                         requester && (
                           <button
+                            type="button"
                             onClick={() => confirm(`${w.dic_log_nm} 대표도메인 지정을 해제${selfApprover && selfApv ? '' : ' 신청'}합니다`) && send(w, 'N')}
                             disabled={w.dom_cnt > 0}
-                            title={w.dom_cnt > 0 ? `사용 중인 도메인 ${w.dom_cnt}건` : undefined}
-                            className="text-red-700 underline disabled:cursor-not-allowed disabled:text-gray-400 disabled:no-underline"
+                            title={w.dom_cnt > 0 ? `사용 중인 도메인 ${w.dom_cnt}건` : '지정 해제'}
+                            className="btn-ghost btn-sm enabled:hover:text-danger"
                           >
-                            지정 해제
+                            <Unlink aria-hidden />
+                            해제
                           </button>
                         )
                       )}
@@ -219,26 +241,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
             </tbody>
           </table>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-          <span className="text-gray-600">
-            총 {total.toLocaleString()}건 · {cond.page} / {pages} 페이지
-          </span>
-          <div className="mx-auto flex items-center gap-1">
-            <button onClick={() => go(cond.page - 1)} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-              ‹
-            </button>
-            <button onClick={() => go(cond.page + 1)} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-              ›
-            </button>
-          </div>
-          <select value={cond.size} onChange={(e) => setCond({ ...cond, size: Number(e.target.value), page: 1 })} className="rounded border px-2 py-1" aria-label="페이지당 건수">
-            {[10, 20, 50, 100].map((n) => (
-              <option key={n} value={n}>
-                {n}건씩
-              </option>
-            ))}
-          </select>
-        </div>
+        <Pager total={total} page={cond.page} size={cond.size} go={go} setSize={(size) => setCond({ ...cond, size, page: 1 })} />
       </section>
     </div>
   )

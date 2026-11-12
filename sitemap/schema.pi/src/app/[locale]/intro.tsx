@@ -1,14 +1,15 @@
 'use client'
 // 메인 공개 영역(로그인 전, 마스터 결정 2026-10-21) — 소개·흐름(구현 완료 단계만)·역할 7종·요금제 이름과 열리는 메뉴(가격은 결제 화면에서만)
 // API 호출 없음(고정 문구 + roles.ts). 로그인하면 숨김 — 로그인 버튼은 아래 LoginGate 가 그대로 담당(UA 판정·redirect 없음)
-import { ArrowRight, CodeXml, DatabaseZap } from 'lucide-react'
+import { CodeXml } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useAppUser } from './google-auth'
 import { PLAN_PERMS, PLANS, ROLES } from '@/lib/roles'
 import { MENU_ICON as I } from '@/lib/menu-icons'
+import { Icon3D } from '@/components/icon-3d'
 
 // 표준 → 모델 → ERD → DDL(MASTER_ROADMAP 1~4단계 중 구현된 범위, 이행·CDC·분석은 미착수라 넣지 않음)
-// 이름·설명 = messages intro.flow.<k>.{nm,desc}
+// 이름 = messages intro.flow.<k>.nm(단계 설명 desc 는 렌더하지 않음 — 키 정리 대상)
 const FLOW = [
   { Icon: I.words, k: 'words' },
   { Icon: I.domains, k: 'domains' },
@@ -20,81 +21,70 @@ const FLOW = [
 // 요금제별로 열리는 메뉴(roles.ts PLAN_PERMS 의 메뉴 권한 → 화면 이름 = messages intro.menu.<권한>)
 const MENU_KEYS = ['MENU_STD', 'MENU_SQL', 'MENU_SET', 'MENU_BAN', 'MENU_MODEL', 'MENU_CHK', 'MENU_ADM'] as const
 const menusOf = (p: (typeof PLANS)[number]) => MENU_KEYS.filter((k) => (PLAN_PERMS[p] as readonly string[]).includes(k))
-const card = 'rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] p-4'
 
 export default function Intro() {
-  const { user, isLoading } = useAppUser()
+  const { user } = useAppUser()
   const t = useTranslations('intro')
   const tc = useTranslations('codes')
-  if (user || isLoading) return null
+  // 로그인 확인 중에도 소개를 보임(Pi SDK 응답 대기 동안 빈 화면 방지) — 확인 끝나 user 가 생기면 숨김
+  if (user) return null
   return (
-    <div className="mt-4 space-y-5">
-      <section className="rounded-2xl bg-gradient-to-br from-[#1f3a68] to-[#3b4a66] px-5 py-8 text-white sm:px-8">
-        <p className="text-sm text-white/70">{t('kicker')}</p>
-        <h2 className="mt-2 text-2xl font-bold leading-snug sm:text-3xl">
-          {t('headline1')}
-          <br />
-          {t('headline2')}
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm text-white/80">{t('lead')}</p>
-      </section>
-
-      <section aria-labelledby="flow-h">
-        <h3 id="flow-h" className="mb-2 font-bold text-[#2c3850]">
-          {t('flowTitle')}
-        </h3>
-        <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+    <div className="space-y-6">
+      {/* 머리 블록(흰 패널) — 왼쪽 2줄 제목, 오른쪽 6단계 키 흐름(이 화면의 빛나는 요소) */}
+      <section className="panel grid gap-8 p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:p-10">
+        <div>
+          <p className="text-xs text-ink-3">{t('kicker')}</p>
+          <h1 className="mt-2 text-2xl font-semibold text-ink lg:text-display">
+            {t('headline1')}
+            <br />
+            {t('headline2')}
+          </h1>
+        </div>
+        {/* lg 이상 = 키 가운데(번호 16 + 간격 8 + 키 절반 24 = 48px)를 잇는 1px 연결선, 양끝 = 첫·끝 칸 가운데 */}
+        <ol aria-label={t('flowTitle')} className="relative grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-6 lg:before:absolute lg:before:inset-x-[8.333%] lg:before:top-12 lg:before:h-px lg:before:bg-line-strong lg:before:content-['']">
           {FLOW.map(({ Icon, k }, i) => (
-            <li key={k} className={`${card} relative flex flex-col items-start gap-1`}>
-              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#3b4a66] text-white">
-                <Icon className="h-4 w-4" strokeWidth={1.5} aria-hidden />
-              </span>
-              <span className="text-xs text-[#5b6578]">{t('step', { n: i + 1 })}</span>
-              <span className="font-semibold text-[#2c3850]">{t(`flow.${k}.nm`)}</span>
-              <span className="text-xs text-[#5b6578]">{t(`flow.${k}.desc`)}</span>
-              {i < FLOW.length - 1 && <ArrowRight className="absolute end-2 top-3 hidden h-4 w-4 text-[#9aa6bd] lg:block rtl:rotate-180" aria-hidden />}
+            <li key={k} className="flex flex-col items-center gap-2 text-center">
+              <span className="font-mono text-xs text-ink-3">{String(i + 1).padStart(2, '0')}</span>
+              <Icon3D icon={Icon} size="lg" />
+              <span className="text-dense font-medium text-ink">{t(`flow.${k}.nm`)}</span>
             </li>
           ))}
         </ol>
       </section>
 
       <section aria-labelledby="role-h">
-        <h3 id="role-h" className="mb-2 font-bold text-[#2c3850]">
+        <h2 id="role-h" className="mb-2 text-sm font-semibold text-ink">
           {t('roleTitle')}
-        </h3>
-        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        </h2>
+        <ul className="panel divide-y divide-line">
           {ROLES.map((r) => (
-            <li key={r} className={card}>
-              <div className="font-semibold text-[#2c3850]">{tc(`role.${r}`)}</div>
-              <p className="mt-1 text-xs text-[#5b6578]">{tc(`roleDesc.${r}`)}</p>
+            <li key={r} className="flex flex-col gap-0.5 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-4">
+              <span className="shrink-0 text-sm font-medium text-ink sm:w-40">{tc(`role.${r}`)}</span>
+              <span className="text-xs text-ink-3">{tc(`roleDesc.${r}`)}</span>
             </li>
           ))}
         </ul>
       </section>
 
       <section aria-labelledby="plan-h">
-        <h3 id="plan-h" className="mb-2 font-bold text-[#2c3850]">
-          {t('planTitle')} <span className="text-xs font-normal text-[#5b6578]">{t('planNote')}</span>
-        </h3>
-        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        <h2 id="plan-h" className="mb-2 text-sm font-semibold text-ink">
+          {t('planTitle')} <span className="text-xs font-normal text-ink-3">{t('planNote')}</span>
+        </h2>
+        <ul className="panel divide-y divide-line">
           {PLANS.map((p) => (
-            <li key={p} className={card}>
-              <div className="font-semibold text-[#2c3850]">{tc(`plan.${p}`)}</div>
-              <div className="mt-2 flex flex-wrap gap-1">
+            <li key={p} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4">
+              <span className="shrink-0 text-sm font-medium text-ink sm:w-40">{tc(`plan.${p}`)}</span>
+              <span className="flex flex-wrap gap-1">
                 {menusOf(p).map((m) => (
-                  <span key={m} className="rounded bg-white px-1.5 py-0.5 text-[11px] text-[#4a5a78] ring-1 ring-[#c9d1df]">
+                  <span key={m} className="badge">
                     {p === 'FREE' ? t('viewOnly', { menu: t(`menu.${m}`) }) : t(`menu.${m}`)}
                   </span>
                 ))}
-              </div>
+              </span>
             </li>
           ))}
         </ul>
       </section>
-
-      <p className="flex items-center gap-2 text-sm text-[#4a5a78]">
-        <DatabaseZap className="h-4 w-4" strokeWidth={1.5} aria-hidden /> {t('footer')}
-      </p>
     </div>
   )
 }

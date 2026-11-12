@@ -7,7 +7,9 @@ import { piFetch } from '@pi/auth/client'
 // 업종 추천 관계(반자동) : 프로젝트 업종 템플릿 관계 중 양쪽 엔터티가 등록된 것 → 칩을 누르면 폼만 채움(저장은 등록 버튼)
 import { useCallback, useEffect, useState } from 'react'
 import { CRDN, relError, relNotation } from '@/lib/model-rel'
-import { ActorCells, confirmSave, noEnterSubmit } from '../words/word-board'
+import { ChevronLeft, ChevronRight, Pencil, Trash2 } from 'lucide-react'
+import { InfoTip } from '@/components/page-head'
+import { ActorCells, TD, confirmSave, noEnterSubmit } from '../words/word-board'
 import { TermPick, type Term } from './attrs'
 
 interface EntOpt {
@@ -66,12 +68,12 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
   }
   const applyNm = async () => {
     const c = nmP?.cands[nmP.pick]
-    if (!nmP || !c?.ok || !confirm(`N:M 관계(${nmP.prnt} ↔ ${nmP.chld})를 교차 엔터티 '${c.nm}'로 해소합니다.\n\n· 교차 엔터티(논리) 생성\n· ${nmP.prnt}·${nmP.chld} → ${c.nm} 식별 관계 2개\n· 원래 N:M 관계 삭제\n· 두 부모 주식별자를 교차 엔터티 주식별자로 상속\n\n진행하시겠습니까?`)) return
+    if (!nmP || !c?.ok || !confirm(`N:M 관계(${nmP.prnt}–${nmP.chld})를 교차 엔터티 '${c.nm}'로 해소합니다.\n\n· 교차 엔터티(논리) 생성\n· ${nmP.prnt}·${nmP.chld} → ${c.nm} 식별 관계 2개\n· 원래 N:M 관계 삭제\n· 두 부모 주식별자를 교차 엔터티 주식별자로 상속\n\n진행하시겠습니까?`)) return
     setNmBusy(true)
     const j = await (await piFetch(`${api}/relations/${nmP.relId}/resolve-nm`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ dic_ids: c.dic_ids }) })).json()
     setNmBusy(false)
     const warn = j.ok && !j.partial ? [j.no_pk ? '부모에 주식별자가 없어 교차 엔터티 식별자를 직접 지정하십시오' : '', j.needs?.length ? '두 부모 식별자 용어가 같아 역할명 상속이 필요합니다(아래 패널)' : ''].filter(Boolean).join(' · ') : ''
-    setMsg(!j.ok ? j.message : j.partial ? j.message : `N:M 해소 완료 : 교차 엔터티 ${j.ent_log_nm}·식별 관계 ${j.rel_ids.length}개·FK ${j.fk_applied}건${j.fail?.length ? ` · 실패 ${j.fail.map((f: { term_log_nm: string; reason: string }) => `${f.term_log_nm}(${f.reason})`).join(', ')}` : ''}${warn ? ` · ⚠ ${warn}` : ''}`)
+    setMsg(!j.ok ? j.message : j.partial ? j.message : `N:M 해소 완료 : 교차 엔터티 ${j.ent_log_nm}·식별 관계 ${j.rel_ids.length}개·FK ${j.fk_applied}건${j.fail?.length ? ` · 실패 ${j.fail.map((f: { term_log_nm: string; reason: string }) => `${f.term_log_nm}(${f.reason})`).join(', ')}` : ''}${warn ? ` · 주의 : ${warn}` : ''}`)
     if (j.ok && j.needs?.length) {
       setRolePick({})
       setRoleNeed({ relId: j.needs[0].rel_id, title: 'N:M 해소', items: j.needs[0].items })
@@ -188,9 +190,9 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
     }
   }
   const sel = (k: 'prnt_ent_id' | 'chld_ent_id', label: string) => (
-    <label className="flex flex-col gap-1">
-      <span className="text-xs text-gray-600">{label}</span>
-      <select value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="rounded border px-2 py-1">
+    <label className="block">
+      <span className="field-label req">{label}</span>
+      <select value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="input" aria-required="true">
         <option value="">선택</option>
         {opts.map((o) => (
           <option key={o.ent_id} value={o.ent_id}>
@@ -200,191 +202,221 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
       </select>
     </label>
   )
-  const yn = (k: 'idnt_yn' | 'prnt_opt_yn' | 'chld_opt_yn', label: string) => (
-    <label className="flex items-center gap-1">
+  const yn = (k: 'idnt_yn' | 'prnt_opt_yn' | 'chld_opt_yn', label: string, tip?: string) => (
+    <label className="inline-flex items-center gap-2 text-sm" title={tip}>
       <input type="checkbox" checked={f[k] === 'Y'} onChange={(e) => setF({ ...f, [k]: e.target.checked ? 'Y' : 'N' })} />
       {label}
     </label>
   )
 
   return (
-    <section className="mt-8 space-y-4">
-      <h2 className="text-lg font-bold">엔터티 관계</h2>
-      <p className="text-sm text-gray-600">부모(1쪽) → 자식(N쪽). 식별 관계 = 부모 식별자가 자식 식별자의 일부(실선), 비식별 = 점선. N:M·자기참조는 비식별만, 식별이면 부모 필수.</p>
+    <section className="mt-6 space-y-4">
+      <div className="flex items-center gap-1">
+        <h2 className="text-sm font-semibold text-ink">엔터티 관계</h2>
+        <InfoTip>부모(1쪽) → 자식(N쪽). 식별 관계 = 부모 식별자가 자식 식별자의 일부(실선), 비식별 = 점선. N:M·자기참조는 비식별만, 식별이면 부모 필수.</InfoTip>
+      </div>
       {editor && (
-        <form onSubmit={save} onKeyDown={noEnterSubmit} className="rounded-xl border border-[#c7d2e6] bg-white p-4 text-sm shadow-md">
-          <div className={`-m-4 mb-4 rounded-t-xl px-4 py-2 font-semibold text-white ${edit ? 'bg-[#c2410c]' : 'bg-[#1f3a68]'}`}>{edit ? '관계 수정' : '관계 등록'}</div>
-          {!edit && recs.length > 0 && (
-            <div className="mb-3 flex flex-wrap items-center gap-1 text-xs">
-              <span className="font-semibold text-[#1f3a68]">업종 추천 :</span>
-              {recs.map((r) => (
-                <button key={`${r.prnt_ent_id}|${r.chld_ent_id}|${r.rel_nm}`} type="button" onClick={() => setF({ ...F0, prnt_ent_id: r.prnt_ent_id, chld_ent_id: r.chld_ent_id, crdn_cd: r.crdn_cd, idnt_yn: r.idnt_yn, chld_opt_yn: r.idnt_yn === 'Y' ? 'N' : 'Y', rel_nm: r.rel_nm })} className="rounded-full border border-amber-400 bg-amber-100 px-2 py-0.5 hover:bg-amber-200">
-                  {r.prnt_nm} → {r.chld_nm} <span className="text-gray-600">({r.rel_nm} · {CRDN[r.crdn_cd as keyof typeof CRDN]}{r.idnt_yn === 'Y' ? ' · 식별' : ''})</span>
-                </button>
-              ))}
-            </div>
-          )}
-          <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr]">
-            {sel('prnt_ent_id', '부모 엔터티')}
-            <label className="flex flex-col gap-1">
-              <span className="text-xs text-gray-600">카디널리티</span>
-              <select value={f.crdn_cd} onChange={(e) => setF({ ...f, crdn_cd: e.target.value })} className="rounded border px-2 py-1">
-                {Object.entries(CRDN).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v}
-                  </option>
+        <form onSubmit={save} onKeyDown={noEnterSubmit} className="panel text-sm">
+          <div className="panel-head" data-mode={edit ? 'edit' : undefined}>
+            {edit ? '관계 수정' : '관계 등록'}
+          </div>
+          <div className="panel-body">
+            {!edit && recs.length > 0 && (
+              <div className="mb-3 flex flex-wrap items-center gap-1.5 text-xs">
+                <span className="me-1 font-medium text-ink-2">업종 추천</span>
+                {recs.map((r) => (
+                  <button key={`${r.prnt_ent_id}|${r.chld_ent_id}|${r.rel_nm}`} type="button" onClick={() => setF({ ...F0, prnt_ent_id: r.prnt_ent_id, chld_ent_id: r.chld_ent_id, crdn_cd: r.crdn_cd, idnt_yn: r.idnt_yn, chld_opt_yn: r.idnt_yn === 'Y' ? 'N' : 'Y', rel_nm: r.rel_nm })} className="btn-key btn-sm">
+                    {r.prnt_nm} → {r.chld_nm} <span className="text-ink-3">{r.rel_nm} · {CRDN[r.crdn_cd as keyof typeof CRDN]}{r.idnt_yn === 'Y' ? ' · 식별' : ''}</span>
+                  </button>
                 ))}
-              </select>
-            </label>
-            {sel('chld_ent_id', '자식 엔터티')}
-          </div>
-          <div className="mt-3 flex flex-wrap items-center gap-4">
-            {yn('idnt_yn', '식별 관계')}
-            {yn('prnt_opt_yn', '부모 선택(자식에 부모 없을 수 있음)')}
-            {yn('chld_opt_yn', '자식 선택(부모에 자식 0건 가능)')}
-            <input value={f.rel_nm} onChange={(e) => setF({ ...f, rel_nm: e.target.value })} placeholder="관계명(동사구, 선택)" maxLength={100} className="rounded border px-2 py-1" />
-          </div>
-          <textarea value={f.rel_desc} onChange={(e) => setF({ ...f, rel_desc: e.target.value })} placeholder="관계 설명" rows={2} className="mt-3 w-full rounded border px-2 py-1" />
-          <div className="mt-3 flex items-center justify-between">
-            <span className="font-mono text-[#1f3a68]">
-              {f.prnt_ent_id && f.chld_ent_id ? `${nm(f.prnt_ent_id)} ${relNotation(f)} ${nm(f.chld_ent_id)}` : ''}
-              {rule && <span className="ml-2 font-sans text-red-700">{RULE_MSG[rule] ?? rule}</span>}
-              {dup && <span className="ml-2 font-sans text-red-700">같은 부모·자식·관계명의 관계가 이미 있습니다</span>}
-              {lockedNow && <span className="ml-2 font-sans text-red-700">작성완료 주제영역입니다 — 완료 취소 후 편집하십시오</span>}
-            </span>
-            <span className="flex gap-2">
-              {edit && (
-                <button type="button" onClick={() => (setEdit(null), setF(F0))} className="rounded border px-4 py-1">
-                  취소
+              </div>
+            )}
+            <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr]">
+              {sel('prnt_ent_id', '부모 엔터티')}
+              <label className="block">
+                <span className="field-label">카디널리티</span>
+                <select value={f.crdn_cd} onChange={(e) => setF({ ...f, crdn_cd: e.target.value })} className="input">
+                  {Object.entries(CRDN).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {sel('chld_ent_id', '자식 엔터티')}
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              {yn('idnt_yn', '식별 관계')}
+              {yn('prnt_opt_yn', '부모 선택', '자식에 부모가 없을 수 있음')}
+              {yn('chld_opt_yn', '자식 선택', '부모에 자식 0건 가능')}
+              <input value={f.rel_nm} onChange={(e) => setF({ ...f, rel_nm: e.target.value })} placeholder="관계명" title="동사구, 선택" maxLength={100} className="input w-auto min-w-40" aria-label="관계명" />
+            </div>
+            <textarea value={f.rel_desc} onChange={(e) => setF({ ...f, rel_desc: e.target.value })} placeholder="설명" rows={2} className="input mt-3" aria-label="관계 설명" />
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+              <span className="flex flex-wrap items-center gap-2">
+                {f.prnt_ent_id && f.chld_ent_id ? (
+                  <span className="chip-phy" data-size="lg">
+                    {`${nm(f.prnt_ent_id)} ${relNotation(f)} ${nm(f.chld_ent_id)}`}
+                  </span>
+                ) : (
+                  ''
+                )}
+                {rule && <span className="text-xs text-danger">{RULE_MSG[rule] ?? rule}</span>}
+                {dup && <span className="text-xs text-danger">같은 부모·자식·관계명의 관계 있음</span>}
+                {lockedNow && <span className="text-xs text-danger">작성완료 주제영역 · 완료 취소 후 편집</span>}
+              </span>
+              <span className="flex gap-2">
+                {edit && (
+                  <button type="button" onClick={() => (setEdit(null), setF(F0))} className="btn-key">
+                    취소
+                  </button>
+                )}
+                <button disabled={!ready} className="btn-3d">
+                  {edit ? '저장' : '등록'}
                 </button>
-              )}
-              <button disabled={!ready} className="btn-3d px-8 disabled:opacity-40">
-                {edit ? '저장' : '등록'}
-              </button>
-            </span>
+              </span>
+            </div>
           </div>
         </form>
       )}
-      {msg && <p className="text-sm text-blue-800">{msg}</p>}
+      {msg && (
+        <p role="status" className="text-dense text-ink">
+          {msg}
+        </p>
+      )}
       {nmP && editor && (
-        <div className="space-y-2 rounded border border-purple-300 bg-purple-50 p-3 text-xs" aria-label="N:M 해소">
-          <p className="font-semibold text-purple-900">
-            N:M 해소 — {nmP.prnt} ↔ {nmP.chld}
-            {nmP.rel_nm ? ` (${nmP.rel_nm})` : ''} : 교차 엔터티 이름을 고르십시오(표준단어 조합, 빨강 = 등록 불가)
-          </p>
-          {nmP.cands.map((c, i) => (
-            <label key={c.nm} className={`flex flex-wrap items-center gap-2 ${c.ok ? '' : 'text-red-700'}`}>
-              <input type="radio" disabled={!c.ok} checked={nmP.pick === i} onChange={() => setNmP({ ...nmP, pick: i })} />
-              <b>{c.nm}</b>
-              {c.ok && <span className="font-mono text-[#1f3a68]">{c.tbl_phy_nm}</span>}
-              {c.missing_words.length > 0 && <span>미등록 단어 : {c.missing_words.join(', ')}</span>}
-              {c.dup && <span>같은 이름의 엔터티 있음</span>}
-              {c.rule_error && <span>{c.rule_error}</span>}
-            </label>
-          ))}
-          {!nmP.cands.some((c) => c.ok) && <p className="text-red-700">등록 가능한 후보가 없습니다 — 표준단어를 신청하거나 논리 모델에서 엔터티를 직접 추가한 뒤 관계를 바꾸십시오</p>}
-          <div className="flex gap-2">
-            <button type="button" onClick={() => void applyNm()} disabled={nmBusy || !nmP.cands[nmP.pick]?.ok} className="btn-3d px-4 py-0.5 disabled:opacity-40">
-              {nmBusy ? '해소 중…' : '교차 엔터티로 해소'}
-            </button>
-            <button type="button" onClick={() => setNmP(null)} className="underline">
-              닫기
-            </button>
+        <div className="panel text-xs" aria-label="N:M 해소">
+          <div className="panel-head">
+            <span className="truncate">
+              N:M 해소 : {nmP.prnt}–{nmP.chld}
+              {nmP.rel_nm ? ` (${nmP.rel_nm})` : ''}
+            </span>
+            <InfoTip>교차 엔터티 이름을 고르십시오(표준단어 조합, 빨강 = 등록 불가)</InfoTip>
+          </div>
+          <div className="panel-body space-y-2">
+            {nmP.cands.map((c, i) => (
+              <label key={c.nm} className={`flex flex-wrap items-center gap-2 ${c.ok ? '' : 'text-danger'}`}>
+                <input type="radio" disabled={!c.ok} checked={nmP.pick === i} onChange={() => setNmP({ ...nmP, pick: i })} />
+                <span className="font-medium">{c.nm}</span>
+                {c.ok && <span className="chip-phy">{c.tbl_phy_nm}</span>}
+                {c.missing_words.length > 0 && <span>미등록 단어 : {c.missing_words.join(', ')}</span>}
+                {c.dup && <span>같은 이름의 엔터티 있음</span>}
+                {c.rule_error && <span>{c.rule_error}</span>}
+              </label>
+            ))}
+            {!nmP.cands.some((c) => c.ok) && <p className="text-danger">등록 가능한 후보 없음 · 표준단어를 신청하거나 논리 모델에서 엔터티를 직접 추가한 뒤 관계 변경</p>}
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setNmP(null)} className="btn-key btn-sm">
+                닫기
+              </button>
+              <button type="button" onClick={() => void applyNm()} disabled={nmBusy || !nmP.cands[nmP.pick]?.ok} className="btn-3d btn-sm">
+                {nmBusy ? '해소 중' : '교차 엔터티로 해소'}
+              </button>
+            </div>
           </div>
         </div>
       )}
       {roleNeed && editor && (
-        <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3 text-xs" aria-label="역할명 상속">
-          <p className="font-semibold text-amber-900">역할명 상속 — 같은 용어로 상속할 수 없는 부모 식별자 : 역할 용어(승인 표준용어)를 고르십시오</p>
-          {roleNeed.items.map((n) => (
-            <div key={n.src_attr_id} className="flex flex-wrap items-center gap-2">
-              <b>{n.term_log_nm}</b>
-              <span className="text-gray-600">{NEED_NM[n.reason]}</span>
-              <TermPick
-                api={api}
-                areaId={areaId}
-                picked={rolePick[n.src_attr_id] ?? null}
-                onPick={(t) => setRolePick((r) => ({ ...r, [n.src_attr_id]: t }))}
-                label={`${n.term_log_nm} 역할 용어 검색`}
-                initialQ={n.term_log_nm}
-              />
+        <div className="panel text-xs" aria-label="역할명 상속">
+          <div className="panel-head" data-mode="edit">
+            <span className="truncate">역할명 상속</span>
+            <InfoTip>같은 용어로 상속할 수 없는 부모 식별자 : 역할 용어(승인 표준용어)를 고르십시오</InfoTip>
+          </div>
+          <div className="panel-body space-y-2">
+            {roleNeed.items.map((n) => (
+              <div key={n.src_attr_id} className="flex flex-wrap items-center gap-2">
+                <span className="font-medium text-ink">{n.term_log_nm}</span>
+                <span className="text-ink-3">{NEED_NM[n.reason]}</span>
+                <TermPick
+                  api={api}
+                  areaId={areaId}
+                  picked={rolePick[n.src_attr_id] ?? null}
+                  onPick={(t) => setRolePick((r) => ({ ...r, [n.src_attr_id]: t }))}
+                  label={`${n.term_log_nm} 역할 용어 검색`}
+                  initialQ={n.term_log_nm}
+                />
+              </div>
+            ))}
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setRoleNeed(null)} className="btn-key btn-sm" title={roleNeed.items.every((n) => n.reason === 'OWN_PK') ? '선택 사항 — 그대로 두어도 됨' : 'FK 점검에 "역할명 필요"로 남음'}>
+                닫기
+              </button>
+              <button type="button" onClick={() => void applyRoles()} disabled={!roleNeed.items.some((n) => rolePick[n.src_attr_id])} className="btn-3d btn-sm">
+                역할명 상속 적용
+              </button>
             </div>
-          ))}
-          <div className="flex gap-2">
-            <button type="button" onClick={() => void applyRoles()} disabled={!roleNeed.items.some((n) => rolePick[n.src_attr_id])} className="btn-3d px-4 py-0.5 disabled:opacity-40">
-              역할명 상속 적용
-            </button>
-            <button type="button" onClick={() => setRoleNeed(null)} className="underline">
-              {roleNeed.items.every((n) => n.reason === 'OWN_PK') ? '닫기(선택 사항 — 그대로 두어도 됨)' : '닫기(FK 점검에 "역할명 필요"로 남음)'}
-            </button>
           </div>
         </div>
       )}
-      <table className="w-full border-collapse text-[0.7rem] [&_td]:whitespace-nowrap">
-        <thead>
-          <tr className="thead-3d text-center">
-            {['#', '부모 엔터티', '관계', '자식 엔터티', '관계명', '식별', '설명', '등록자', '등록일시', '처리'].map((h) => (
-              <th key={h} className="border px-2 py-2">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rels.length === 0 ? (
-            <tr>
-              <td colSpan={10} className="border px-2 py-4 text-center text-gray-500">
-                등록된 관계가 없습니다
-              </td>
+      <div className="overflow-x-auto rounded-card border border-line bg-surface">
+        <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
+          <thead>
+            <tr className="thead-3d text-start">
+              {['#', '부모 엔터티', '관계', '자식 엔터티', '관계명', '식별', '설명', '등록자', '등록일시', '처리'].map((h) => (
+                <th key={h} className="px-3 py-2">
+                  {h}
+                </th>
+              ))}
             </tr>
-          ) : (
-            rels.map((x, i) => (
-              <tr key={x.rel_id} className="hover:bg-gray-50">
-                <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{(page - 1) * SIZE + i + 1}</td>
-                <td className="border px-2 py-1 font-medium">{x.prnt.ent_log_nm}</td>
-                <td className="border px-2 py-1 text-center font-mono text-[#1f3a68]" title={`${CRDN[x.crdn_cd as keyof typeof CRDN]} · 부모 ${x.prnt_opt_yn === 'Y' ? '선택' : '필수'} · 자식 ${x.chld_opt_yn === 'Y' ? '선택' : '필수'}`}>
-                  {x.notation}
-                </td>
-                <td className="border px-2 py-1 font-medium">{x.chld.ent_log_nm}</td>
-                <td className="border px-2 py-1">{x.rel_nm}</td>
-                <td className="border px-2 py-1 text-center">{x.idnt_yn === 'Y' ? '식별' : '비식별'}</td>
-                <td className="w-[25%] border px-2 py-1 !whitespace-normal">{x.rel_desc}</td>
-                <ActorCells nm={x.regr_nm} d={x.reg_dtm} />
-                <td className="border px-2 py-1 text-center">
-                  {editor && (
-                    <>
-                      <button onClick={() => startEdit(x)} className="mr-2 text-blue-700 underline">
-                        수정
-                      </button>
-                      {x.crdn_cd === 'NM' ? (
-                        <button onClick={() => void openNm(x)} className="mr-2 text-purple-700 underline" title="교차 엔터티 + 식별 관계 2개로 해소">
-                          N:M 해소
-                        </button>
-                      ) : (
-                        <button onClick={() => void fkFlow(x.rel_id, `관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm}`)} className="mr-2 text-blue-700 underline" title="부모 식별자 상속(FK) 다시 점검">
-                          FK
-                        </button>
-                      )}
-                      <button onClick={() => del(x)} className="text-red-700 underline">
-                        삭제
-                      </button>
-                    </>
-                  )}
+          </thead>
+          <tbody>
+            {rels.length === 0 ? (
+              <tr>
+                <td colSpan={10} className="px-3 py-6 text-center text-ink-3">
+                  등록된 관계 없음
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-      <div className="flex items-center justify-center gap-2 text-sm">
-        <span className="text-gray-600">총 {total.toLocaleString()}건</span>
-        <button onClick={() => setPage(page - 1)} disabled={page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-          ‹
-        </button>
-        <span className="tabular-nums">{page}</span>
-        <button onClick={() => setPage(page + 1)} disabled={page * SIZE >= total} className="rounded border px-2 py-1 disabled:opacity-30">
-          ›
-        </button>
+            ) : (
+              rels.map((x, i) => (
+                <tr key={x.rel_id}>
+                  <td className={`${TD} text-right font-mono text-xs text-ink-3 tabular-nums`}>{(page - 1) * SIZE + i + 1}</td>
+                  <td className={`${TD} font-medium`}>{x.prnt.ent_log_nm}</td>
+                  <td className={TD} title={`${CRDN[x.crdn_cd as keyof typeof CRDN]} · 부모 ${x.prnt_opt_yn === 'Y' ? '선택' : '필수'} · 자식 ${x.chld_opt_yn === 'Y' ? '선택' : '필수'}`}>
+                    <span className="chip-phy">{x.notation}</span>
+                  </td>
+                  <td className={`${TD} font-medium`}>{x.chld.ent_log_nm}</td>
+                  <td className={TD}>{x.rel_nm}</td>
+                  <td className={`${TD} text-ink-2`}>{x.idnt_yn === 'Y' ? '식별' : '비식별'}</td>
+                  <td className={`${TD} w-[25%] !whitespace-normal text-ink-2`}>{x.rel_desc}</td>
+                  <ActorCells nm={x.regr_nm} d={x.reg_dtm} />
+                  <td className={TD}>
+                    {editor && (
+                      <span className="inline-flex items-center gap-1">
+                        <button type="button" onClick={() => startEdit(x)} aria-label="수정" title="수정" className="btn-ghost btn-icon btn-sm">
+                          <Pencil aria-hidden />
+                        </button>
+                        {x.crdn_cd === 'NM' ? (
+                          <button type="button" onClick={() => void openNm(x)} className="btn-ghost btn-sm" title="교차 엔터티 + 식별 관계 2개로 해소">
+                            N:M 해소
+                          </button>
+                        ) : (
+                          <button type="button" onClick={() => void fkFlow(x.rel_id, `관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm}`)} className="btn-ghost btn-sm" title="부모 식별자 상속(FK) 다시 점검">
+                            FK
+                          </button>
+                        )}
+                        <button type="button" onClick={() => del(x)} aria-label="삭제" title="삭제" className="btn-ghost btn-icon btn-sm hover:text-danger">
+                          <Trash2 aria-hidden />
+                        </button>
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-xs text-ink-3 tabular-nums">총 {total.toLocaleString()}건</span>
+        <div className="mx-auto flex items-center gap-1">
+          <button type="button" onClick={() => setPage(page - 1)} disabled={page <= 1} aria-label="이전" title="이전" className="btn-ghost btn-icon btn-sm">
+            <ChevronLeft className="rtl:rotate-180" aria-hidden />
+          </button>
+          <span className="min-w-8 text-center text-dense tabular-nums">{page}</span>
+          <button type="button" onClick={() => setPage(page + 1)} disabled={page * SIZE >= total} aria-label="다음" title="다음" className="btn-ghost btn-icon btn-sm">
+            <ChevronRight className="rtl:rotate-180" aria-hidden />
+          </button>
+        </div>
       </div>
     </section>
   )

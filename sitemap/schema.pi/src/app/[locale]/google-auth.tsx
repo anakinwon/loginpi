@@ -3,6 +3,7 @@
 //  useAppUser : 두 세션을 하나의 user 로 합친다(Pi 우선). Google 은 Pi 계정과 연동(sys_usr_auth_lnk)된 경우에만 user 가 된다.
 //  연동 흐름 : Pi Browser 로그인 사용자가 코드 발급(PiLinkCodeIssuer) → 일반 브라우저 Google 세션이 코드 입력(LinkCodeForm) → update() 로 세션 갱신.
 //  Google 버튼은 NEXT_PUBLIC_GOOGLE_LOGIN=1 일 때만 노출. UA 판정 없음
+import { LogOut } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -95,8 +96,10 @@ export function useAppUser() {
   }
 }
 
-const BTN = 'rounded border border-gray-300 px-3 py-1.5 text-sm'
-const BTN_PRIMARY = 'rounded bg-black px-3 py-1.5 text-sm text-white disabled:opacity-50'
+// 버튼 = 공용 클래스(globals.css) — 보조 평면 btn-key, 주요 남색 키캡 btn-3d(비활성은 클래스가 회색 처리)
+const BTN = 'btn-key'
+const BTN_PRIMARY = 'btn-3d'
+const PANEL = 'panel flex max-w-sm flex-col gap-3 p-4'
 
 export function GoogleLoginButton({ className = BTN }: { className?: string }) {
   const t = useTranslations('auth')
@@ -108,11 +111,13 @@ export function GoogleLoginButton({ className = BTN }: { className?: string }) {
   )
 }
 
-export function GoogleSignOutButton() {
+// compact = 헤더용(640 미만은 LogOut 아이콘만, 이름은 sr-only 로 유지)
+export function GoogleSignOutButton({ className = BTN, compact = false }: { className?: string; compact?: boolean }) {
   const t = useTranslations('auth')
   return (
-    <button type="button" className={BTN} onClick={() => void signOut({ callbackUrl: '/' })}>
-      {t('signOut')}
+    <button type="button" className={className} title={compact ? t('signOut') : undefined} onClick={() => void signOut({ callbackUrl: '/' })}>
+      {compact && <LogOut className="sm:hidden" aria-hidden />}
+      <span className={compact ? 'max-sm:sr-only' : undefined}>{t('signOut')}</span>
     </button>
   )
 }
@@ -120,7 +125,7 @@ export function GoogleSignOutButton() {
 export function LinkCheckFailed() {
   const t = useTranslations('auth')
   return (
-    <p className="text-sm text-red-600" role="alert">
+    <p className="text-sm text-danger" role="alert">
       {t('linkCheckFailed')}
     </p>
   )
@@ -136,7 +141,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
 
   return (
     <form
-      className="flex max-w-sm flex-col gap-2 rounded border border-gray-200 p-4"
+      className={PANEL}
       onSubmit={async (e) => {
         e.preventDefault()
         setBusy(true)
@@ -151,11 +156,11 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
         setBusy(false)
       }}
     >
-      <p className="font-medium">{t('link.codeFormTitle')}</p>
-      {googleEmail && <p className="text-xs text-gray-500">{googleEmail}</p>}
-      <p className="text-sm">{t('link.codeFormHint')}</p>
+      <p className="text-sm font-semibold text-ink">{t('link.codeFormTitle')}</p>
+      {googleEmail && <p className="text-xs text-ink-3">{googleEmail}</p>}
+      <p className="text-sm text-ink-2">{t('link.codeFormHint')}</p>
       <input
-        className="rounded border border-gray-300 px-2 py-1 font-mono tracking-widest"
+        className="input text-center font-mono text-base tracking-widest"
         inputMode="numeric"
         pattern="[0-9]{6}"
         maxLength={6}
@@ -166,7 +171,7 @@ export function LinkCodeForm({ onLinked }: { onLinked?: () => void }) {
         required
       />
       {msg && (
-        <p className={msg.ok ? 'text-sm' : 'text-sm text-red-600'} role={msg.ok ? 'status' : 'alert'}>
+        <p className={msg.ok ? 'text-sm text-ok' : 'text-sm text-danger'} role={msg.ok ? 'status' : 'alert'}>
           {msg.text}
         </p>
       )}
@@ -197,19 +202,19 @@ export function PiLinkCodeIssuer() {
   }, [issued])
 
   return (
-    <div className="flex max-w-sm flex-col gap-2 rounded border border-gray-200 p-4">
-      <p className="font-medium">{t('link.issuerTitle')}</p>
-      <p className="text-sm">{t('link.issuerHint')}</p>
+    <div className={PANEL}>
+      <p className="text-sm font-semibold text-ink">{t('link.issuerTitle')}</p>
+      <p className="text-sm text-ink-2">{t('link.issuerHint')}</p>
       {issued && (
         <>
-          <p className="font-mono text-3xl tracking-widest" aria-live="polite">
+          <p className="font-mono text-3xl tracking-widest text-ink tabular-nums" aria-live="polite">
             {issued.code}
           </p>
-          <p className="text-xs text-gray-500">{t('link.minutesLeft', { minutes: minutesLeft })}</p>
+          <p className="text-xs text-ink-3">{t('link.minutesLeft', { minutes: minutesLeft })}</p>
         </>
       )}
       {error && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="text-sm text-danger" role="alert">
           {error}
         </p>
       )}
@@ -237,29 +242,29 @@ export function PiLinkCodeIssuer() {
 export function LinkPanel() {
   const { user, source, isLoading, googleUnlinked, googleLinkError, piSignIn, piError } = useAppUser()
   const t = useTranslations()
-  if (isLoading && !user) return <p className="text-sm text-gray-600">{t('auth.checking')}</p>
+  if (isLoading && !user) return <p className="text-sm text-ink-3">{t('auth.checking')}</p>
   if (googleLinkError) return <LinkCheckFailed />
   if (googleUnlinked) return <LinkCodeForm />
   if (user && source === 'google')
     return (
-      <p className="text-sm" role="status">
-        {t.rich('link.linkedAs', { name: user.username ?? user.displayName, b: (c) => <b>{c}</b> })}{' '}
-        <Link href="/" className="underline">
+      <p className="text-sm text-ink-2" role="status">
+        {t.rich('link.linkedAs', { name: user.username ?? user.displayName, b: (c) => <b className="font-semibold text-ink">{c}</b> })}{' '}
+        <Link href="/" className="text-accent-ink hover:underline">
           {t('common.goHome')}
         </Link>
       </p>
     )
   if (user && source === 'pi') return <PiLinkCodeIssuer />
   return (
-    <div className="flex flex-col items-start gap-2">
-      <p className="text-sm">{t('auth.required')}</p>
-      <div className="flex gap-2">
-        <button type="button" className={BTN_PRIMARY} onClick={() => void piSignIn()}>
+    <div className={PANEL}>
+      <p className="text-sm text-ink-2">{t('auth.required')}</p>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" className={`${BTN_PRIMARY} btn-lg w-full sm:w-auto`} onClick={() => void piSignIn()}>
           {t('auth.piSignIn')}
         </button>
-        <GoogleLoginButton />
+        <GoogleLoginButton className={`${BTN} btn-lg w-full sm:w-auto`} />
       </div>
-      {piError && <p className="text-xs text-red-600">{piError}</p>}
+      {piError && <p className="text-xs text-danger">{piError}</p>}
     </div>
   )
 }

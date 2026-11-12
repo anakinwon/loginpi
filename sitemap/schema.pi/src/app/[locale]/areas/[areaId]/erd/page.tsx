@@ -11,7 +11,7 @@ import { piFetch } from '@pi/auth/client'
 //   자동 = 가까운 변 + 같은 변에 모인 선 고르게 나눔(modelpi/edge-geo.ts). 옮긴 선만 배치 저장 때 함께 저장(sql/034 mdl_dgm_rel)
 //  관계선 겹침 0(마스터 지시 2026-11-07 "관계선이 절대로 겹치면 안 됨") : 경로 = modelpi/edge-route.ts 격자 A*(박스 피함·같은 선분 공유 없음·교차는 건너뛰기 반원·라벨은 덜 겹치는 자리),
 //   작업 스레드(edge-route.worker.ts)에서 계산 — 엔터티·끝점을 옮기면 다시 계산, 결과가 오기 전 옮긴 관계만 예전 단순 경로(smoothstep). 인쇄·PNG·SVG 는 화면 그림 복사라 같은 경로
-//  인쇄(마스터 지시 2026-10-18) : 툴바 용지·방향 + '페이지 가이드' = 캔버스에 100% 크기 페이지 경계 점선(쪽 번호). 🖨 인쇄 = 미리보기(body 직속 포털)
+//  인쇄(마스터 지시 2026-10-18) : 툴바 용지·방향 + '페이지 가이드' = 캔버스에 100% 크기 페이지 경계 점선(쪽 번호). 인쇄 = 미리보기(body 직속 포털)
 //   — 화면 그림(.react-flow__viewport)을 복사해 쪽마다 위치만 바꿔 그림 : '한 장에 맞춤' 또는 '가이드대로 나눔(엔터티 없는 쪽 제외)', @page 용지 지정, 인쇄 때 미리보기 밖은 숨김
 //  표기법(마스터 지시 2026-10-18) : IE(ERwin 정보공학) / 바커(DA#) 선택(이 브라우저에 기억). 바커 = 둥근 박스·# * o, 선 반쪽 실선(필수)·점선(선택),
 //   까마귀발 = 여러 건, 식별 관계 = 자식 쪽 가로 막대(UID bar). 부모 쪽 반 = 부모의 자식 참여(chld_opt_yn), 자식 쪽 반 = 자식의 부모 참여(prnt_opt_yn)
@@ -21,6 +21,10 @@ import '@xyflow/react/dist/style.css'
 import { toPng, toSvg } from 'html-to-image'
 import { Background, BaseEdge, Controls, EdgeLabelRenderer, getNodesBounds, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, SelectionMode, useNodesState, useReactFlow, useStoreApi, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import { Link } from '@/i18n/navigation'
+import { Download, KeyRound, Pin, Plus, Pencil, Printer, TriangleAlert, X } from 'lucide-react'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 import { createContext, use, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { dbmsList } from '@/lib/modelpi/dbms'
@@ -85,7 +89,7 @@ type Nt = 'IE' | 'BK' // 표기법 : IE(ERwin 정보공학) / BK(바커, DA#)
 type EntData = { ent: Ent; lvl: Lvl; phy: boolean; fix: boolean; nt?: Nt; nmo?: Nmo }
 const NT_NM: Record<Nt, string> = { IE: 'IE 표기(ERwin)', BK: '바커 표기(DA#)' }
 const LEGEND: Record<Nt, string> = {
-  IE: '실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 🔑 주식별자(다홍) · ↗ 상속 FK(분홍) · * 필수',
+  IE: '실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 열쇠 = 주식별자(다홍) · ↗ 상속 FK(분홍) · * 필수',
   BK: '바커 표기 : 선 반쪽 실선 = 반드시(필수) · 점선 = 선택 · 까마귀발 = 여러 건 · 가로 막대 = 식별 관계(UID) · # 식별자(다홍) · 상속 FK(분홍) · * 필수 · o 선택',
 }
 type ENode = Node<EntData, 'ent'>
@@ -96,14 +100,14 @@ const LVL_NM: Record<Lvl, string> = { CNCP: '개념(이름)', LGCL: '논리(속�
 // 논리 데이터타입 이름(GET /api/types, 화면 진입 시 채움) — 데이터타입 보기 : NUMERIC(10,2)·VARCHAR(50)
 const LT: Record<string, string> = {}
 const tpText = (a: Attr) => (a.dom ? `${LT[a.dom.lgc_tp_cd] ?? a.dom.lgc_tp_cd}${a.dom.data_len ? `(${a.dom.data_len}${a.dom.data_scale ? `,${a.dom.data_scale}` : ''})` : ''}` : '')
-// 속성 줄 = 칸 배열(DA# 처럼 칸 정렬) — [기호, 이름, …옵션 칸]. IE : 🔑 주식별자·↗ 상속·· 일반 + 이름 끝 * 필수 / 바커 : # 식별자·* 필수·o 선택
+// 속성 줄 = 칸 배열(DA# 처럼 칸 정렬) — [기호, 이름, …옵션 칸]. IE : PK(열쇠 아이콘으로 그림) 주식별자·↗ 상속·· 일반 + 이름 끝 * 필수 / 바커 : # 식별자·* 필수·o 선택
 //  논리 : 속성명[보조]{동의어} · (컬럼명) · 도메인 / 물리 : 컬럼명[보조]{동의어} · 데이터타입 · 속성명 · 도메인 — 켠 옵션만 칸이 생김
 const cells = (e: Ent, lvl: Lvl, phy: boolean, nt: Nt = 'IE', o: Nmo = NMO_DEF): string[][] =>
   lvl === 'CNCP'
     ? []
     : e.attrs.map((a) => {
         const p = phy || lvl === 'PHY'
-        const mark = nt === 'BK' ? (a.pk_yn === 'Y' ? '#' : a.esntl_yn === 'Y' ? '*' : 'o') : a.pk_yn === 'Y' ? '🔑' : a.fk_rel_id ? '↗' : '·'
+        const mark = nt === 'BK' ? (a.pk_yn === 'Y' ? '#' : a.esntl_yn === 'Y' ? '*' : 'o') : a.pk_yn === 'Y' ? 'PK' : a.fk_rel_id ? '↗' : '·'
         const req = nt !== 'BK' && a.esntl_yn === 'Y' && a.pk_yn !== 'Y' ? ' *' : ''
         if (p)
           return [mark, `${a.term_phy_nm}${addOn(a.attr_asst_nm, a.term_syn, o.pColAsst, o.pColSyn)}${req}`, ...(o.pColTp ? [tpText(a)] : []), ...(o.pColAttr ? [a.term_log_nm] : []), ...(o.pColDom ? [a.dom_nm ?? ''] : [])]
@@ -162,7 +166,7 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
   const mk = vm?.ent[e.ent_id]
   const delA = vm?.delAttr[e.ent_id] ?? 0
   return (
-    <div style={{ minWidth: w, width: 'max-content', minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid', background: c.fill, boxShadow: mk ? `0 0 0 4px ${VER_C[mk]}` : undefined }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
+    <div style={{ minWidth: w, width: 'max-content', minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid', background: c.fill, boxShadow: mk ? `0 0 0 4px ${VER_C[mk]}` : undefined }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 text-xs shadow-1 ${selected ? 'ring-2 ring-accent' : ''}`}>
       {SIDES.map(([k, p]) => (
         <span key={k}>
           <Handle type="source" id={`s-${k}`} position={p} className="!h-1 !w-1 !border-0 !bg-transparent" />
@@ -171,27 +175,27 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
       ))}
       <div style={{ background: c.head, color: c.text, borderBottom: `1px solid ${c.border}` }} className="flex items-center gap-1 px-2 py-1 font-semibold">
         <span className="truncate" title={title(e, isPhy(lvl, phy), nmo)}>{title(e, isPhy(lvl, phy), nmo)}</span>
-        {fix && <span title="고정(자동 배치가 옮기지 않음)">📌</span>}
-        {mk && <span className="rounded px-1 text-[10px] text-white" style={{ background: VER_C[mk] }}>{VER_NM[mk]}</span>}
-        {delA > 0 && <span className="rounded px-1 text-[10px] text-white" style={{ background: VER_C.DEL }} title="기준 버전에 있던 속성이 지금은 없음">속성 삭제 {delA}</span>}
-        {e.ref && <span className="ml-auto rounded bg-white/60 px-1 text-[10px]">참조 · {e.subj_nm}</span>}
+        {fix && <Pin className="h-3 w-3 shrink-0" strokeWidth={1.75} aria-label="고정(자동 배치가 옮기지 않음)" />}
+        {mk && <span className="rounded-chip px-1 text-xs font-medium text-on-accent" style={{ background: VER_C[mk] }}>{VER_NM[mk]}</span>}
+        {delA > 0 && <span className="rounded-chip px-1 text-xs font-medium text-on-accent" style={{ background: VER_C.DEL }} title="기준 버전에 있던 속성이 지금은 없음">속성 삭제 {delA}</span>}
+        {e.ref && <span className="ms-auto rounded-chip bg-surface/60 px-1 text-xs font-normal">참조 · {e.subj_nm}</span>}
       </div>
       {/* 박스 너비 = 내용(표) 맞춤, 추정 크기는 최소 너비 — 관계선은 실측 크기(measured)로 붙음 */}
       {lvl !== 'CNCP' && (
-        <table className="mx-2 my-1 font-mono leading-[18px]">
+        <table data-grid className="mx-2 my-1 font-mono leading-[18px]">
           <tbody>
             {cells(e, lvl, phy, nt, nmo).map((r, i) => (
               <tr key={i} className={e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''} style={{ color: keyColor(e.attrs[i]), background: (vm && e.attrs[i] && VER_BG[vm.attr[e.attrs[i].attr_id]]) || undefined }}>
                 {r.map((c, j) => (
-                  <td key={j} className={`whitespace-nowrap ${j === 0 ? 'pr-1' : 'pr-3'} ${j > 1 ? 'font-normal text-gray-600' : ''}`}>
-                    {c}
+                  <td key={j} className={`whitespace-nowrap ${j === 0 ? 'pr-1' : 'pr-3'} ${j > 1 ? 'font-normal text-ink-2' : ''}`}>
+                    {j === 0 && c === 'PK' ? <KeyRound className="inline h-3 w-3 align-[-1px]" strokeWidth={2} aria-label="주식별자" /> : c}
                   </td>
                 ))}
               </tr>
             ))}
             {!e.attrs.length && (
               <tr>
-                <td className="text-gray-400">(속성 없음)</td>
+                <td className="text-ink-3">(속성 없음)</td>
               </tr>
             )}
           </tbody>
@@ -423,7 +427,7 @@ function Erd({ areaId }: { areaId: string }) {
       }}
       onDoubleClick={() => setPaneW((p) => { const v = { ...p, [k]: PANE[k].def }; keepPane(v); return v })}
     >
-      <span className="h-16 w-1.5 rounded-full bg-[#c7d2e6] group-hover:bg-[#3b5f9e]" />
+      <span className="h-16 w-1 rounded-chip bg-line-strong transition-colors group-hover:bg-accent" />
     </div>
   )
   useEffect(() => {
@@ -871,6 +875,7 @@ function Erd({ areaId }: { areaId: string }) {
     try {
       const opt = {
         backgroundColor: '#ffffff',
+        skipFonts: true, // 캔버스 = 시스템 글꼴(.erd-sheet) — 웹 글꼴(Plex 한글 조각) base64 내장 생략
         width: w,
         height: h,
         pixelRatio: kind === 'png' ? 2 : 1,
@@ -922,20 +927,44 @@ function Erd({ areaId }: { areaId: string }) {
   }, [ents])
   const prjSubjs = subjs.filter((s) => s.prj_id === prjId)
   const selIss = (chk?.issues ?? []).filter((i) => i.ent_id === sel)
-  const sel2 = 'rounded border border-white/60 bg-white px-2 py-1 text-gray-900'
-  const btn = 'rounded bg-white/20 px-3 py-1 hover:bg-white/30 disabled:opacity-40'
+  const sel2 = 'input-sm w-auto max-w-full'
+  const btn = 'btn-key btn-sm'
+  const chk2 = 'flex items-center gap-1.5 whitespace-nowrap text-dense text-ink-2'
+  const sep = <span className="h-5 w-px bg-line" aria-hidden />
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5 md:flex md:h-full md:flex-col">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-1 text-2xl font-bold">ERD</h1>
+    <main className="w-full px-4 py-2 lg:px-6 md:flex md:h-full md:flex-col">
+      <PageHead
+        dense
+        title="ERD"
+        info="순서 = 엔터티 작성완료 → 물리 전환 → 테이블 작성완료 → ERD. ERD 작성완료 = 배치·관계선 잠금, DDL 생성 대상"
+        actions={
+          <>
+            {dgmSts === 'CMPTN' && <span className="badge" data-tone="ok">작성완료</span>}
+            {lay && (
+              <button type="button" className={`${dirty ? 'btn-3d' : 'btn-key'} btn-sm`} disabled={!dirty || busy || !nodes.length} onClick={() => void save()}>
+                배치 저장{dirty ? ' *' : ''}
+              </button>
+            )}
+            {editor && subj && phyDone && (
+              dgmSts === 'CMPTN' ? (
+                <button type="button" className="btn-key btn-sm" disabled={busy} onClick={() => void setStage('WRT')} title="완료를 취소하면 배치·관계선을 다시 편집할 수 있습니다">
+                  완료 취소
+                </button>
+              ) : (
+                <button type="button" className="btn-3d btn-sm" disabled={busy || dirty || !nodes.length} onClick={() => void setStage('CMPTN')} title={dirty ? '배치를 먼저 저장하십시오' : '배치·관계선을 잠그고 DDL 생성 대상으로'}>
+                  ERD 작성완료
+                </button>
+              )
+            )}
+          </>
+        }
+      />
       {markers('')}
 
-      <section className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#c7d2e6] bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow-md" aria-label="ERD 설정">
+      <section className="panel mt-1 flex flex-wrap items-center gap-2 px-3 py-2" aria-label="ERD 설정">
         <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setSubj(''), setPhyId(''), setPhyModels(null), setSel(null))} className={sel2} aria-label="프로젝트 선택">
-          {prjs.length === 0 && <option value="">프로젝트가 없습니다</option>}
+          {prjs.length === 0 && <option value="">프로젝트 없음</option>}
           {prjs.map((p) => (
             <option key={p.prj_id} value={p.prj_id}>
               {p.prj_nm}
@@ -974,158 +1003,153 @@ function Erd({ areaId }: { areaId: string }) {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-1">
+        <label className={chk2}>
           <input type="checkbox" checked={phy} onChange={(e) => setPhy(e.target.checked)} /> 물리명
         </label>
-        <button type="button" className="rounded bg-white/20 px-2 py-1 hover:bg-white/30" onClick={() => setNmoDraft(nmo)} title="DA# 개체명 보기옵션 — 보조명·동의어·도메인·논리명 병기">
+        <label className={chk2} title="관계로 이어진 다른 주제영역 엔터티를 점선 박스로 함께 표시">
+          <input type="checkbox" checked={showRef} onChange={(e) => (setShowRef(e.target.checked), setSel(null))} /> 참조 표시
+        </label>
+        <button type="button" className={btn} onClick={() => setNmoDraft(nmo)} title="DA# 개체명 보기옵션 — 보조명·동의어·도메인·논리명 병기">
           개체명 보기옵션
         </button>
-        <label className="flex items-center gap-1" title="관계로 이어진 다른 주제영역 엔터티를 점선 박스로 함께 표시">
-          <input type="checkbox" checked={showRef} onChange={(e) => (setShowRef(e.target.checked), setSel(null))} /> 다른 주제영역 참조 표시
+        {sep}
+        <button type="button" className={btn} disabled={!lay || !nodes.length} onClick={() => arrange('all')}>
+          자동 배치
+        </button>
+        <button type="button" className={btn} disabled={!lay || !nodes.length} onClick={() => arrange('new')}>
+          새 엔터티만 배치
+        </button>
+        <button type="button" className={btn} disabled={!undo} onClick={revert}>
+          되돌리기
+        </button>
+        <button type="button" className={btn} disabled={!prjId} onClick={() => setVerOpen(true)} title="프로젝트 논리 모델 스냅샷 저장·두 버전(또는 현재) 비교">
+          버전
+        </button>
+        {sep}
+        <select value={pr.paper} onChange={(e) => changePaper({ paper: e.target.value })} className={sel2} aria-label="인쇄 용지">
+          {Object.keys(PAPER).map((k) => (
+            <option key={k} value={k}>
+              {k}
+            </option>
+          ))}
+        </select>
+        <select value={pr.orient} onChange={(e) => changePaper({ orient: e.target.value as Orient })} className={sel2} aria-label="인쇄 방향">
+          <option value="landscape">가로</option>
+          <option value="portrait">세로</option>
+        </select>
+        <label className={chk2} title="100% 크기 인쇄 쪽 경계를 점선으로 표시">
+          <input type="checkbox" checked={pr.guide} onChange={(e) => setPr({ ...pr, guide: e.target.checked })} /> 페이지 가이드
         </label>
-        <span className="ml-auto flex flex-wrap gap-2">
-          <button type="button" className={btn} disabled={!lay || !nodes.length} onClick={() => arrange('all')}>
-            자동 배치
+        <label className={chk2} title="오른쪽 아래 전체 미리보기(작은 지도) 보이기·숨기기">
+          <input type="checkbox" checked={mini} onChange={(e) => toggleMini(e.target.checked)} /> 미리보기
+        </label>
+        <span className="flex items-center gap-1">
+          <button type="button" className="btn-ghost btn-sm" disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 — 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
+            <Printer aria-hidden />
+            인쇄
           </button>
-          <button type="button" className={btn} disabled={!lay || !nodes.length} onClick={() => arrange('new')}>
-            새 엔터티만 배치
-          </button>
-          <button type="button" className={btn} disabled={!undo} onClick={revert}>
-            되돌리기
-          </button>
-          <select value={pr.paper} onChange={(e) => changePaper({ paper: e.target.value })} className={sel2} aria-label="인쇄 용지">
-            {Object.keys(PAPER).map((k) => (
-              <option key={k} value={k}>
-                {k}
-              </option>
-            ))}
-          </select>
-          <select value={pr.orient} onChange={(e) => changePaper({ orient: e.target.value as Orient })} className={sel2} aria-label="인쇄 방향">
-            <option value="landscape">가로</option>
-            <option value="portrait">세로</option>
-          </select>
-          <label className="flex items-center gap-1" title="100% 크기 인쇄 쪽 경계를 점선으로 표시">
-            <input type="checkbox" checked={pr.guide} onChange={(e) => setPr({ ...pr, guide: e.target.checked })} /> 페이지 가이드
-          </label>
-          <label className="flex items-center gap-1" title="오른쪽 아래 전체 미리보기(작은 지도) 보이기·숨기기">
-            <input type="checkbox" checked={mini} onChange={(e) => toggleMini(e.target.checked)} /> 미리보기
-          </label>
-          <button type="button" className={btn} disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 — 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
-            🖨 인쇄
-          </button>
-          <button type="button" className={btn} disabled={!nodes.length || busy} onClick={() => void exportImg('png')} title="ERD 전체를 PNG 이미지로 내려받기(100% 크기·2배 해상도, 손잡이·가이드 제외)">
+          <button type="button" className="btn-ghost btn-sm" disabled={!nodes.length || busy} onClick={() => void exportImg('png')} title="ERD 전체를 PNG 이미지로 내려받기(100% 크기·2배 해상도, 손잡이·가이드 제외)">
+            <Download aria-hidden />
             PNG
           </button>
-          <button type="button" className={btn} disabled={!nodes.length || busy} onClick={() => void exportImg('svg')} title="ERD 전체를 SVG 로 내려받기(확대해도 선명)">
+          <button type="button" className="btn-ghost btn-sm" disabled={!nodes.length || busy} onClick={() => void exportImg('svg')} title="ERD 전체를 SVG 로 내려받기(확대해도 선명)">
+            <Download aria-hidden />
             SVG
           </button>
-          <button type="button" className={btn} disabled={!prjId} onClick={() => setVerOpen(true)} title="프로젝트 논리 모델 스냅샷 저장·두 버전(또는 현재) 비교">
-            버전
-          </button>
-          {lay && (
-            <button type="button" className="rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40" disabled={!dirty || busy || !nodes.length} onClick={() => void save()}>
-              배치 저장{dirty ? ' *' : ''}
-            </button>
-          )}
-          {dgmSts === 'CMPTN' && <span className="rounded bg-emerald-500 px-2 py-1 font-semibold">ERD 작성완료</span>}
-          {editor && subj && phyDone && (
-            dgmSts === 'CMPTN' ? (
-              <button type="button" className={btn} disabled={busy} onClick={() => void setStage('WRT')} title="완료를 취소하면 배치·관계선을 다시 편집할 수 있습니다">
-                완료 취소
-              </button>
-            ) : (
-              <button type="button" className="rounded bg-emerald-500 px-3 py-1 font-semibold hover:bg-emerald-600 disabled:opacity-40" disabled={busy || dirty || !nodes.length} onClick={() => void setStage('CMPTN')} title={dirty ? '배치를 먼저 저장하십시오' : '배치·관계선을 잠그고 DDL 생성 대상으로'}>
-                ERD 작성완료
-              </button>
-            )
-          )}
         </span>
       </section>
-      {phyModels && phyModels.length === 0 && (
-        <p className="mt-2 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="note">
-          이 프로젝트에는 아직 물리 모델이 없습니다. 순서는 논리 모델 → 물리 모델 → ERD 입니다 —{' '}
-          <Link href={`/areas/${areaId}/physical`} className="font-semibold underline">
-            물리 모델에서 먼저 전환
-          </Link>
-          하십시오.
-        </p>
-      )}
-      {phyModels && phyModels.length > 0 && !phyDone && (
-        <p className="mt-2 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="note">
-          이 주제영역에 작성완료된 테이블이 없습니다. 순서는 엔터티 작성완료 → 물리 전환 → 테이블 작성완료 → ERD 입니다 —{' '}
-          <Link href={`/areas/${areaId}/physical`} className="font-semibold underline">
-            물리 모델에서 엔터티 전환·테이블 작성완료
-          </Link>
-          하십시오.
-        </p>
-      )}
-      {phyModels && phyModels.length > 0 && phyDone && hidden > 0 && (
-        <p className="mt-2 text-sm text-amber-800" role="note">
-          작성완료 테이블이 아닌 엔터티 {hidden}개는 표시하지 않습니다 —{' '}
-          <Link href={`/areas/${areaId}/physical`} className="underline">
-            물리 모델에서 전환·작성완료
-          </Link>
-          하면 보입니다.
-        </p>
-      )}
-      {(rtLim.far.size > 0 || rtLim.big) && (
-        <p className="mt-2 text-sm text-amber-800" role="note">
-          {rtLim.far.size > 0 ? `좌표가 ±${ROUTE_MAX.crd.toLocaleString()}px 밖이거나 크기가 비정상인 엔터티 ${rtLim.far.size}개는 관계선 경로 계산에서 빼고` : '그림 범위가 너무 넓어 관계선 경로 계산을 건너뛰고'} 단순 경로로 그립니다 — 멀리 떨어진 엔터티를 옮기거나 자동 배치 후 저장하면 정리됩니다.
-        </p>
-      )}
-      {boxOvl > 0 && (
-        <p className="mt-2 text-sm text-amber-800" role="note">
-          엔터티 박스 {boxOvl}쌍이 서로 겹쳐 있습니다(저장된 위치) — 관계선이 겹친 박스 사이를 지나지 못해 테두리로 돌아갈 수 있습니다. {lay ? '툴바 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.' : '작성완료 ERD 는 완료 취소 후 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.'}
-        </p>
+      {((phyModels && phyModels.length > 0 && phyDone && hidden > 0) || rtLim.far.size > 0 || rtLim.big || boxOvl > 0) && (
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1" role="note">
+          {phyModels && phyModels.length > 0 && phyDone && hidden > 0 && (
+            <span className="inline-flex items-center gap-0.5">
+              <span className="badge" data-tone="warn">
+                <TriangleAlert className="h-3 w-3" aria-hidden />
+                미표시 {hidden}
+              </span>
+              <InfoTip label="미표시 엔터티">
+                작성완료 테이블이 아닌 엔터티 {hidden}개는 표시하지 않습니다 —{' '}
+                <Link href={`/areas/${areaId}/physical`} className="text-accent-ink hover:underline">
+                  물리 모델에서 전환·작성완료
+                </Link>
+                하면 보입니다.
+              </InfoTip>
+            </span>
+          )}
+          {(rtLim.far.size > 0 || rtLim.big) && (
+            <span className="inline-flex items-center gap-0.5">
+              <span className="badge" data-tone="warn">
+                <TriangleAlert className="h-3 w-3" aria-hidden />
+                단순 경로{rtLim.far.size > 0 ? ` ${rtLim.far.size}` : ''}
+              </span>
+              <InfoTip label="관계선 단순 경로">
+                {rtLim.far.size > 0 ? `좌표가 ±${ROUTE_MAX.crd.toLocaleString()}px 밖이거나 크기가 비정상인 엔터티 ${rtLim.far.size}개는 관계선 경로 계산에서 빼고` : '그림 범위가 너무 넓어 관계선 경로 계산을 건너뛰고'} 단순 경로로 그립니다 — 멀리 떨어진 엔터티를 옮기거나 자동 배치 후 저장하면 정리됩니다.
+              </InfoTip>
+            </span>
+          )}
+          {boxOvl > 0 && (
+            <span className="inline-flex items-center gap-0.5">
+              <span className="badge" data-tone="warn">
+                <TriangleAlert className="h-3 w-3" aria-hidden />
+                겹침 {boxOvl}
+              </span>
+              <InfoTip label="박스 겹침">
+                엔터티 박스 {boxOvl}쌍이 서로 겹쳐 있습니다(저장된 위치) — 관계선이 겹친 박스 사이를 지나지 못해 테두리로 돌아갈 수 있습니다. {lay ? '툴바 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.' : '작성완료 ERD 는 완료 취소 후 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.'}
+              </InfoTip>
+            </span>
+          )}
+        </div>
       )}
       {msg && (
-        <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">
+        <p role="status" className="mt-2 text-dense text-ink-2">
           {msg}
         </p>
       )}
       {verShow && verMark && (
-        <div role="status" className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-sm">
-          <span className="font-semibold">버전 차이 표시 : {verShow.title}</span>
+        <div role="status" className="panel mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 text-dense">
+          <span className="font-medium text-ink">버전 차이 : {verShow.title}</span>
           {(['INS', 'UPD'] as const).map((k) => (
-            <span key={k} className="flex items-center gap-1">
-              <span className="inline-block h-3 w-3 rounded-sm" style={{ background: VER_C[k] }} /> {VER_NM[k]}
+            <span key={k} className="flex items-center gap-1 text-ink-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-chip" style={{ background: VER_C[k] }} /> {VER_NM[k]}
             </span>
           ))}
-          <span>추가 {verShow.cnt.ins} · 변경 {verShow.cnt.upd} · 삭제 {verShow.cnt.del}</span>
-          {verMark.delEnt + verMark.delRel > 0 && <span className="text-red-700">삭제된 엔터티 {verMark.delEnt}·관계 {verMark.delRel} 는 캔버스에 없음(버전 패널 목록 참고)</span>}
-          <button type="button" className="ml-auto rounded border border-emerald-400 px-2 py-0.5 hover:bg-emerald-100" onClick={() => setVerShow(null)}>
+          <span className="text-ink-2 tabular-nums">
+            추가 {verShow.cnt.ins} · 변경 {verShow.cnt.upd} · 삭제 {verShow.cnt.del}
+          </span>
+          {verMark.delEnt + verMark.delRel > 0 && <span className="text-danger">삭제된 엔터티 {verMark.delEnt}·관계 {verMark.delRel} 는 캔버스에 없음(버전 패널 목록 참고)</span>}
+          <button type="button" className="btn-ghost btn-sm ms-auto" onClick={() => setVerShow(null)}>
             표시 끄기
           </button>
         </div>
       )}
 
-      <div className="mt-3 grid h-[72vh] gap-3 md:h-auto md:min-h-[26rem] md:flex-1 md:grid-cols-[var(--erd-l)_10px_minmax(0,1fr)_10px_var(--erd-r)] md:gap-0" style={{ ["--erd-l" as string]: `${paneW.l}px`, ["--erd-r" as string]: `${paneW.r}px` }}>
-        <nav className="overflow-auto rounded border text-sm" aria-label="모델 트리">
+      <div className="mt-2 grid h-[72vh] gap-3 md:h-auto md:min-h-[26rem] md:flex-1 md:grid-cols-[var(--erd-l)_10px_minmax(0,1fr)_10px_var(--erd-r)] md:gap-0" style={{ ["--erd-l" as string]: `${paneW.l}px`, ["--erd-r" as string]: `${paneW.r}px` }}>
+        <nav className="panel overflow-auto text-dense" aria-label="모델 트리">
           {tree.map(([nm, es]) => (
             <details key={nm} open>
-              <summary className="cursor-pointer bg-[#e9eff9] px-2 py-1 font-semibold">
-                {nm} <span className="text-xs text-gray-500">({es.length})</span>
+              <summary className="cursor-pointer border-b border-line bg-raised px-3 py-1.5 font-medium text-ink">
+                {nm} <span className="font-mono text-xs text-ink-3 tabular-nums">{es.length}</span>
               </summary>
               <ul>
                 {es.map((e) => (
                   <li key={e.ent_id}>
-                    <button type="button" onClick={() => focus(e.ent_id)} aria-current={sel === e.ent_id} className={`w-full truncate px-3 py-1 text-left ${sel === e.ent_id ? 'bg-amber-100' : 'hover:bg-gray-50'}`}>
-                      <span style={{ color: entTpColor(e.ent_tp_cd).border }}>■</span> {isPhy(lvl, phy) ? `${e.tbl_phy_nm} (${e.ent_log_nm})` : e.ent_log_nm}
-                      {e.ref && <span className="ml-1 text-xs text-gray-500">참조</span>}
+                    <button type="button" onClick={() => focus(e.ent_id)} aria-current={sel === e.ent_id} className={`flex w-full items-center gap-2 px-3 py-1 text-start transition-colors ${sel === e.ent_id ? 'bg-accent-soft text-ink' : 'text-ink-2 hover:bg-raised hover:text-ink'}`}>
+                      <span className="inline-block h-2 w-2 shrink-0 rounded-[2px]" style={{ background: entTpColor(e.ent_tp_cd).border }} aria-hidden />
+                      <span className="truncate">{isPhy(lvl, phy) ? `${e.tbl_phy_nm} (${e.ent_log_nm})` : e.ent_log_nm}</span>
+                      {e.ref && <span className="badge ms-auto">참조</span>}
                     </button>
                   </li>
                 ))}
               </ul>
             </details>
           ))}
-          {!ents.length && <p className="p-3 text-gray-500">엔터티가 없습니다(논리 모델에서 등록)</p>}
+          {!ents.length && <p className="p-3 text-ink-3">엔터티 없음</p>}
         </nav>
         {splitter('l')}
 
         {/* 오른쪽 끌기로 화면 이동할 때 브라우저 메뉴 막음 — 빈 곳뿐 아니라 엔터티·관계선·선택 상자 위에서 떼도(onPaneContextMenu 는 빈 곳만, 2026-10-20 검증 지적) */}
         <div
           ref={canvasRef}
-          className="rounded border"
+          className="erd-sheet relative overflow-hidden rounded-card border border-line"
           aria-label="ERD 캔버스"
           onContextMenu={(e) => e.preventDefault()}
         >
@@ -1169,15 +1193,15 @@ function Erd({ areaId }: { areaId: string }) {
             // 처음 화면 맞춤은 load()가 함(기억한 위치가 있으면 그 위치) — fitView 속성은 그 뒤에 다시 맞춰 기억 위치를 덮으므로 쓰지 않음
             proOptions={{ hideAttribution: false }}
           >
-            <Background gap={20} size={1} />
+            <Background gap={20} size={1} color="rgba(16,24,40,0.14)" />
             {pr.guide && (
               <ViewportPortal>
                 {Array.from({ length: page.grid.rows * page.grid.cols }, (_, i) => {
                   const c = i % page.grid.cols, r = Math.floor(i / page.grid.cols)
                   const t = page.grid.tiles.find((x) => x.c === c && x.r === r)
                   return (
-                    <div key={i} className="pointer-events-none absolute border-2 border-dashed border-sky-500/70" style={{ left: page.grid.x0 + c * page.cw, top: page.grid.y0 + r * page.ch, width: page.cw, height: page.ch }}>
-                      <span className="absolute top-1 left-2 text-xs font-semibold text-sky-600/80">{t ? `${t.no}쪽` : '(빈 쪽 — 인쇄 안 함)'} · {pr.paper} {pr.orient === 'landscape' ? '가로' : '세로'}</span>
+                    <div key={i} className="pointer-events-none absolute border-2 border-dashed border-accent/50" style={{ left: page.grid.x0 + c * page.cw, top: page.grid.y0 + r * page.ch, width: page.cw, height: page.ch }}>
+                      <span className="absolute top-1 left-2 text-xs font-medium text-accent-ink/80">{t ? `${t.no}쪽` : '(빈 쪽 — 인쇄 안 함)'} · {pr.paper} {pr.orient === 'landscape' ? '가로' : '세로'}</span>
                     </div>
                   )
                 })}
@@ -1187,122 +1211,159 @@ function Erd({ areaId }: { areaId: string }) {
             {mini && <MiniMap pannable zoomable nodeColor={(n) => entTpColor((n.data as EntData).ent.ent_tp_cd).border} />}
           </ReactFlow>
           </MarkCtx.Provider>
+          {/* 화면 단위 빈 상태 — 그릴 엔터티가 없을 때 사유 한 줄(물리 모델 없음·작성완료 테이블 없음) + 이동 */}
+          {phyModels && !ents.length && (
+            <div className="empty absolute inset-0 z-10 justify-center bg-surface/80">
+              <Icon3D icon={MENU_ICON.erd} />
+              <p>{phyModels.length === 0 ? '물리 모델 없음' : !phyDone ? '작성완료 테이블 없음' : '엔터티 없음'}</p>
+              {(phyModels.length === 0 || !phyDone) && (
+                <Link href={`/areas/${areaId}/physical`} className="btn-key btn-sm">
+                  물리 모델로
+                </Link>
+              )}
+            </div>
+          )}
         </div>
         {splitter('r')}
 
-        <aside className="overflow-auto rounded border p-3 text-sm" aria-label="엔터티 정보">
+        <aside className="panel overflow-auto p-3 text-dense" aria-label="엔터티 정보">
           {editor && !form && (
-            <button type="button" onClick={() => setForm('new')} disabled={!prjSubjs.length} className="mb-2 rounded border px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-40">
-              ＋ 엔터티 추가
+            <button type="button" onClick={() => setForm('new')} disabled={!prjSubjs.length} className="btn-key btn-sm mb-3">
+              <Plus aria-hidden />
+              엔터티 추가
             </button>
           )}
           {form === 'new' && <EntForm key="new" api={api} areaId={areaId} subjs={prjSubjs} onDone={formDone} onCancel={() => setForm(null)} />}
           {form === 'edit' && selEnt && <EntForm key={`edit-${selEnt.ent_id}-${selEnt.ver_no}`} api={api} areaId={areaId} subjs={prjSubjs} init={selEnt} onDone={formDone} onCancel={() => setForm(null)} />}
           {selEnt && !form ? (
             <>
-              <h2 className="font-semibold text-[#1f3a68]">{selEnt.ent_log_nm}</h2>
-              <p className="font-mono text-xs text-gray-600">{selEnt.tbl_phy_nm}</p>
-              <p className="mt-1 text-xs">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h2 className="truncate text-sm font-semibold text-ink">{selEnt.ent_log_nm}</h2>
+                  <span className="chip-phy mt-1">{selEnt.tbl_phy_nm}</span>
+                </div>
+                {editor && (
+                  <button type="button" onClick={() => setForm('edit')} aria-label="엔터티 수정" title="엔터티 수정" className="btn-ghost btn-icon btn-sm">
+                    <Pencil aria-hidden />
+                  </button>
+                )}
+              </div>
+              <p className="mt-2 text-xs text-ink-3">
                 {selEnt.subj_nm} · {ENT_TP[selEnt.ent_tp_cd as EntTp] ?? selEnt.ent_tp_cd}
                 {selEnt.ref && ' · 다른 주제영역(참조)'}
               </p>
-              {selEnt.ent_desc && <p className="mt-1 text-xs text-gray-700">{selEnt.ent_desc}</p>}
-              {editor && (
-                <button type="button" onClick={() => setForm('edit')} className="mt-2 mr-2 rounded border px-2 py-0.5 text-xs hover:bg-gray-50">
-                  엔터티 수정
-                </button>
-              )}
+              {selEnt.ent_desc && <p className="mt-1 text-xs text-ink-2">{selEnt.ent_desc}</p>}
               {selIss.length > 0 && (
-                <ul className="mt-2 list-disc pl-4 text-xs text-red-700" aria-label="이 엔터티 검토 결과">
+                <ul className="mt-2 list-disc ps-4 text-xs text-danger" aria-label="이 엔터티 검토 결과">
                   {selIss.map((i, k) => (
                     <li key={k}>{i.msg}</li>
                   ))}
                 </ul>
               )}
               {lay && (
-                <label className="mt-2 flex items-center gap-1">
-                  <input type="checkbox" checked={!!byId.get(selEnt.ent_id)?.data.fix} onChange={() => toggleFix(selEnt.ent_id)} /> 위치 고정(자동 배치 제외)
+                <label className="mt-2 flex items-center gap-2 text-ink-2">
+                  <input type="checkbox" checked={!!byId.get(selEnt.ent_id)?.data.fix} onChange={() => toggleFix(selEnt.ent_id)} /> 위치 고정
                 </label>
               )}
-              <p className="mt-2 text-xs text-gray-600">관계 {rels.filter((r) => r.prnt_ent_id === selEnt.ent_id || r.chld_ent_id === selEnt.ent_id).length}건(아래 관계 편집)</p>
+              <p className="mt-2 text-xs text-ink-3">관계 {rels.filter((r) => r.prnt_ent_id === selEnt.ent_id || r.chld_ent_id === selEnt.ent_id).length}건</p>
               <div className="mt-2">
                 <Attrs key={selEnt.ent_id} api={api} areaId={areaId} entId={selEnt.ent_id} entNm={selEnt.ent_log_nm} editor={editor} onChanged={refresh} />
               </div>
             </>
           ) : form ? null : selRelObj ? (
             <>
-              <h2 className="font-semibold text-[#1f3a68]">관계선</h2>
-              <p className="mt-1 text-xs">
+              <div className="flex items-center gap-1">
+                <h2 className="text-sm font-semibold text-ink">관계선</h2>
+                {lay && (
+                  <InfoTip label="선 위치 조정">
+                    흰 원 = 끝점 : 끌면 박스 변을 따라 움직이고, 다른 변 가까이 놓으면 그 변으로 옮겨 갑니다. 주황 네모 = 꺾임점 : 끌면 가운데 선이 옮겨집니다. 손잡이를 두 번 누르거나 아래 버튼 = 자동 위치.
+                  </InfoTip>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-ink-2">
                 {entNm(selRelObj.prnt_ent_id)} → {entNm(selRelObj.chld_ent_id)}
                 {selRelObj.rel_nm && ` · ${selRelObj.rel_nm}`} · {selRelObj.idnt_yn === 'Y' ? '식별' : '비식별'}
               </p>
-              <p className="mt-1 text-xs text-gray-600">{lyt[selRelObj.rel_id] ? '위치를 옮긴 선(배치 저장 때 함께 저장)' : '자동 위치(가까운 변, 같은 변의 선은 고르게 나눔)'}</p>
+              <p className="mt-1 text-xs text-ink-3">{lyt[selRelObj.rel_id] ? '옮긴 위치(배치 저장 때 함께 저장)' : '자동 위치'}</p>
               {lay ? (
-                <>
-                  <ul className="mt-2 list-disc pl-4 text-xs text-gray-700">
-                    <li>흰 원 = 끝점 : 끌면 박스 변을 따라 움직이고, 다른 변 가까이 놓으면 그 변으로 옮겨 갑니다</li>
-                    <li>주황 네모 = 꺾임점 : 끌면 가운데 선이 옮겨집니다</li>
-                    <li>손잡이를 두 번 누르거나 아래 버튼 = 자동 위치</li>
-                  </ul>
-                  <button type="button" disabled={!lyt[selRelObj.rel_id]} onClick={() => resetRel(selRelObj.rel_id)} className="mt-2 rounded border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-40">
-                    선 위치 초기화(자동)
-                  </button>
-                </>
+                <button type="button" disabled={!lyt[selRelObj.rel_id]} onClick={() => resetRel(selRelObj.rel_id)} className="btn-key btn-sm mt-2">
+                  선 위치 초기화
+                </button>
               ) : (
-                <p className="mt-2 text-xs text-gray-500">{editor ? 'ERD 작성완료 : 선 위치는 완료 취소 후 옮길 수 있습니다' : '조회 권한 : 선 위치는 편집 권한이 있을 때 옮길 수 있습니다'}</p>
+                <p className="mt-2 text-xs text-ink-3">{editor ? 'ERD 작성완료 : 선 위치는 완료 취소 후 옮길 수 있습니다' : '조회 권한 : 선 위치는 편집 권한이 있을 때 옮길 수 있습니다'}</p>
               )}
             </>
           ) : (
-            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. {lay ? '빈 곳을 왼쪽 버튼으로 끌면 여러 엔터티 선택(Ctrl+클릭 추가) → 하나를 끌면 함께 이동, 화면 이동은 오른쪽·가운데 버튼 끌기' : '작성완료·조회 권한은 엔터티 이동 불가 — 끌기 = 화면 이동(옮기려면 완료 취소)'}. {LEGEND[nt]}</p>
+            <div className="flex items-center gap-1 text-ink-3">
+              <span>엔터티·관계선 선택</span>
+              <InfoTip label="범례" align="end">
+                엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. {lay ? '빈 곳을 왼쪽 버튼으로 끌면 여러 엔터티 선택(Ctrl+클릭 추가) → 하나를 끌면 함께 이동, 화면 이동은 오른쪽·가운데 버튼 끌기' : '작성완료·조회 권한은 엔터티 이동 불가 — 끌기 = 화면 이동(옮기려면 완료 취소)'}. {LEGEND[nt]}
+              </InfoTip>
+            </div>
           )}
         </aside>
       </div>
 
       {chk && (
-        <section className="mt-3 rounded border p-3 text-sm" aria-label="검토 결과">
-          <h2 className="font-semibold text-[#1f3a68]">검토 결과(논리 모델 점검)</h2>
-          <p className="mt-1">
-            주식별자 없음 {chk.summary.no_pk} · FK 누락 {chk.summary.fk_missing} · 수정 필요 {chk.summary.issues} · 검토 {chk.summary.reviews}
-            {!chk.summary.no_pk && !chk.summary.fk_missing && !chk.summary.issues ? <span className="ml-2 text-green-700">물리 전환 가능</span> : <span className="ml-2 text-amber-700">물리 전환 전 해결 필요</span>}
-          </p>
-          <details className="mt-1">
-            <summary className="cursor-pointer text-xs text-gray-600">이슈 {chk.issues.length}건 보기(누르면 해당 엔터티로 이동)</summary>
-            <ul className="mt-1 max-h-48 overflow-auto text-xs">
-              {chk.issues.map((i, k) => (
-                <li key={k}>
-                  <button type="button" className="text-left hover:underline" onClick={() => focus(i.ent_id)}>
-                    [{i.kind}] {ents.find((e) => e.ent_id === i.ent_id)?.ent_log_nm ?? ''} — {i.msg}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </details>
+        <section className="panel mt-3" aria-label="검토 결과">
+          <h2 className="panel-head">
+            검토 결과
+            {!chk.summary.no_pk && !chk.summary.fk_missing && !chk.summary.issues ? (
+              <span className="badge ms-auto" data-tone="ok">
+                물리 전환 가능
+              </span>
+            ) : (
+              <span className="badge ms-auto" data-tone="warn">
+                물리 전환 전 해결 필요
+              </span>
+            )}
+          </h2>
+          <div className="panel-body text-dense">
+            <p className="text-ink-2 tabular-nums">
+              주식별자 없음 {chk.summary.no_pk} · FK 누락 {chk.summary.fk_missing} · 수정 필요 {chk.summary.issues} · 검토 {chk.summary.reviews}
+            </p>
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs text-accent-ink hover:underline">이슈 {chk.issues.length}건</summary>
+              <ul className="mt-1 max-h-48 overflow-auto text-xs">
+                {chk.issues.map((i, k) => (
+                  <li key={k}>
+                    <button type="button" className="py-0.5 text-start text-ink-2 hover:text-ink hover:underline" onClick={() => focus(i.ent_id)}>
+                      <span className="badge me-1">{i.kind}</span>
+                      {ents.find((e) => e.ent_id === i.ent_id)?.ent_log_nm ?? ''} — {i.msg}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </div>
         </section>
       )}
       {prjId && (
-        <details className="mt-3 rounded border p-3 text-sm">
-          <summary className="cursor-pointer font-semibold text-[#1f3a68]">관계 편집(등록·수정·삭제·FK 상속·N:M 해소)</summary>
-          <Relations api={api} prjId={prjId} editor={editor} entsKey={ents.length} onSaved={refresh} />
+        <details className="panel mt-3 text-dense">
+          <summary className="panel-head cursor-pointer">관계 편집</summary>
+          <div className="panel-body">
+            <Relations api={api} prjId={prjId} editor={editor} entsKey={ents.length} onSaved={refresh} />
+          </div>
         </details>
       )}
       {nmoDraft && (
-        <div className="fixed inset-0 z-[900] grid place-items-center bg-black/30" onClick={() => setNmoDraft(null)}>
-          <div role="dialog" aria-label="개체명 보기옵션" className="w-80 rounded-lg border bg-white text-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b px-3 py-2">
-              <strong>개체명 보기옵션</strong>
-              <button type="button" onClick={() => setNmoDraft(null)} aria-label="닫기" className="text-gray-500">
-                ✕
+        <div className="fixed inset-0 z-[900] grid place-items-center bg-[rgb(16_24_40/0.4)] p-4" onClick={() => setNmoDraft(null)}>
+          <div role="dialog" aria-label="개체명 보기옵션" className="w-80 max-w-full rounded-sheet border border-line bg-surface text-dense shadow-2" onClick={(e) => e.stopPropagation()}>
+            <div className="panel-head justify-between">
+              개체명 보기옵션
+              <button type="button" onClick={() => setNmoDraft(null)} aria-label="닫기" title="닫기" className="btn-ghost btn-icon btn-sm">
+                <X aria-hidden />
               </button>
             </div>
-            <div className="max-h-[70vh] overflow-auto p-2">
+            <div className="max-h-[70vh] space-y-3 overflow-auto p-3">
               {NMO_FORM.map(([grp, secs]) => (
-                <div key={grp} className="mb-2 rounded border">
-                  <div className="bg-gray-100 px-2 py-1 font-semibold">{grp}</div>
+                <div key={grp} className="overflow-hidden rounded-card border border-line">
+                  <div className="bg-raised px-3 py-1.5 font-semibold text-ink">{grp}</div>
                   {secs.map(([sec, items]) => (
                     <div key={sec}>
-                      <div className="bg-gray-50 px-3 py-0.5 text-xs font-semibold text-gray-700">{sec}</div>
+                      <div className="border-t border-line px-3 py-1 text-xs font-medium text-ink-3">{sec}</div>
                       {items.map(([k, nm]) => (
-                        <label key={k} className="flex items-center justify-between border-t px-4 py-1 hover:bg-gray-50">
+                        <label key={k} className="flex items-center justify-between border-t border-line px-4 py-1.5 text-ink-2 transition-colors hover:bg-raised">
                           {nm}
                           <input type="checkbox" checked={nmoDraft[k]} onChange={(e) => setNmoDraft({ ...nmoDraft, [k]: e.target.checked })} />
                         </label>
@@ -1311,17 +1372,17 @@ function Erd({ areaId }: { areaId: string }) {
                   ))}
                 </div>
               ))}
-              <p className="px-1 text-xs text-gray-500">표시 : [보조명] · {'{동의어}'} · 물리에서 (논리명) — 논리/물리는 '물리명'·표시 수준(물리)에 따름</p>
+              <p className="hint">[보조명] · {'{동의어}'} · 물리에서 (논리명)</p>
             </div>
-            <div className="flex justify-end gap-2 border-t px-3 py-2">
-              <button type="button" onClick={() => setNmoDraft(NMO_DEF)} className="mr-auto text-xs text-gray-600 underline">
+            <div className="flex justify-end gap-2 border-t border-line px-3 py-2">
+              <button type="button" onClick={() => setNmoDraft(NMO_DEF)} className="btn-ghost btn-sm me-auto">
                 기본값
               </button>
-              <button type="button" onClick={() => applyNmo(nmoDraft)} className="btn-3d px-4 py-1">
-                확인
-              </button>
-              <button type="button" onClick={() => setNmoDraft(null)} className="rounded border px-4 py-1">
+              <button type="button" onClick={() => setNmoDraft(null)} className="btn-key btn-sm">
                 취소
+              </button>
+              <button type="button" onClick={() => applyNmo(nmoDraft)} className="btn-3d btn-sm">
+                확인
               </button>
             </div>
           </div>
@@ -1329,7 +1390,7 @@ function Erd({ areaId }: { areaId: string }) {
       )}
       {shot !== null &&
         createPortal(
-          <div id="erd-print-root" className="fixed inset-0 z-[1000] overflow-auto bg-gray-300 p-4">
+          <div id="erd-print-root" className="erd-sheet fixed inset-0 z-[1000] overflow-auto p-4" style={{ backgroundColor: 'var(--raised)' }}>
             <style>{`@page { size: ${pr.paper === 'Letter' ? 'letter' : pr.paper} ${pr.orient}; margin: ${pr.margin}mm }
 @media print {
   body > *:not(#erd-print-root) { display: none !important }
@@ -1340,8 +1401,8 @@ function Erd({ areaId }: { areaId: string }) {
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact }
 }`}</style>
             {markers('p')}
-            <div className="no-print mb-3 flex w-full flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow" aria-label="인쇄 설정">
-              <strong className="mr-1">인쇄 설정</strong>
+            <div className="no-print panel mb-3 flex w-full flex-wrap items-center gap-2 px-3 py-2" aria-label="인쇄 설정">
+              <strong className="me-1 text-sm font-semibold text-ink">인쇄 설정</strong>
               <select value={pr.paper} onChange={(e) => changePaper({ paper: e.target.value })} className={sel2} aria-label="용지">
                 {Object.keys(PAPER).map((k) => (
                   <option key={k} value={k}>
@@ -1364,27 +1425,28 @@ function Erd({ areaId }: { areaId: string }) {
                 <option value="fit">한 장에 맞춤</option>
                 <option value="pages">가이드대로 나눔(100%, {page.grid.tiles.length}쪽)</option>
               </select>
-              <label className="flex items-center gap-1">
+              <label className={chk2}>
                 <input type="checkbox" checked={pr.title} onChange={(e) => setPr({ ...pr, title: e.target.checked })} /> 제목·범례
               </label>
-              <span className="ml-auto flex gap-2">
-                <button type="button" className="rounded bg-white px-3 py-1 font-semibold text-[#1f3a68]" onClick={() => window.print()}>
-                  인쇄 ({sheets.length}쪽)
-                </button>
+              <span className="ms-auto flex gap-2">
                 <button type="button" className={btn} onClick={() => setShot(null)}>
                   닫기
+                </button>
+                <button type="button" className="btn-3d btn-sm" onClick={() => window.print()}>
+                  <Printer aria-hidden />
+                  인쇄 ({sheets.length}쪽)
                 </button>
               </span>
             </div>
             {sheets.map((sh) => (
-              <div key={sh.no} className="erd-page mx-auto mb-4 flex flex-col overflow-hidden bg-white shadow-lg" style={{ width: page.w, height: page.h }}>
+              <div key={sh.no} className="erd-page mx-auto mb-4 flex flex-col overflow-hidden bg-surface shadow-2" style={{ width: page.w, height: page.h }}>
                 {pr.title && (
-                  <div className="flex shrink-0 items-end justify-between border-b-2 border-[#1f3a68] px-3 text-xs" style={{ height: TITLE_H }}>
+                  <div className="flex shrink-0 items-end justify-between border-b border-line-strong px-3 text-xs" style={{ height: TITLE_H }}>
                     <span className="pb-1">
-                      <strong className="text-base text-[#1f3a68]">ERD — {prjSubjs.find((x) => x.subj_id === subj)?.subj_nm ?? ''}</strong>
-                      <span className="ml-2 text-gray-600">{prjs.find((x) => x.prj_id === prjId)?.prj_nm}</span>
+                      <strong className="text-base font-semibold text-ink">ERD — {prjSubjs.find((x) => x.subj_id === subj)?.subj_nm ?? ''}</strong>
+                      <span className="ms-2 text-ink-2">{prjs.find((x) => x.prj_id === prjId)?.prj_nm}</span>
                     </span>
-                    <span className="pb-1 text-gray-600">
+                    <span className="pb-1 text-ink-2">
                       {LVL_NM[lvl]} · {NT_NM[nt]} · {phy ? '물리명' : '논리명'} · 출력 {new Date().toLocaleDateString('sv-SE')} · {sh.no} / {sheets.length}쪽
                     </span>
                   </div>
@@ -1393,7 +1455,8 @@ function Erd({ areaId }: { areaId: string }) {
                   <div className="react-flow__viewport" style={{ position: 'absolute', transform: `translate(${sh.t.x}px, ${sh.t.y}px) scale(${sh.t.zoom})` }} dangerouslySetInnerHTML={{ __html: shot }} />
                 </div>
                 {pr.title && (
-                  <div className="shrink-0 border-t px-3 text-[10px] leading-4 text-gray-500" style={{ height: FOOT_H }}>
+                  /* 범례 줄 높이 FOOT_H(16px) 고정 — 인쇄 쪽 계산값이라 글자 10px 유지 */
+                  <div className="shrink-0 border-t border-line px-3 text-[10px] leading-4 text-ink-3" style={{ height: FOOT_H }}>
                     {LEGEND[nt]}
                   </div>
                 )}

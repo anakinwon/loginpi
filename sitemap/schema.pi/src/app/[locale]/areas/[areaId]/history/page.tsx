@@ -1,8 +1,9 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 변경 이력 화면 — 대상·동작·사용자·기간 조건 조회, 행을 펼치면 변경 전후 값 비교(바뀐 항목만)
-import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { PageHead } from '@/components/page-head'
 import { auditDiff } from '@/lib/audit-diff'
 import { ACT_NM, AUDIT_NM_KEYS, TGT_NM } from '@/lib/roles'
 
@@ -51,7 +52,7 @@ export default function HistoryPage({ params }: { params: Promise<{ areaId: stri
 
   const pages = data ? Math.max(1, Math.ceil(data.total / data.size)) : 1
   const sel = (k: keyof typeof EMPTY, opts: Record<string, string>, label: string) => (
-    <select value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="rounded border px-2 py-1" aria-label={label}>
+    <select value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="input w-auto" aria-label={label}>
       <option value="">{label} 전체</option>
       {Object.entries(opts).map(([v, n]) => (
         <option key={v} value={v}>
@@ -62,103 +63,106 @@ export default function HistoryPage({ params }: { params: Promise<{ areaId: stri
   )
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">변경 이력</h1>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="변경 이력" />
       <form
         onSubmit={(e) => {
           e.preventDefault()
           setPage(1)
           setApplied(f)
         }}
-        className="mt-4 flex flex-wrap items-center gap-2 text-sm"
+        className="flex flex-wrap items-center gap-2 text-sm"
       >
         {sel('tgt', TGT_NM, '대상')}
         {sel('act', ACT_NM, '동작')}
-        <input value={f.usr} onChange={(e) => setF({ ...f, usr: e.target.value })} placeholder="사용자명" className="rounded border px-2 py-1" />
-        <input type="date" value={f.from} onChange={(e) => setF({ ...f, from: e.target.value })} className="rounded border px-2 py-1" aria-label="시작일" />
-        <span>~</span>
-        <input type="date" value={f.to} onChange={(e) => setF({ ...f, to: e.target.value })} className="rounded border px-2 py-1" aria-label="종료일" />
-        <button className="rounded bg-gray-800 px-3 py-1 text-white">조회</button>
-        {data && <span className="ml-auto text-gray-500">총 {data.total}건</span>}
+        <input value={f.usr} onChange={(e) => setF({ ...f, usr: e.target.value })} placeholder="사용자명" aria-label="사용자명" className="input w-40" />
+        <input type="date" value={f.from} onChange={(e) => setF({ ...f, from: e.target.value })} className="input w-auto" aria-label="시작일" />
+        <span className="text-ink-3">~</span>
+        <input type="date" value={f.to} onChange={(e) => setF({ ...f, to: e.target.value })} className="input w-auto" aria-label="종료일" />
+        <button className="btn-key">조회</button>
       </form>
-      <table className="mt-4 w-full border-collapse text-sm">
-        <thead>
-          <tr className="bg-gray-100 text-left">
-            {['일시', '대상', '이름', '동작', '사용자', '경로'].map((h) => (
-              <th key={h} className="border px-2 py-1">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {!data || data.items.length === 0 ? (
-            <tr>
-              <td colSpan={6} className="border px-2 py-4 text-center text-gray-500">
-                {msg || '이력이 없습니다'}
-              </td>
+      <div className="mt-3 overflow-x-auto rounded-card border border-line bg-surface">
+        <table className="w-full border-collapse text-dense">
+          <thead>
+            <tr className="thead-3d text-start">
+              {['일시', '대상', '이름', '동작', '사용자', '경로'].map((h) => (
+                <th key={h} className="px-3 py-2">
+                  {h}
+                </th>
+              ))}
             </tr>
-          ) : (
-            data.items.flatMap((l) => {
-              const rows = [
-                <tr key={l.log_id} onClick={() => setOpen(open === l.log_id ? null : l.log_id)} className="cursor-pointer hover:bg-gray-50" aria-expanded={open === l.log_id}>
-                  <td className="whitespace-nowrap border px-2 py-1">{new Date(l.reg_dtm).toLocaleString('ko-KR')}</td>
-                  <td className="border px-2 py-1">{TGT_NM[l.tgt_tp_cd] ?? l.tgt_tp_cd}</td>
-                  <td className="border px-2 py-1">{targetName(l)}</td>
-                  <td className="border px-2 py-1">{ACT_NM[l.act_cd] ?? l.act_cd}</td>
-                  <td className="border px-2 py-1">{l.sys_user?.pi_usr_nm}</td>
-                  <td className="border px-2 py-1">{l.apv_req_id ? '승인' : '직접'}</td>
-                </tr>,
-              ]
-              if (open === l.log_id) {
-                const diff = auditDiff(l.bfr_val, l.aftr_val)
-                rows.push(
-                  <tr key={l.log_id + '-d'}>
-                    <td colSpan={6} className="border bg-gray-50 px-4 py-2">
-                      {diff.length === 0 ? (
-                        <span className="text-gray-500">비교할 변경 항목이 없습니다</span>
-                      ) : (
-                        <table className="w-full text-xs">
-                          <thead>
-                            <tr className="text-left text-gray-600">
-                              <th className="pr-4">항목</th>
-                              <th className="pr-4">변경 전</th>
-                              <th>변경 후</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {diff.map((d) => (
-                              <tr key={d.key}>
-                                <td className="pr-4 font-mono">{d.key}</td>
-                                <td className="pr-4 text-red-700">{show(d.before)}</td>
-                                <td className="text-blue-800">{show(d.after)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
+          </thead>
+          <tbody>
+            {!data || data.items.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-3 py-6 text-center text-ink-3">
+                  {msg || '이력이 없습니다'}
+                </td>
+              </tr>
+            ) : (
+              data.items.flatMap((l) => {
+                const rows = [
+                  <tr key={l.log_id} onClick={() => setOpen(open === l.log_id ? null : l.log_id)} className={`cursor-pointer ${open === l.log_id ? '[&>td]:bg-raised' : ''}`} aria-expanded={open === l.log_id}>
+                    <td className={`border-b px-3 py-1.5 font-mono text-xs whitespace-nowrap text-ink-3 tabular-nums`}>{new Date(l.reg_dtm).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 16)}</td>
+                    <td className={`border-b px-3 py-1.5 whitespace-nowrap`}>
+                      <span className="badge">{TGT_NM[l.tgt_tp_cd] ?? l.tgt_tp_cd}</span>
                     </td>
+                    <td className={`border-b px-3 py-1.5 font-medium`}>{targetName(l)}</td>
+                    <td className={`border-b px-3 py-1.5 whitespace-nowrap`}>{ACT_NM[l.act_cd] ?? l.act_cd}</td>
+                    <td className={`border-b px-3 py-1.5 text-xs whitespace-nowrap text-ink-3`}>{l.sys_user?.pi_usr_nm}</td>
+                    <td className={`border-b px-3 py-1.5 text-xs whitespace-nowrap text-ink-3`}>{l.apv_req_id ? '승인' : '직접'}</td>
                   </tr>,
-                )
-              }
-              return rows
-            })
-          )}
-        </tbody>
-      </table>
-      <div className="mt-3 flex items-center justify-center gap-3 text-sm">
-        <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded border px-3 py-1 disabled:opacity-40">
-          이전
-        </button>
-        <span>
-          {page} / {pages}
-        </span>
-        <button disabled={page >= pages} onClick={() => setPage(page + 1)} className="rounded border px-3 py-1 disabled:opacity-40">
-          다음
-        </button>
+                ]
+                if (open === l.log_id) {
+                  const diff = auditDiff(l.bfr_val, l.aftr_val)
+                  rows.push(
+                    <tr key={l.log_id + '-d'}>
+                      <td colSpan={6} className="border-b bg-well px-4 py-3">
+                        {diff.length === 0 ? (
+                          <span className="text-ink-3">비교할 변경 항목이 없습니다</span>
+                        ) : (
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="text-start text-ink-3">
+                                <th className="py-1 pe-4 text-start font-medium">항목</th>
+                                <th className="py-1 pe-4 text-start font-medium">변경 전</th>
+                                <th className="py-1 text-start font-medium">변경 후</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {diff.map((d) => (
+                                <tr key={d.key}>
+                                  <td className="py-1 pe-4 font-mono text-ink-2">{d.key}</td>
+                                  <td className={`py-1 pe-4 ${d.before == null ? 'text-ink-off' : 'text-danger line-through decoration-1'}`}>{show(d.before)}</td>
+                                  <td className="py-1 text-ink">{show(d.after)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </td>
+                    </tr>,
+                  )
+                }
+                return rows
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-3 flex items-center gap-3">
+        {data && <span className="font-mono text-xs text-ink-3 tabular-nums">총 {data.total.toLocaleString()}건</span>}
+        <div className="mx-auto flex items-center gap-1">
+          <button type="button" disabled={page <= 1} onClick={() => setPage(page - 1)} aria-label="이전" title="이전" className="btn-ghost btn-icon btn-sm">
+            <ChevronLeft className="rtl:rotate-180" aria-hidden />
+          </button>
+          <span className="font-mono text-xs text-ink-2 tabular-nums">
+            {page} / {pages}
+          </span>
+          <button type="button" disabled={page >= pages} onClick={() => setPage(page + 1)} aria-label="다음" title="다음" className="btn-ghost btn-icon btn-sm">
+            <ChevronRight className="rtl:rotate-180" aria-hidden />
+          </button>
+        </div>
       </div>
     </main>
   )

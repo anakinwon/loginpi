@@ -2,12 +2,15 @@
 import { piFetch } from '@pi/auth/client'
 // 논리 모델 화면(MD3·MD4 1차, 2026-10-17 마스터 지시) — 개념 모델의 핵심 엔터티에서 출발하는 논리 모델링 작업대
 //  상단 : 프로젝트 선택·검증 요약(준수율·PK·필수 4종·고아·FK 누락·정규화 의심)·논리 ERD(Mermaid) 복사·내려받기
-//  왼쪽 : 주제영역 콤보(선택한 주제영역 1개, 물리 화면과 선택 공유) + 엔터티(🔑·4종 n/4·속성 수·이슈 배지) / 오른쪽 : 선택 엔터티 — 부모·자식 관계, FK 전파 누락(체크 → 적용), 정규화 의심(적용 = 이동·제거), 속성 패널(개념 모델과 공용)
+//  왼쪽 : 주제영역 콤보(선택한 주제영역 1개, 물리 화면과 선택 공유) + 엔터티(주식별자 열쇠·4종 n/4·속성 수·이슈 배지) / 오른쪽 : 선택 엔터티 — 부모·자식 관계, FK 전파 누락(체크 → 적용), 정규화 의심(적용 = 이동·제거), 속성 패널(개념 모델과 공용)
 //  반자동 : 점검은 저장 없음(GET …/projects/[prjId]/logical), 적용은 속성 API. 이름은 물리 전환 전까지 대문자
 //  편집(sql/026) : 논리 엔터티 추가(LGCL)·엔터티 수정(이름·유형·설명·주제영역·핵심 승격)·삭제(속성·관계 연쇄), 관계 편집 패널(개념 모델 공용)
-import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { Copy, Download, KeyRound, Pencil, Plus, Printer, TriangleAlert, Trash2 } from 'lucide-react'
 import { type MbrRole, type Perm } from '@/lib/roles'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
@@ -243,236 +246,300 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
   const s = m?.summary
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">논리 모델</h1>
-      <p className="mt-1 text-sm text-gray-600">개념 모델의 핵심 엔터티에서 출발해 속성·식별자·관계(FK)를 완성하고 정규화를 점검합니다(점검은 저장하지 않고, 적용은 사용자가 선택).</p>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="논리 모델" info="개념 모델의 핵심 엔터티에서 출발해 속성·식별자·관계(FK)를 완성하고 정규화를 점검합니다(점검은 저장하지 않고, 적용은 사용자가 선택)." />
 
-      <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#c7d2e6] bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-3 text-sm text-white shadow-md">
-        <span className="font-semibold">프로젝트</span>
-        <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setSel(null))} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="프로젝트 선택">
-          {prjs.length === 0 && <option value="">프로젝트가 없습니다(개념 모델에서 등록)</option>}
+      <div className="panel flex flex-wrap items-center gap-2 px-3 py-2 text-sm">
+        <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setSel(null))} className="input-sm w-auto max-w-60" aria-label="프로젝트 선택">
+          {prjs.length === 0 && <option value="">프로젝트 없음(개념 모델에서 등록)</option>}
           {prjs.map((p) => (
             <option key={p.prj_id} value={p.prj_id}>
               {p.prj_nm}
             </option>
           ))}
         </select>
-        {m && <span className="rounded bg-white/20 px-2 py-0.5 font-mono text-xs">{m.prj.tbl_pfx_txt}_</span>}
+        {m && <span className="chip-phy">{m.prj.tbl_pfx_txt}_</span>}
         {m && (
-          <span className="ml-auto flex flex-wrap gap-2">
-            <button type="button" onClick={() => void copyMmd()} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30">
-              논리 ERD 복사(Mermaid)
+          <span className="ms-auto flex flex-wrap items-center gap-1">
+            <button type="button" onClick={() => void copyMmd()} className="btn-ghost btn-sm" title="논리 ERD 복사(Mermaid)">
+              <Copy aria-hidden />
+              Mermaid
             </button>
-            <button type="button" onClick={downMmd} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30">
-              .mmd 내려받기
+            <button type="button" onClick={downMmd} className="btn-ghost btn-sm" title=".mmd 내려받기">
+              <Download aria-hidden />
+              .mmd
             </button>
-            <button type="button" onClick={() => setShowMmd((v) => !v)} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30">
-              {showMmd ? '텍스트 닫기' : '텍스트 보기'}
+            <button type="button" onClick={() => setShowMmd((v) => !v)} aria-pressed={showMmd} className="btn-ghost btn-sm">
+              텍스트
             </button>
-            <span className="mx-1 border-l border-white/40" aria-hidden />
+            <span className="mx-1 h-5 w-px bg-line" aria-hidden />
             {(['ent', 'attr', 'rel'] as const).map((t) => (
-              <button key={t} type="button" onClick={() => void downDoc(t)} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30" title="CSV(엑셀)">
+              <button key={t} type="button" onClick={() => void downDoc(t)} className="btn-ghost btn-sm" title="CSV(엑셀)">
+                <Download aria-hidden />
                 {{ ent: '엔터티', attr: '속성', rel: '관계' }[t]}정의서
               </button>
             ))}
-            <button type="button" onClick={() => void printDoc()} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30" title="3종 인쇄용(브라우저 인쇄 → PDF)">
-              정의서 인쇄
+            <button type="button" onClick={() => void printDoc()} className="btn-ghost btn-sm" title="3종 인쇄용(브라우저 인쇄 → PDF)">
+              <Printer aria-hidden />
+              인쇄
             </button>
           </span>
         )}
       </div>
       {prjId && <StageBar api={api} prjId={prjId} editor={editor} mode="LGC" subjId={subjId} rev={m} onChanged={() => void load()} />}
-      {showMmd && m && <textarea readOnly value={m.mermaid} rows={10} className="mt-2 w-full rounded border p-2 font-mono text-xs" aria-label="Mermaid 텍스트" />}
+      {showMmd && m && <textarea readOnly value={m.mermaid} rows={10} className="input mt-3 font-mono text-xs" aria-label="Mermaid 텍스트" />}
       {msg && (
-        <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">
+        <p role="status" className="mt-2 text-dense text-ink">
           {msg}
         </p>
       )}
 
       {s && (
-        <section className="mt-4 grid grid-cols-2 gap-2 text-center text-sm md:grid-cols-10" aria-label="논리 모델 검증 요약">
-          {[
-            ['준수율', `${s.rate}%`, s.rate === 100],
-            ['통과 엔터티', `${s.passed}/${s.ents}`, s.passed === s.ents],
-            ['PK 없음', s.no_pk, !s.no_pk],
-            ['필수 4종 미달', s.must_short, !s.must_short],
-            ['고아 엔터티', s.orphan, !s.orphan],
-            ['FK 누락', s.fk_missing, !s.fk_missing],
-            ['통과 막는 이슈(합계)', s.issues, !s.issues],
-            ['표준 정합', s.std, !s.std],
-            ['모델 검토', s.rev, !s.rev],
-            ['검토(경고)', s.reviews, !s.reviews],
-          ].map(([k, v, ok]) => (
-            <div key={String(k)} className={`rounded-lg border px-2 py-2 ${ok ? 'border-green-300 bg-green-50' : 'border-amber-300 bg-amber-50'}`}>
-              <div className="text-xs text-gray-600">{k}</div>
-              <div className="text-lg font-bold tabular-nums">{v}</div>
-            </div>
-          ))}
-          <p className="col-span-2 text-left text-xs text-gray-600 md:col-span-10">
-            물리 전환(MD5) 진입 조건 : 모든 엔터티 통과(주식별자·필수 4종·관계·FK·정규화 의심 해소){m?.capped ? ' — 엔터티·속성 상한(500·5,000)에 도달해 일부만 점검' : ''}
-          </p>
+        <section className="mt-6" aria-label="논리 모델 검증 요약">
+          <div className="flex items-center gap-1">
+            <h2 className="text-sm font-semibold text-ink">검증 요약</h2>
+            <InfoTip>
+              물리 전환(MD5) 진입 조건 : 모든 엔터티 통과(주식별자·필수 4종·관계·FK·정규화 의심 해소){m?.capped ? ' — 엔터티·속성 상한(500·5,000)에 도달해 일부만 점검' : ''}
+            </InfoTip>
+            {m?.capped && (
+              <span className="badge" data-tone="warn">
+                일부만 점검
+              </span>
+            )}
+          </div>
+          <div className="panel mt-2 grid grid-cols-2 gap-px overflow-hidden bg-line sm:grid-cols-5 xl:grid-cols-10">
+            {[
+              ['준수율', `${s.rate}%`, s.rate === 100],
+              ['통과 엔터티', `${s.passed}/${s.ents}`, s.passed === s.ents],
+              ['PK 없음', s.no_pk, !s.no_pk],
+              ['필수 4종 미달', s.must_short, !s.must_short],
+              ['고아 엔터티', s.orphan, !s.orphan],
+              ['FK 누락', s.fk_missing, !s.fk_missing],
+              ['통과 막는 이슈', s.issues, !s.issues],
+              ['표준 정합', s.std, !s.std],
+              ['모델 검토', s.rev, !s.rev],
+              ['검토(경고)', s.reviews, !s.reviews],
+            ].map(([k, v, ok]) => (
+              <div key={String(k)} className="min-h-[4.5rem] bg-surface px-3 py-2.5">
+                <div className="truncate text-xs text-ink-3">{k}</div>
+                <div className={`mt-1 text-2xl font-semibold tabular-nums ${ok ? 'text-ink' : 'text-warn'}`}>{v}</div>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
       {m && (
-        <div className="mt-4 grid gap-4 md:grid-cols-[18rem_1fr]">
-          <aside className="space-y-3 rounded-xl border border-[#c7d2e6] bg-white p-3 text-sm shadow-sm" aria-label="엔터티 목록">
+        <div className="mt-6 grid gap-6 md:grid-cols-[18rem_minmax(0,1fr)]">
+          <aside className="panel h-fit space-y-2 p-3 text-sm" aria-label="엔터티 목록">
             {editor && (
-              <button type="button" onClick={() => setForm(form === 'new' ? null : 'new')} className="btn-3d w-full px-2 py-1">
-                ＋ 엔터티 추가
+              <button type="button" onClick={() => setForm(form === 'new' ? null : 'new')} aria-pressed={form === 'new'} className="btn-3d w-full">
+                <Plus aria-hidden />
+                엔터티 추가
               </button>
             )}
-            <select value={subjId} onChange={(e) => (setSubjId(e.target.value), setSel(null), setForm(null))} className="w-full rounded border px-2 py-1" aria-label="주제영역 선택">
-              {subjs.length === 0 && <option value="">주제영역이 없습니다(개념 모델에서 등록)</option>}
+            <select value={subjId} onChange={(e) => (setSubjId(e.target.value), setSel(null), setForm(null))} className="input" aria-label="주제영역 선택">
+              {subjs.length === 0 && <option value="">주제영역 없음(개념 모델에서 등록)</option>}
               {subjs.map((x) => (
                 <option key={x.subj_id} value={x.subj_id}>
                   {x.subj_nm}({(m.ents ?? []).filter((e) => e.subj_id === x.subj_id).length})
                 </option>
               ))}
             </select>
-            <button type="button" onClick={() => setSel(null)} className={`w-full rounded px-2 py-1 text-left ${!sel ? 'bg-[#1f3a68] text-white' : 'hover:bg-[#e9eff9]'}`}>
-              주제영역 엔터티 전체({subjEnts.length})
+            <button type="button" onClick={() => setSel(null)} aria-current={!sel || undefined} className={`flex w-full items-center rounded-control px-2 py-1.5 text-start transition-colors ${!sel ? 'bg-accent-soft font-medium text-accent-ink' : 'hover:bg-raised'}`}>
+              <span className="flex-1">주제영역 엔터티 전체</span>
+              <span className="font-mono text-xs tabular-nums">{subjEnts.length}</span>
             </button>
-            <div>
-              {subjEnts.length === 0 && <p className="px-1 text-xs text-gray-500">이 주제영역에 엔터티가 없습니다</p>}
+            <div className="space-y-0.5">
+              {subjEnts.length === 0 && <p className="px-2 py-2 text-xs text-ink-3">엔터티 없음</p>}
               {subjEnts.map((e) => {
                 const c = chkBy.get(e.ent_id)
                 return (
-                  <button key={e.ent_id} type="button" onClick={() => setSel(e.ent_id)} className={`flex w-full items-center gap-1 rounded px-2 py-1 text-left ${sel === e.ent_id ? 'bg-[#1f3a68] text-white' : 'hover:bg-[#e9eff9]'}`}>
+                  <button key={e.ent_id} type="button" onClick={() => setSel(e.ent_id)} aria-current={sel === e.ent_id || undefined} className={`flex w-full items-center gap-1.5 rounded-control px-2 py-1.5 text-start transition-colors ${sel === e.ent_id ? 'bg-accent-soft text-accent-ink' : 'hover:bg-raised'}`}>
                     <span className="min-w-0 flex-1 truncate">{e.ent_log_nm}</span>
                     {e.mdl_lvl_cd === 'LGCL' && (
-                      <span className="rounded bg-purple-100 px-1 text-[0.65rem] text-purple-800" title="논리 모델에서 추가한 엔터티">
+                      <span className="badge" title="논리 모델에서 추가한 엔터티">
                         논리
                       </span>
                     )}
-                    <span title="주식별자">{c?.pk ? '🔑' : '⚠'}</span>
-                    <span className={`rounded px-1 text-[0.65rem] ${c?.must === 4 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}`} title="필수 4종">
+                    {c?.pk ? <KeyRound className="h-3.5 w-3.5 shrink-0 text-ink-3" strokeWidth={1.75} aria-label="주식별자 있음" /> : <TriangleAlert className="h-3.5 w-3.5 shrink-0 text-warn" strokeWidth={1.75} aria-label="주식별자 없음" />}
+                    <span className="badge tabular-nums" data-tone={c?.must === 4 ? 'ok' : 'danger'} title="필수 4종">
                       {c?.must}/4
                     </span>
-                    <span className="text-[0.65rem] opacity-70" title="속성 수">
+                    <span className="min-w-4 text-right font-mono text-xs text-ink-3 tabular-nums" title="속성 수">
                       {e.attrs.length}
                     </span>
-                    {!!c && c.fk_missing + c.issues > 0 && <span className="rounded bg-amber-200 px-1 text-[0.65rem] text-amber-900">{c.fk_missing + c.issues}</span>}
+                    {!!c && c.fk_missing + c.issues > 0 && (
+                      <span className="badge tabular-nums" data-tone="warn" title="FK 누락 + 이슈">
+                        {c.fk_missing + c.issues}
+                      </span>
+                    )}
                   </button>
                 )
               })}
             </div>
           </aside>
 
-          <section className="space-y-4">
+          <section className="min-w-0 space-y-4">
             {form === 'new' && <EntForm key="new" api={api} areaId={areaId} subjs={subjs} onDone={formDone} onCancel={() => setForm(null)} />}
             {form === 'edit' && cur && <EntForm key={`edit-${cur.ent_id}-${cur.ver_no}`} api={api} areaId={areaId} subjs={subjs} init={cur} onDone={formDone} onCancel={() => setForm(null)} />}
             {cur && (
-              <div className="rounded-xl border border-[#c7d2e6] bg-white p-4 text-sm shadow-sm">
-                <h2 className="flex flex-wrap items-center gap-2 text-lg font-bold">
-                  {cur.ent_log_nm} <span className="font-mono text-sm text-[#1f3a68]">{cur.tbl_phy_nm}</span>
-                  <span className={`rounded px-1.5 text-xs font-normal ${cur.mdl_lvl_cd === 'LGCL' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>{cur.mdl_lvl_cd === 'LGCL' ? '논리 엔터티' : '핵심 엔터티'}</span>
+              <div className="panel text-sm">
+                <div className="panel-head flex-wrap py-2">
+                  <h2 className="text-base">{cur.ent_log_nm}</h2>
+                  <span className="chip-phy font-normal">{cur.tbl_phy_nm}</span>
+                  <span className="badge">{cur.mdl_lvl_cd === 'LGCL' ? '논리 엔터티' : '핵심 엔터티'}</span>
                   {editor && (
-                    <span className="ml-auto flex gap-2 text-xs font-normal">
-                      <button type="button" onClick={() => setForm(form === 'edit' ? null : 'edit')} className="rounded border border-[#1f3a68] px-2 py-0.5 text-[#1f3a68]">
-                        엔터티 수정
+                    <span className="ms-auto flex gap-2">
+                      <button type="button" onClick={() => setForm(form === 'edit' ? null : 'edit')} aria-pressed={form === 'edit'} className="btn-key btn-sm">
+                        <Pencil aria-hidden />
+                        수정
                       </button>
-                      <button type="button" onClick={() => void delEnt(cur)} className="rounded border border-red-700 px-2 py-0.5 text-red-700">
+                      <button type="button" onClick={() => void delEnt(cur)} className="btn-danger btn-sm">
+                        <Trash2 aria-hidden />
                         삭제
                       </button>
                     </span>
                   )}
-                </h2>
-                {cur.ent_desc && <p className="mt-1 text-xs text-gray-600">{cur.ent_desc}</p>}
-                <ul className="mt-2 space-y-0.5 text-xs text-gray-700">
-                  {m.rels
-                    .filter((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id)
-                    .map((r) => {
-                      const up = r.chld_ent_id === cur.ent_id
-                      const o = entBy.get(up ? r.prnt_ent_id : r.chld_ent_id)
-                      return (
-                        <li key={r.rel_id}>
-                          {up ? '부모' : '자식'} :{' '}
-                          <button type="button" onClick={() => o && setSel(o.ent_id)} className="underline">
-                            {o?.ent_log_nm}
-                          </button>{' '}
-                          ({r.rel_nm ?? '관계'} · {CRDN[r.crdn_cd]} · {r.idnt_yn === 'Y' ? '식별' : '비식별'}
-                          {up ? (r.prnt_opt_yn === 'Y' ? ' · 부모 선택' : ' · 부모 필수') : ''})
-                        </li>
-                      )
-                    })}
-                  {!m.rels.some((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id) && <li className="text-amber-700">관계가 없습니다(고아 엔터티) — 아래 관계 편집에서 등록하십시오</li>}
-                </ul>
+                </div>
+                <div className="panel-body">
+                  {cur.ent_desc && <p className="mb-2 text-dense text-ink-2">{cur.ent_desc}</p>}
+                  <ul className="space-y-1 text-xs text-ink-2">
+                    {m.rels
+                      .filter((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id)
+                      .map((r) => {
+                        const up = r.chld_ent_id === cur.ent_id
+                        const o = entBy.get(up ? r.prnt_ent_id : r.chld_ent_id)
+                        return (
+                          <li key={r.rel_id} className="flex flex-wrap items-center gap-1.5">
+                            <span className="badge">{up ? '부모' : '자식'}</span>
+                            <button type="button" onClick={() => o && setSel(o.ent_id)} className="font-medium text-accent-ink hover:underline">
+                              {o?.ent_log_nm}
+                            </button>
+                            <span className="text-ink-3">
+                              {r.rel_nm ?? '관계'} · {CRDN[r.crdn_cd]} · {r.idnt_yn === 'Y' ? '식별' : '비식별'}
+                              {up ? (r.prnt_opt_yn === 'Y' ? ' · 부모 선택' : ' · 부모 필수') : ''}
+                            </span>
+                          </li>
+                        )
+                      })}
+                    {!m.rels.some((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id) && (
+                      <li className="flex items-center gap-1 text-warn">
+                        <TriangleAlert className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                        고아 엔터티 · 아래 관계 편집에서 등록
+                      </li>
+                    )}
+                  </ul>
+                </div>
               </div>
             )}
 
-            <div className="rounded-xl border border-[#c7d2e6] bg-white p-4 text-sm shadow-sm">
-              <h3 className="font-semibold text-[#1f3a68]">FK 자동 전파 {sel ? '' : '(전체)'} — 관계의 부모 식별자가 자식에 없음</h3>
-              {gaps.length === 0 ? (
-                <p className="mt-1 text-gray-500">누락된 FK 가 없습니다</p>
-              ) : (
-                <>
-                  <ul className="mt-1 divide-y divide-[#eef2f8]">
-                    {gaps.map((g) => {
-                      const k = `${g.rel_id}|${g.term_id}`
-                      return (
-                        <li key={k} className="flex items-center gap-2 py-1">
-                          <input type="checkbox" disabled={!editor || g.role} checked={!g.role && gapChk.has(k)} onChange={() => setGapChk((x) => (x.has(k) ? new Set([...x].filter((y) => y !== k)) : new Set([...x, k])))} aria-label={`${g.chld_nm} ${g.term_log_nm}`} />
-                          <span>
-                            {g.chld_nm} ← <b>{g.term_log_nm}</b> ({g.prnt_nm}) · {g.pk ? '🔑 식별(자식 PK 포함)' : '비식별 FK'} · {g.esntl ? '필수' : '선택'}
-                            {g.role && <span className="ml-1 rounded bg-amber-100 px-1 text-xs text-amber-800">역할명 필요 — 아래 관계 편집의 FK 버튼에서 역할 용어 선택</span>}
-                          </span>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                  {editor && (
-                    <button type="button" disabled={busy} onClick={() => void applyGaps(gaps.filter((g) => gapChk.has(`${g.rel_id}|${g.term_id}`)))} className="btn-3d mt-2 px-4 py-0.5 disabled:opacity-40">
-                      선택 FK 전파({gaps.filter((g) => gapChk.has(`${g.rel_id}|${g.term_id}`)).length})
-                    </button>
-                  )}
-                </>
-              )}
+            <div className="panel text-sm">
+              <div className="panel-head">
+                <h3>FK 자동 전파</h3>
+                {!sel && <span className="text-xs font-normal text-ink-3">전체</span>}
+                <InfoTip>관계의 부모 식별자가 자식에 없음</InfoTip>
+                {gaps.length > 0 && (
+                  <span className="badge ms-auto tabular-nums" data-tone="warn">
+                    {gaps.length}
+                  </span>
+                )}
+              </div>
+              <div className="px-4 py-3">
+                {gaps.length === 0 ? (
+                  <p className="text-ink-3">누락된 FK 없음</p>
+                ) : (
+                  <>
+                    <ul className="divide-y divide-line">
+                      {gaps.map((g) => {
+                        const k = `${g.rel_id}|${g.term_id}`
+                        return (
+                          <li key={k} className="flex items-center gap-2 py-1.5">
+                            <input type="checkbox" disabled={!editor || g.role} checked={!g.role && gapChk.has(k)} onChange={() => setGapChk((x) => (x.has(k) ? new Set([...x].filter((y) => y !== k)) : new Set([...x, k])))} aria-label={`${g.chld_nm} ${g.term_log_nm}`} />
+                            <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+                              <span>{g.chld_nm}</span>
+                              <span className="text-ink-3">←</span>
+                              <span className="font-medium">{g.term_log_nm}</span>
+                              <span className="text-ink-3">({g.prnt_nm})</span>
+                              <span className="inline-flex items-center gap-1 text-xs text-ink-2">
+                                {g.pk && <KeyRound className="h-3 w-3" strokeWidth={1.75} aria-hidden />}
+                                {g.pk ? '식별(자식 PK 포함)' : '비식별 FK'} · {g.esntl ? '필수' : '선택'}
+                              </span>
+                              {g.role && (
+                                <span className="badge" data-tone="warn" title="아래 관계 편집의 FK 버튼에서 역할 용어 선택">
+                                  역할명 필요
+                                </span>
+                              )}
+                            </span>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                    {editor && (
+                      <div className="mt-2 flex justify-end">
+                        <button type="button" disabled={busy} onClick={() => void applyGaps(gaps.filter((g) => gapChk.has(`${g.rel_id}|${g.term_id}`)))} className="btn-key btn-sm tabular-nums">
+                          선택 FK 전파 {gaps.filter((g) => gapChk.has(`${g.rel_id}|${g.term_id}`)).length}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
-            <div className="rounded-xl border border-[#c7d2e6] bg-white p-4 text-sm shadow-sm">
-              <h3 className="font-semibold text-[#1f3a68]">점검 {sel ? '' : '(전체)'} — 정규화 의심·모델 검토·표준 정합(판단은 DA, 수정 필요는 통과를 막음)</h3>
-              {iss.length === 0 ? (
-                <p className="mt-1 text-gray-500">의심 항목이 없습니다</p>
-              ) : (
-                <ul className="mt-1 divide-y divide-[#eef2f8]">
-                  {iss.map((i, k) => (
-                    <li key={k} className="flex flex-wrap items-center gap-2 py-1">
-                      <span className="rounded bg-gray-100 px-1 text-xs">{KIND_NM[i.kind] ?? i.kind}</span>
-                      {!sel && (
-                        <button type="button" onClick={() => setSel(i.ent_id)} className="text-xs underline">
-                          {entBy.get(i.ent_id)?.ent_log_nm}
-                        </button>
-                      )}
-                      <span className="min-w-0 flex-1">{i.msg}</span>
-                      {editor && (i.action === 'move' || i.action === 'remove') && (
-                        <button type="button" disabled={busy} onClick={() => void applyIssue(i)} className="rounded border border-[#1f3a68] px-2 text-xs text-[#1f3a68] disabled:opacity-40">
-                          {ACT_NM[i.action]}
-                        </button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <div className="panel text-sm">
+              <div className="panel-head">
+                <h3>점검</h3>
+                {!sel && <span className="text-xs font-normal text-ink-3">전체</span>}
+                <InfoTip>정규화 의심·모델 검토·표준 정합. 판단은 DA, 수정 필요는 통과를 막음</InfoTip>
+                {iss.length > 0 && (
+                  <span className="badge ms-auto tabular-nums" data-tone="warn">
+                    {iss.length}
+                  </span>
+                )}
+              </div>
+              <div className="px-4 py-3">
+                {iss.length === 0 ? (
+                  <p className="text-ink-3">의심 항목 없음</p>
+                ) : (
+                  <ul className="divide-y divide-line">
+                    {iss.map((i, k) => (
+                      <li key={k} className="flex flex-wrap items-center gap-2 py-1.5">
+                        <span className="badge">{KIND_NM[i.kind] ?? i.kind}</span>
+                        {!sel && (
+                          <button type="button" onClick={() => setSel(i.ent_id)} className="text-xs font-medium text-accent-ink hover:underline">
+                            {entBy.get(i.ent_id)?.ent_log_nm}
+                          </button>
+                        )}
+                        <span className="min-w-0 flex-1 text-ink-2">{i.msg}</span>
+                        {editor && (i.action === 'move' || i.action === 'remove') && (
+                          <button type="button" disabled={busy} onClick={() => void applyIssue(i)} className="btn-key btn-sm">
+                            {ACT_NM[i.action]}
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             {cur ? (
               <div>
-                <h3 className="mb-1 font-semibold text-[#1f3a68]">속성 — {cur.ent_log_nm}</h3>
+                <h3 className="mb-2 text-sm font-semibold text-ink">속성 : {cur.ent_log_nm}</h3>
                 <Attrs key={`${cur.ent_id}-${rev}`} api={api} areaId={areaId} entId={cur.ent_id} entNm={cur.ent_log_nm} editor={editor} />
               </div>
             ) : (
-              <p className="text-sm text-gray-500">왼쪽에서 엔터티를 고르면 속성·관계를 편집할 수 있습니다.</p>
+              <div className="panel empty">
+                <Icon3D icon={MENU_ICON.logical} />
+                엔터티를 고르면 속성·관계 편집
+              </div>
             )}
           </section>
         </div>
       )}
       {m && prjId && (
-        <section className="mt-6" aria-label="관계 편집">
-          <h3 className="mb-1 font-semibold text-[#1f3a68]">관계 편집 — 핵심·논리 엔터티 전체</h3>
+        <section aria-label="관계 편집">
           <Relations api={api} prjId={prjId} editor={editor} entsKey={m.ents.length} onSaved={refresh} />
         </section>
       )}

@@ -4,6 +4,10 @@ import { piFetch } from '@pi/auth/client'
 //  반영 = 기존 API 를 순서대로 호출(엔터티 → 속성 → 관계 → FK 연결)해 표준 검증을 그대로 받음, 결과 ID 는 스테이징에 출처로 기록. 반영 후 ERD 화면이 새 엔터티를 자동 배치
 //  미매핑 칼럼(용어 없음)·미등록 단어 테이블은 반영하지 않고 표준 신청 후보로 보여 줌. 서버는 고객 DB 에 접속하지 않는다(카탈로그 SQL 은 사용자가 실행)
 import { Link } from '@/i18n/navigation'
+import { Copy, FolderOpen, KeyRound } from 'lucide-react'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
 import { type MbrRole, type Perm } from '@/lib/roles'
@@ -53,9 +57,9 @@ interface Rel {
   opt: boolean
 }
 const MAP_NM: Record<string, string> = { EXACT: '완전일치', CMNT: '코멘트', SPLIT: '단어 분해(신청 후보)', NONE: '미매핑' }
-const MAP_CLS: Record<string, string> = { EXACT: 'text-green-700', CMNT: 'text-green-700', SPLIT: 'text-amber-700', NONE: 'text-red-700' }
+const MAP_CLS: Record<string, string> = { EXACT: 'text-ok', CMNT: 'text-ok', SPLIT: 'text-warn', NONE: 'text-danger' }
 const DBMS = dbmsList()
-const btn = 'rounded border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-40'
+const btn = 'btn-key btn-sm'
 
 export default function ReversePage({ params }: { params: Promise<{ areaId: string }> }) {
   const { areaId } = use(params)
@@ -184,7 +188,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
     for (const t of targets) {
       const e = await post(`${api}/entities`, { subj_id: subj, dic_ids: t.dic_ids, ent_tp_cd: 'BASE', ent_desc: t.tbl_desc, mdl_lvl_cd: 'LGCL' })
       if (!e.ok) {
-        out.push(`✗ ${t.tbl_nm} : ${e.message}`)
+        out.push(`실패 ${t.tbl_nm} : ${e.message}`)
         continue
       }
       const entId = e.item.ent_id as string
@@ -199,7 +203,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
           markC.push({ rvs_col_id: c.rvs_col_id, attr_id: a.item.attr_id })
         } else out.push(`  ${t.tbl_nm}.${c.col_nm} : ${a.message}`)
       }
-      out.push(`✓ ${t.tbl_nm} → ${e.item.ent_log_nm} (속성 ${n}/${(cols.get(t.rvs_tbl_id) ?? []).length})`)
+      out.push(`성공 ${t.tbl_nm} → ${e.item.ent_log_nm} (속성 ${n}/${(cols.get(t.rvs_tbl_id) ?? []).length})`)
       await mark(markT.slice(-1), markC.splice(0))
     }
     for (const i of relPick) {
@@ -209,7 +213,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
       if (det.cols.some((x) => x.rel_id && r.cols.includes(x.col_nm) && det.tbls.find((t) => t.rvs_tbl_id === x.rvs_tbl_id)?.tbl_nm === r.chld)) continue // 이미 반영된 관계
       const rel = await post(`${api}/relations`, { prnt_ent_id: p, chld_ent_id: c, crdn_cd: '1N', idnt_yn: r.idnt ? 'Y' : 'N', prnt_opt_yn: r.opt && !r.idnt ? 'Y' : 'N', rel_desc: r.src === 'FK' ? `리버스 선언 FK ${r.fk_nm ?? ''}`.trim() : '리버스 이름 기반 후보' })
       if (!rel.ok) {
-        out.push(`✗ 관계 ${r.prnt} → ${r.chld} : ${rel.message}`)
+        out.push(`실패 관계 ${r.prnt} → ${r.chld} : ${rel.message}`)
         continue
       }
       const relId = rel.item.rel_id as string
@@ -220,8 +224,8 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
       // 칼럼명이 부모 주키와 같으면 FK 상속 연결(같은 용어 속성을 관계에 묶음), 역할명이면 논리 모델에서 연결
       if (r.cols.join() === r.ref_cols.join()) {
         const f = await post(`${api}/relations/${relId}/fk-plan`, {})
-        out.push(f.ok ? `✓ 관계 ${r.prnt} → ${r.chld} (FK 연결 ${f.applied})` : `△ 관계 ${r.prnt} → ${r.chld} : FK 연결 실패 ${f.message}`)
-      } else out.push(`△ 관계 ${r.prnt} → ${r.chld} : 역할명 FK(${r.cols.join(',')}) — 논리 모델의 관계 FK 버튼에서 연결하십시오`)
+        out.push(f.ok ? `성공 관계 ${r.prnt} → ${r.chld} (FK 연결 ${f.applied})` : `확인 관계 ${r.prnt} → ${r.chld} : FK 연결 실패 ${f.message}`)
+      } else out.push(`확인 관계 ${r.prnt} → ${r.chld} : 역할명 FK(${r.cols.join(',')}) — 논리 모델의 관계 FK 버튼에서 연결하십시오`)
     }
     await mark([], markC)
     setBusy(false)
@@ -231,74 +235,90 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
     await loadJobs()
   }
 
+  const sel2 = 'input-sm w-auto max-w-full'
+  const TD = 'border-b px-3 py-1.5 align-top'
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">리버스</h1>
-      <p className="mt-1 text-sm text-gray-600">기존 DB 의 DDL 또는 카탈로그 조회 결과(CSV)를 표준 데이터 모델로 가져옵니다. 칼럼은 승인된 표준용어로 역매핑되고, 매핑되지 않은 이름은 표준 신청 후보로 남습니다.</p>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="리버스" info="기존 DB 의 DDL 또는 카탈로그 조회 결과(CSV)를 표준 데이터 모델로 가져옵니다. 칼럼은 승인된 표준용어로 역매핑되고, 매핑되지 않은 이름은 표준 신청 후보로 남습니다. 서버는 고객 DB 에 접속하지 않습니다(카탈로그 SQL 은 사용자가 실행)." />
 
-      <section className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#c7d2e6] bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-3 text-sm text-white shadow-md" aria-label="리버스 원천">
-        <select value={prjId} onChange={(e) => setPrjId(e.target.value)} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="프로젝트 선택">
-          {prjs.length === 0 && <option value="">프로젝트가 없습니다</option>}
+      <section className="panel flex flex-wrap items-center gap-2 px-3 py-2" aria-label="리버스 원천">
+        <select value={prjId} onChange={(e) => setPrjId(e.target.value)} className={sel2} aria-label="프로젝트 선택">
+          {prjs.length === 0 && <option value="">프로젝트 없음</option>}
           {prjs.map((p) => (
             <option key={p.prj_id} value={p.prj_id}>
               {p.prj_nm}
             </option>
           ))}
         </select>
-        <select value={dbms} onChange={(e) => setDbms(e.target.value as DbmsCd)} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="DBMS 선택">
+        <select value={dbms} onChange={(e) => setDbms(e.target.value as DbmsCd)} className={sel2} aria-label="DBMS 선택">
           {DBMS.map((d) => (
             <option key={d.cd} value={d.cd}>
               {d.nm}
             </option>
           ))}
         </select>
-        <select value={src} onChange={(e) => setSrc(e.target.value as 'DDL' | 'CSV')} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="원천 형식">
+        <select value={src} onChange={(e) => setSrc(e.target.value as 'DDL' | 'CSV')} className={sel2} aria-label="원천 형식">
           <option value="DDL">DDL(.sql)</option>
           <option value="CSV">카탈로그 조회 결과(CSV)</option>
         </select>
-        <button type="button" onClick={() => void copyCatalog()} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30" disabled={!prjId}>
-          카탈로그 조회 SQL 복사
+        <span className="h-5 w-px bg-line" aria-hidden />
+        <button type="button" onClick={() => void copyCatalog()} className={btn} disabled={!prjId} title="대상 DB 에서 실행할 카탈로그 조회 SQL 복사 — 결과를 CSV(머리글 포함)로 저장해 올림">
+          <Copy aria-hidden />
+          카탈로그 SQL
         </button>
-        <label className="cursor-pointer rounded bg-white/20 px-3 py-1 hover:bg-white/30">
+        <label className={`${btn} focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent-ink`}>
+          <FolderOpen aria-hidden />
           파일 선택
-          <input type="file" accept=".sql,.ddl,.txt,.csv" className="hidden" onChange={(e) => void onFile(e.target.files?.[0])} />
+          <input type="file" accept=".sql,.ddl,.txt,.csv" className="sr-only" onChange={(e) => void onFile(e.target.files?.[0])} />
         </label>
-        {fileNm && <span className="text-xs">{fileNm}</span>}
+        {fileNm && <span className="chip-phy max-w-48 truncate">{fileNm}</span>}
         {editor && (
-          <button type="button" onClick={() => void stage()} disabled={busy || !text.trim() || !prjId} className="ml-auto rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40">
+          <button type="button" onClick={() => void stage()} disabled={busy || !text.trim() || !prjId} className={`${det ? 'btn-key' : 'btn-3d'} btn-sm ms-auto`}>
             해석·매핑
           </button>
         )}
       </section>
-      <textarea value={text} onChange={(e) => (setText(e.target.value), setFileNm(null))} rows={6} placeholder={src === 'DDL' ? 'CREATE TABLE … 문장을 붙여넣거나 파일을 고르십시오' : 'TABLE_NAME,COLUMN_NAME,DATA_TYPE,… 머리글 포함 CSV'} className="mt-2 w-full rounded border p-2 font-mono text-xs" aria-label="원천 내용" />
+      <textarea value={text} onChange={(e) => (setText(e.target.value), setFileNm(null))} rows={6} placeholder={src === 'DDL' ? 'CREATE TABLE …' : 'TABLE_NAME,COLUMN_NAME,DATA_TYPE,…'} className="input mt-3 font-mono text-xs" aria-label="원천 내용" />
       {msg && (
-        <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">
+        <p role="status" className="mt-2 text-dense text-ink-2">
           {msg}
         </p>
       )}
 
       {jobs.length > 0 && (
-        <nav className="mt-3 flex flex-wrap gap-2 text-sm" aria-label="리버스 작업">
+        <nav className="mt-4 flex flex-wrap gap-2" aria-label="리버스 작업">
           {jobs.map((j) => (
-            <button key={j.rvs_job_id} type="button" onClick={() => setJobId(j.rvs_job_id)} aria-pressed={j.rvs_job_id === jobId} className={`rounded-full border px-3 py-1 ${j.rvs_job_id === jobId ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : ''}`}>
-              {j.file_nm ?? j.src_cd} · 테이블 {j.tbl_cnt} · 매핑 {j.map_pct}%{j.job_sts_cd === 'APPLIED' ? ' · 반영' : ''}
+            <button key={j.rvs_job_id} type="button" onClick={() => setJobId(j.rvs_job_id)} aria-pressed={j.rvs_job_id === jobId} className="btn-key btn-sm">
+              {j.file_nm ?? j.src_cd}
+              <span className="text-xs font-normal text-ink-3 tabular-nums">
+                테이블 {j.tbl_cnt} · 매핑 {j.map_pct}%
+              </span>
+              {j.job_sts_cd === 'APPLIED' && (
+                <span className="badge" data-tone="ok">
+                  반영
+                </span>
+              )}
             </button>
           ))}
         </nav>
       )}
 
+      {!jobs.length && !text.trim() && (
+        <div className="panel empty mt-4">
+          <Icon3D icon={MENU_ICON.settings} />
+          <p>DDL 붙여넣기 또는 파일 선택</p>
+        </div>
+      )}
+
       {det && (
-        <>
-          <section className="mt-3 flex flex-wrap items-center gap-2 text-sm" aria-label="반영">
-            <span>
+        <div className="mt-6 space-y-6">
+          <section className="flex flex-wrap items-center gap-2" aria-label="반영">
+            <span className="text-dense text-ink-2 tabular-nums">
               매핑 {det.job.map_pct}% · 신청 후보 {cands.length}
             </span>
             {editor && (
-              <>
-                <select value={subj} onChange={(e) => setSubj(e.target.value)} className="ml-auto rounded border px-2 py-1" aria-label="반영할 주제영역">
+              <span className="ms-auto flex flex-wrap items-center gap-2">
+                <select value={subj} onChange={(e) => setSubj(e.target.value)} className={sel2} aria-label="반영할 주제영역">
                   <option value="">반영할 주제영역</option>
                   {subjs
                     .filter((s) => s.prj_id === prjId)
@@ -308,20 +328,20 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
                       </option>
                     ))}
                 </select>
-                <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={busy || !pick.size || !subj} onClick={() => void apply()}>
+                <button type="button" className="btn-3d btn-sm" disabled={busy || !pick.size || !subj} onClick={() => void apply()}>
                   선택 {pick.size}개 모델에 반영
                 </button>
-              </>
+              </span>
             )}
           </section>
-          {log.length > 0 && <pre className="mt-2 max-h-48 overflow-auto rounded border bg-gray-50 p-2 text-xs">{log.join('\n')}</pre>}
+          {log.length > 0 && <pre className="paper max-h-48 overflow-auto rounded-card border border-line bg-well p-3 font-mono text-xs">{log.join('\n')}</pre>}
 
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead className="bg-[#e9eff9]">
-                <tr>
+          <div className="overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense">
+              <thead>
+                <tr className="thead-3d text-start">
                   {['', '테이블', '엔터티 단어', '칼럼(매핑)', '상태'].map((h) => (
-                    <th key={h} className="border px-2 py-1 text-left">
+                    <th key={h} className="px-3 py-2 text-start">
                       {h}
                     </th>
                   ))}
@@ -332,26 +352,28 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
                   const cs = cols.get(t.rvs_tbl_id) ?? []
                   const ok = !!t.dic_ids?.length
                   return (
-                    <tr key={t.rvs_tbl_id} className={t.ent_id ? 'bg-green-50' : ''}>
-                      <td className="border px-2 py-1 align-top">
+                    <tr key={t.rvs_tbl_id} className={t.ent_id ? 'bg-ok-soft' : ''}>
+                      <td className={TD}>
                         <input type="checkbox" disabled={!ok || !!t.ent_id || !editor} checked={pick.has(t.rvs_tbl_id)} onChange={() => setPick((p) => (p.has(t.rvs_tbl_id) ? new Set([...p].filter((x) => x !== t.rvs_tbl_id)) : new Set([...p, t.rvs_tbl_id])))} aria-label={`${t.tbl_nm} 반영`} />
                       </td>
-                      <td className="border px-2 py-1 align-top font-mono">
-                        {t.tbl_nm}
-                        {t.tbl_desc && <div className="font-sans text-xs text-gray-600">{t.tbl_desc}</div>}
+                      <td className={TD}>
+                        <span className="chip-phy">{t.tbl_nm}</span>
+                        {t.tbl_desc && <div className="mt-1 text-xs whitespace-normal text-ink-2">{t.tbl_desc}</div>}
                       </td>
-                      <td className="border px-2 py-1 align-top text-xs">{ok ? `${t.dic_ids!.length}단어` : <span className="text-red-700">미등록 단어 — 표준단어 신청 후 다시 해석</span>}</td>
-                      <td className="border px-2 py-1 align-top text-xs">
-                        <ul>
+                      <td className={`${TD} text-xs`}>{ok ? <span className="text-ink-2 tabular-nums">{t.dic_ids!.length}단어</span> : <span className="text-danger">미등록 단어 — 표준단어 신청 후 다시 해석</span>}</td>
+                      <td className={`${TD} text-xs`}>
+                        <ul className="space-y-0.5">
                           {cs.map((c) => (
-                            <li key={c.rvs_col_id}>
-                              {c.pk_seq ? '🔑' : '·'} <span className="font-mono">{c.col_nm}</span> <span className={MAP_CLS[c.map_cd]}>{MAP_NM[c.map_cd]}</span>
-                              {c.cand_nm && <span className="text-gray-600"> → {c.cand_nm}</span>}
+                            <li key={c.rvs_col_id} className="flex flex-wrap items-center gap-x-1.5">
+                              {c.pk_seq ? <KeyRound className="h-3 w-3 text-ink-2" aria-label="주키" /> : <span className="inline-block w-3 text-center text-ink-3">·</span>}
+                              <span className="font-mono">{c.col_nm}</span>
+                              <span className={MAP_CLS[c.map_cd]}>{MAP_NM[c.map_cd]}</span>
+                              {c.cand_nm && <span className="text-ink-3">→ {c.cand_nm}</span>}
                             </li>
                           ))}
                         </ul>
                       </td>
-                      <td className="border px-2 py-1 align-top text-xs">{t.ent_id ? '반영됨' : ok ? '반영 가능' : '불가'}</td>
+                      <td className={`${TD} text-xs whitespace-nowrap`}>{t.ent_id ? <span className="badge" data-tone="ok">반영됨</span> : ok ? <span className="text-ink-3">반영 가능</span> : <span className="badge">불가</span>}</td>
                     </tr>
                   )
                 })}
@@ -360,18 +382,23 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
           </div>
 
           {det.rels.length > 0 && (
-            <section className="mt-3 text-sm" aria-label="관계 후보">
-              <h2 className="font-semibold text-[#1f3a68]">관계 후보(선언 FK 는 기본 선택, 이름 기반은 직접 선택)</h2>
-              <ul className="mt-1">
+            <section aria-label="관계 후보">
+              <h2 className="mb-2 flex items-center gap-1 text-sm font-semibold text-ink">
+                관계 후보
+                <InfoTip label="관계 후보">선언 FK 는 기본 선택, 이름 기반 후보는 직접 선택합니다.</InfoTip>
+              </h2>
+              <ul className="panel divide-y divide-line">
                 {det.rels.map((r, i) => (
                   <li key={i}>
-                    <label className="flex items-center gap-1">
+                    <label className="flex flex-wrap items-center gap-2 px-4 py-2 text-dense">
                       <input type="checkbox" disabled={!editor} checked={relPick.has(i)} onChange={() => setRelPick((p) => (p.has(i) ? new Set([...p].filter((x) => x !== i)) : new Set([...p, i])))} />
-                      <span className="font-mono">
+                      <span className="font-mono text-xs">
                         {r.prnt} → {r.chld} ({r.cols.join(', ')})
                       </span>
-                      <span className={r.src === 'FK' ? 'text-green-700' : 'text-amber-700'}>{r.src === 'FK' ? `선언 FK${r.fk_nm ? ` ${r.fk_nm}` : ''}` : '이름 기반 후보'}</span>
-                      {r.idnt && <span className="text-xs">식별</span>}
+                      <span className="badge" data-tone={r.src === 'FK' ? 'ok' : 'warn'}>
+                        {r.src === 'FK' ? `선언 FK${r.fk_nm ? ` ${r.fk_nm}` : ''}` : '이름 기반 후보'}
+                      </span>
+                      {r.idnt && <span className="badge">식별</span>}
                     </label>
                   </li>
                 ))}
@@ -380,13 +407,16 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
           )}
 
           {cands.length > 0 && (
-            <details className="mt-3 text-sm">
-              <summary className="cursor-pointer font-semibold text-[#1f3a68]">표준 신청 후보 {cands.length}건(용어 미매핑 칼럼)</summary>
-              <ul className="mt-1 text-xs">
+            <details className="panel">
+              <summary className="panel-head cursor-pointer">
+                표준 신청 후보 <span className="font-mono text-xs font-normal text-ink-3 tabular-nums">{cands.length}</span>
+              </summary>
+              <ul className="divide-y divide-line text-dense">
                 {cands.map((c) => (
-                  <li key={c.rvs_col_id}>
-                    <span className="font-mono">{c.col_nm}</span> {c.cand_nm ? `→ ${c.cand_nm}` : '(단어 분해 불가)'}{' '}
-                    <Link href={`/areas/${areaId}/terms?new=${encodeURIComponent(c.cand_nm ?? c.col_nm)}`} className="text-blue-700 underline">
+                  <li key={c.rvs_col_id} className="flex flex-wrap items-center gap-2 px-4 py-2">
+                    <span className="chip-phy">{c.col_nm}</span>
+                    <span className="text-ink-2">{c.cand_nm ? `→ ${c.cand_nm}` : '(단어 분해 불가)'}</span>
+                    <Link href={`/areas/${areaId}/terms?new=${encodeURIComponent(c.cand_nm ?? c.col_nm)}`} className="ms-auto text-xs text-accent-ink hover:underline">
                       용어 신청
                     </Link>
                   </li>
@@ -394,7 +424,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
               </ul>
             </details>
           )}
-        </>
+        </div>
       )}
     </main>
   )

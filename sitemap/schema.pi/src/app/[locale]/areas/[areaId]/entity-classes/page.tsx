@@ -2,10 +2,12 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 분류어 관리 화면 — 단어에 엔터티 분류어 지정·테이블 접미어 지정·변경·해제 신청(단어 수정 승인 절차, sql/017), 목록 조회
 // 기준 : 정의서 §8.4 데이터 성격 접미어 + 기관 확장(2026-10-16 마스터 확정), 단어 물리명(컬럼용)과 테이블 접미어(테이블명용)는 별도
-import { Link } from '@/i18n/navigation'
 import { use, useCallback, useEffect, useState } from 'react'
+import { Check, Pencil, Unlink, X } from 'lucide-react'
+import { InfoTip, PageHead } from '@/components/page-head'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, noEnterSubmit } from '../words/word-board'
+import { Pager } from '../terms/term-board'
 
 interface Item {
   dic_id: string
@@ -113,12 +115,9 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
   }
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">엔터티 분류어</h1>
-      <div className="mt-6 space-y-6">
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead title="엔터티 분류어" />
+      <div className="space-y-6">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -126,13 +125,22 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
               send(cur, { ent_clss_yn: 'Y', ...(norm(sfx) ? { tbl_sfx_txt: norm(sfx) } : {}) }, '지정')
           }}
           onKeyDown={noEnterSubmit}
-          className="overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] text-sm shadow-md"
+          className="panel"
         >
-          <h2 className="bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-5 py-2.5 text-base font-semibold text-white">엔터티 분류어 지정</h2>
-          <fieldset disabled={!requester} className="p-5 disabled:opacity-60">
+          <div className="panel-head">
+            <h2>엔터티 분류어 지정</h2>
+            <InfoTip>기준 : 정의서 §8.4 데이터 성격 접미어 + 기관 확장(2026-10-16 확정). 단어 물리명(컬럼용)은 그대로 두고, 테이블 이름에는 접미어를 붙입니다(예 : 이력 → TB_○○○_H)</InfoTip>
+            {role && !requester && (
+              <span className="badge ms-auto" title="지정·변경·해제는 신청 권한(역할·요금제)이 있어야 합니다">
+                조회 전용
+              </span>
+            )}
+          </div>
+          <fieldset disabled={!requester} className="panel-body disabled:opacity-60">
             <div className="grid gap-3 md:grid-cols-4">
-              <div>
-                <input list="ent-cands" value={pick} onChange={(e) => setPick(e.target.value)} placeholder="엔터티 분류어(승인완료 단어 검색)" className="w-full rounded border border-[#b8c6e0] bg-white px-3 py-2" aria-label="엔터티 분류어" />
+              <label>
+                <span className="field-label req">엔터티 분류어</span>
+                <input list="ent-cands" value={pick} onChange={(e) => setPick(e.target.value)} placeholder="승인완료 단어" className="input" aria-required="true" />
                 <datalist id="ent-cands">
                   {cands.map((w) => (
                     <option key={w.dic_id} value={w.dic_log_nm}>
@@ -140,30 +148,35 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
                     </option>
                   ))}
                 </datalist>
-                {pick.trim() && !cur && <p className="mt-1 text-red-700">승인완료 단어 중 금칙어가 아니고 아직 지정되지 않은 단어를 고르십시오</p>}
-              </div>
-              <p className="rounded border border-[#d5ddec] bg-white px-3 py-2 font-mono">{cur?.dic_phy_nm ?? '물리명'}</p>
+                {pick.trim() && !cur && <span className="hint block text-danger">승인완료 단어 중 금칙어가 아니고 아직 지정되지 않은 단어를 고르십시오</span>}
+              </label>
               <div>
-                <input value={sfx} onChange={(e) => setSfx(e.target.value)} placeholder="테이블 접미어(예 : _H)" maxLength={5} className="w-full rounded border border-[#b8c6e0] bg-white px-3 py-2 font-mono" aria-label="테이블 접미어" />
-                {sfxErr(sfx) && <p className="mt-1 text-red-700">{sfxErr(sfx)}</p>}
+                <span className="field-label">물리명</span>
+                <div className="flex h-9 items-center">{cur ? <span className="chip-phy" data-size="lg">{cur.dic_phy_nm}</span> : <span className="text-ink-off">-</span>}</div>
               </div>
-              <p className="rounded border border-[#d5ddec] bg-white px-3 py-2 text-gray-600">{cur?.dic_desc || '단어 설명'}</p>
+              <label>
+                <span className="field-label">테이블 접미어</span>
+                <input value={sfx} onChange={(e) => setSfx(e.target.value)} placeholder="_H" maxLength={5} className="input font-mono" />
+                {sfxErr(sfx) && <span className="hint block text-danger">{sfxErr(sfx)}</span>}
+              </label>
+              <div>
+                <span className="field-label">단어 설명</span>
+                <p className="flex min-h-9 items-center text-dense text-ink-2">{cur?.dic_desc || <span className="text-ink-off">-</span>}</p>
+              </div>
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
               <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
-              <div className="ml-auto flex gap-2">
-                <button type="button" onClick={() => (setPick(''), setSfx(''))} className="rounded border bg-white px-5 py-2">
+              <div className="ms-auto flex gap-2">
+                <button type="button" onClick={() => (setPick(''), setSfx(''))} className="btn-key">
                   초기화
                 </button>
-                <button disabled={!cur || !!sfxErr(sfx)} className="btn-3d px-8 disabled:opacity-40">
+                <button disabled={!cur || !!sfxErr(sfx)} className="btn-3d">
                   지정 신청
                 </button>
               </div>
             </div>
-            <p className="mt-2 text-xs text-gray-500">기준 : 정의서 §8.4 데이터 성격 접미어 + 기관 확장(2026-10-16 확정). 단어 물리명(컬럼용)은 그대로 두고, 테이블 이름에는 접미어를 붙입니다(예 : 이력 → TB_○○○_H)</p>
-            {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 지정·변경·해제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
             {msg && (
-              <p role="status" className="mt-2 font-medium text-[#1f3a68]">
+              <p role="status" className="mt-3 text-dense text-ink-2">
                 {msg}
               </p>
             )}
@@ -176,14 +189,14 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
               e.preventDefault()
               setCond({ ...cond, kw: q.trim(), page: 1 })
             }}
-            className="flex flex-wrap gap-2"
+            className="flex flex-wrap items-center gap-2"
           >
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(분류어·물리명·접미어)" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색" aria-label="검색명(분류어·물리명·접미어)" title="분류어·물리명·접미어" className="input min-w-48 flex-1" />
             <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
-            <button className="btn-3d">검색</button>
+            <button className="btn-key">검색</button>
           </form>
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full border-collapse text-[0.7rem] [&_td]:whitespace-nowrap [&_.text-xs]:text-[0.6rem]">
+          <div className="mt-3 overflow-x-auto rounded-card border border-line bg-surface">
+            <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
               <colgroup>
                 {COL_W.map((w, i) => (
                   <col key={i} className={w} />
@@ -192,7 +205,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
               <thead>
                 <tr className="thead-3d text-center">
                   {['#', '엔터티 분류어', '물리명', '테이블 접미어', '테이블명 예', '설명', '등록자', '등록일시', '상태', '승인자', '승인일시', '처리'].map((h) => (
-                    <th key={h} className="whitespace-nowrap border px-2 py-2">
+                    <th key={h} className="border-b px-3 py-2">
                       {h}
                     </th>
                   ))}
@@ -201,59 +214,65 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
               <tbody>
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="border px-2 py-4 text-center text-gray-500">
-                      지정된 엔터티 분류어가 없습니다
+                    <td colSpan={12} className="py-6 text-center text-ink-3">
+                      검색 결과 없음
                     </td>
                   </tr>
                 ) : (
                   items.map((w, i) => (
-                    <tr key={w.dic_id} className={edit?.id === w.dic_id ? 'bg-amber-50' : 'hover:bg-gray-50'}>
-                      <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
-                      <td className="border px-2 py-1 font-medium">{w.dic_log_nm}</td>
-                      <td className="border px-2 py-1 font-mono">{w.dic_phy_nm}</td>
-                      <td className="border px-2 py-1 text-center font-mono font-semibold text-[#1f3a68]">
+                    <tr key={w.dic_id} data-mode={edit?.id === w.dic_id ? 'edit' : undefined}>
+                      <td className="border px-3 py-1 text-end font-mono text-xs text-ink-3 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
+                      <td className="border px-3 py-1 font-medium">{w.dic_log_nm}</td>
+                      <td className="border px-3 py-1">
+                        <span className="chip-phy">{w.dic_phy_nm}</span>
+                      </td>
+                      <td className="border px-3 py-1 text-center">
                         {edit?.id === w.dic_id ? (
-                          <span>
-                            <input value={edit.sfx} onChange={(e) => setEdit({ ...edit, sfx: e.target.value })} maxLength={5} className="w-16 rounded border px-1" aria-label="새 접미어" />
-                            {sfxErr(edit.sfx, w.dic_log_nm) && <span className="ml-1 text-red-700">{sfxErr(edit.sfx, w.dic_log_nm)}</span>}
+                          <span className="inline-flex items-center gap-1">
+                            <input value={edit.sfx} onChange={(e) => setEdit({ ...edit, sfx: e.target.value })} maxLength={5} className="input-sm w-16 font-mono" aria-label="새 접미어" />
+                            {sfxErr(edit.sfx, w.dic_log_nm) && <span className="text-xs text-danger">{sfxErr(edit.sfx, w.dic_log_nm)}</span>}
                           </span>
+                        ) : w.tbl_sfx_txt ? (
+                          <span className="chip-phy">{w.tbl_sfx_txt}</span>
                         ) : (
-                          (w.tbl_sfx_txt ?? <span className="font-normal text-gray-400">미지정</span>)
+                          <span className="text-xs text-ink-3">미지정</span>
                         )}
                       </td>
-                      <td className="border px-2 py-1 font-mono text-gray-500">{w.tbl_sfx_txt ? `TB_○○○${w.tbl_sfx_txt}` : ''}</td>
-                      <td className="border px-2 py-1 !whitespace-normal">{w.dic_desc}</td>
+                      <td className="border px-3 py-1 font-mono text-xs text-ink-3">{w.tbl_sfx_txt ? `TB_○○○${w.tbl_sfx_txt}` : ''}</td>
+                      <td className="border px-3 py-1 text-ink-2 !whitespace-normal">{w.dic_desc}</td>
                       <ActorCells nm={w.regr_nm} d={w.std_reg_dtm} />
                       <StsCell sts={w.std_sts_cd} pend={w.pend && (w.pend.ent === 'N' ? 'KEY_N' : w.pend.ent === 'Y' ? 'KEY_Y' : 'SFX')} apv={`/areas/${areaId}/approvals?tp=DIC`} />
                       <ActorCells nm={w.apv_nm} d={w.apv_dtm} />
-                      <td className="whitespace-nowrap border px-2 py-1 text-center">
+                      <td className="whitespace-nowrap border px-3 py-1 text-center">
                         {w.pend || w.std_sts_cd === 'REQ' ? (
                           <ApvLink apv={`/areas/${areaId}/approvals?tp=DIC`} />
                         ) : w.std_sts_cd !== 'CNFM' ? (
-                          <span className="text-xs text-gray-500">-</span>
+                          <span className="text-xs text-ink-3">-</span>
                         ) : edit?.id === w.dic_id ? (
-                          <>
+                          <span className="inline-flex gap-1">
                             <button
                               disabled={!!sfxErr(edit.sfx, w.dic_log_nm)}
                               onClick={() => confirm(`'${w.dic_log_nm}' 테이블 접미어를 ${norm(edit.sfx) || '미지정'}(으)로 변경 신청하시겠습니까?`) && send(w, { tbl_sfx_txt: norm(edit.sfx) || null }, '접미어 변경')}
-                              className="mr-2 text-blue-700 underline disabled:text-gray-400"
+                              aria-label="저장"
+                              title="저장"
+                              className="btn-ghost btn-icon btn-sm"
                             >
-                              저장
+                              <Check aria-hidden />
                             </button>
-                            <button onClick={() => setEdit(null)} className="text-gray-600 underline">
-                              취소
+                            <button onClick={() => setEdit(null)} aria-label="취소" title="취소" className="btn-ghost btn-icon btn-sm">
+                              <X aria-hidden />
                             </button>
-                          </>
+                          </span>
                         ) : (
                           requester && (
-                            <>
-                              <button onClick={() => setEdit({ id: w.dic_id, sfx: w.tbl_sfx_txt ?? '' })} className="mr-2 text-blue-700 underline">
-                                접미어 변경
+                            <span className="inline-flex gap-1">
+                              <button onClick={() => setEdit({ id: w.dic_id, sfx: w.tbl_sfx_txt ?? '' })} aria-label="접미어 변경" title="접미어 변경" className="btn-ghost btn-icon btn-sm">
+                                <Pencil aria-hidden />
                               </button>
-                              <button onClick={() => confirm(`'${w.dic_log_nm}' 엔터티 분류어 지정을 해제 신청하시겠습니까?(접미어도 비워집니다)`) && send(w, { ent_clss_yn: 'N' }, '지정 해제')} className="text-red-700 underline">
-                                지정 해제
+                              <button onClick={() => confirm(`'${w.dic_log_nm}' 엔터티 분류어 지정을 해제 신청하시겠습니까?(접미어도 비워집니다)`) && send(w, { ent_clss_yn: 'N' }, '지정 해제')} aria-label="지정 해제" title="지정 해제" className="btn-ghost btn-icon btn-sm hover:text-danger">
+                                <Unlink aria-hidden />
                               </button>
-                            </>
+                            </span>
                           )
                         )}
                       </td>
@@ -263,26 +282,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-gray-600">
-              총 {total.toLocaleString()}건 · {cond.page} / {pages} 페이지
-            </span>
-            <div className="mx-auto flex items-center gap-1">
-              <button onClick={() => go(cond.page - 1)} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-                ‹
-              </button>
-              <button onClick={() => go(cond.page + 1)} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-                ›
-              </button>
-            </div>
-            <select value={cond.size} onChange={(e) => setCond({ ...cond, size: Number(e.target.value), page: 1 })} className="rounded border px-2 py-1" aria-label="페이지당 건수">
-              {[10, 20, 50, 100].map((n) => (
-                <option key={n} value={n}>
-                  {n}건씩
-                </option>
-              ))}
-            </select>
-          </div>
+          <Pager page={cond.page} pages={pages} total={total} size={cond.size} go={go} setSize={(size) => setCond({ ...cond, size, page: 1 })} />
         </section>
       </div>
     </main>

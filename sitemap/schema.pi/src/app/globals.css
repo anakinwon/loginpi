@@ -1,9 +1,9 @@
-/* schema.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
+/* schema.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 없음). 방향 = 제도판 위 표준 장부 : 흑연 중립 램프 + 남색 강조 1색 + 3D 는 주요 버튼·키캡 아이콘만 */
 @import 'tailwindcss';
 /* 공용 패키지 컴포넌트(@pi/i18n 언어 콤보·π 시세칩)는 앱 밖이라 자동 탐지가 안 됨 — 명시 */
 @source '../../../../packages/pi-i18n/src';
 
-/* 언어 콤보·π 시세칩(@pi/i18n, loginpi 동일 className)이 쓰는 shadcn 토큰 → Tailwind 색 유틸리티 */
+/* ① 시맨틱 토큰 → 유틸리티(글자색 남색은 text-accent-ink — text-accent 는 채움색이라 글자에 쓰지 않음) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -11,67 +11,230 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-primary: var(--primary);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-well: var(--well);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-off: var(--ink-off);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-edge: var(--accent-edge);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-code);
+  /* 반경 — 맨 rounded = 컨트롤 6, rounded-xl = 카드 10, rounded-2xl = 시트 14 */
+  --radius: var(--r-control);
+  --radius-chip: var(--r-chip);
+  --radius-control: var(--r-control);
+  --radius-card: var(--r-card);
+  --radius-sheet: var(--r-sheet);
+  --radius-xl: var(--r-card);
+  --radius-2xl: var(--r-sheet);
+  /* 그림자 — 기존 shadow-sm·md·lg·xl 사용처도 조용한 중립 그림자로 */
+  --shadow-1: var(--sh-1);
+  --shadow-2: var(--sh-2);
+  --shadow-sm: var(--sh-1);
+  --shadow-md: var(--sh-1);
+  --shadow-lg: var(--sh-2);
+  --shadow-xl: var(--sh-2);
 }
 
+/* ② 고정 스케일 — 글자 2단(13 표 본문·32 소개 제목), 모션 곡선 1개, gray 를 흑연 램프로 재지정(아직 안 바꾼 gray 유틸도 같은 색, gray-400 글자 = AA 위해 ink-3) */
+@theme {
+  --text-dense: 0.8125rem;
+  --text-dense--line-height: 1.25rem;
+  --text-display: 2rem;
+  --text-display--line-height: 2.5rem;
+  --text-display--letter-spacing: -0.02em;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --default-transition-duration: 120ms;
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  --color-gray-50: #f5f6f8;
+  --color-gray-100: #eef0f4;
+  --color-gray-200: #e3e6eb;
+  --color-gray-300: #cdd2da;
+  --color-gray-400: #626d80;
+  --color-gray-500: #626d80;
+  --color-gray-600: #475467;
+  --color-gray-700: #344054;
+  --color-gray-800: #1d2939;
+  --color-gray-900: #101828;
+  --color-gray-950: #0b111c;
+  --color-blue-700: #2b4c86;
+}
+
+/* ③ 라이트(기본). AA : ink 17.8 · ink-2 7.7 · ink-3 5.2(surface)/4.8(canvas)/4.6(raised) · 남색 위 흰 글자 8.5 · accent-ink/accent-soft 7.2 · ok 5.3 · warn 5.0 · danger 6.6
+   ④ 다크 = 화면 코드의 하드코딩 색(dark: 미대응)이 0건이 된 뒤에만 추가 — 그 전까지 라이트 전용 */
 :root {
-  --background: #ffffff;
-  --foreground: #1f2937;
-  /* shadcn 토큰 — 밝은 단일 테마(회색 계열 + 앱 남색 강조) */
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --border: #e5e7eb;
-  --primary: #2b4c86;
+  color-scheme: light;
+  --canvas: #f5f6f8;
+  --surface: #ffffff;
+  --raised: #eef0f4;
+  --well: #f7f8fa;
+  --line: rgba(16, 24, 40, 0.09);
+  --line-strong: rgba(16, 24, 40, 0.18);
+  --ink: #101828;
+  --ink-2: #475467;
+  --ink-3: #626d80;
+  --ink-off: #98a1b0;
+  --accent: #2b4c86;
+  --accent-hover: #325694;
+  --accent-edge: #1b3361;
+  --accent-ink: #2b4c86;
+  --accent-soft: #e6edf9;
+  --on-accent: #ffffff;
+  --ok: #1f7a4d;
+  --ok-soft: #e8f3ec;
+  --warn: #b45309;
+  --warn-soft: #fef6ea;
+  --danger: #b42318;
+  --danger-soft: #fcedeb;
+  --sh-1: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --sh-2: 0 12px 32px -8px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.06);
+  /* 키캡 재질 — 3D 아이콘·주요 버튼 전용(빛 = 왼쪽 위) */
+  --key-hi: #ffffff;
+  --key-lo: #eceff3;
+  --key-bevel: rgba(255, 255, 255, 0.95);
+  --key-shade: rgba(16, 24, 40, 0.06);
+  --key-rim: rgba(16, 24, 40, 0.12);
+  --key-edge: #cfd5de;
+  --key-cast: rgba(16, 24, 40, 0.18);
+  --key-glyph: #344054;
+  --key-glyph-hl: rgba(255, 255, 255, 0.9);
+  /* shadcn 토큰 — 공용 @pi/i18n 언어 콤보·π 시세칩을 패키지 수정 없이 램프에 맞춤 */
+  --background: var(--surface);
+  --foreground: var(--ink);
+  --muted: var(--raised);
+  --muted-foreground: var(--ink-3);
+  --border: var(--line);
+  --primary: var(--accent-ink);
+  --r-chip: 4px;
+  --r-control: 6px;
+  --r-card: 10px;
+  --r-sheet: 14px;
+  /* 글꼴 — next/font 변수(<html> 클래스)가 없으면 시스템 한글 글꼴 */
+  --font-ui: var(--font-plex-kr, 'IBM Plex Sans KR'), 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  --font-code: var(--font-plex-mono, 'IBM Plex Mono'), ui-monospace, 'D2Coding', Consolas, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-1: 120ms;
+  --dur-2: 180ms;
+  --dur-3: 320ms;
   /* 분류체계 화면 상단 헤더 높이(site-header h-12) — #area-scroll·SQL 편집기 고정 틀의 top */
   --area-head-h: 3rem;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+/* ⑤ 밝은 섬 — 테마 무관 밝은 종이. .paper = SQL 편집기·DDL 미리보기, .erd-sheet = .paper + 시스템 글꼴(ERD 캔버스·인쇄 미리보기 포털 — 내보내기 skipFonts 와 같은 글꼴) */
+.paper,
+.erd-sheet {
+  color-scheme: light;
+  --canvas: #f5f6f8;
+  --surface: #ffffff;
+  --raised: #eef0f4;
+  --well: #f7f8fa;
+  --line: rgba(16, 24, 40, 0.09);
+  --line-strong: rgba(16, 24, 40, 0.18);
+  --ink: #101828;
+  --ink-2: #475467;
+  --ink-3: #626d80;
+  --ink-off: #98a1b0;
+  color: var(--ink);
+}
+.erd-sheet {
+  --font-ui: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  --font-code: ui-monospace, 'D2Coding', Consolas, monospace;
+  font-family: var(--font-ui);
+  background-color: #fbfbfc;
 }
 
-/* 목록 표 머리글 3D — 남색 그라데이션 바탕 + 위 밝은선·아래 어두운선(돌출 경사면) + 글자 그림자. 사용 : <tr className="thead-3d"> */
-.thead-3d th {
-  color: #ffffff;
-  font-weight: 700;
-  text-align: center;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
-  background: linear-gradient(180deg, #4a6fae 0%, #2b4c86 55%, #1f3a68 100%);
-  border-color: #1a3159;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 0 rgba(0, 0, 0, 0.25);
-}
-
-/* 3D 버튼 — 푸른 그라데이션 + 위 밝은선·아래 두께(그림자), 누르면 내려앉음. 사용 : <button className="btn-3d"> (btn-3d-green = 엑셀) */
-.btn-3d {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.375rem;
-  border: 1px solid #1a3159;
-  color: #ffffff;
-  font-weight: 600;
-  white-space: nowrap;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
-  background: linear-gradient(180deg, #4a6fae 0%, #2b4c86 55%, #1f3a68 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 3px 0 #13284a, 0 4px 6px rgba(31, 58, 104, 0.35);
-  transition: transform 0.05s, box-shadow 0.05s, filter 0.15s;
-}
-.btn-3d:hover:not(:disabled) {
-  filter: brightness(1.1);
-}
-.btn-3d:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 #13284a, 0 1px 2px rgba(31, 58, 104, 0.35);
-}
-.btn-3d-green {
-  border-color: #14532d;
-  background: linear-gradient(180deg, #3f9b5f 0%, #23753f 55%, #17582d 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 3px 0 #0f3d1f, 0 4px 6px rgba(23, 88, 45, 0.35);
-}
-.btn-3d-green:active {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 #0f3d1f, 0 1px 2px rgba(23, 88, 45, 0.35);
+/* ⑥ 기본 요소 */
+@layer base {
+  /* v4 기본 테두리색 = currentColor — 표 칸·입력칸 검은 실선의 원인. 헤어라인 한 줄로 정리 */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--line);
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    /* 한글은 낱말 안에서 끊지 않음, 긴 영문·물리명은 넘칠 때만 끊음 */
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--ink);
+  }
+  ::placeholder {
+    color: var(--ink-3);
+    opacity: 1;
+  }
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+  }
+  /* 입력칸 = 평면(한 단 옅은 바탕 + 진한 헤어라인). 안쪽 그림자 없음 — 3D 는 주요 버튼·아이콘만 */
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color']),
+  select,
+  textarea {
+    background-color: var(--well);
+    border-color: var(--line-strong);
+    color: var(--ink);
+    transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+  }
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color']):focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent-ink);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-ink) 20%, transparent);
+  }
+  [aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+  :disabled {
+    cursor: not-allowed;
+  }
+  a {
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::after,
+    ::before {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+    }
+  }
 }
 
 /* 분류체계 화면 틀(#area-scroll, layout) — 인쇄 때는 일반 흐름으로 펼치고 하단 메뉴 숨김 */
@@ -96,4 +259,468 @@ body {
   #area-scroll main table:not([data-grid]) :is(th, td) {
     word-break: keep-all;
   }
+}
+
+/* 버튼 — 3D 키캡 두께·눌림은 주요(btn-3d) 하나만, 보조(btn-key)·위험(btn-danger)은 평평한 흰 버튼, 고스트 = 툴바·행 동작. 층 안이라 px-8·w-full·h-9 유틸이 덮어씀 */
+@layer components {
+  .btn-3d,
+  .btn-key,
+  .btn-ghost,
+  .btn-danger {
+    --b-h: 36px;
+    --b-px: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: var(--b-h);
+    padding-inline: var(--b-px);
+    border-radius: var(--r-control);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  }
+  :is(.btn-3d, .btn-key, .btn-ghost, .btn-danger) > svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.75;
+  }
+  .btn-sm {
+    --b-h: 28px;
+    --b-px: 10px;
+    gap: 4px;
+    font-size: 0.8125rem;
+  }
+  .btn-sm > svg {
+    width: 14px;
+    height: 14px;
+  }
+  .btn-lg {
+    --b-h: 44px;
+    --b-px: 20px;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  .btn-icon {
+    width: var(--b-h);
+    padding-inline: 0;
+  }
+  @media (max-width: 639px) {
+    .btn-3d,
+    .btn-key,
+    .btn-ghost,
+    .btn-danger {
+      --b-h: 40px;
+    }
+    .btn-sm {
+      --b-h: 32px;
+    }
+    .btn-lg {
+      --b-h: 44px;
+    }
+  }
+  /* 주요 — 남색 키캡(앱 유일의 3D 버튼) */
+  .btn-3d {
+    --b-e: 2px;
+    color: var(--on-accent);
+    background-color: var(--accent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.18), 0 0 0 1px var(--accent-edge), 0 var(--b-e) 0 var(--accent-edge), 0 calc(var(--b-e) + 1px) 6px -2px var(--key-cast);
+  }
+  .btn-3d:hover:not(:disabled, [aria-disabled='true']) {
+    background-color: var(--accent-hover);
+  }
+  .btn-3d:active:not(:disabled, [aria-disabled='true']) {
+    --b-e: 0px;
+    transform: translateY(2px);
+  }
+  /* 보조·위험 — 평평한 흰 버튼(두께 없음) */
+  .btn-key,
+  .btn-danger {
+    color: var(--ink);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 1px var(--line-strong), var(--sh-1);
+  }
+  .btn-key:hover:not(:disabled, [aria-disabled='true']) {
+    background-color: var(--raised);
+  }
+  .btn-danger {
+    color: var(--danger);
+  }
+  .btn-danger:hover:not(:disabled, [aria-disabled='true']) {
+    background-color: var(--danger-soft);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--danger) 45%, transparent);
+  }
+  :is(.btn-key, .btn-danger):active:not(:disabled, [aria-disabled='true']) {
+    box-shadow: 0 0 0 1px var(--line-strong), inset 0 1px 2px var(--key-shade);
+  }
+  /* 토글 켜짐(분류체계 칩·ERD 표시 토글) */
+  .btn-key[aria-pressed='true'] {
+    color: var(--accent-ink);
+    background-color: var(--accent-soft);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-ink) 35%, transparent);
+  }
+  /* 고스트 — 툴바·행 동작·페이지 번호·도움말·접기 */
+  .btn-ghost {
+    color: var(--ink-2);
+    background-color: transparent;
+  }
+  .btn-ghost:hover:not(:disabled, [aria-disabled='true']) {
+    color: var(--ink);
+    background-color: var(--raised);
+  }
+  .btn-ghost:active:not(:disabled, [aria-disabled='true']),
+  .btn-ghost[aria-pressed='true'] {
+    color: var(--ink);
+    background-color: var(--raised);
+  }
+  .btn-ghost[aria-current='page'] {
+    color: var(--accent-ink);
+    background-color: var(--accent-soft);
+    font-weight: 600;
+  }
+  /* 비활성 — 평평한 회색, 투명도 흐림 없음 */
+  :is(.btn-3d, .btn-key, .btn-danger):is(:disabled, [aria-disabled='true']) {
+    cursor: not-allowed;
+    transform: none;
+    color: var(--ink-off);
+    background-color: var(--raised);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .btn-ghost:is(:disabled, [aria-disabled='true']) {
+    cursor: not-allowed;
+    color: var(--ink-off);
+    background-color: transparent;
+  }
+}
+
+/* 3D 키캡 아이콘(Icon3D) — sm 28 · md 40 · lg 48, 반경 = 크기/4, 두께 2px, 글리프 = 같은 아이콘 두 겹(음각) */
+@layer components {
+  .key3d {
+    --k: 40px;
+    --k-g: 20px;
+    --k-e: 2px;
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: var(--k);
+    height: var(--k);
+    border-radius: calc(var(--k) / 4);
+    color: var(--key-glyph);
+    background-image: linear-gradient(160deg, var(--key-hi) 30%, var(--key-lo) 100%);
+    box-shadow: inset 0 1px 0 var(--key-bevel), inset 0 -1px 0 var(--key-shade), 0 0 0 1px var(--key-rim), 0 var(--k-e) 0 var(--key-edge), 0 calc(var(--k-e) + 2px) 8px -3px var(--key-cast);
+    transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+  }
+  .key3d > svg {
+    grid-area: 1 / 1;
+    width: var(--k-g);
+    height: var(--k-g);
+    stroke-width: 1.5;
+  }
+  .key3d > .key3d-hl {
+    color: var(--key-glyph-hl);
+    transform: translateY(1px);
+  }
+  .key3d[data-size='sm'] {
+    --k: 28px;
+    --k-g: 16px;
+  }
+  .key3d[data-size='sm'] > svg {
+    stroke-width: 1.75;
+  }
+  .key3d[data-size='lg'] {
+    --k: 48px;
+    --k-g: 24px;
+  }
+  /* 현재 메뉴 = 남색 키(하단 메뉴·접힌 바 전용) */
+  .key3d[data-on] {
+    color: var(--on-accent);
+    background-image: none;
+    background-color: var(--accent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px var(--accent-edge), 0 var(--k-e) 0 var(--accent-edge), 0 calc(var(--k-e) + 2px) 8px -3px var(--key-cast);
+  }
+  .key3d[data-on] > .key3d-hl {
+    color: rgba(0, 0, 0, 0.28);
+  }
+  /* 키를 감싼 링크·버튼만 반응(임의 부모 :hover 금지) — 올리면 테두리 한 단 진하게, 누르면 내려앉음 */
+  :is(a, button, summary):hover > .key3d {
+    --key-rim: var(--line-strong);
+  }
+  :is(a, button, summary):active > .key3d {
+    --k-e: 0px;
+    transform: translateY(2px);
+  }
+  /* 바로가기 키패드 받침(대시보드 전용) — 반경 14·안쪽 8 */
+  .key-tray {
+    display: grid;
+    gap: 4px;
+    padding: 8px;
+    border-radius: var(--r-sheet);
+    background-color: var(--raised);
+  }
+}
+
+/* 공통 패턴 — 패널·표 머리·물리명 칩·배지·세그먼트 탭·입력칸·빈 상태·접힌 도움말 */
+@layer components {
+  .panel {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-1);
+  }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding-inline: 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .panel-head[data-mode='edit'] {
+    box-shadow: inset 2px 0 0 var(--warn);
+  }
+  .panel-body {
+    padding: 16px;
+  }
+  @media (min-width: 1024px) {
+    .panel-body {
+      padding: 20px;
+    }
+  }
+  /* 표 머리글 — 이름 유지(<tr className="thead-3d">), 평면 회색 머리 */
+  .thead-3d th {
+    background-color: var(--raised);
+    color: var(--ink-2);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    text-align: start;
+    white-space: nowrap;
+    text-shadow: none;
+    border-color: var(--line);
+    box-shadow: inset 0 -1px 0 var(--line-strong);
+  }
+  /* 시그니처 — 물리명 고정폭 칩 */
+  .chip-phy {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding-inline: 6px;
+    border-radius: var(--r-chip);
+    background-color: var(--raised);
+    color: var(--ink);
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    white-space: nowrap;
+  }
+  .chip-phy[data-size='lg'] {
+    height: 32px;
+    padding-inline: 10px;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    background-color: var(--well);
+    box-shadow: 0 0 0 1px var(--line-strong);
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 20px;
+    padding-inline: 6px;
+    border-radius: var(--r-chip);
+    background-color: var(--raised);
+    color: var(--ink-2);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge[data-tone='ok'] {
+    background-color: var(--ok-soft);
+    color: var(--ok);
+  }
+  .badge[data-tone='warn'] {
+    background-color: var(--warn-soft);
+    color: var(--warn);
+  }
+  .badge[data-tone='danger'] {
+    background-color: var(--danger-soft);
+    color: var(--danger);
+  }
+  .badge[data-tone='accent'] {
+    background-color: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .seg {
+    display: inline-flex;
+    max-width: 100%;
+    gap: 2px;
+    padding: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-radius: 8px;
+    background-color: var(--raised);
+  }
+  .seg-item {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding-inline: 12px;
+    border-radius: var(--r-control);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    white-space: nowrap;
+    transition: color var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+  }
+  .seg-item:hover {
+    color: var(--ink);
+  }
+  .seg-item:is([aria-current='page'], [aria-selected='true'], [aria-pressed='true']) {
+    color: var(--ink);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 1px var(--line), var(--sh-1);
+  }
+  .input {
+    width: 100%;
+    height: 36px;
+    padding-inline: 12px;
+    border-width: 1px;
+    border-radius: var(--r-control);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  .input-sm {
+    height: 28px;
+    padding-inline: 8px;
+    border-width: 1px;
+    border-radius: var(--r-control);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+  textarea.input {
+    height: auto;
+    min-height: 76px;
+    padding-block: 8px;
+  }
+  @media (max-width: 639px) {
+    .input {
+      height: 40px;
+    }
+    .input-sm {
+      height: 32px;
+    }
+  }
+  .field-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .req::after {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-inline-start: 4px;
+    vertical-align: middle;
+    border-radius: 2px;
+    background-color: var(--accent);
+  }
+  .hint {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--ink-3);
+  }
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px 16px;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+  }
+  /* 접힌 도움말(<details>, JS 없음) — 바깥 클릭으로 닫히지 않음(summary 재클릭으로 닫음, 수용) */
+  .info-tip {
+    position: relative;
+    display: inline-flex;
+  }
+  .info-tip > summary {
+    list-style: none;
+  }
+  .info-tip > summary::-webkit-details-marker {
+    display: none;
+  }
+  .info-pop {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 6px);
+    inset-inline-start: 0;
+    width: max-content;
+    max-width: min(20rem, calc(100vw - 32px));
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    background-color: var(--surface);
+    box-shadow: var(--sh-2);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    font-weight: 400;
+    color: var(--ink-2);
+    white-space: normal;
+  }
+  .info-pop[data-align='end'] {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+  }
+  /* 좁은 화면(390 등) — 기준점 옆에 띄우면 오른쪽으로 넘침 → 화면 아래 시트로(하단 메뉴 위, 메뉴 없는 화면은 바닥 16) */
+  @media (max-width: 639px) {
+    .info-pop,
+    .info-pop[data-align='end'] {
+      position: fixed;
+      top: auto;
+      inset-inline: 16px;
+      bottom: calc(var(--area-nav-h, 0px) + 16px);
+      width: auto;
+      max-width: none;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+  }
+}
+
+/* 데이터 표 공통 — 층 밖(유틸 border 보다 우선). 제외 = data-grid 속성(SQL 결과 그리드 + ERD 노드 표) */
+main table:not([data-grid]) :is(th, td) {
+  border-inline-width: 0;
+}
+main table:not([data-grid]) th {
+  white-space: nowrap;
+}
+main table:not([data-grid]) > tbody > tr:hover > td {
+  background-color: var(--raised);
+}
+main tr[aria-selected='true'] > td {
+  background-color: var(--accent-soft);
+}
+main tr[aria-selected='true'] > td:first-child {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+main tr[data-mode='edit'] > td {
+  background-color: var(--warn-soft);
 }

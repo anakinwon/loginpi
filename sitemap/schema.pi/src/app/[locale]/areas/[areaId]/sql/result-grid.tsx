@@ -3,6 +3,7 @@
 // 헤더 누르기 = 받은 행 안 정렬(오름 → 내림 → 원래), 빠른 필터 = 받은 행 안 글자 포함, 셀 누르고 Ctrl+C = 값 복사, TSV 복사·CSV·JSON 내려받기
 // 칼럼명 = 편집기로 끌어 놓기·헤더 고르고 Ctrl+C·오른쪽 누르기 복사(따옴표 식별자), 헤더 오른쪽 끝 끌기 = 칼럼 너비(두 번 누르면 자동)
 // 아래 상태줄(DBeaver 처럼) : 수행 시간 자세히('N row(s) fetched - 0.025s (0.006s fetch), on 날짜 at 시각') · 패치 크기 · 전체 패치 · 쪽 이동(처음 ‹ n/N › 끝, 화면 200행씩)
+import { ArrowDownToLine, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ChevronUp, Copy, Download } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { quoteIdent, type Dialect } from '@/lib/modelpi/sql-split'
 
@@ -47,18 +48,18 @@ function download(name: string, body: string, type: string) {
 
 // 상태 문구 — 성공 행 질의 / 반영 행 / 오류 / 건너뜀·되돌림
 function statusOf(r: RunRes, at: string, mode: RunMode): ReactNode {
-  if (r.rslt === 'ERR' || r.err_cd) return <span className="text-red-700">{r.err_cd ? `[${r.err_cd}] ` : ''}{r.err_msg ?? RSLT_NM[r.rslt]}</span>
-  if (r.rslt !== 'OK') return <span className="text-gray-600">{RSLT_NM[r.rslt]}</span>
+  if (r.rslt === 'ERR' || r.err_cd) return <span className="text-danger">{r.err_cd ? `[${r.err_cd}] ` : ''}{r.err_msg ?? RSLT_NM[r.rslt]}</span>
+  if (r.rslt !== 'OK') return <span className="text-ink-2">{RSLT_NM[r.rslt]}</span>
   const when = onAt(at)
-  const tryTag = mode === 'TRY' && r.kind === 'WRITE' ? <b className="text-amber-700">미리 실행(반영 안 됨 · Commit 필요) · </b> : null
+  const tryTag = mode === 'TRY' && r.kind === 'WRITE' ? <span className="font-medium text-warn">미리 실행(반영 안 됨 · Commit 필요) · </span> : null
   if (r.columns)
     return (
       <span>
         {tryTag}
         {r.rows?.length ?? 0} row(s) fetched - {sec(r.ms)}{r.fetch_ms != null && ` (${sec(r.fetch_ms)} fetch)`}, {when}
-        {r.cut === 'ROWS' && <b className="text-amber-700"> · 더 있음(전체 패치)</b>}
-        {r.cut === 'BYTES' && <b className="text-amber-700"> · 응답 크기 한도(3.5MB)에서 멈춤</b>}
-        {r.cut === 'TIME' && <b className="text-amber-700"> · 시간 한도에서 멈춤</b>}
+        {r.cut === 'ROWS' && <span className="font-medium text-warn"> · 더 있음(전체 패치)</span>}
+        {r.cut === 'BYTES' && <span className="font-medium text-warn"> · 응답 크기 한도(3.5MB)에서 멈춤</span>}
+        {r.cut === 'TIME' && <span className="font-medium text-warn"> · 시간 한도에서 멈춤</span>}
       </span>
     )
   return (
@@ -71,15 +72,15 @@ function statusOf(r: RunRes, at: string, mode: RunMode): ReactNode {
 
 // 아래 상태줄 — 상태 문구 · 패치 크기 · 전체 패치 · 쪽 이동
 function Bar({ status, fetch, total, pager }: { status: ReactNode; fetch: Fetch; total: string; pager?: { page: number; pages: number; go(n: number): void } }) {
-  const nav = 'rounded border bg-white px-1.5 disabled:opacity-40'
+  const nav = 'btn-ghost btn-icon btn-sm'
   return (
-    <div className="flex flex-wrap items-center gap-2 border-t bg-gray-50 px-2 py-1 text-xs">
-      <span className="min-w-0 flex-1" role="status">
-        {status} <span className="ml-1 text-gray-500">· {total}</span>
+    <div className="flex flex-wrap items-center gap-2 border-t border-line bg-canvas px-2 py-1 text-xs text-ink-2">
+      <span className="min-w-0 flex-1 font-mono" role="status">
+        {status} <span className="ms-1 text-ink-3">· {total}</span>
       </span>
       <label className="flex items-center gap-1" title="한 번에 가져올 행 수(다음 실행부터)">
         패치
-        <select value={fetch.limit} onChange={(e) => fetch.setLimit(Number(e.target.value))} className="rounded border bg-white px-1" aria-label="패치 크기">
+        <select value={fetch.limit} onChange={(e) => fetch.setLimit(Number(e.target.value))} className="input-sm w-auto" aria-label="패치 크기">
           {fetch.sizes.map((n) => (
             <option key={n} value={n}>
               {n}
@@ -87,18 +88,18 @@ function Bar({ status, fetch, total, pager }: { status: ReactNode; fetch: Fetch;
           ))}
         </select>
       </label>
-      <button type="button" className={nav} disabled={fetch.busy || !fetch.canAll} onClick={fetch.fetchAll} title={fetch.canAll ? `마지막 조회를 전체 행(최대 ${fetch.all.toLocaleString()}행·응답 3.5MB)으로 다시 실행` : '조회 문장 실행 뒤에만(쓰기 문장은 다시 실행하지 않음)'}>
-        ⏬ 전체 패치
+      <button type="button" className="btn-key btn-sm" disabled={fetch.busy || !fetch.canAll} onClick={fetch.fetchAll} title={fetch.canAll ? `마지막 조회를 전체 행(최대 ${fetch.all.toLocaleString()}행·응답 3.5MB)으로 다시 실행` : '조회 문장 실행 뒤에만(쓰기 문장은 다시 실행하지 않음)'}>
+        <ArrowDownToLine aria-hidden /> 전체 패치
       </button>
       {pager && (
-        <span className="flex items-center gap-1">
-          <button type="button" className={nav} disabled={pager.page <= 1} onClick={() => pager.go(1)} aria-label="처음 쪽">⏮</button>
-          <button type="button" className={nav} disabled={pager.page <= 1} onClick={() => pager.go(pager.page - 1)} aria-label="이전 쪽">‹</button>
-          <span className="tabular-nums">
+        <span className="flex items-center gap-0.5">
+          <button type="button" className={nav} disabled={pager.page <= 1} onClick={() => pager.go(1)} aria-label="처음 쪽" title="처음 쪽"><ChevronsLeft className="rtl:rotate-180" aria-hidden /></button>
+          <button type="button" className={nav} disabled={pager.page <= 1} onClick={() => pager.go(pager.page - 1)} aria-label="이전 쪽" title="이전 쪽"><ChevronLeft className="rtl:rotate-180" aria-hidden /></button>
+          <span className="px-1 font-mono tabular-nums">
             {pager.page} / {pager.pages}
           </span>
-          <button type="button" className={nav} disabled={pager.page >= pager.pages} onClick={() => pager.go(pager.page + 1)} aria-label="다음 쪽">›</button>
-          <button type="button" className={nav} disabled={pager.page >= pager.pages} onClick={() => pager.go(pager.pages)} aria-label="마지막 쪽">⏭</button>
+          <button type="button" className={nav} disabled={pager.page >= pager.pages} onClick={() => pager.go(pager.page + 1)} aria-label="다음 쪽" title="다음 쪽"><ChevronRight className="rtl:rotate-180" aria-hidden /></button>
+          <button type="button" className={nav} disabled={pager.page >= pager.pages} onClick={() => pager.go(pager.pages)} aria-label="마지막 쪽" title="마지막 쪽"><ChevronsRight className="rtl:rotate-180" aria-hidden /></button>
         </span>
       )}
     </div>
@@ -151,12 +152,13 @@ export function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (p
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b bg-gray-50 px-2 py-1 text-xs">
-        <input value={kw} onChange={(e) => (setKw(e.target.value), setPage(1))} placeholder="받은 행에서 찾기" className="rounded border px-2 py-0.5" aria-label="결과 빠른 필터" />
-        <button type="button" className="rounded border bg-white px-2 py-0.5" onClick={() => copy(tsv())}>TSV 복사</button>
-        <button type="button" className="rounded border bg-white px-2 py-0.5" onClick={() => download(`${base}.csv`, [cols.map((c) => csvCell(c.name)).join(','), ...rows.map((o) => o.v.map(csvCell).join(','))].join('\r\n'), 'text/csv;charset=utf-8')}>CSV</button>
-        <button type="button" className="rounded border bg-white px-2 py-0.5" onClick={() => download(`${base}.json`, JSON.stringify(rows.map((o) => Object.fromEntries(cols.map((c, i) => [c.name, o.v[i]]))), null, 2), 'application/json')}>JSON</button>
-        {note && <span className="text-gray-600" aria-live="polite">{note}</span>}
+      <div className="flex flex-wrap items-center gap-1 border-b border-line bg-canvas px-2 py-1 text-xs">
+        <input value={kw} onChange={(e) => (setKw(e.target.value), setPage(1))} placeholder="필터" className="input-sm w-40" aria-label="결과 빠른 필터" />
+        <span className="mx-1 h-5 w-px bg-line" aria-hidden />
+        <button type="button" className="btn-ghost btn-sm" onClick={() => copy(tsv())}><Copy aria-hidden /> TSV</button>
+        <button type="button" className="btn-ghost btn-sm" onClick={() => download(`${base}.csv`, [cols.map((c) => csvCell(c.name)).join(','), ...rows.map((o) => o.v.map(csvCell).join(','))].join('\r\n'), 'text/csv;charset=utf-8')}><Download aria-hidden /> CSV</button>
+        <button type="button" className="btn-ghost btn-sm" onClick={() => download(`${base}.json`, JSON.stringify(rows.map((o) => Object.fromEntries(cols.map((c, i) => [c.name, o.v[i]]))), null, 2), 'application/json')}><Download aria-hidden /> JSON</button>
+        {note && <span className="truncate text-ink-3" aria-live="polite">{note}</span>}
       </div>
       <div
         className="min-h-0 flex-1 overflow-auto"
@@ -169,9 +171,9 @@ export function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (p
         }}
       >
         <table data-grid className="border-collapse font-mono text-xs">
-          <thead className="sticky top-0 z-10 bg-[#e9eff9]">
+          <thead className="sticky top-0 z-10 bg-raised text-ink-2">
             <tr>
-              <th className="border px-2 py-1 text-right text-gray-500">#</th>
+              <th className="border px-2 py-1 text-right font-medium text-ink-3">#</th>
               {cols.map((c, i) => {
                 const q = quoteIdent(c.name, dialect)
                 return (
@@ -180,7 +182,7 @@ export function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (p
                     tabIndex={0}
                     style={wStyle(i)}
                     title="누르기 = 정렬 · 이름 끌어 편집기에 놓기 · Ctrl+C/오른쪽 누르기 = 칼럼명 복사 · 오른쪽 끝 끌기 = 너비"
-                    className="relative cursor-pointer overflow-hidden border px-2 py-1 text-left whitespace-nowrap focus:outline-2 focus:outline-blue-500"
+                    className="relative cursor-pointer overflow-hidden border px-2 py-1 text-start font-medium whitespace-nowrap text-ink focus:outline-2 focus:outline-accent-ink"
                     onClick={() => setSort(sort?.i !== i ? { i, dir: 1 } : sort.dir === 1 ? { i, dir: -1 } : null)}
                     onKeyDown={(e) => (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c' && (e.preventDefault(), e.stopPropagation(), copy(q))}
                     onContextMenu={(e) => (e.preventDefault(), copy(q))}
@@ -189,8 +191,8 @@ export function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (p
                     <span draggable onDragStart={(e) => (e.dataTransfer.setData('text/plain', q), (e.dataTransfer.effectAllowed = 'copy'))} className="cursor-grab">
                       {c.name}
                     </span>{' '}
-                    {sort?.i === i ? (sort.dir === 1 ? '▲' : '▼') : ''}
-                    <span className="block truncate text-[10px] font-normal text-gray-500">{c.type}</span>
+                    {sort?.i === i ? sort.dir === 1 ? <ChevronUp className="inline h-3 w-3 text-accent-ink" strokeWidth={2} aria-label="오름차순" /> : <ChevronDown className="inline h-3 w-3 text-accent-ink" strokeWidth={2} aria-label="내림차순" /> : ''}
+                    <span className="block truncate text-xs font-normal text-ink-3">{c.type}</span>
                     <span
                       role="separator"
                       aria-orientation="vertical"
@@ -204,7 +206,7 @@ export function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (p
                         const cw = w[i] ?? (e.currentTarget.parentElement?.getBoundingClientRect().width ?? 100)
                         setW((p) => ({ ...p, [i]: Math.max(COL_MIN, Math.round(cw + d)) }))
                       }}
-                      className="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none hover:bg-[#3b5f9e]/40"
+                      className="absolute top-0 right-0 h-full w-1.5 cursor-col-resize touch-none hover:bg-accent/40"
                       onPointerDown={resize(i)}
                       onClick={(e) => e.stopPropagation()}
                       onDoubleClick={(e) => (e.stopPropagation(), setW(({ [i]: _x, ...rest }) => rest))}
@@ -216,18 +218,18 @@ export function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (p
           </thead>
           <tbody>
             {shown.map((o, ri) => (
-              <tr key={o.n} className="hover:bg-amber-50">
-                <td className="border bg-gray-50 px-2 text-right text-gray-500">{o.n}</td>
+              <tr key={o.n} className="hover:bg-raised">
+                <td className="border bg-canvas px-2 text-right text-ink-3">{o.n}</td>
                 {o.v.map((v, ci) => (
-                  <td key={ci} style={wStyle(ci)} onClick={() => setCur({ r: ri, c: ci })} className={`max-w-[28rem] truncate border px-2 py-0.5 ${NUM.test(cols[ci]?.type ?? '') || typeof v === 'number' ? 'text-right' : ''} ${cur?.r === ri && cur?.c === ci ? 'outline outline-2 outline-blue-500' : ''}`} title={txt(v)}>
-                    {v == null ? <span className="text-gray-400 italic">[NULL]</span> : txt(v)}
+                  <td key={ci} style={wStyle(ci)} onClick={() => setCur({ r: ri, c: ci })} className={`max-w-[28rem] truncate border px-2 py-0.5 ${NUM.test(cols[ci]?.type ?? '') || typeof v === 'number' ? 'text-right' : ''} ${cur?.r === ri && cur?.c === ci ? 'outline outline-2 outline-accent-ink' : ''}`} title={txt(v)}>
+                    {v == null ? <span className="text-ink-off italic">[NULL]</span> : txt(v)}
                   </td>
                 ))}
               </tr>
             ))}
             {!shown.length && (
               <tr>
-                <td colSpan={cols.length + 1} className="p-3 text-center text-gray-500">행이 없습니다</td>
+                <td colSpan={cols.length + 1} className="py-6 text-center font-sans text-ink-3">행 없음</td>
               </tr>
             )}
           </tbody>
@@ -247,9 +249,9 @@ export default function ResultPanel({ results, ms, at, mode, dialect, fetch }: {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {results.length > 1 && (
-        <div role="tablist" className="flex gap-1 overflow-x-auto border-b px-1 pt-1 text-xs">
+        <div role="tablist" className="seg m-1 shrink-0">
           {results.map((x, k) => (
-            <button key={x.seq} role="tab" aria-selected={k === i} onClick={() => setI(k)} className={`rounded-t border px-2 py-0.5 whitespace-nowrap ${k === i ? 'bg-white font-semibold' : 'bg-gray-100'} ${x.rslt === 'ERR' ? 'text-red-700' : x.rslt === 'OK' ? '' : 'text-gray-400'}`}>
+            <button key={x.seq} role="tab" aria-selected={k === i} onClick={() => setI(k)} style={{ height: 24 }} className={`seg-item ${x.rslt === 'ERR' ? 'text-danger' : x.rslt === 'OK' ? '' : 'text-ink-off'}`}>
               {x.seq}. {x.columns ? `결과 ${x.rows?.length ?? 0}행` : x.rslt === 'OK' ? `${x.affected ?? 0}행 ${mode === 'TRY' ? '(미리)' : '반영'}` : RSLT_NM[x.rslt]}
             </button>
           ))}
@@ -261,7 +263,7 @@ export default function ResultPanel({ results, ms, at, mode, dialect, fetch }: {
         </div>
       ) : (
         <>
-          <pre className="min-h-0 flex-1 overflow-auto p-2 text-xs whitespace-pre-wrap text-gray-700">{r.txt}</pre>
+          <pre className="min-h-0 flex-1 overflow-auto p-2 font-mono text-xs whitespace-pre-wrap text-ink-2">{r.txt}</pre>
           {bar()}
         </>
       )}

@@ -5,6 +5,7 @@
 //  Data = SELECT * 쪽 단위 조회(sec=data, 50·100·200·500행) — 표는 result-grid 의 Grid 재사용 / 엔티티 관계도 = sql-obj-erd.tsx
 //  API = GET {api}/sql/obj?conn&schema&rel&sec (piFetch — Pi Browser 는 쿠키 없음), 실패 code NOT_SUPPORTED = 이 DBMS 미지원 회색 안내
 import { piFetch } from '@pi/auth/client'
+import { ArrowDownRight, ArrowUpRight, ChartColumn, ChevronLeft, ChevronRight, CircleDashed, Clock, Columns3, Copy, FileCode, KeyRound, Link2, ListTree, RotateCw, Rows3, ScrollText, ShieldCheck, SquareCheck, SquarePlus, User, Zap } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import type { Dialect } from '@/lib/modelpi/sql-split'
 import { Grid, type Cell } from './result-grid'
@@ -17,32 +18,32 @@ type DataRes = Res & { columns?: { name: string; type: string }[]; rows?: Cell[]
 type ErdRes = Res & { tables?: ErdTable[]; rels?: ErdRel[] }
 type Sub = 'props' | 'data' | 'erd'
 
-// 섹션(보고서 순서) — [sec, 라벨(그림처럼 영문, 권한만 한글), 아이콘]
+// 섹션(보고서 순서) — [sec, 라벨(그림처럼 영문, 권한만 한글), 선 아이콘(lucide)]
 const SECS = [
-  ['cols', 'Columns', '▥'],
-  ['cons', 'Constraints', '🔑'],
-  ['fks', 'Foreign Keys', '🔗'],
-  ['idx', 'Indexes', '📇'],
-  ['deps', 'Dependencies', '⤵'],
-  ['refs', 'References', '⤴'],
-  ['parts', 'Partitions', '▤'],
-  ['trg', 'Triggers', '⚡'],
-  ['rules', 'Rules', '📜'],
-  ['pol', 'Policies', '🛡'],
-  ['stats', 'Statistics', '📊'],
-  ['grants', '권한', '👤'],
-  ['ddl', 'DDL', '📄'],
-  ['virt', 'Virtual', '◌'],
+  ['cols', 'Columns', Columns3],
+  ['cons', 'Constraints', KeyRound],
+  ['fks', 'Foreign Keys', Link2],
+  ['idx', 'Indexes', ListTree],
+  ['deps', 'Dependencies', ArrowDownRight],
+  ['refs', 'References', ArrowUpRight],
+  ['parts', 'Partitions', Rows3],
+  ['trg', 'Triggers', Zap],
+  ['rules', 'Rules', ScrollText],
+  ['pol', 'Policies', ShieldCheck],
+  ['stats', 'Statistics', ChartColumn],
+  ['grants', '권한', User],
+  ['ddl', 'DDL', FileCode],
+  ['virt', 'Virtual', CircleDashed],
 ] as const
 type Sec = (typeof SECS)[number][0]
 const SIZES = [50, 100, 200, 500] as const
 const NET: Res = { ok: false, message: '요청이 실패했습니다(네트워크)' }
-// 칼럼 형식 아이콘(DBeaver 처럼) — PK 🔑 / 불리언 ☑ / 날짜·시각 🕒 / 숫자 123 / 그 밖 AZ
+// 칼럼 형식 아이콘(DBeaver 처럼) — PK KeyRound / 불리언 SquareCheck / 날짜·시각 Clock / 숫자 123 / 그 밖 AZ
 const typeIcon = (it: Record<string, Cell>) => {
   const t = String(it.type ?? '')
-  if (it.pk) return '🔑'
-  if (/bool/i.test(t)) return '☑'
-  if (/date|time|interval/i.test(t)) return '🕒'
+  if (it.pk) return <KeyRound className="inline h-3 w-3 text-warn" strokeWidth={1.75} />
+  if (/bool/i.test(t)) return <SquareCheck className="inline h-3 w-3" strokeWidth={1.75} />
+  if (/date|time|interval/i.test(t)) return <Clock className="inline h-3 w-3" strokeWidth={1.75} />
   if (/int|numeric|decimal|float|double|real|money|serial|NUMBER|BINARY_(FLOAT|DOUBLE)/i.test(t)) return '123'
   return 'AZ'
 }
@@ -55,36 +56,36 @@ const fmtBytes = (s: string | number | null) => {
 }
 
 function Fail({ r }: { r: Res }) {
-  if (r.code === 'NOT_SUPPORTED') return <p className="p-3 text-xs text-gray-500">이 DBMS 에서는 지원하지 않습니다.</p>
-  return <p className="p-3 text-xs font-medium text-red-700" role="alert">{r.message ?? '불러오지 못했습니다'}</p>
+  if (r.code === 'NOT_SUPPORTED') return <p className="p-3 text-xs text-ink-3">이 DBMS 미지원</p>
+  return <p className="p-3 text-xs text-danger" role="alert">{r.message ?? '불러오지 못했습니다'}</p>
 }
 
 // 범용 표 — 서버가 준 columns 순서·라벨 그대로(모든 섹션 공용), Columns 섹션은 이름 앞 형식 아이콘
 function SecTable({ r, cols }: { r: SecRes; cols: boolean }) {
   const hs = r.columns ?? []
   return (
-    <table className="w-full border-collapse font-mono text-[0.72rem]">
+    <table className="w-full border-collapse font-mono text-xs">
       <thead className="sticky top-0 z-10">
         <tr className="thead-3d">
           {hs.map((h) => (
-            <th key={h.key} className="border px-2 py-1 text-left whitespace-nowrap">{h.label}</th>
+            <th key={h.key} className="px-3 py-1.5 text-start font-sans whitespace-nowrap">{h.label}</th>
           ))}
         </tr>
       </thead>
       <tbody>
         {(r.items ?? []).map((it, i) => (
-          <tr key={i} className="hover:bg-amber-50">
+          <tr key={i} className="border-b border-line">
             {hs.map((h, j) => {
               const v = it[h.key]
               return (
-                <td key={h.key} className={`max-w-[28rem] truncate border px-2 py-0.5 ${typeof v === 'number' ? 'text-right' : ''} ${typeof v === 'boolean' ? 'text-center' : ''}`} title={cellTxt(v)}>
+                <td key={h.key} className={`max-w-[28rem] truncate px-3 py-1 ${typeof v === 'number' ? 'text-right' : ''} ${typeof v === 'boolean' ? 'text-center' : ''}`} title={cellTxt(v)}>
                   {cols && j === 0 && (
-                    <span className={`mr-1 inline-block w-6 text-center text-[0.6rem] font-bold ${it.pk ? '' : 'text-[#3b5f9e]'}`} aria-hidden>
+                    <span className={`me-1 inline-block w-6 text-center text-xs ${it.pk ? '' : 'text-ink-3'}`} aria-hidden>
                       {typeIcon(it)}
                     </span>
                   )}
                   {cellTxt(v)}
-                  {cols && j === 0 && it.fk ? <span className="ml-1 text-[0.6rem] text-amber-700" title="외래키 칼럼">FK</span> : null}
+                  {cols && j === 0 && it.fk ? <span className="badge ms-1" data-tone="warn" title="외래키 칼럼">FK</span> : null}
                 </td>
               )
             })}
@@ -92,7 +93,7 @@ function SecTable({ r, cols }: { r: SecRes; cols: boolean }) {
         ))}
         {!r.items?.length && (
           <tr>
-            <td colSpan={Math.max(1, hs.length)} className="p-3 text-center text-gray-500">항목이 없습니다</td>
+            <td colSpan={Math.max(1, hs.length)} className="py-6 text-center font-sans text-ink-3">항목 없음</td>
           </tr>
         )}
       </tbody>
@@ -171,52 +172,52 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
   const cur = cache[sec]
   const items = cur && cur !== 'loading' && cur.ok ? (cur.items?.length ?? 0) : null
   const subBtn = (k: Sub, nm: string) => (
-    <button key={k} type="button" role="tab" aria-selected={sub === k} onClick={() => setSub(k)} className={`rounded-t border px-2 py-0.5 whitespace-nowrap ${sub === k ? '-mb-px border-b-white bg-white font-semibold' : 'bg-gray-100 hover:bg-white'}`}>
+    <button key={k} type="button" role="tab" aria-selected={sub === k} onClick={() => setSub(k)} className="seg-item" style={{ height: 24 }}>
       {nm}
     </button>
   )
   const field = (label: string, v: React.ReactNode, wide = false) => (
     <label className={`flex min-w-0 items-center gap-1 ${wide ? 'sm:col-span-2' : ''}`}>
-      <span className="w-28 shrink-0 text-gray-600">{label}</span>
-      <span className="min-w-0 flex-1 truncate rounded border bg-gray-50 px-1.5 py-0.5 font-mono" title={typeof v === 'string' ? v : undefined}>
-        {v === '' || v == null ? <span className="text-gray-400"> </span> : v}
+      <span className="w-28 shrink-0 text-ink-3">{label}</span>
+      <span className="min-w-0 flex-1 truncate rounded-control border border-line bg-well px-2 py-0.5 font-mono text-ink" title={typeof v === 'string' ? v : undefined}>
+        {v === '' || v == null ? <span className="text-ink-off"> </span> : v}
       </span>
     </label>
   )
   const check = (label: string, v: boolean | null | undefined) => (
     <label className="flex items-center gap-1">
-      <input type="checkbox" checked={!!v} readOnly disabled className="accent-[#1f3a68]" />
-      <span className="text-gray-700">{label}</span>
+      <input type="checkbox" checked={!!v} readOnly disabled />
+      <span className="text-ink-2">{label}</span>
     </label>
   )
 
   // 오른쪽 내용 — 섹션별
   const secBody = () => {
-    if (sec === 'virt') return <p className="p-3 text-xs text-gray-500">DBeaver 가상 키(프로젝트 설정 전용, DB 객체 아님) — 이 화면에서는 제공하지 않습니다.</p>
-    if (!cur || cur === 'loading') return <p className="p-3 text-xs text-gray-500">불러오는 중…</p>
+    if (sec === 'virt') return <p className="p-3 text-xs text-ink-3">DBeaver 가상 키(프로젝트 설정 전용, DB 객체 아님) — 제공하지 않음</p>
+    if (!cur || cur === 'loading') return <p className="p-3 text-xs text-ink-3">불러오는 중…</p>
     if (!cur.ok) return <Fail r={cur} />
     if (sec === 'ddl')
       return (
         <div className="flex h-full min-h-0 flex-col">
-          <div className="flex flex-wrap items-center gap-2 border-b bg-gray-50 px-2 py-1">
-            <button type="button" className="btn-3d px-2 py-0 text-xs" onClick={() => copy(cur.ddl ?? '')}>복사</button>
-            <button type="button" className="btn-3d px-2 py-0 text-xs" disabled={sqlFull} onClick={() => onNewSql(cur.ddl ?? '')} title={sqlFull ? 'SQL 탭이 요금제 상한입니다 — 탭을 닫거나 요금제를 올리십시오' : '이 DDL 로 새 SQL 탭'}>
-              새 SQL 탭으로 열기
+          <div className="flex flex-wrap items-center gap-2 border-b border-line bg-canvas px-2 py-1">
+            <button type="button" className="btn-key btn-sm" onClick={() => copy(cur.ddl ?? '')}><Copy aria-hidden /> 복사</button>
+            <button type="button" className="btn-key btn-sm" disabled={sqlFull} onClick={() => onNewSql(cur.ddl ?? '')} title={sqlFull ? 'SQL 탭이 요금제 상한입니다 — 탭을 닫거나 요금제를 올리십시오' : '이 DDL 로 새 SQL 탭'}>
+              <SquarePlus aria-hidden /> 새 SQL 탭
             </button>
-            {sqlFull && <span className="text-gray-500">SQL 탭 상한 — 탭을 닫으면 열 수 있습니다</span>}
-            {note && <span className="text-gray-600" aria-live="polite">{note}</span>}
+            {sqlFull && <span className="text-ink-3">SQL 탭 상한 — 탭을 닫으면 열 수 있음</span>}
+            {note && <span className="text-ink-3" aria-live="polite">{note}</span>}
           </div>
-          <pre className="min-h-0 flex-1 overflow-auto bg-white p-2 font-mono text-[0.72rem] whitespace-pre">{cur.ddl}</pre>
+          <pre className="paper min-h-0 flex-1 overflow-auto bg-surface p-2 font-mono text-xs whitespace-pre">{cur.ddl}</pre>
         </div>
       )
     return (
       <div className="flex h-full min-h-0 flex-col">
         {sec === 'stats' && (
-          <div className="flex flex-wrap items-center gap-2 border-b bg-gray-50 px-2 py-1">
-            <button type="button" className="btn-3d px-2 py-0 text-xs" onClick={() => void countRows()} title="SELECT COUNT(*) — 큰 테이블은 오래 걸릴 수 있음">
+          <div className="flex flex-wrap items-center gap-2 border-b border-line bg-canvas px-2 py-1">
+            <button type="button" className="btn-key btn-sm" onClick={() => void countRows()} title="SELECT COUNT(*) — 큰 테이블은 오래 걸릴 수 있음">
               실제 행 수 세기
             </button>
-            {count != null && <span className="font-mono">{typeof count === 'number' ? `${count.toLocaleString()} 행` : count}</span>}
+            {count != null && <span className="font-mono tabular-nums">{typeof count === 'number' ? `${count.toLocaleString()} 행` : count}</span>}
           </div>
         )}
         <div className="min-h-0 flex-1 overflow-auto">
@@ -228,18 +229,20 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
 
   const dr = data.res
   return (
-    <div className="flex h-full min-h-0 flex-col text-[0.75rem]">
-      <div role="tablist" aria-label="객체 편집기" className="flex shrink-0 gap-1 overflow-x-auto overflow-y-hidden border-b bg-gray-50 px-1 pt-1">
-        {subBtn('props', 'Properties')}
-        {subBtn('data', 'Data')}
-        {!isView && subBtn('erd', '엔티티 관계도')}
+    <div className="flex h-full min-h-0 flex-col text-xs">
+      <div className="flex shrink-0 items-center border-b border-line bg-canvas px-2 py-1">
+        <span role="tablist" aria-label="객체 편집기" className="seg">
+          {subBtn('props', 'Properties')}
+          {subBtn('data', 'Data')}
+          {!isView && subBtn('erd', '엔티티 관계도')}
+        </span>
       </div>
 
       {sub === 'props' && (
         <div className="flex min-h-0 flex-1 flex-col">
-          <section className="shrink-0 border-b px-2 py-1.5" aria-label="테이블 정보">
+          <section className="shrink-0 border-b border-line px-3 py-2" aria-label="테이블 정보">
             {head === 'loading' || !head ? (
-              <p className="text-gray-500">불러오는 중…</p>
+              <p className="text-ink-3">불러오는 중…</p>
             ) : !head.ok ? (
               <Fail r={head} />
             ) : (
@@ -260,28 +263,28 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
           </section>
           <div className="flex min-h-0 flex-1 flex-col md:flex-row">
             {/* 좁은 화면 = 고르기 상자, 넓은 화면 = 왼쪽 세로 목록 */}
-            <select value={sec} onChange={(e) => setSec(e.target.value as Sec)} className="m-1 shrink-0 rounded border px-1 py-0.5 md:hidden" aria-label="섹션">
-              {SECS.map(([k, nm, ic]) => (
+            <select value={sec} onChange={(e) => setSec(e.target.value as Sec)} className="input-sm m-2 w-auto shrink-0 md:hidden" aria-label="섹션">
+              {SECS.map(([k, nm]) => (
                 <option key={k} value={k}>
-                  {ic} {nm}
+                  {nm}
                 </option>
               ))}
             </select>
-            <nav aria-label="섹션" className="hidden w-40 shrink-0 overflow-y-auto border-r bg-gray-50 py-1 md:block">
-              {SECS.map(([k, nm, ic]) => (
-                <button key={k} type="button" aria-current={sec === k} onClick={() => setSec(k)} className={`flex w-full items-center gap-1.5 px-2 py-0.5 text-left ${sec === k ? 'bg-[#dbe5f5] font-semibold text-[#1f3a68]' : 'hover:bg-white'}`}>
-                  <span className="w-4 text-center" aria-hidden>{ic}</span>
+            <nav aria-label="섹션" className="hidden w-40 shrink-0 overflow-y-auto border-e border-line bg-canvas p-1 md:block">
+              {SECS.map(([k, nm, Ic]) => (
+                <button key={k} type="button" aria-current={sec === k} onClick={() => setSec(k)} className={`flex w-full items-center gap-2 rounded-control px-2 py-1 text-start transition-colors ${sec === k ? 'bg-accent-soft font-medium text-accent-ink' : 'text-ink-2 hover:bg-raised hover:text-ink'}`}>
+                  <Ic className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
                   {nm}
                 </button>
               ))}
             </nav>
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
               <div className="min-h-0 flex-1">{secBody()}</div>
-              <div className="flex shrink-0 items-center gap-2 border-t bg-gray-50 px-2 py-1">
-                <button type="button" className="btn-3d px-2 py-0 text-xs" disabled={sec === 'virt' || cur === 'loading'} onClick={() => (sec === 'stats' && setCount(null), void loadSec(sec))} title="이 섹션 다시 불러오기">
-                  ↻ Refresh
+              <div className="flex shrink-0 items-center gap-2 border-t border-line bg-canvas px-2 py-1">
+                <button type="button" className="btn-ghost btn-sm" disabled={sec === 'virt' || cur === 'loading'} onClick={() => (sec === 'stats' && setCount(null), void loadSec(sec))} title="이 섹션 다시 불러오기">
+                  <RotateCw aria-hidden /> 새로고침
                 </button>
-                <span className="ml-auto text-gray-500">{items != null && sec !== 'ddl' ? `${items} items` : ''}</span>
+                <span className="ms-auto font-mono text-ink-3 tabular-nums">{items != null && sec !== 'ddl' ? `${items} items` : ''}</span>
               </div>
             </div>
           </div>
@@ -290,12 +293,12 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
 
       {sub === 'data' && (
         <div className="flex min-h-0 flex-1 flex-col">
-          <p className="shrink-0 truncate border-b bg-gray-50 px-2 py-0.5 font-mono text-gray-700" title="이 탭이 실행하는 조회(조회 전용)">
+          <p className="shrink-0 truncate border-b border-line bg-canvas px-2 py-1 font-mono text-ink-2" title="이 탭이 실행하는 조회(조회 전용)">
             SELECT * FROM {qn}
           </p>
           <div className="min-h-0 flex-1">
             {!dr || dr === 'loading' ? (
-              <p className="p-3 text-gray-500">불러오는 중…</p>
+              <p className="p-3 text-ink-3">불러오는 중…</p>
             ) : !dr.ok ? (
               <Fail r={dr} />
             ) : (
@@ -304,32 +307,32 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
                 r={{ seq: data.page, txt: `SELECT * FROM ${qn}`, kind: 'READ', rslt: 'OK', columns: dr.columns ?? [], rows: dr.rows ?? [] }}
                 dialect={dialect}
                 bar={(pager) => {
-                  const nav = 'rounded border bg-white px-1.5 disabled:opacity-40'
+                  const nav = 'btn-ghost btn-icon btn-sm'
                   const from = (data.page - 1) * data.size
                   return (
-                    <div className="flex flex-wrap items-center gap-2 border-t bg-gray-50 px-2 py-1 text-xs">
-                      <span className="min-w-0 flex-1" role="status">
+                    <div className="flex flex-wrap items-center gap-2 border-t border-line bg-canvas px-2 py-1 text-xs text-ink-2">
+                      <span className="min-w-0 flex-1 font-mono tabular-nums" role="status">
                         {dr.rows?.length ? `${(from + 1).toLocaleString()} – ${(from + dr.rows.length).toLocaleString()}행` : '행 없음'}
-                        {dr.more && <b className="ml-1 text-amber-700">· 더 있음</b>}
+                        {dr.more && <span className="ms-1 font-medium text-warn">· 더 있음</span>}
                       </span>
                       <label className="flex items-center gap-1">
                         건수
-                        <select value={data.size} onChange={(e) => void loadData(1, Number(e.target.value))} className="rounded border bg-white px-1" aria-label="한 쪽 행 수">
+                        <select value={data.size} onChange={(e) => void loadData(1, Number(e.target.value))} className="input-sm w-auto" aria-label="한 쪽 행 수">
                           {SIZES.map((n) => (
                             <option key={n} value={n}>{n}</option>
                           ))}
                         </select>
                       </label>
-                      <button type="button" className={nav} disabled={data.page <= 1} onClick={() => void loadData(data.page - 1, data.size)} aria-label="이전 쪽">‹ 이전</button>
-                      <span className="tabular-nums">{data.page}쪽</span>
-                      <button type="button" className={nav} disabled={!dr.more} onClick={() => void loadData(data.page + 1, data.size)} aria-label="다음 쪽">다음 ›</button>
-                      <button type="button" className={nav} onClick={() => void loadData(data.page, data.size)} title="이 쪽 다시 조회">↻</button>
+                      <button type="button" className={nav} disabled={data.page <= 1} onClick={() => void loadData(data.page - 1, data.size)} aria-label="이전 쪽" title="이전 쪽"><ChevronLeft className="rtl:rotate-180" aria-hidden /></button>
+                      <span className="font-mono tabular-nums">{data.page}쪽</span>
+                      <button type="button" className={nav} disabled={!dr.more} onClick={() => void loadData(data.page + 1, data.size)} aria-label="다음 쪽" title="다음 쪽"><ChevronRight className="rtl:rotate-180" aria-hidden /></button>
+                      <button type="button" className={nav} onClick={() => void loadData(data.page, data.size)} aria-label="이 쪽 다시 조회" title="이 쪽 다시 조회"><RotateCw aria-hidden /></button>
                       {pager.pages > 1 && (
-                        <span className="flex items-center gap-1 text-gray-500" title="받은 행을 화면에서 200행씩">
+                        <span className="flex items-center gap-1 text-ink-3" title="받은 행을 화면에서 200행씩">
                           화면
-                          <button type="button" className={nav} disabled={pager.page <= 1} onClick={() => pager.go(pager.page - 1)} aria-label="화면 이전">‹</button>
-                          {pager.page}/{pager.pages}
-                          <button type="button" className={nav} disabled={pager.page >= pager.pages} onClick={() => pager.go(pager.page + 1)} aria-label="화면 다음">›</button>
+                          <button type="button" className={nav} disabled={pager.page <= 1} onClick={() => pager.go(pager.page - 1)} aria-label="화면 이전" title="화면 이전"><ChevronLeft className="rtl:rotate-180" aria-hidden /></button>
+                          <span className="font-mono tabular-nums">{pager.page}/{pager.pages}</span>
+                          <button type="button" className={nav} disabled={pager.page >= pager.pages} onClick={() => pager.go(pager.page + 1)} aria-label="화면 다음" title="화면 다음"><ChevronRight className="rtl:rotate-180" aria-hidden /></button>
                         </span>
                       )}
                     </div>
@@ -344,7 +347,7 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
       {sub === 'erd' && (
         <div className="min-h-0 flex-1">
           {!erd || erd === 'loading' ? (
-            <p className="p-3 text-gray-500">불러오는 중…</p>
+            <p className="p-3 text-ink-3">불러오는 중…</p>
           ) : !erd.ok ? (
             <Fail r={erd} />
           ) : (

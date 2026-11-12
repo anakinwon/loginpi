@@ -18,13 +18,14 @@ type Data = {
   verdict: 'DEPLOYING' | 'FAIL' | 'WAIT' | 'OK' | 'SLOW' | 'RECUR'
   minReq: number
 }
-const VERDICT: Record<Data['verdict'], [string, string]> = {
-  DEPLOYING: ['운영 배포 중', 'border-violet-400 bg-violet-50 text-violet-800'],
-  FAIL: ['배포 실패 — 이전 배포 유지(재분석 가능)', 'border-red-400 bg-red-50 text-red-700'],
-  SLOW: ['느림 그대로 — 배포 후 느림 비율이 줄지 않음', 'border-amber-400 bg-amber-50 text-amber-800'],
-  WAIT: ['확인 중 — 배포 후 요청 부족', 'border-amber-400 bg-amber-50 text-amber-800'],
-  OK: ['해결 확인 — 배포 후 오류 0', 'border-emerald-500 bg-emerald-50 text-emerald-800'],
-  RECUR: ['재발 — 배포 후에도 서버 오류', 'border-red-400 bg-red-50 text-red-700'],
+// 판정 → 문구·배지 색조(badge data-tone)
+const VERDICT: Record<Data['verdict'], [string, 'ok' | 'warn' | 'danger' | 'accent']> = {
+  DEPLOYING: ['운영 배포 중', 'accent'],
+  FAIL: ['배포 실패 — 이전 배포 유지(재분석 가능)', 'danger'],
+  SLOW: ['느림 그대로 — 배포 후 느림 비율이 줄지 않음', 'warn'],
+  WAIT: ['확인 중 — 배포 후 요청 부족', 'warn'],
+  OK: ['해결 확인 — 배포 후 오류 0', 'ok'],
+  RECUR: ['재발 — 배포 후에도 서버 오류', 'danger'],
 }
 const POLL_MS = 5_000
 const hm = (t: string | number) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
@@ -63,28 +64,28 @@ export default function VerifyPanel({ route }: { route: string }) {
     }
   }, [route, areaId])
 
-  if (err) return <p className="text-xs text-red-700">{err}</p>
-  if (d === undefined) return <p className="text-xs text-[#5b6578]">배포 후 실측을 불러오는 중…</p>
-  if (d === null) return <p className="text-xs text-[#5b6578]">이 경로의 AI 수정 배포 기록이 없습니다.</p>
+  if (err) return <p className="text-xs text-danger">{err}</p>
+  if (d === undefined) return <p className="text-xs text-ink-3">배포 후 실측 불러오는 중…</p>
+  if (d === null) return <p className="text-xs text-ink-3">이 경로의 AI 수정 배포 기록 없음</p>
   const v = VERDICT[d.verdict]
   const mins = Math.max(0, Math.floor((d.now - d.deploy.cut) / 60_000))
   return (
-    <div className="rounded border border-[#d6deeb] bg-white p-2 text-xs" aria-live="polite">
+    <div className="rounded-card border border-line bg-surface p-3 text-xs" aria-live="polite">
       <div className="flex flex-wrap items-center gap-2">
-        <b className="text-[#2c3850]">{d.deploy.rbk ? '되돌림 배포 후 실시간 확인' : '배포 후 실시간 확인'}</b>
-        <span className={`rounded border px-2 py-0.5 font-semibold ${v[1]}`}>{v[0]}</span>
-        <span className="text-[#5b6578]">
+        <span className="text-sm font-semibold text-ink">{d.deploy.rbk ? '되돌림 배포 후 실시간 확인' : '배포 후 실시간 확인'}</span>
+        <span className="badge" data-tone={v[1]}>{v[0]}</span>
+        <span className="text-ink-3">
           {routeMenu(route)} · <span className="font-mono">{route}</span>
           {d.deploy.pr != null && ` · PR #${d.deploy.pr}`}
           {d.deploy.at && ` · 배포 확인 ${hm(d.deploy.at)} · 경과 ${mins}분`}
           {d.deploy.until > d.now && ` · 재분석 가능 ${hm(d.deploy.until)} 이후`}
         </span>
-        <span className="ml-auto text-[#8a93a5]">{at ? `${hm(at)} 갱신 · ${POLL_MS / 1000}초마다` : ''}</span>
+        <span className="ms-auto font-mono text-ink-3">{at ? `${hm(at)} 갱신 · ${POLL_MS / 1000}초마다` : ''}</span>
       </div>
       {d.verdict !== 'DEPLOYING' && d.verdict !== 'FAIL' && (
-        <table className="mt-1 border-collapse tabular-nums">
+        <table data-grid className="mt-2 border-collapse tabular-nums">
           <thead>
-            <tr className="text-left text-[#5b6578]">
+            <tr className="text-start text-ink-3">
               {['', '요청', '오류', '오류율', '느림'].map((h) => (
                 <th key={h} className="pr-4 font-normal">
                   {h}
@@ -94,16 +95,16 @@ export default function VerifyPanel({ route }: { route: string }) {
           </thead>
           <tbody>
             <tr>
-              <td className="pr-4 font-semibold text-[#2c3850]">배포 후</td>
+              <td className="pr-4 font-medium text-ink">배포 후</td>
               <td className="pr-4">
                 {d.post.req}
-                {d.post.req < d.minReq && <span className="text-amber-700"> / 판정 {d.minReq}건 필요</span>}
+                {d.post.req < d.minReq && <span className="text-warn"> / 판정 {d.minReq}건 필요</span>}
               </td>
-              <td className={`pr-4 ${d.post.err ? 'font-semibold text-red-700' : ''}`}>{d.post.err}</td>
+              <td className={`pr-4 ${d.post.err ? 'font-medium text-danger' : ''}`}>{d.post.err}</td>
               <td className="pr-4">{rate(d.post)}</td>
               <td className="pr-4">{d.post.slow}</td>
             </tr>
-            <tr className="text-[#5b6578]">
+            <tr className="text-ink-3">
               <td className="pr-4">배포 전(같은 길이)</td>
               <td className="pr-4">{d.pre.req}</td>
               <td className="pr-4">{d.pre.err}</td>
@@ -113,9 +114,9 @@ export default function VerifyPanel({ route }: { route: string }) {
           </tbody>
         </table>
       )}
-      {d.aborted > 0 && <p className="mt-1 text-[#5b6578]">끊긴 요청(상태 0, 화면 이동·새로고침) {d.aborted}건 — 서버 오류가 아니라 판정에서 제외</p>}
+      {d.aborted > 0 && <p className="mt-1 text-ink-3">끊긴 요청(상태 0, 화면 이동·새로고침) {d.aborted}건 — 판정에서 제외</p>}
       {d.evts.length > 0 && (
-        <ul className="mt-1 text-red-700">
+        <ul className="mt-1 font-mono text-danger">
           {d.evts.slice(0, 5).map((e, i) => (
             <li key={i}>
               {hm(e.occr_dtm)} · {e.evt_cd === 'ERR' ? `오류 ${e.sts_no}` : '느림'} · {e.rsp_val}ms · {pageMenu(e.scr_txt)}
@@ -123,7 +124,7 @@ export default function VerifyPanel({ route }: { route: string }) {
           ))}
         </ul>
       )}
-      {d.verdict === 'WAIT' && <p className="mt-1 text-[#5b6578]">이 API 를 쓰는 화면({routeMenu(route)})을 열어 요청을 만들면 15~20초 안에 반영됩니다(브라우저 계측 묶음 전송).</p>}
+      {d.verdict === 'WAIT' && <p className="mt-1 text-ink-3">{routeMenu(route)} 화면을 열어 요청을 만들면 15~20초 안에 반영</p>}
     </div>
   )
 }

@@ -4,7 +4,10 @@
 //  오른쪽 탭 : 미리보기(+실행 요청) / 요청·승인·실행 결과 / 접속 관리 — 실행은 DA 승인 후(자기 승인 금지), 서버 직접(PostgreSQL·Oracle) 또는 로컬 에이전트
 // ponytail: 테이블 목록은 물리 모델 전체를 한 번 받아 화면에서 페이지 나눔(DDL 생성에 전체가 필요) — 수천 개 모델이면 서버 페이지 조회로
 import { piFetch } from '@pi/auth/client'
-import { Link } from '@/i18n/navigation'
+import { ChevronLeft, ChevronRight, Download, TriangleAlert } from 'lucide-react'
+import { Icon3D } from '@/components/icon-3d'
+import { InfoTip, PageHead } from '@/components/page-head'
+import { MENU_ICON } from '@/lib/menu-icons'
 import { use, useEffect, useMemo, useState } from 'react'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import ConnPanel, { type Conn } from './conn-panel'
@@ -190,7 +193,7 @@ export default function DdlPage({
     setRev((r) => r + 1)
     setTab('req')
   }
-  const sel2 = 'rounded border border-white/60 bg-white px-2 py-1 text-gray-900'
+  const sel2 = 'input-sm w-auto max-w-full'
   const subjNm = new Map(subjs.map((s) => [s.subj_id, s.subj_nm]))
   const pickedBySubj = [
     ...new Set(
@@ -200,15 +203,16 @@ export default function DdlPage({
     (s) =>
       `${subjNm.get(s)} ${tbls.filter((t) => t.subj_id === s && picked.has(t.phy_tbl_id)).length}`,
   )
+  const TD = 'border-b px-3 py-1.5'
 
   return (
-    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
-      <Link href="/" className="text-sm text-blue-700 underline">
-        ← 분류체계 목록
-      </Link>
-      <h1 className="mt-1 text-2xl font-bold">DDL 생성</h1>
+    <main className="w-full px-4 py-4 lg:px-6 lg:py-5">
+      <PageHead
+        title="DDL 생성"
+        info="순서 = 테이블 작성완료 → ERD 작성완료 → DDL. PK 는 유일 인덱스를 먼저 만든 뒤 그 인덱스로 생성하고, FK 는 만들지 않습니다(PostgreSQL 은 이름 전부 소문자). 다른 주제영역으로 옮겨 가도 선택은 유지됩니다."
+      />
       <section
-        className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#c7d2e6] bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow-md"
+        className="panel flex flex-wrap items-center gap-2 px-3 py-2"
         aria-label="DDL 대상 선택"
       >
         <select
@@ -217,7 +221,7 @@ export default function DdlPage({
           className={sel2}
           aria-label="프로젝트 선택"
         >
-          {prjs.length === 0 && <option value="">프로젝트가 없습니다</option>}
+          {prjs.length === 0 && <option value="">프로젝트 없음</option>}
           {prjs.map((p) => (
             <option key={p.prj_id} value={p.prj_id}>
               {p.prj_nm}
@@ -230,38 +234,40 @@ export default function DdlPage({
           className={sel2}
           aria-label="물리 모델(DBMS)"
         >
-          {mdls.length === 0 && <option value="">물리 모델이 없습니다</option>}
+          {mdls.length === 0 && <option value="">물리 모델 없음</option>}
           {mdls.map((m) => (
             <option key={m.phy_mdl_id} value={m.phy_mdl_id}>
               물리 {dbmsList().find((d) => d.cd === m.dbms_cd)?.nm ?? m.dbms_cd}
             </option>
           ))}
         </select>
-        <span className="text-xs text-white/80">
-          순서 : 테이블 작성완료 → ERD 작성완료 → DDL
-        </span>
       </section>
       {msg && (
-        <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">
+        <p role="status" className="mt-2 text-dense text-ink-2">
           {msg}
         </p>
       )}
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)_minmax(0,1.3fr)]">
-        <nav className="rounded border text-sm" aria-label="주제영역">
-          <h2 className="bg-[#e9eff9] px-2 py-1 font-semibold">주제영역</h2>
-          <ul>
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[220px_minmax(0,1fr)_minmax(0,1.3fr)]">
+        <nav className="panel self-start overflow-hidden text-dense" aria-label="주제영역">
+          <h2 className="panel-head">주제영역</h2>
+          <ul className="py-1">
             {subjs.map((s) => (
               <li key={s.subj_id}>
                 <button
                   type="button"
                   onClick={() => (setSubjId(s.subj_id), setPage(1))}
                   aria-current={s.subj_id === subjId}
-                  className={`w-full px-3 py-1 text-left ${s.subj_id === subjId ? 'bg-amber-100' : 'hover:bg-gray-50'} ${s.dgm_done ? '' : 'text-gray-400'}`}
+                  className={`w-full px-4 py-1.5 text-start transition-colors ${s.subj_id === subjId ? 'bg-accent-soft text-ink' : 'hover:bg-raised'} ${s.dgm_done ? 'text-ink-2' : 'text-ink-3'}`}
                 >
-                  {s.subj_nm} <span className="text-xs">({s.n})</span>
+                  {s.subj_nm}{' '}
+                  <span className="font-mono text-xs text-ink-3 tabular-nums">
+                    {s.n}
+                  </span>
                   {!s.dgm_done && (
-                    <span className="block text-xs">ERD 작성완료 필요</span>
+                    <span className="block text-xs text-warn">
+                      ERD 작성완료 필요
+                    </span>
                   )}
                 </button>
               </li>
@@ -270,77 +276,83 @@ export default function DdlPage({
         </nav>
 
         <section
-          className="rounded border p-2 text-sm"
+          className="panel p-3 text-dense"
           aria-label="물리 테이블 목록"
         >
           <div className="flex flex-wrap items-center gap-2">
             <input
               value={kw}
               onChange={(e) => (setKw(e.target.value), setPage(1))}
-              placeholder="테이블 이름 검색"
-              className="rounded border px-2 py-1"
+              placeholder="테이블명"
+              className="input min-w-0 flex-1"
               aria-label="테이블 검색"
             />
-            <label className="flex items-center gap-1">
+            <label className="flex items-center gap-2 whitespace-nowrap text-ink-2">
               <input
                 type="checkbox"
                 checked={allOn}
                 disabled={!okIds.length}
                 onChange={(e) => toggle(okIds, e.target.checked)}
               />{' '}
-              이 주제영역 전체 선택({okIds.length})
+              전체 선택({okIds.length})
             </label>
           </div>
-          <table className="mt-2 w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="w-8 border px-1 py-1">선택</th>
-                <th className="border px-2 py-1 text-left">테이블</th>
-                <th className="border px-2 py-1 text-left">상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((t) => (
-                <tr key={t.phy_tbl_id} className={t.ok ? '' : 'text-gray-400'}>
-                  <td className="border px-1 py-1 text-center">
-                    <input
-                      type="checkbox"
-                      disabled={!t.ok}
-                      checked={picked.has(t.phy_tbl_id)}
-                      onChange={(e) => toggle([t.phy_tbl_id], e.target.checked)}
-                      aria-label={`${t.tbl_nm} 선택`}
-                    />
-                  </td>
-                  <td className="border px-2 py-1 font-mono">{t.tbl_nm}</td>
-                  <td className="border px-2 py-1 text-xs">
-                    {t.ok ? (
-                      <span className="text-green-700">대상</span>
-                    ) : (
-                      <span className="rounded bg-gray-100 px-1">{t.why}</span>
-                    )}
-                  </td>
+          <div className="mt-3 overflow-x-auto rounded-card border border-line">
+            <table className="w-full border-collapse text-dense">
+              <thead>
+                <tr className="thead-3d text-start">
+                  <th className="w-10 px-3 py-2">선택</th>
+                  <th className="px-3 py-2 text-start">테이블</th>
+                  <th className="px-3 py-2 text-start">상태</th>
                 </tr>
-              ))}
-              {!rows.length && (
-                <tr>
-                  <td colSpan={3} className="p-3 text-center text-gray-500">
-                    테이블이 없습니다
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          <div className="mt-2 flex flex-wrap items-center gap-1 text-xs">
-            <span className="mr-auto text-gray-600">
-              총 {list.length}개 · {page} / {pages} 페이지
+              </thead>
+              <tbody>
+                {rows.map((t) => (
+                  <tr key={t.phy_tbl_id} className={t.ok ? '' : 'text-ink-3'}>
+                    <td className={`${TD} text-center`}>
+                      <input
+                        type="checkbox"
+                        disabled={!t.ok}
+                        checked={picked.has(t.phy_tbl_id)}
+                        onChange={(e) => toggle([t.phy_tbl_id], e.target.checked)}
+                        aria-label={`${t.tbl_nm} 선택`}
+                      />
+                    </td>
+                    <td className={TD}>
+                      <span className="chip-phy">{t.tbl_nm}</span>
+                    </td>
+                    <td className={TD}>
+                      {t.ok ? (
+                        <span className="text-xs text-ok">대상</span>
+                      ) : (
+                        <span className="badge">{t.why}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {!rows.length && (
+                  <tr>
+                    <td colSpan={3} className="px-3 py-6 text-center text-ink-3">
+                      테이블 없음
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-1">
+            <span className="me-auto font-mono text-xs text-ink-3 tabular-nums">
+              총 {list.length.toLocaleString()}건 · {page} / {pages}
             </span>
             <button
               type="button"
               onClick={() => setPage(page - 1)}
               disabled={page <= 1}
-              className="rounded border px-2 py-1 disabled:opacity-30"
+              aria-label="이전"
+              title="이전"
+              className="btn-ghost btn-icon btn-sm"
             >
-              ‹
+              <ChevronLeft className="rtl:rotate-180" aria-hidden />
             </button>
             {Array.from(
               { length: Math.min(5, pages) },
@@ -351,8 +363,8 @@ export default function DdlPage({
                 key={p}
                 type="button"
                 onClick={() => setPage(p)}
-                aria-current={p === page}
-                className={`hidden rounded border px-2 py-1 sm:inline ${p === page ? 'bg-[#1f3a68] text-white' : ''}`}
+                aria-current={p === page ? 'page' : undefined}
+                className="btn-ghost btn-sm hidden min-w-8 tabular-nums sm:inline-flex"
               >
                 {p}
               </button>
@@ -361,22 +373,24 @@ export default function DdlPage({
               type="button"
               onClick={() => setPage(page + 1)}
               disabled={page >= pages}
-              className="rounded border px-2 py-1 disabled:opacity-30"
+              aria-label="다음"
+              title="다음"
+              className="btn-ghost btn-icon btn-sm"
             >
-              ›
+              <ChevronRight className="rtl:rotate-180" aria-hidden />
             </button>
           </div>
         </section>
 
         <section
-          className="rounded border p-2 text-sm"
+          className="panel min-w-0 p-3 text-dense"
           aria-label="DDL 미리보기·실행"
         >
-          <div role="tablist" className="mb-2 flex gap-1 border-b text-sm">
+          <div role="tablist" className="seg mb-3">
             {(
               [
                 ['pv', 'DDL 미리보기'],
-                ['req', '실행 요청·승인·결과'],
+                ['req', '실행 요청·결과'],
                 ['conn', 'DB 접속'],
               ] as const
             ).map(([k, nm]) => (
@@ -386,7 +400,7 @@ export default function DdlPage({
                 role="tab"
                 aria-selected={tab === k}
                 onClick={() => setTab(k)}
-                className={`-mb-px rounded-t border px-3 py-1 ${tab === k ? 'border-b-white bg-white font-semibold text-[#1f3a68]' : 'bg-gray-50 text-gray-600'}`}
+                className="seg-item"
               >
                 {nm}
               </button>
@@ -399,48 +413,51 @@ export default function DdlPage({
           {tab === 'pv' && (
             <>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-[#1f3a68]">
+                <span className="font-medium text-ink tabular-nums">
                   선택 {picked.size}개
                 </span>
                 {pickedBySubj.length > 0 && (
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-ink-3">
                     ({pickedBySubj.join(' · ')})
                   </span>
                 )}
-                <button
-                  type="button"
-                  className="ml-auto rounded bg-[#1f3a68] px-3 py-1 text-white disabled:opacity-40"
-                  disabled={!picked.size || busy}
-                  onClick={() => void preview()}
-                >
-                  DDL 미리보기
-                </button>
-                <button
-                  type="button"
-                  className="rounded border px-3 py-1 disabled:opacity-40"
-                  disabled={!pv?.ddl}
-                  onClick={down}
-                >
-                  내려받기(.sql)
-                </button>
-                <button
-                  type="button"
-                  className="rounded border px-2 py-1 text-xs"
-                  disabled={!picked.size}
-                  onClick={() => toggle([...picked], false)}
-                >
-                  선택 해제
-                </button>
+                <span className="ms-auto flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    className="btn-ghost btn-sm"
+                    disabled={!picked.size}
+                    onClick={() => toggle([...picked], false)}
+                  >
+                    선택 해제
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-key btn-sm"
+                    disabled={!pv?.ddl}
+                    onClick={down}
+                  >
+                    <Download aria-hidden />
+                    .sql
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-3d btn-sm"
+                    disabled={!picked.size || busy}
+                    onClick={() => void preview()}
+                  >
+                    DDL 미리보기
+                  </button>
+                </span>
               </div>
               {pv && (
                 <>
-                  <p className="mt-2 text-xs text-gray-600">
+                  <p className="mt-2 text-xs text-ink-3 tabular-nums">
                     테이블 {pv.tbl_cnt}개 · 실행 문장 {pv.stmt_cnt}개 · 해시{' '}
                     <span className="font-mono">{pv.hash.slice(0, 8)}</span>
                   </p>
                   {pv.blockers.length > 0 && (
                     <ul
-                      className="mt-2 list-disc rounded border border-red-200 bg-red-50 py-1 pl-6 text-xs text-red-800"
+                      className="mt-2 list-disc ps-5 text-xs text-danger"
                       aria-label="실행 차단 사유"
                     >
                       {pv.blockers.map((b, i) => (
@@ -449,16 +466,20 @@ export default function DdlPage({
                     </ul>
                   )}
                   <div
-                    className="mt-2 flex flex-wrap items-center gap-2 rounded border border-[#c7d2e6] bg-[#f4f7fc] p-2"
+                    className="mt-3 flex flex-wrap items-center gap-2 rounded-card border border-line bg-well p-3"
                     aria-label="DB 실행 요청"
                   >
-                    <span className="text-xs font-semibold">
+                    <span className="flex items-center gap-1 text-xs font-medium text-ink-2">
                       DB 에 직접 생성
+                      <InfoTip label="실행 절차">
+                        요청 → 다른 데이터아키텍트 승인 → 실행(서버 직접은 이
+                        화면, 에이전트는 사내 PC 에서 자동)
+                      </InfoTip>
                     </span>
                     <select
                       value={connId}
                       onChange={(e) => setConnId(e.target.value)}
-                      className="rounded border px-2 py-1 text-xs"
+                      className="input-sm w-auto max-w-full"
                       aria-label="실행할 DB 접속"
                     >
                       <option value="">접속 선택</option>
@@ -471,7 +492,7 @@ export default function DdlPage({
                     </select>
                     <button
                       type="button"
-                      className="rounded bg-emerald-600 px-3 py-1 text-xs text-white disabled:opacity-40"
+                      className="btn-danger btn-sm"
                       disabled={
                         !connId ||
                         busy ||
@@ -487,30 +508,26 @@ export default function DdlPage({
                     >
                       실행 요청
                     </button>
-                    <span className="w-full text-xs font-medium text-red-700">⚠ DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.</span>
+                    <span className="flex w-full items-start gap-1 text-xs text-danger">
+                      <TriangleAlert className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
+                      테이블마다 CREATE 직전 DROP … CASCADE 포함 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다
+                    </span>
                     {!myConns.length && (
-                      <span className="text-xs text-gray-500">
-                        이 DBMS 접속이 없습니다 — 'DB 접속' 탭에서
-                        등록(데이터아키텍트)
+                      <span className="w-full text-xs text-ink-3">
+                        이 DBMS 접속 없음 — 'DB 접속' 탭에서 등록(데이터아키텍트)
                       </span>
                     )}
-                    <span className="w-full text-xs text-gray-500">
-                      요청 → 다른 데이터아키텍트 승인 → 실행(서버 직접은 이
-                      화면, 에이전트는 사내 PC 에서 자동)
-                    </span>
                   </div>
-                  <pre className="mt-2 max-h-[60vh] overflow-auto rounded bg-gray-900 p-3 font-mono text-xs text-gray-100">
+                  <pre className="paper mt-3 max-h-[60vh] overflow-auto rounded-card border border-line bg-well p-3 font-mono text-xs">
                     {pv.ddl}
                   </pre>
                 </>
               )}
               {!pv && (
-                <p className="mt-3 text-gray-500">
-                  테이블을 고른 뒤 'DDL 미리보기'를 누르십시오. 다른
-                  주제영역으로 옮겨 가도 선택은 유지됩니다. PK 는 유일 인덱스를
-                  먼저 만든 뒤 그 인덱스로 생성하고, FK 는 만들지
-                  않습니다(PostgreSQL 은 이름 전부 소문자).
-                </p>
+                <div className="empty">
+                  <Icon3D icon={MENU_ICON.physical} />
+                  <p>테이블 선택 후 DDL 미리보기</p>
+                </div>
               )}
             </>
           )}

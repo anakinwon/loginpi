@@ -3,13 +3,15 @@
 // 분류체계 칩(누르면 그 분류체계가 마지막 선택) · 내 차례(역할 ∩ 요금제 권한별 카드) · 표준사전 현황 · 바로가기 · 최근 변경 5건 · 요금제
 // 모바일 = 한 열(내 차례 먼저), 데스크톱 = 왼쪽 2칸(할 일·현황) + 오른쪽 1칸(바로가기·최근 변경·요금제). 분류체계 목록·새로 만들기는 맨 아래 접기(AreaHome 재사용)
 import { piFetch } from '@pi/auth/client'
-import { ClipboardCheck, DatabaseZap, History, Inbox, Send, Waypoints, type LucideIcon } from 'lucide-react'
+import { ChevronDown, ClipboardCheck, DatabaseZap, Send, Waypoints, type LucideIcon } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import AreaHome from './area-home'
 import type { MbrRole, Perm, PlanCd } from '@/lib/roles'
 import { MENU_ICON as I } from '@/lib/menu-icons'
+import { Icon3D } from '@/components/icon-3d'
+import { PageHead } from '@/components/page-head'
 
 interface Recent {
   log_id: string
@@ -39,8 +41,8 @@ interface HomeRes {
   area: AreaDash | null
 }
 
-const card = 'rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] p-4'
-const h3 = 'mb-2 flex items-center gap-1.5 font-bold text-[#2c3850]'
+// 섹션 제목(h2 14/600, 아이콘 없음) — 화면 제목 h1 = PageHead(분류체계명)
+const h2 = 'mb-2 flex items-center gap-2 text-sm font-semibold text-ink'
 // 바로가기 = 하단 메뉴(area-nav)와 같은 경로·아이콘(src/lib/menu-icons)·권한, 이름 = messages nav.<nm>
 const LINKS: { seg: string; nm: string; Icon: LucideIcon; perm?: Perm }[] = [
   { seg: 'words', nm: 'words', Icon: I.words, perm: 'STD_VIEW' },
@@ -64,15 +66,13 @@ const ago = (s: string, t: (k: string, v?: Record<string, number>) => string) =>
 
 function Todo({ href, Icon, nm, val, sub }: { href: string; Icon: LucideIcon; nm: string; val: number; sub?: string }) {
   return (
-    <Link href={href} className={`${card} flex items-center gap-3 transition hover:shadow-md`}>
-      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${val ? 'bg-[#3b4a66] text-white' : 'bg-white text-[#5b6578] ring-1 ring-[#c9d1df]'}`}>
-        <Icon className="h-5 w-5" strokeWidth={1.5} aria-hidden />
-      </span>
+    <Link href={href} className="panel flex items-center gap-3 p-4 transition-colors hover:bg-raised">
+      <Icon className="h-[18px] w-[18px] shrink-0 text-ink-2" strokeWidth={1.5} aria-hidden />
       <span className="min-w-0 flex-1">
-        <span className="block text-sm text-[#4a5a78]">{nm}</span>
-        {sub && <span className="block text-xs text-[#5b6578]">{sub}</span>}
+        <span className="block truncate text-sm font-medium text-ink">{nm}</span>
+        {sub && <span className="block truncate text-xs text-ink-3">{sub}</span>}
       </span>
-      <span className={`text-2xl font-bold tabular-nums ${val ? 'text-[#1f3a68]' : 'text-[#9aa6bd]'}`}>{val}</span>
+      <span className={`text-2xl font-semibold tabular-nums ${val ? 'text-accent-ink' : 'text-ink-3'}`}>{val}</span>
     </Link>
   )
 }
@@ -83,6 +83,7 @@ export default function Dashboard() {
   const t = useTranslations('dashboard')
   const tn = useTranslations('nav')
   const tc = useTranslations('codes')
+  const tm = useTranslations('common') // 로딩 문구 = common.loading(dashboard.loading 키 없음 — 콘솔 MISSING_MESSAGE 해소)
   const locale = useLocale()
   // 코드 → 이름(번역 키가 없는 새 코드는 코드 그대로)
   const code = (ns: 'role' | 'plan' | 'act' | 'tgt', v: string) => (tc.has(`${ns}.${v}`) ? tc(`${ns}.${v}`) : v)
@@ -102,8 +103,8 @@ export default function Dashboard() {
     void load()
   }, [load])
 
-  if (!res) return <p className="mt-6 text-sm text-gray-500">{t('loading')}</p>
-  if (!res.ok) return <p className="mt-6 text-sm text-red-700">{res.message}</p>
+  if (!res) return <p className="text-sm text-ink-3">{tm('loading')}</p>
+  if (!res.ok) return <p className="text-sm text-danger">{res.message}</p>
   const a = res.area
   const base = a ? `/areas/${a.area_id}` : ''
   const has = (p?: Perm) => !p || !!a?.perms.includes(p)
@@ -117,22 +118,15 @@ export default function Dashboard() {
     : []
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="space-y-6">
       {/* 분류체계 칩 — 고르면 그 분류체계가 '마지막 선택'(서버 기록, 기기 공통) */}
       {res.areas.length > 0 && (
-        <nav aria-label={t('myAreas')} className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        <nav aria-label={t('myAreas')} className="-mx-1 flex gap-2 overflow-x-auto px-1 py-1">
           {res.areas.map((x) => {
             const on = x.area_id === a?.area_id
             return (
-              <button
-                key={x.area_id}
-                type="button"
-                disabled={busy}
-                aria-pressed={on}
-                onClick={() => !on && void load(x.area_id)}
-                className={`shrink-0 rounded-full border px-3 py-1.5 text-sm transition disabled:opacity-60 ${on ? 'border-[#3b4a66] bg-[#3b4a66] font-semibold text-white' : 'border-[#c9d1df] bg-white text-[#2c3850] hover:bg-[#e2e7ef]'}`}
-              >
-                {x.area_nm} <span className={`text-xs ${on ? 'text-white/70' : 'text-[#5b6578]'}`}>{code('role', x.role)}</span>
+              <button key={x.area_id} type="button" disabled={busy} aria-pressed={on} onClick={() => !on && void load(x.area_id)} className="btn-key btn-sm shrink-0">
+                {x.area_nm} <span className="text-xs font-normal text-ink-2">{code('role', x.role)}</span>
               </button>
             )
           })}
@@ -140,40 +134,40 @@ export default function Dashboard() {
       )}
 
       {a && (
-        <>
-          <header className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2 className="text-xl font-bold text-[#1f3a68]">{a.area_nm}</h2>
-              <p className="text-sm text-[#5b6578]">
+        <div>
+          <PageHead
+            back={false}
+            title={a.area_nm}
+            sub={
+              <>
                 {code('role', a.role)} · {t('planLine', { plan: code('plan', a.plan.plan) })}
                 {a.plan.end && t('until', { date: day(a.plan.end, locale) })}
-                {a.plan.grace && <span className="ms-1 font-semibold text-red-700">{t('grace')}</span>}
-              </p>
-            </div>
-            <Link href={`${base}/${has('STD_VIEW') ? 'words' : 'plan'}`} className="rounded-lg bg-[#3b4a66] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#2c3850]">
-              {t('openArea')}
-            </Link>
-          </header>
+                {a.plan.grace && <span className="ms-1 font-medium text-danger">{t('grace')}</span>}
+              </>
+            }
+            actions={
+              <Link href={`${base}/${has('STD_VIEW') ? 'words' : 'plan'}`} className="btn-3d">
+                {t('openArea')}
+              </Link>
+            }
+          />
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            <div className="space-y-4 lg:col-span-2">
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
               <section aria-labelledby="todo-h">
-                <h3 id="todo-h" className={h3}>
-                  <Inbox className="h-4 w-4" strokeWidth={1.5} aria-hidden /> {t('todoTitle')}
-                </h3>
-                {todos.length ? (
-                  <div className="grid gap-2 sm:grid-cols-2">{todos}</div>
-                ) : (
-                  <p className={`${card} text-sm text-[#4a5a78]`}>{t('todoEmpty')}</p>
-                )}
+                <h2 id="todo-h" className={h2}>
+                  {t('todoTitle')}
+                </h2>
+                {todos.length ? <div className="grid gap-2 sm:grid-cols-2">{todos}</div> : <p className="panel p-4 text-sm text-ink-2">{t('todoEmpty')}</p>}
               </section>
 
               {a.std && (
                 <section aria-labelledby="std-h">
-                  <h3 id="std-h" className={h3}>
-                    <I.words className="h-4 w-4" strokeWidth={1.5} aria-hidden /> {t('stdTitle')} <span className="text-xs font-normal text-[#5b6578]">{t('stdBasis')}</span>
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <h2 id="std-h" className={h2}>
+                    {t('stdTitle')} <span className="text-xs font-normal text-ink-3">{t('stdBasis')}</span>
+                  </h2>
+                  {/* 한 패널 4칸 — 칸 사이 헤어라인 = gap-px 바탕(line) */}
+                  <div className="panel grid grid-cols-2 gap-px overflow-hidden bg-line sm:grid-cols-4">
                     {(
                       [
                         ['words', a.std.dic],
@@ -182,9 +176,9 @@ export default function Dashboard() {
                         ['codes', a.std.cd],
                       ] as const
                     ).map(([seg, v]) => (
-                      <Link key={seg} href={`${base}/${seg}`} className={`${card} text-center transition hover:shadow-md`}>
-                        <div className="text-2xl font-bold tabular-nums text-[#1f3a68]">{v.toLocaleString(locale)}</div>
-                        <div className="text-xs text-[#4a5a78]">{tn(seg)}</div>
+                      <Link key={seg} href={`${base}/${seg}`} className="bg-surface p-4 text-center transition-colors hover:bg-raised">
+                        <div className="text-xs text-ink-3">{tn(seg)}</div>
+                        <div className="mt-1 text-2xl font-semibold tabular-nums text-ink">{v.toLocaleString(locale)}</div>
                       </Link>
                     ))}
                   </div>
@@ -192,16 +186,17 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <section aria-labelledby="go-h">
-                <h3 id="go-h" className={h3}>
+                <h2 id="go-h" className={h2}>
                   {t('shortcuts')}
-                </h3>
-                <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-3">
+                </h2>
+                {/* 바로가기 키패드 — 화면에서 유일하게 3D 키캡이 모인 곳 */}
+                <div className="key-tray grid-cols-4 sm:grid-cols-6 lg:grid-cols-3">
                   {LINKS.filter((l) => has(l.perm)).map(({ seg, nm, Icon }) => (
-                    <Link key={seg} href={`${base}/${seg}`} className="flex flex-col items-center gap-1 rounded-lg border border-[#c9d1df] bg-white px-1 py-2 text-center text-[11px] text-[#2c3850] transition hover:bg-[#e2e7ef]">
-                      <Icon className="h-5 w-5 text-[#3b4a66]" strokeWidth={1.5} aria-hidden />
-                      {tn(nm)}
+                    <Link key={seg} href={`${base}/${seg}`} className="flex min-w-0 flex-col items-center gap-1.5 rounded-control px-1 py-2 text-center text-xs text-ink-2 transition-colors hover:text-ink">
+                      <Icon3D icon={Icon} />
+                      <span className="max-w-full truncate">{tn(nm)}</span>
                     </Link>
                   ))}
                 </div>
@@ -209,37 +204,41 @@ export default function Dashboard() {
 
               {a.recent && (
                 <section aria-labelledby="recent-h">
-                  <h3 id="recent-h" className={h3}>
-                    <History className="h-4 w-4" strokeWidth={1.5} aria-hidden /> {t('recentTitle')}
-                    <Link href={`${base}/history`} className="ms-auto text-xs font-normal text-blue-700 underline">
+                  <h2 id="recent-h" className={h2}>
+                    {t('recentTitle')}
+                    <Link href={`${base}/history`} className="ms-auto text-xs font-normal text-accent-ink hover:underline">
                       {t('allHistory')}
                     </Link>
-                  </h3>
+                  </h2>
                   {a.recent.length ? (
-                    <ul className={`${card} divide-y divide-[#d6deeb] p-0`}>
+                    <ul className="panel divide-y divide-line">
                       {a.recent.map((r) => (
-                        <li key={r.log_id} className="px-3 py-2 text-sm">
-                          <span className="me-1 rounded bg-white px-1 text-[11px] text-[#4a5a78] ring-1 ring-[#c9d1df]">{code('tgt', r.tgt_tp_cd)}</span>
-                          {r.nm && <span className="font-medium text-[#2c3850]">{r.nm} </span>}{code('act', r.act_cd)}
-                          <span className="block text-xs text-[#5b6578]">
+                        <li key={r.log_id} className="px-4 py-2.5 text-sm text-ink-2">
+                          <span className="badge me-1.5">{code('tgt', r.tgt_tp_cd)}</span>
+                          {r.nm && <span className="font-medium text-ink">{r.nm} </span>}
+                          {code('act', r.act_cd)}
+                          <span className="mt-0.5 block text-xs text-ink-3">
                             {r.usr ?? '—'} · {ago(r.reg_dtm, t)}
                           </span>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className={`${card} text-sm text-[#5b6578]`}>{t('noHistory')}</p>
+                    <p className="panel p-4 text-sm text-ink-3">{t('noHistory')}</p>
                   )}
                 </section>
               )}
             </div>
           </div>
-        </>
+        </div>
       )}
 
-      <details className="rounded-xl border border-[#c9d1df] bg-white" open={!res.areas.length}>
-        <summary className="cursor-pointer px-4 py-2 font-semibold text-[#2c3850]">{t('areaList')}</summary>
-        <div className="px-4 pb-4">
+      <details className="panel group [&:not([open])>summary]:border-b-0" open={!res.areas.length}>
+        <summary className="panel-head cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          {t('areaList')}
+          <ChevronDown className="ms-auto h-4 w-4 text-ink-3 transition-transform group-open:rotate-180" strokeWidth={1.5} aria-hidden />
+        </summary>
+        <div className="panel-body">
           <AreaHome />
         </div>
       </details>

@@ -3,6 +3,8 @@
 // API 키는 등록하지 않음(서버 환경변수) — 제공사별 키 설정 여부만 표시
 import { piFetch } from '@pi/auth/client'
 import { useCallback, useEffect, useState } from 'react'
+import { InfoTip } from '@/components/page-head'
+import { RowActions, TD } from '../words/word-board'
 
 type Prvd = 'CLAUDE' | 'GEMINI' | 'OPENAI'
 interface Mdl {
@@ -59,28 +61,81 @@ export default function AiMdlForm() {
   }
   const setDflt = async (m: Mdl) => done(await send('PUT', { ...m, dflt_yn: 'Y' }), `${m.dsp_nm} 을(를) 기본 모델로 지정했습니다`)
 
-  if (deny) return <p className="text-sm text-gray-600">{deny}</p>
-  const inp = 'min-w-40 flex-1 rounded border px-3 py-2'
+  if (deny) return <p className="text-sm text-ink-2">{deny}</p>
+  // 입력칸 = 라벨 + 입력(라벨 = 접근성 이름)
+  const field = (label: string, req: boolean, el: React.ReactNode) => (
+    <label className="block">
+      <span className={`field-label ${req ? 'req' : ''}`}>{label}</span>
+      {el}
+    </label>
+  )
   return (
-    <section className="text-sm">
-      <p className="mb-3 text-[#5b6578]">
-        모니터링 &gt; 애플리케이션의 <b>AI 원인 분석</b>에 쓰는 모델입니다. 분석 결과에 여기 등록한 모델·요금제·계정이 함께 표시됩니다. API 키는 이 화면에 저장하지 않고 서버 환경변수로 둡니다.
-      </p>
-      {keys && (
-        <ul className="mb-3 flex flex-wrap gap-2">
-          {(Object.keys(PRVD_NM) as Prvd[]).map((p) => (
-            <li key={p} className={`rounded border px-2 py-1 text-xs ${keys[p].on ? 'border-green-300 bg-green-50 text-green-800' : 'border-gray-300 bg-gray-50 text-gray-600'}`}>
-              {PRVD_NM[p]} · <span className="font-mono">{keys[p].env}</span> {keys[p].on ? '설정됨' : '없음'}
-            </li>
-          ))}
-        </ul>
-      )}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+    <section className="space-y-6 text-sm">
+      <form onSubmit={submit} className="panel">
+        <div className="panel-head" data-mode={edit ? 'edit' : undefined}>
+          <h2 className="truncate">{edit ? 'AI 분석 모델 수정' : 'AI 분석 모델 등록'}</h2>
+          <InfoTip align="end">모니터링 &gt; 애플리케이션의 AI 원인 분석에 쓰는 모델입니다. 분석 결과에 여기 등록한 모델·요금제·계정이 함께 표시됩니다. API 키는 이 화면에 저장하지 않고 서버 환경변수로 둡니다.</InfoTip>
+          {keys && (
+            <ul className="ms-auto flex flex-wrap justify-end gap-1">
+              {(Object.keys(PRVD_NM) as Prvd[]).map((p) => (
+                <li key={p} className="badge" data-tone={keys[p].on ? 'ok' : undefined} title={`${keys[p].env} ${keys[p].on ? '설정됨' : '없음'}`}>
+                  <span className="font-mono">{keys[p].env}</span> {keys[p].on ? '설정됨' : '없음'}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="panel-body">
+          <div className="grid items-end gap-3 md:grid-cols-2 lg:grid-cols-5">
+            {field(
+              '제공사',
+              true,
+              <select value={form.prvd_cd} onChange={(e) => setForm({ ...form, prvd_cd: e.target.value as Prvd })} className="input">
+                {(Object.keys(PRVD_NM) as Prvd[]).map((p) => (
+                  <option key={p} value={p}>
+                    {PRVD_NM[p]}
+                  </option>
+                ))}
+              </select>,
+            )}
+            {field('모델명', true, <input value={form.mdl_nm} onChange={(e) => setForm({ ...form, mdl_nm: e.target.value })} placeholder={EX[form.prvd_cd]} aria-required="true" required maxLength={100} pattern="[A-Za-z0-9][A-Za-z0-9._\-]*" className="input font-mono" />)}
+            {field('표시명', true, <input value={form.dsp_nm} onChange={(e) => setForm({ ...form, dsp_nm: e.target.value })} placeholder="Claude Opus 5.5" aria-required="true" required maxLength={100} className="input" />)}
+            {field('요금제', false, <input value={form.plan_nm} onChange={(e) => setForm({ ...form, plan_nm: e.target.value })} placeholder="API 종량제" maxLength={100} className="input" />)}
+            {field('계정', false, <input value={form.acct_nm} onChange={(e) => setForm({ ...form, acct_nm: e.target.value })} placeholder="계정 표시명" maxLength={100} className="input" />)}
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <label className="inline-flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={form.dflt_yn === 'Y'} onChange={(e) => setForm({ ...form, dflt_yn: e.target.checked ? 'Y' : 'N' })} /> 기본 모델
+            </label>
+            <div className="ms-auto flex gap-2">
+              {edit && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEdit(null)
+                    setForm(EMPTY)
+                  }}
+                  className="btn-key"
+                >
+                  취소
+                </button>
+              )}
+              <button className="btn-3d">{edit ? '저장' : '등록'}</button>
+            </div>
+          </div>
+          {msg && (
+            <p role="status" className="mt-3 text-dense text-ink">
+              {msg}
+            </p>
+          )}
+        </div>
+      </form>
+      <div className="overflow-x-auto rounded-card border border-line bg-surface">
+        <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
           <thead>
-            <tr className="bg-gray-100 text-left whitespace-nowrap">
-              {['기본', '제공사', '표시명', '모델명(API)', '요금제(결제 모델)', '계정', ''].map((h, i) => (
-                <th key={i} className="border px-2 py-1">
+            <tr className="thead-3d text-start">
+              {['기본', '제공사', '표시명', '모델명(API)', '요금제', '계정', '처리'].map((h, i) => (
+                <th key={i} className="px-3 py-2">
                   {h}
                 </th>
               ))}
@@ -89,43 +144,46 @@ export default function AiMdlForm() {
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={7} className="border px-2 py-4 text-center text-gray-500">
-                  등록된 모델이 없습니다 — 분석은 Claude Opus 5.5(요금제 미등록)로 진행됩니다
+                <td colSpan={7} className="px-3 py-6 text-center text-ink-3">
+                  등록된 모델 없음 · 기본 분석 = Claude Opus 5.5
                 </td>
               </tr>
             ) : (
               items.map((m) => (
-                <tr key={m.mdl_id} className={edit?.mdl_id === m.mdl_id ? 'bg-amber-50' : ''}>
-                  <td className="border px-2 py-1 text-center">
+                <tr key={m.mdl_id} data-mode={edit?.mdl_id === m.mdl_id ? 'edit' : undefined}>
+                  <td className={TD}>
                     {m.dflt_yn === 'Y' ? (
-                      <span className="rounded bg-gray-800 px-1.5 py-0.5 text-xs text-white">기본</span>
+                      <span className="badge" data-tone="accent">
+                        기본
+                      </span>
                     ) : (
-                      <button onClick={() => void setDflt(m)} className="text-xs text-blue-700 underline">
+                      <button type="button" onClick={() => void setDflt(m)} className="text-xs text-accent-ink hover:underline">
                         기본으로
                       </button>
                     )}
                   </td>
-                  <td className="border px-2 py-1 whitespace-nowrap">
+                  <td className={TD}>
                     {PRVD_NM[m.prvd_cd]}
-                    {keys && !keys[m.prvd_cd].on && <span className="ml-1 text-xs text-red-700">(키 없음)</span>}
+                    {keys && !keys[m.prvd_cd].on && (
+                      <span className="badge ms-1" data-tone="danger">
+                        키 없음
+                      </span>
+                    )}
                   </td>
-                  <td className="border px-2 py-1">{m.dsp_nm}</td>
-                  <td className="border px-2 py-1 font-mono text-xs">{m.mdl_nm}</td>
-                  <td className="border px-2 py-1">{!m.plan_nm || m.plan_nm.startsWith('[') ? <span className="text-red-700">{m.plan_nm || '[미입력]'}</span> : m.plan_nm}</td>
-                  <td className="border px-2 py-1">{m.acct_nm || <span className="text-gray-400">-</span>}</td>
-                  <td className="border px-2 py-1 whitespace-nowrap">
-                    <button
-                      onClick={() => {
+                  <td className={`${TD} font-medium`}>{m.dsp_nm}</td>
+                  <td className={TD}>
+                    <span className="chip-phy">{m.mdl_nm}</span>
+                  </td>
+                  <td className={TD}>{!m.plan_nm || m.plan_nm.startsWith('[') ? <span className="text-danger">{m.plan_nm || '[미입력]'}</span> : m.plan_nm}</td>
+                  <td className={`${TD} text-ink-2`}>{m.acct_nm || <span className="text-ink-off">-</span>}</td>
+                  <td className={`${TD} w-px`}>
+                    <RowActions
+                      onEdit={() => {
                         setEdit(m)
                         setForm({ prvd_cd: m.prvd_cd, mdl_nm: m.mdl_nm, dsp_nm: m.dsp_nm, plan_nm: m.plan_nm, acct_nm: m.acct_nm, dflt_yn: m.dflt_yn })
                       }}
-                      className="mr-1 text-blue-700 underline"
-                    >
-                      수정
-                    </button>
-                    <button onClick={() => void remove(m)} className="text-red-700 underline">
-                      삭제
-                    </button>
+                      onRemove={() => void remove(m)}
+                    />
                   </td>
                 </tr>
               ))
@@ -133,41 +191,6 @@ export default function AiMdlForm() {
           </tbody>
         </table>
       </div>
-      <form onSubmit={submit} className="mt-4 flex flex-wrap items-end gap-2 rounded border p-3">
-        <span className="w-full font-semibold">{edit ? 'AI 분석 모델 수정' : 'AI 분석 모델 등록'}</span>
-        <select aria-label="제공사" value={form.prvd_cd} onChange={(e) => setForm({ ...form, prvd_cd: e.target.value as Prvd })} className="rounded border px-3 py-2">
-          {(Object.keys(PRVD_NM) as Prvd[]).map((p) => (
-            <option key={p} value={p}>
-              {PRVD_NM[p]}
-            </option>
-          ))}
-        </select>
-        <input aria-label="모델명" value={form.mdl_nm} onChange={(e) => setForm({ ...form, mdl_nm: e.target.value })} placeholder={`모델명(필수) 예 ${EX[form.prvd_cd]}`} required maxLength={100} pattern="[A-Za-z0-9][A-Za-z0-9._\-]*" className={inp} />
-        <input aria-label="표시명" value={form.dsp_nm} onChange={(e) => setForm({ ...form, dsp_nm: e.target.value })} placeholder="표시명(필수) 예 Claude Opus 5.5" required maxLength={100} className={inp} />
-        <input aria-label="요금제" value={form.plan_nm} onChange={(e) => setForm({ ...form, plan_nm: e.target.value })} placeholder="요금제(결제 모델) 예 API 종량제·무료 등급" maxLength={100} className={inp} />
-        <input aria-label="계정" value={form.acct_nm} onChange={(e) => setForm({ ...form, acct_nm: e.target.value })} placeholder="계정(키 발급 조직·계정 표시명)" maxLength={100} className={inp} />
-        <label className="flex items-center gap-1 py-2">
-          <input type="checkbox" checked={form.dflt_yn === 'Y'} onChange={(e) => setForm({ ...form, dflt_yn: e.target.checked ? 'Y' : 'N' })} /> 기본 모델
-        </label>
-        <button className="rounded bg-gray-800 px-4 py-2 text-white">{edit ? '수정 저장' : '등록'}</button>
-        {edit && (
-          <button
-            type="button"
-            onClick={() => {
-              setEdit(null)
-              setForm(EMPTY)
-            }}
-            className="rounded border px-4 py-2"
-          >
-            취소
-          </button>
-        )}
-      </form>
-      {msg && (
-        <p role="status" className="mt-2 text-gray-700">
-          {msg}
-        </p>
-      )}
     </section>
   )
 }

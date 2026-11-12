@@ -3,6 +3,7 @@
 // 승인은 화면에 보인 DDL 해시(expect_hash)로 — 그 사이 모델이 바뀌면 서버가 거부(DDL_CHANGED)
 import { piFetch } from '@pi/auth/client'
 import { useCallback, useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Req {
   req_id: string
@@ -42,6 +43,8 @@ const RSLT_NM: Record<string, string> = {
   SKIP: '건너뜀',
   RBK: '되돌림',
 }
+// 상태 배지 톤(표시만) — 대기·일부 = warn, 반려·실패 = danger, 완료 = ok, 승인·실행중 = accent, 취소 = 기본
+const STS_TONE: Record<string, string | undefined> = { REQ: 'warn', APV: 'accent', RJCT: 'danger', RUN: 'accent', DONE: 'ok', FAIL: 'danger', PART: 'warn' }
 const SIZE = 10
 
 export default function ReqPanel({
@@ -106,7 +109,7 @@ export default function ReqPanel({
     if (
       !det ||
       !window.confirm(
-        `대상 DB 에 DDL 문장 ${det.item.stmt_cnt}개를 실행합니다.\n⚠ DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.\n계속할까요?`,
+        `대상 DB 에 DDL 문장 ${det.item.stmt_cnt}개를 실행합니다.\n주의 : DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.\n계속할까요?`,
       )
     )
       return
@@ -128,83 +131,95 @@ export default function ReqPanel({
   const tries = det
     ? [...new Set(det.stmts.map((s) => s.exec_try_no))].sort((a, b) => b - a)
     : []
+  const TD = 'border-b px-3 py-1.5'
 
   return (
-    <div className="text-sm">
+    <div className="text-dense">
       {msg && (
-        <p role="status" className="mb-2 font-medium text-[#1f3a68]">
+        <p role="status" className="mb-2 text-ink-2">
           {msg}
         </p>
       )}
-      <table className="w-full border-collapse text-xs">
-        <thead>
-          <tr className="bg-gray-50">
-            <th className="border px-2 py-1">요청 일시</th>
-            <th className="border px-2 py-1 text-left">접속</th>
-            <th className="border px-2 py-1">테이블·문장</th>
-            <th className="border px-2 py-1">상태</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((r) => (
-            <tr
-              key={r.req_id}
-              onClick={() => setSel(r.req_id)}
-              className={`cursor-pointer ${sel === r.req_id ? 'bg-amber-100' : 'hover:bg-gray-50'}`}
-            >
-              <td className="border px-2 py-1 text-center">
-                {r.reg_dtm.slice(0, 16).replace('T', ' ')}
-                {r.mine && (
-                  <span className="ml-1 text-gray-500">(내 요청)</span>
-                )}
-              </td>
-              <td className="border px-2 py-1">{r.conn_nm}</td>
-              <td className="border px-2 py-1 text-center">
-                {r.tbl_ids.length} · {r.stmt_cnt}
-              </td>
-              <td className="border px-2 py-1 text-center">
-                {REQ_STS_NM[r.req_sts_cd] ?? r.req_sts_cd}
-              </td>
+      <div className="overflow-x-auto rounded-card border border-line">
+        <table className="w-full border-collapse text-dense">
+          <thead>
+            <tr className="thead-3d text-start">
+              <th className="px-3 py-2 text-start">요청 일시</th>
+              <th className="px-3 py-2 text-start">접속</th>
+              <th className="px-3 py-2 text-end">테이블·문장</th>
+              <th className="px-3 py-2 text-start">상태</th>
             </tr>
-          ))}
-          {!items.length && (
-            <tr>
-              <td colSpan={4} className="p-3 text-center text-gray-500">
-                실행 요청이 없습니다
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-      <div className="mt-1 flex items-center justify-end gap-1 text-xs">
-        <span className="mr-auto text-gray-600">
-          총 {total}건 · {page} / {pages}
+          </thead>
+          <tbody>
+            {items.map((r) => (
+              <tr
+                key={r.req_id}
+                onClick={() => setSel(r.req_id)}
+                aria-selected={sel === r.req_id}
+                className="cursor-pointer"
+              >
+                <td className={`${TD} whitespace-nowrap font-mono text-xs tabular-nums`}>
+                  {r.reg_dtm.slice(0, 16).replace('T', ' ')}
+                  {r.mine && (
+                    <span className="ms-1 font-sans text-ink-3">(내 요청)</span>
+                  )}
+                </td>
+                <td className={TD}>{r.conn_nm}</td>
+                <td className={`${TD} text-end tabular-nums`}>
+                  {r.tbl_ids.length} · {r.stmt_cnt}
+                </td>
+                <td className={TD}>
+                  <span className="badge" data-tone={STS_TONE[r.req_sts_cd]}>
+                    {REQ_STS_NM[r.req_sts_cd] ?? r.req_sts_cd}
+                  </span>
+                </td>
+              </tr>
+            ))}
+            {!items.length && (
+              <tr>
+                <td colSpan={4} className="px-3 py-6 text-center text-ink-3">
+                  실행 요청 없음
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-2 flex items-center justify-end gap-1">
+        <span className="me-auto font-mono text-xs text-ink-3 tabular-nums">
+          총 {total.toLocaleString()}건 · {page} / {pages}
         </span>
         <button
           type="button"
           onClick={() => setPage(page - 1)}
           disabled={page <= 1}
-          className="rounded border px-2 disabled:opacity-30"
+          aria-label="이전"
+          title="이전"
+          className="btn-ghost btn-icon btn-sm"
         >
-          ‹
+          <ChevronLeft className="rtl:rotate-180" aria-hidden />
         </button>
         <button
           type="button"
           onClick={() => setPage(page + 1)}
           disabled={page >= pages}
-          className="rounded border px-2 disabled:opacity-30"
+          aria-label="다음"
+          title="다음"
+          className="btn-ghost btn-icon btn-sm"
         >
-          ›
+          <ChevronRight className="rtl:rotate-180" aria-hidden />
         </button>
       </div>
 
       {det && (
         <section
-          className="mt-3 rounded border p-2"
+          className="mt-3 rounded-card border border-line p-3"
           aria-label="실행 요청 상세"
         >
-          <p className="text-xs text-gray-600">
-            {REQ_STS_NM[det.item.req_sts_cd]} ·{' '}
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-3">
+            <span className="badge" data-tone={STS_TONE[det.item.req_sts_cd]}>
+              {REQ_STS_NM[det.item.req_sts_cd]}
+            </span>
             {det.item.exec_mthd_cd === 'SRV'
               ? '서버 직접 실행'
               : '로컬 에이전트 실행'}{' '}
@@ -212,12 +227,12 @@ export default function ReqPanel({
             <span className="font-mono">{det.item.ddl_hash.slice(0, 8)}</span> ·
             시도 {det.item.exec_try_no}회
             {det.item.rjct_rsn && (
-              <span className="ml-1 text-red-700">
+              <span className="text-danger">
                 반려 사유 : {det.item.rjct_rsn}
               </span>
             )}
           </p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             {sts === 'REQ' && det.can_approve && (
               <button
                 type="button"
@@ -241,24 +256,24 @@ export default function ReqPanel({
                       setMsg('본인 승인 사유를 5자 이상 입력하십시오')
                     return
                   }
-                  if (window.confirm('표시된 DDL 그대로 실행을 승인할까요?\n⚠ DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.'))
+                  if (window.confirm('표시된 DDL 그대로 실행을 승인할까요?\n주의 : DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.'))
                     void act(
                       { act: 'approve', expect_hash: det.item.ddl_hash },
                       '승인했습니다',
                     )
                 }}
-                className="rounded bg-emerald-600 px-3 py-1 text-white disabled:opacity-40"
+                className="btn-3d btn-sm"
               >
                 {det.self_approve ? '본인 승인' : '승인'}
               </button>
             )}
             {sts === 'REQ' && det.mine && !det.can_approve && (
-              <span className="self-center text-xs text-gray-500">
+              <span className="text-xs text-ink-3">
                 본인 요청은 다른 승인권자(시스템담당자·데이터아키텍트)가 승인합니다
               </span>
             )}
             {sts === 'REQ' && det.self_approve && (
-              <span className="self-center text-xs text-amber-700">
+              <span className="text-xs text-warn">
                 데이터아키텍트가 1명인 분류체계라 본인 승인 가능(사유 필수·감사
                 기록)
               </span>
@@ -275,7 +290,7 @@ export default function ReqPanel({
                       '반려했습니다',
                     )
                 }}
-                className="rounded border px-3 py-1 disabled:opacity-40"
+                className="btn-danger btn-sm"
               >
                 반려
               </button>
@@ -285,7 +300,7 @@ export default function ReqPanel({
                 type="button"
                 disabled={busy}
                 onClick={() => void act({ act: 'cancel' }, '취소했습니다')}
-                className="rounded border px-3 py-1 disabled:opacity-40"
+                className="btn-key btn-sm"
               >
                 요청 취소
               </button>
@@ -296,13 +311,13 @@ export default function ReqPanel({
                   type="button"
                   disabled={busy}
                   onClick={() => void run()}
-                  className="rounded bg-[#1f3a68] px-3 py-1 text-white disabled:opacity-40"
+                  className="btn-danger btn-sm"
                 >
                   {sts === 'APV' ? 'DB 에 실행' : '다시 실행'}
                 </button>
               )}
             {det.item.exec_mthd_cd === 'AGT' && sts === 'APV' && (
-              <span className="self-center text-xs text-gray-600">
+              <span className="text-xs text-ink-3">
                 로컬 에이전트가 가져가 실행합니다(에이전트 실행 중이어야 함)
               </span>
             )}
@@ -317,56 +332,58 @@ export default function ReqPanel({
                       '다시 실행 대기 — 에이전트가 다음 확인 때 가져갑니다',
                     )
                   }
-                  className="rounded bg-[#1f3a68] px-3 py-1 text-white disabled:opacity-40"
+                  className="btn-key btn-sm"
                 >
                   에이전트로 다시 실행
                 </button>
               )}
             {sts === 'RUN' && (
-              <span className="self-center text-xs text-gray-600">
+              <span className="text-xs text-ink-3">
                 실행 중 — 잠시 뒤 다시 불러오십시오
               </span>
             )}
           </div>
           {tries.map((t) => (
-            <details key={t} open={t === tries[0]} className="mt-2">
-              <summary className="cursor-pointer text-xs font-semibold">
+            <details key={t} open={t === tries[0]} className="mt-3">
+              <summary className="cursor-pointer text-xs font-medium text-ink-2">
                 시도 {t} 결과
               </summary>
-              <table className="mt-1 w-full border-collapse text-xs">
-                <tbody>
-                  {det.stmts
-                    .filter((s) => s.exec_try_no === t)
-                    .map((s) => (
-                      <tr
-                        key={s.stmt_seq}
-                        className={s.rslt_cd === 'ERR' ? 'bg-red-50' : ''}
-                      >
-                        <td className="border px-1 text-center">
-                          {s.stmt_seq}
-                        </td>
-                        <td className="border px-1 font-mono">
-                          {s.stmt_txt.split('\n')[0].slice(0, 80)}
-                        </td>
-                        <td className="border px-1 text-center">
-                          {RSLT_NM[s.rslt_cd] ?? s.rslt_cd}
-                        </td>
-                        <td className="border px-1">
-                          {s.err_msg
-                            ? `${s.err_cd ?? ''} ${s.err_msg}`
-                            : s.elapsed_ms != null
-                              ? `${s.elapsed_ms}ms`
-                              : ''}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+              <div className="mt-1 overflow-x-auto rounded-card border border-line">
+                <table className="w-full border-collapse text-xs">
+                  <tbody>
+                    {det.stmts
+                      .filter((s) => s.exec_try_no === t)
+                      .map((s) => (
+                        <tr
+                          key={s.stmt_seq}
+                          className={s.rslt_cd === 'ERR' ? 'bg-danger-soft' : ''}
+                        >
+                          <td className="border-b px-2 py-1 text-end font-mono text-ink-3 tabular-nums">
+                            {s.stmt_seq}
+                          </td>
+                          <td className="border-b px-2 py-1 font-mono">
+                            {s.stmt_txt.split('\n')[0].slice(0, 80)}
+                          </td>
+                          <td className={`border-b px-2 py-1 whitespace-nowrap ${s.rslt_cd === 'OK' ? 'text-ok' : s.rslt_cd === 'ERR' ? 'text-danger' : 'text-ink-3'}`}>
+                            {RSLT_NM[s.rslt_cd] ?? s.rslt_cd}
+                          </td>
+                          <td className="border-b px-2 py-1 text-ink-2">
+                            {s.err_msg
+                              ? `${s.err_cd ?? ''} ${s.err_msg}`
+                              : s.elapsed_ms != null
+                                ? `${s.elapsed_ms}ms`
+                                : ''}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </details>
           ))}
-          <details className="mt-2">
-            <summary className="cursor-pointer text-xs">요청 DDL 보기</summary>
-            <pre className="mt-1 max-h-[40vh] overflow-auto rounded bg-gray-900 p-2 font-mono text-xs text-gray-100">
+          <details className="mt-3">
+            <summary className="cursor-pointer text-xs text-accent-ink hover:underline">요청 DDL 보기</summary>
+            <pre className="paper mt-1 max-h-[40vh] overflow-auto rounded-card border border-line bg-well p-3 font-mono text-xs">
               {det.item.ddl_txt}
             </pre>
           </details>

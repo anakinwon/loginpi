@@ -5,7 +5,9 @@ import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { type MbrRole, type Perm } from '@/lib/roles'
 import { domTpByGrp, guessDomGroup } from '@/lib/bulk'
-import { ActorCells, ApvFields, ApvLink, SeCell, SeFilter, SeSelect, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
+import { Download, TriangleAlert } from 'lucide-react'
+import { InfoTip } from '@/components/page-head'
+import { ActorCells, ApvFields, ApvLink, Pager, RowActions, SeCell, SeFilter, SeSelect, StsCell, StsFilter, TD, confirmSave, noEnterSubmit } from '../words/word-board'
 
 interface Domain {
   dom_id: string
@@ -190,134 +192,156 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
     done(j, `표준도메인 ${d.dom_nm} 삭제`)
   }
 
-  const input = (k: Field, ph: string, extra: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
-    <input value={form[k]} onChange={set(k)} placeholder={ph} className="w-full rounded border px-3 py-2" {...extra} />
+  // 입력칸 = 라벨 + 입력(placeholder 는 예시 값만)
+  const input = (k: Field, label: string, extra: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
+    <label className="block">
+      <span className="field-label">{label}</span>
+      <input value={form[k]} onChange={set(k)} className="input" {...extra} />
+    </label>
   )
 
   return (
-    <div className="mt-6 space-y-6">
-      <form onSubmit={submit} onKeyDown={noEnterSubmit} className="overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] text-sm shadow-md">
-        <h2 className={`px-5 py-2.5 text-base font-semibold text-white ${edit ? 'bg-gradient-to-r from-[#b45309] to-[#d97706]' : 'bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e]'}`}>
-          {edit ? `도메인 수정 : ${edit.dom_nm}` : '도메인 등록'}
-        </h2>
-        <fieldset disabled={!requester} className="p-5 disabled:opacity-60">
-          <details className="mb-3 rounded border border-[#c7d2e6] bg-white px-3 py-2 text-xs">
-            <summary className="cursor-pointer font-semibold text-[#1f3a68]">세 유형의 의미 — 유형은 &quot;값을 무엇으로 통제하느냐&quot;에 따른 구분</summary>
-            <table className="mt-2 w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50 text-left">
-                  {['유형', '통제 대상', '무엇을 관리하나', '해당 분류 예'].map((h) => (
-                    <th key={h} className="border px-2 py-1">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
+    <div className="space-y-6">
+      <form onSubmit={submit} onKeyDown={noEnterSubmit} className="panel text-sm">
+        <div className="panel-head" data-mode={edit ? 'edit' : undefined}>
+          <h2 className="truncate">{edit ? `도메인 수정 : ${edit.dom_nm}` : '도메인 등록'}</h2>
+          <div className="ms-auto flex items-center gap-2">
+            {role && !requester && (
+              <span className="badge" title="등록·수정·삭제는 신청 권한(역할·요금제)이 있어야 합니다">
+                조회 전용
+              </span>
+            )}
+            <InfoTip label="유형의 의미" align="end">
+              <p className="mb-2 font-medium text-ink">유형 = 값을 무엇으로 통제하느냐</p>
+              <dl className="space-y-1.5">
                 {Object.entries(TP_DESC).map(([c, d]) => (
-                  <tr key={c}>
-                    <td className="border px-2 py-1">{TP_NM[c]}</td>
-                    <td className="border px-2 py-1 font-semibold">{d.ctl}</td>
-                    <td className="border px-2 py-1">{d.mng}</td>
-                    <td className="border px-2 py-1">{d.ex}</td>
-                  </tr>
+                  <div key={c}>
+                    <dt className="font-medium text-ink">
+                      {TP_NM[c]} · {d.ctl}
+                    </dt>
+                    <dd>
+                      {d.mng} (예 : {d.ex})
+                    </dd>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </details>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4 [&_input]:border-[#b8c6e0] [&_input]:bg-white [&_input]:focus:outline-[#3b5f9e] [&_select]:border-[#b8c6e0] [&_select]:bg-white [&_select]:focus:outline-[#3b5f9e]">
+              </dl>
+              <p className="mt-2">
+                대표도메인명은 지정된 대표도메인만 고를 수 있습니다 :{' '}
+                <Link href={`/areas/${areaId}/key-domains`} className="text-accent-ink hover:underline">
+                  대표도메인 관리
+                </Link>
+              </p>
+            </InfoTip>
+          </div>
+        </div>
+        <fieldset disabled={!requester} className="panel-body disabled:opacity-60">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             <div>
-              <select value={form.dom_tp_cd} onChange={set('dom_tp_cd')} className="w-full rounded border px-3 py-2" aria-label="도메인 유형" title={tpTitle(form.dom_tp_cd)}>
-                {Object.entries(TP_NM).map(([v, n]) => (
-                  <option key={v} value={v}>
-                    유형 : {n} — {TP_DESC[v].ctl}
+              <label className="block">
+                <span className="field-label req">유형</span>
+                <select value={form.dom_tp_cd} onChange={set('dom_tp_cd')} className="input" aria-required title={tpTitle(form.dom_tp_cd)}>
+                  {Object.entries(TP_NM).map(([v, n]) => (
+                    <option key={v} value={v}>
+                      {n} — {TP_DESC[v].ctl}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {TP_DESC[form.dom_tp_cd] && <p className="hint truncate">{TP_DESC[form.dom_tp_cd].mng}</p>}
+            </div>
+            <label className="block">
+              <span className="field-label req">도메인그룹</span>
+              <select value={form.dom_grp_id} onChange={set('dom_grp_id')} className="input" required aria-required>
+                <option value="">선택</option>
+                {groups.map((g) => (
+                  <option key={g.dom_grp_id} value={g.dom_grp_id}>
+                    {g.dom_grp_nm}
                   </option>
                 ))}
               </select>
-              {TP_DESC[form.dom_tp_cd] && (
-                <p className="mt-1 text-xs leading-snug text-gray-600">
-                  <b>{TP_DESC[form.dom_tp_cd].ctl}</b> 통제 : {TP_DESC[form.dom_tp_cd].mng}
-                  <br />예 : {TP_DESC[form.dom_tp_cd].ex}
-                </p>
-              )}
-            </div>
-            <select value={form.dom_grp_id} onChange={set('dom_grp_id')} className="w-full rounded border px-3 py-2" required aria-label="도메인그룹">
-              <option value="">도메인그룹 선택(필수)</option>
-              {groups.map((g) => (
-                <option key={g.dom_grp_id} value={g.dom_grp_id}>
-                  그룹 : {g.dom_grp_nm}
-                </option>
-              ))}
-            </select>
+            </label>
             <div>
-              <select value={form.key_dom_nm} onChange={(e) => void pickKey(e.target.value)} className="w-full rounded border px-3 py-2" required aria-label="대표도메인명">
-                <option value="">대표도메인명 선택(필수, 지정된 대표도메인)</option>
-                {edit && !keyWords.some((w) => w.dic_log_nm === edit.key_dom_nm) && <option value={edit.key_dom_nm}>{edit.key_dom_nm} (지정된 대표도메인 아님)</option>}
-                {keyWords.map((w) => (
-                  <option key={w.dic_id} value={w.dic_log_nm}>
-                    {w.dic_log_nm} ({w.dic_phy_nm})
+              <label className="block">
+                <span className="field-label req">대표도메인명</span>
+                <select value={form.key_dom_nm} onChange={(e) => void pickKey(e.target.value)} className="input" required aria-required>
+                  <option value="">선택</option>
+                  {edit && !keyWords.some((w) => w.dic_log_nm === edit.key_dom_nm) && <option value={edit.key_dom_nm}>{edit.key_dom_nm} (지정된 대표도메인 아님)</option>}
+                  {keyWords.map((w) => (
+                    <option key={w.dic_id} value={w.dic_log_nm}>
+                      {w.dic_log_nm} ({w.dic_phy_nm})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {autoMsg && <p className="hint">{autoMsg}</p>}
+            </div>
+            <label className="block">
+              <span className="field-label req">논리 데이터타입</span>
+              <select value={form.lgc_tp_cd} onChange={set('lgc_tp_cd')} className="input" required aria-required>
+                <option value="">선택</option>
+                {types.map((t) => (
+                  <option key={t.lgc_tp_cd} value={t.lgc_tp_cd}>
+                    {t.lgc_tp_nm} ({t.lgc_tp_abbr_nm})
                   </option>
                 ))}
               </select>
-              {autoMsg && <p className="mt-1 text-xs leading-snug text-[#1f3a68]">{autoMsg}</p>}
-            </div>
-            <select value={form.lgc_tp_cd} onChange={set('lgc_tp_cd')} className="w-full rounded border px-3 py-2" required aria-label="논리 데이터타입">
-              <option value="">논리 데이터타입 선택(필수)</option>
-              {types.map((t) => (
-                <option key={t.lgc_tp_cd} value={t.lgc_tp_cd}>
-                  {t.lgc_tp_nm} ({t.lgc_tp_abbr_nm})
-                </option>
-              ))}
-            </select>
+            </label>
             {input('data_len', '길이', { type: 'number', min: 1 })}
             {input('data_scale', '소수점', { type: 'number', min: 0, disabled: !form.data_len })}
             {input('min_val_txt', '최소값', { maxLength: 40 })}
             {input('max_val_txt', '최대값', { maxLength: 40 })}
-            {input('fmt_txt', '저장형식(예 : 9999999.99)', { maxLength: 4000 })}
-            {input('disp_fmt_txt', '표현형식(예 : 9,999,999.99)', { maxLength: 200 })}
-            {input('unit_nm', '단위(예 : 원·%)', { maxLength: 50 })}
-            {input('alw_val_txt', '허용값(범위·코드값)', { maxLength: 4000 })}
+            {input('fmt_txt', '저장형식', { maxLength: 4000, placeholder: '9999999.99' })}
+            {input('disp_fmt_txt', '표현형식', { maxLength: 200, placeholder: '9,999,999.99' })}
+            {input('unit_nm', '단위', { maxLength: 50, placeholder: '원·%' })}
+            {input('alw_val_txt', '허용값', { maxLength: 4000, placeholder: '범위·코드값' })}
             <div className="md:col-span-2 lg:col-span-4">{input('dom_desc', '설명', { maxLength: 4000 })}</div>
           </div>
           {keyWords.length === 0 && (
-            <p className="mt-2 text-red-700">
-              속성 분류어로 지정된 표준단어가 없습니다 :{' '}
-              <Link href={`/areas/${areaId}/words`} className="underline">
-                표준단어 등록
-              </Link>
-              에서 &apos;속성 분류어 (도메인 사용)&apos;을 선택해 먼저 등록하십시오
+            <p className="mt-3 flex items-center gap-1.5 text-xs text-danger">
+              <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
+              <span>
+                속성 분류어 표준단어가 없습니다 :{' '}
+                <Link href={`/areas/${areaId}/words`} className="underline">
+                  표준단어 등록
+                </Link>
+                에서 &apos;속성 분류어(도메인 사용)&apos;을 선택해 먼저 등록하십시오
+              </span>
             </p>
           )}
-          {groups.length === 0 && <p className="mt-2 text-red-700">등록된 도메인그룹이 없습니다 : 설정 화면에서 먼저 등록하십시오</p>}
-          <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2">
+          {groups.length === 0 && (
+            <p className="mt-3 flex items-center gap-1.5 text-xs text-danger">
+              <TriangleAlert className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} aria-hidden />
+              등록된 도메인그룹이 없습니다 : 설정 화면에서 먼저 등록하십시오
+            </p>
+          )}
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
             {preview && (
-              <p className={preview.dup ? 'text-red-700' : 'text-gray-700'}>
-                도메인명 : <b>{preview.dom_nm}</b>
-                {preview.dup && ' (이미 있음)'}
-              </p>
+              <span className="inline-flex items-center gap-2" title="도메인명(자동 생성)">
+                <span className="chip-phy" data-size="lg">
+                  {preview.dom_nm}
+                </span>
+                {preview.dup && (
+                  <span className="badge" data-tone="danger">
+                    이미 있음
+                  </span>
+                )}
+              </span>
             )}
             <SeSelect value={form.std_se_cd} onChange={(v) => setForm({ ...form, std_se_cd: v })} />
             <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
-            <div className="ml-auto flex gap-2">
+            <div className="ms-auto flex gap-2">
               {edit && (
-                <button type="button" onClick={reset} className="rounded border bg-white px-5 py-2">
+                <button type="button" onClick={reset} className="btn-key">
                   취소
                 </button>
               )}
-              <button disabled={preview?.dup} className="btn-3d px-8 disabled:opacity-40">
-                {edit ? (edit.std_sts_cd === 'RJCT' ? '수정 후 재신청' : '수정 저장') : '등록'}
+              <button disabled={preview?.dup} className="btn-3d">
+                {edit ? (edit.std_sts_cd === 'RJCT' ? '재신청' : '저장') : '등록'}
               </button>
             </div>
           </div>
-          <p className="mt-2 text-xs text-gray-500">
-            대표도메인명은 지정된 대표도메인만 고를 수 있습니다 :{' '}
-            <Link href={`/areas/${areaId}/key-domains`} className="text-blue-700 underline">
-              대표도메인 관리
-            </Link>
-          </p>
-          {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 등록·수정·삭제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
           {msg && (
-            <p role="status" className="mt-2 font-medium text-[#1f3a68]">
+            <p role="status" className="mt-3 text-dense font-medium text-ink">
               {msg}
             </p>
           )}
@@ -330,27 +354,28 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
             e.preventDefault()
             setCond({ ...cond, kw: q.trim(), page: 1 })
           }}
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap items-center gap-2"
         >
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(대표도메인명·도메인명)" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="대표도메인명·도메인명" aria-label="검색어(대표도메인명·도메인명)" className="input min-w-48 flex-1" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
           <SeFilter value={cond.se} onChange={(se) => setCond({ ...cond, se, page: 1 })} />
-          <button className="btn-3d">검색</button>
-          <a href={`/api/areas/${areaId}/export/domains?${new URLSearchParams({ ...(cond.kw ? { q: cond.kw } : {}), ...(cond.se ? { se: cond.se } : {}) })}`} className="btn-3d btn-3d-green" download>
-            엑셀 다운로드
+          <button className="btn-key">검색</button>
+          <a href={`/api/areas/${areaId}/export/domains?${new URLSearchParams({ ...(cond.kw ? { q: cond.kw } : {}), ...(cond.se ? { se: cond.se } : {}) })}`} className="btn-key" download>
+            <Download aria-hidden />
+            엑셀
           </a>
         </form>
-        <div className="mt-3 overflow-x-auto">
-          <table className="w-full border-collapse [&_td]:whitespace-nowrap text-[0.7rem] [&_.text-xs]:text-[0.6rem]">
+        <div className="mt-3 overflow-x-auto rounded-card border border-line bg-surface">
+          <table className="w-full border-collapse text-dense [&_td]:whitespace-nowrap">
             <colgroup>
               {COL_W.map((w, i) => (
                 <col key={i} className={w} />
               ))}
             </colgroup>
             <thead>
-              <tr className="thead-3d text-center">
+              <tr className="thead-3d text-start">
                 {['#', '도메인명', '대표도메인명', '유형', '그룹', '논리타입', '길이', '설명', '등록자', '등록일시', '구분', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
-                  <th key={i} className="whitespace-nowrap border px-2 py-2">
+                  <th key={i} className="px-3 py-2">
                     {h}
                   </th>
                 ))}
@@ -359,40 +384,29 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
             <tbody>
               {domains.length === 0 ? (
                 <tr>
-                  <td colSpan={15} className="border px-2 py-4 text-center text-gray-500">
+                  <td colSpan={15} className="px-3 py-6 text-center text-ink-3">
                     등록된 도메인이 없습니다
                   </td>
                 </tr>
               ) : (
                 domains.map((d, i) => (
-                  <tr key={d.dom_id} className={edit?.dom_id === d.dom_id ? 'bg-amber-50' : 'hover:bg-gray-50'}>
-                    <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
-                    <td className="border px-2 py-1 font-medium">{d.dom_nm}</td>
-                    <td className="border px-2 py-1">{d.key_dom_nm}</td>
-                    <td className="border px-2 py-1 text-center" title={tpTitle(d.dom_tp_cd)}>{TP_NM[d.dom_tp_cd] ?? d.dom_tp_cd}</td>
-                    <td className="border px-2 py-1">{d.std_dom_grp?.dom_grp_nm}</td>
-                    <td className="border px-2 py-1">{d.std_lgc_tp?.lgc_tp_nm}</td>
-                    <td className="border px-2 py-1">{d.data_len ? `${d.data_len}${d.data_scale ? `,${d.data_scale}` : ''}` : ''}{d.unit_nm ? ` (${d.unit_nm})` : ''}</td>
-                    <td className="border px-2 py-1 !whitespace-normal">{d.dom_desc}</td>
+                  <tr key={d.dom_id} data-mode={edit?.dom_id === d.dom_id ? 'edit' : undefined}>
+                    <td className={`${TD} text-right font-mono text-xs text-ink-3 tabular-nums`}>{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
+                    <td className={`${TD} font-medium`}>{d.dom_nm}</td>
+                    <td className={TD}>{d.key_dom_nm}</td>
+                    <td className={TD} title={tpTitle(d.dom_tp_cd)}>
+                      <span className="badge">{TP_NM[d.dom_tp_cd] ?? d.dom_tp_cd}</span>
+                    </td>
+                    <td className={`${TD} text-ink-2`}>{d.std_dom_grp?.dom_grp_nm}</td>
+                    <td className={`${TD} text-ink-2`}>{d.std_lgc_tp?.lgc_tp_nm}</td>
+                    <td className={`${TD} text-right tabular-nums`}>{d.data_len ? `${d.data_len}${d.data_scale ? `,${d.data_scale}` : ''}` : ''}{d.unit_nm ? ` (${d.unit_nm})` : ''}</td>
+                    <td className={`${TD} min-w-60 !whitespace-normal text-ink-2`}>{d.dom_desc}</td>
                     <ActorCells nm={d.regr_nm} d={d.std_reg_dtm} />
                     <SeCell se={d.std_se_cd} />
                     <StsCell sts={d.std_sts_cd} pend={d.pend_act} apv={`/areas/${areaId}/approvals?tp=DOM`} />
                     <ActorCells nm={d.apv_nm} d={d.apv_dtm} />
-                    <td className="whitespace-nowrap border px-2 py-1 text-center">
-                      {d.std_sts_cd === 'REQ' || d.pend_act ? (
-                        <ApvLink apv={`/areas/${areaId}/approvals?tp=DOM`} />
-                      ) : (
-                        requester && (
-                          <>
-                            <button onClick={() => startEdit(d)} className="mr-2 text-blue-700 underline">
-                              수정
-                            </button>
-                            <button onClick={() => remove(d)} className="text-red-700 underline">
-                              삭제
-                            </button>
-                          </>
-                        )
-                      )}
+                    <td className={TD}>
+                      {d.std_sts_cd === 'REQ' || d.pend_act ? <ApvLink apv={`/areas/${areaId}/approvals?tp=DOM`} /> : requester && <RowActions onEdit={() => startEdit(d)} onRemove={() => remove(d)} />}
                     </td>
                   </tr>
                 ))
@@ -400,41 +414,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
             </tbody>
           </table>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
-          <span className="text-gray-600">
-            총 {total.toLocaleString()}건 · {cond.page} / {pages} 페이지
-          </span>
-          <div className="mx-auto flex items-center gap-1">
-            {[
-              ['«', 1],
-              ['‹', cond.page - 1],
-            ].map(([l, p]) => (
-              <button key={l} onClick={() => go(p as number)} disabled={cond.page <= 1} className="rounded border px-2 py-1 disabled:opacity-30">
-                {l}
-              </button>
-            ))}
-            {Array.from({ length: Math.min(5, pages) }, (_, i) => Math.min(Math.max(1, cond.page - 2), Math.max(1, pages - 4)) + i).map((p) => (
-              <button key={p} onClick={() => go(p)} aria-current={p === cond.page ? 'page' : undefined} className={`min-w-8 rounded border px-2 py-1 ${p === cond.page ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : ''}`}>
-                {p}
-              </button>
-            ))}
-            {[
-              ['›', cond.page + 1],
-              ['»', pages],
-            ].map(([l, p]) => (
-              <button key={l} onClick={() => go(p as number)} disabled={cond.page >= pages} className="rounded border px-2 py-1 disabled:opacity-30">
-                {l}
-              </button>
-            ))}
-          </div>
-          <select value={cond.size} onChange={(e) => setCond({ ...cond, size: Number(e.target.value), page: 1 })} className="rounded border px-2 py-1" aria-label="페이지당 건수">
-            {[10, 20, 50, 100].map((n) => (
-              <option key={n} value={n}>
-                {n}건씩
-              </option>
-            ))}
-          </select>
-        </div>
+        <Pager total={total} page={cond.page} size={cond.size} go={go} setSize={(size) => setCond({ ...cond, size, page: 1 })} />
       </section>
     </div>
   )
