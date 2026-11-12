@@ -14,7 +14,7 @@
 //     서브 메뉴 = 메인 메뉴 바로 위, 묶음 기준 정렬(마스터 지시 2026-10-18) : 표준사전 = 묶음 왼쪽 끝에 맞춤, 모델·설정 = 묶음 오른쪽 끝에 맞춤(화면 끝 안쪽으로)
 //   · 요금제 = 설정 오른쪽 독립 메인 메뉴, 권한 무관(멤버면 항상 — 결제 전에도 들어가야 함, 마스터 지시 2026-10-19)
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
-//  접기·펼치기 = 화면 아래 가운데 같은 자리의 작은 화살표 탭(마스터 2026-11-12) — 접힘 = 탭만 살짝, 펼침 = nav 윗 테두리 가운데 탭. 접힘 탭은 맨 아래에서 12px 띄움(2026-11-02 Pi Browser 하단 제스처 바 가림 사고)
+//  접기·펼치기 = 화면 아래 가운데 같은 자리의 작은 화살표 탭(마스터 2026-11-12) — 접힘 = 탭만 살짝, 펼침 = 같은 탭 + 메뉴 알약만(나머지 투명·클릭 통과, 마스터 2026-11-12). 접힘 탭은 맨 아래에서 12px 띄움(2026-11-02 Pi Browser 하단 제스처 바 가림 사고)
 import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -155,8 +155,8 @@ const REST: Item[] = [
 // 요금제 — 권한 무관 독립 메뉴(설정 오른쪽)
 const PLAN_ITEM: Item = { seg: 'plan', nm: 'plan', icon: I.plan }
 
-// 메뉴 묶음 — 박스 없이 묶음 사이 헤어라인만(2026-11-12 디자인 개편)
-const group = 'flex shrink-0 gap-0.5 [&+&]:border-s [&+&]:border-line [&+&]:ps-2'
+// 메뉴 묶음 — 묶음마다 반투명 알약 바탕, 묶음 밖은 투명·클릭 통과(마스터 2026-11-12 — 펼침도 접힘처럼 메뉴만 보이게)
+const group = 'pointer-events-auto flex shrink-0 gap-0.5 rounded-lg border border-line bg-surface/85 p-0.5 shadow-1'
 // ?tab= 이 없을 때 화면별 기본 탭
 const DEF_TAB: Record<string, string> = {
   model: 'prj',
@@ -295,18 +295,18 @@ export default function AreaNav() {
     <nav
       ref={navRef}
       aria-label={t('label')}
-      className={`fixed inset-x-0 bottom-0 z-40 ${fold ? 'pointer-events-none flex justify-center pb-[max(12px,env(safe-area-inset-bottom))]' : 'touch-manipulation border-t border-line bg-surface pb-[max(4px,env(safe-area-inset-bottom))]'}`}
+      className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 ${fold ? 'flex justify-center pb-[max(12px,env(safe-area-inset-bottom))]' : 'touch-manipulation pb-[max(4px,env(safe-area-inset-bottom))]'}`}
     >
-      {/* 접기·펼치기 탭 = 화면 아래 가운데 같은 자리(마스터 2026-11-12) — 접힘 = 탭만 본문 위에 뜸(nav 는 투명·클릭 통과·본문 예약 0, 탭 바탕 85% 불투명, 맨 아래에서 12px 띄워 Pi Browser 하단 제스처 바에 가리지 않게 — 2026-11-02), 펼침 = nav 윗 테두리 가운데에 붙은 탭(-mb-px 로 테두리와 이음). 단추 = 56×32 눌림 영역, 보이는 탭 = 아래 56×20 */}
+      {/* 접기·펼치기 탭 = 화면 아래 가운데 같은 자리(마스터 2026-11-12) — 접힘 = 탭만 본문 위에 뜸(nav 는 투명·클릭 통과·본문 예약 0, 탭 바탕 85% 불투명, 맨 아래에서 12px 띄워 Pi Browser 하단 제스처 바에 가리지 않게 — 2026-11-02), 펼침 = 메뉴 위 가운데 같은 모양 탭(nav 바탕·테두리 없음 — 메뉴 묶음·서브 바만 반투명 바탕). 단추 = 56×32 눌림 영역, 보이는 탭 = 아래 56×20 */}
       <button
         type="button"
         onClick={toggle}
         aria-expanded={!fold}
         aria-label={fold ? (cur ? t('expandWith', { menu: t(cur.nm) }) : t('expand')) : t('collapse')}
         title={fold ? t('expand') : t('collapse')}
-        className={`group pointer-events-auto flex h-8 w-14 touch-manipulation items-end justify-center ${fold ? '' : 'absolute bottom-full left-1/2 -mb-px -translate-x-1/2'}`}
+        className={`group pointer-events-auto flex h-8 w-14 touch-manipulation items-end justify-center ${fold ? '' : 'absolute bottom-full left-1/2 -translate-x-1/2'}`}
       >
-        <span className={`flex h-5 w-14 items-center justify-center border border-line text-ink-2 transition-colors group-hover:bg-raised group-hover:text-ink ${fold ? 'rounded-lg bg-surface/85 shadow-1' : 'rounded-t-lg border-b-0 bg-surface'}`}>
+        <span className="flex h-5 w-14 items-center justify-center rounded-lg border border-line bg-surface/85 text-ink-2 shadow-1 transition-colors group-hover:bg-raised group-hover:text-ink">
           {fold ? <ChevronUp className="h-4 w-4" aria-hidden /> : <ChevronDown className="h-4 w-4" aria-hidden />}
         </span>
       </button>
@@ -319,7 +319,7 @@ export default function AreaNav() {
               left: subX ?? 0,
               visibility: subX == null ? 'hidden' : undefined,
             }}
-            className="seg absolute bottom-1 max-w-[calc(100vw-16px)]"
+            className="seg pointer-events-auto absolute bottom-1 max-w-[calc(100vw-16px)] border border-line shadow-1"
           >
             {subsOf(active).map((s) => (
               <li key={s.seg + (s.tab ?? '')}>
