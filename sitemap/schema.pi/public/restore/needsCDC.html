@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<!-- dbms.pi 7단계 PiCDC·PipeLine 방향 검토 장표 : Kafka 없이 CDC를 시작해도 되는가, AI는 어디에 쓰는가, 공식 문서로 본 네 가지 질문. 근거 = PRD v0.7·ROADMAP·공식 문서·발표·연구(2024-10 ~ 2026-11). 공개 경로라 비밀·개인 경로 금지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dbms.pi CDC 방향 검토 : Kafka 없이 시작해도 되는가</title>
+<style>
+  :root { --bg:#e9eaec; --paper:#fff; --ink:#1f2328; --sub:#59636e; --line:#d8dadd; --navy:#1f3864; --sky:#2e75b6; --org:#ed7d31; --old:#8c959f; --new:#2e75b6; --ok:#1a7f37; --warn:#9a6700; --red:#c62828; --band:#404040; --soft:#f2f4f7; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 'Malgun Gothic', system-ui, sans-serif }
+  .deck { max-width:1120px; margin:0 auto; padding:24px 12px 40px; display:grid; gap:22px }
+  .slide { background:var(--paper); aspect-ratio:16/9; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,.08); padding:30px 40px 8px; display:flex; flex-direction:column; position:relative; overflow:hidden }
+  .slide header { border-bottom:3px solid var(--navy); padding-bottom:8px; margin-bottom:14px; position:relative }
+  .slide header::after { content:''; position:absolute; left:0; bottom:-3px; width:90px; height:3px; background:var(--org) }
+  .crumb { position:absolute; right:0; top:-4px; font-size:11px; color:var(--sub); text-align:right; line-height:1.4 }
+  h1 { font-size:24px; margin:0; color:var(--navy) }
+  h2 { font-size:21px; margin:0; color:var(--navy) }
+  .gov { font-size:15px; color:var(--ink); margin:0 0 12px; font-weight:600 }
+  .gov b { color:var(--sky) }
+  .body { flex:1; display:grid; gap:14px; min-height:0 }
+  .c2 { grid-template-columns:1fr 1fr } .c3 { grid-template-columns:1.15fr .85fr }
+  .box { border:1px solid var(--line); border-radius:4px; overflow:hidden; display:flex; flex-direction:column }
+  .box > h3 { margin:0; background:var(--band); color:#fff; font-size:13.5px; padding:6px 12px; font-weight:800 }
+  .box > .in { padding:10px 14px; font-size:13.5px; flex:1 }
+  .finding { margin-top:12px; background:var(--soft); border-left:5px solid var(--sky); padding:8px 14px; font-size:14px }
+  .finding b { color:var(--navy) }
+  .src { font-size:11px; color:var(--sub); margin-top:8px }
+  table { width:100%; border-collapse:collapse; font-size:13px }
+  th, td { padding:5px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top }
+  th { background:var(--soft); color:var(--sub); font-weight:600 }
+  td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  .same { color:var(--ok); font-weight:700 } .diff { color:var(--org); font-weight:700 } .tbd { color:var(--red); font-weight:700 }
+  ul { margin:4px 0; padding-left:18px } li { margin:2px 0 }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+  .kpi { border:1px solid var(--line); border-radius:4px; padding:12px 14px; text-align:center }
+  .kpi .v { font-size:30px; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums }
+  .kpi .l { font-size:12px; color:var(--sub) }
+  .tag { display:inline-block; font-size:11px; font-weight:700; padding:0 7px; border-radius:9px; margin-right:4px; white-space:nowrap }
+  .t-h { background:#fde8d7; color:#b4520f } .t-m { background:#e3eefa; color:#1f5f99 } .t-l { background:#eef0f2; color:#59636e }
+  .pg { margin-top:10px; padding-top:5px; border-top:1px solid var(--line); text-align:center; font-size:11px; color:var(--sub) }
+  .cover { justify-content:center; background:linear-gradient(135deg,#1f3864 0%,#2e5597 100%); color:#fff }
+  .cover h1 { color:#fff; font-size:34px; line-height:1.3 } .cover p { color:#dbe5f4; font-size:16px; margin:6px 0 }
+  .cover .big { font-size:52px; font-weight:800; margin:18px 0 6px; color:#fff } .cover .big small { font-size:22px; color:#f4b183 }
+  .tight th, .tight td { padding:3px 7px; font-size:12px; line-height:1.45 }
+  .xt th, .xt td { padding:2px 6px; font-size:11.5px; line-height:1.4 }
+  .good { color:var(--ok); font-weight:700 } .bad { color:var(--red); font-weight:700 } .mid { color:var(--warn); font-weight:700 }
+  .pick { background:#eef6ee }
+  .q { font-weight:700; color:var(--navy) }
+  .refs { font-size:12px; columns:2; column-gap:28px; margin:0; padding-left:20px } .refs li { break-inside:avoid; margin:0 0 5px }
+  .refs a { color:var(--sky) }
+  @media (max-width:760px) { .slide { aspect-ratio:auto; padding:22px 18px } .c2,.c3,.kpis { grid-template-columns:1fr } .crumb { display:none } .refs { columns:1 } }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- 표지 -->
+  <section class="slide cover">
+    <p>dbms.pi 7단계 PiCDC·PipeLine 방향 검토</p>
+    <h1>Kafka 없이 CDC를 시작해도 되는가</h1>
+    <div class="big">Kafka 없이 시작 <small>AI는 매핑·검증·감시를 맡는다</small></div>
+    <p>검토 대상 : dbms.pi PRD v0.7 11.3절(PiCDC·PipeLine) · ROADMAP Phase 6 · 공식 문서로 본 질문 4가지</p>
+    <p style="font-size:13px;margin-top:24px">근거 : PostgreSQL·Oracle·Kafka·Debezium·Claude API·Supabase·AWS·Google Cloud·Snowflake·Databricks·Confluent 공식 문서 · 커뮤니티 글 · LLM 매핑 연구 (2024-10 ~ 2026-11) · 작성 2026-11-14</p>
+  </section>
+
+  <!-- 요약 -->
+  <section class="slide">
+    <header><h2>1. 요약</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>요약</div></header>
+    <p class="gov"><b>Kafka는 빼고 시작한다.</b> 변경을 옮기는 일은 <b>DB 로그와 오프셋 저장</b>이 맡고, AI는 매핑·검증·감시를 맡는다</p>
+    <div class="body" style="grid-template-rows:auto 1fr">
+      <div class="kpis">
+        <div class="kpi"><div class="v">0 / 7</div><div class="l">PRD CDC 요구사항(R00~R06) 중 Kafka가 있어야 하는 항목</div></div>
+        <div class="kpi"><div class="v">1 / 5</div><div class="l">CDC가 하는 일 5가지 중 Kafka가 꼭 필요한 일(팬아웃·재생)</div></div>
+        <div class="kpi"><div class="v">7곳</div><div class="l">Kafka 없는 로그 캡처를 기본 기능으로 적은 공식 문서</div></div>
+      </div>
+      <div class="body c2">
+        <div class="box"><h3>확인된 사실</h3><div class="in"><ul>
+          <li>현재 PRD v0.7의 캡처 방식은 폴링(1차)과 PostgreSQL 논리 복제(2차)다. Kafka 항목은 없다</li>
+          <li>Debezium 공식 문서는 엔진(앱 내장)과 서버(싱크 20여 종) 모두 Kafka 없이 쓰는 방법을 안내한다</li>
+          <li>Claude API 공식 문서는 temperature 0.0에서도 결과가 완전히 결정적이지 않다고 적는다</li>
+          <li>AWS·Google의 이행 서비스는 규칙 엔진이 먼저 변환하고, 남은 부분을 생성형 AI가 돕는다</li>
+        </ul></div></div>
+        <div class="box"><h3>판단</h3><div class="in"><ul>
+          <li><span class="tag t-h">권장</span>고객망 워커(Java)에 Debezium 엔진을 넣고, 오프셋은 대상 DB에 둔다</li>
+          <li><span class="tag t-h">권장</span>AI는 매핑 초안·검증 SQL·스키마 변경 영향·지연 이상 설명을 맡는다. 결과는 사람 승인과 결정적 검증을 거친다</li>
+          <li><span class="tag t-m">조건부</span>재검토 신호 5개 중 2개가 생기면 Kafka를 전송 구간에 넣는다</li>
+          <li><span class="tag t-l">배제</span>AI가 주기적으로 차이를 조회해 변경을 만드는 방식</li>
+        </ul></div></div>
+      </div>
+    </div>
+    <div class="finding"><b>시사점</b> : 핵심 장치는 변경을 빠짐없이 순서대로 옮기는 부분이다. 이 일은 DB 로그와 오프셋 저장이 맡고, Kafka와 AI는 그 앞뒤를 돕는다.</div>
+    <div class="pg">2</div>
+  </section>
+
+  <!-- 네 가지 질문과 답 -->
+  <section class="slide">
+    <header><h2>2. 네 가지 질문과 답</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>질문과 답</div></header>
+    <p class="gov">로그 캡처는 <b>Kafka 없이 된다</b>. AI는 <b>Kafka 자리를 맡지 못한다</b>. 검증된 제품은 <b>각 클라우드 안</b>에 있다</p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:21%">질문</th><th style="width:11%">답</th><th style="width:38%">공식 문서 근거</th><th>조건·한계</th></tr>
+        <tr><td class="q">① DB 로그 기반 캡처를 Kafka 없이 할 수 있나?</td><td><span class="tag t-h">된다</span></td><td>PostgreSQL 논리 디코딩·복제 슬롯, Oracle LogMiner, Debezium 엔진·서버("Kafka 없이 원천에서 바로"), Supabase·Google·Databricks 관리형 CDC</td><td>최소 1회 전달이라 멱등 적재, 읽은 위치 기록, 슬롯 감시가 필요하다</td></tr>
+        <tr><td class="q">② AI가 Kafka 역할을 대신할 수 있나?</td><td><span class="tag t-l">못한다</span></td><td>Kafka는 내구성·파티션 순서·보존 기간 재생을 보장한다. Claude API는 상태를 저장하지 않고, temperature 0.0에서도 결과가 완전히 결정적이지 않다</td><td>AI는 Kafka·CDC를 받아 쓰는 쪽이다(Confluent Streaming Agents, Debezium AI)</td></tr>
+        <tr><td class="q">③ Kafka 없는 Debezium과 AI로 대신할 수 있나?</td><td><span class="tag t-m">조건부로 된다</span></td><td>Debezium 엔진 문서 : 장애 대응을 Kafka Connect 대신 앱이 맡는다. Debezium AI : 임베딩 변환(Java 21 이상), PyDebeziumAI(Kafka 없이 프로세스 안에서 실행)</td><td>재시작·오프셋은 워커가 맡는다. Debezium AI는 AI용 데이터 준비 기능이라, 매핑·검증 AI는 따로 만든다</td></tr>
+        <tr><td class="q">④ 같은 기능을 갖춘 검증된 솔루션이 있나?</td><td><span class="tag t-m">클라우드 안에는 있다</span></td><td>Supabase Pipelines(공개 알파)와 자동 임베딩, AWS DMS와 생성형 AI 변환, Google DMS·Datastream과 Gemini, Snowflake Openflow와 Cortex, Databricks Lakeflow Connect</td><td>대상이 그 회사 클라우드여야 한다. 고객 온프레미스 Oracle·Tibero에서 고객이 정한 대상으로 가는 범용 제품은 찾지 못했다</td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>시사점</b> : AWS·Google 공식 문서는 "규칙 엔진이 먼저 변환하고, 남은 부분을 생성형 AI가 돕는" 구조를 쓴다. dbms.pi도 같은 원칙을 따른다.</div>
+    <div class="src">※ 출처 : 질문별 상세는 5~8번 장, 문서 목록은 참고 자료 (1/2)</div>
+    <div class="pg">3</div>
+  </section>
+
+  <!-- 계획과 조건 -->
+  <section class="slide">
+    <header><h2>3. dbms.pi 계획과 실행 조건</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>현재 계획</div></header>
+    <p class="gov">현재 계획 문서에는 <b>Kafka가 없다</b>. 실행 환경도 <b>상시 브로커를 두기 어려운</b> 구조다</p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:15%">항목</th><th style="width:63%">현재 계획·조건</th><th>근거</th></tr>
+        <tr><td>목적</td><td>이행(PiMig) 뒤 변경 인계, 레이크 3층 적재의 기반 파이프라인</td><td>PRD 11.3·11.4, MIG-R08</td></tr>
+        <tr><td>캡처 방식</td><td>① 폴링(변경일시 칼럼, 1차) ② PostgreSQL 논리 복제(pgoutput·wal2json, 2차) ③ Supabase Realtime은 보조 신호</td><td>CDC-R01</td></tr>
+        <tr><td>정확성 요구</td><td>워터마크 겹침 창, 키 중복 제거, 멱등 upsert, 키별 순서, 복제 슬롯 보호</td><td>CDC-R02·R04·R06</td></tr>
+        <tr><td>실행 위치</td><td>고객망 로컬 워커(SchemaPiAgent.java 확장), 서명 지시서, 원천 읽기 전용</td><td>A2·A10</td></tr>
+        <tr><td>앱 런타임</td><td>Vercel 함수와 Supabase. 요청 단위로 실행돼 상시 소비자를 두기 어렵다</td><td>루트 CLAUDE.md</td></tr>
+        <tr><td>원천 범위</td><td>1차는 PostgreSQL. Oracle·Tibero 변경 캡처는 Phase 6 분석에서 정한다</td><td>PRD 10절 #8</td></tr>
+        <tr><td>레이크</td><td>raw, standardized, curated 3층. 저장소 위치는 법무 검토 뒤 정한다</td><td>ANL-R01, 10절 #7</td></tr>
+        <tr><td>일정·인력</td><td>Phase 6 추정 10 작업일, 1인 개발</td><td>dbms.pi ROADMAP</td></tr>
+        <tr><td>시험 환경</td><td>로컬 pitel-pg(11억 행)가 wal_level=logical, 복제 슬롯 10개 설정으로 이미 떠 있다</td><td>docker inspect(11-14)</td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>Key Finding</b> : Kafka 구상은 계획 문서에 아직 들어가지 않았다. 결정이 필요한 곳은 전송 구간 하나다.</div>
+    <div class="src">※ 출처 : sitemap/dbms.pi/docs/PRD.md v0.7 · ROADMAP.md · schema.pi MASTER_ROADMAP.md · pitel-pg 컨테이너 기동 인자</div>
+    <div class="pg">4</div>
+  </section>
+
+  <!-- 업계 변화 -->
+  <section class="slide">
+    <header><h2>4. 2024~2026 업계 변화</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>업계 변화</div></header>
+    <p class="gov">큰 회사는 Kafka를 <b>AI 데이터 기반</b>으로 키우고, 작은 팀용 도구는 <b>원천에서 목적지로 바로</b> 간다</p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:11%">시기</th><th style="width:58%">변화</th><th>dbms.pi에 주는 뜻</th></tr>
+        <tr><td>2024-07</td><td>ClickHouse가 PeerDB(Postgres 전용 CDC 엔진) 인수, 오픈소스 유지</td><td>CDC가 분석 제품의 기능으로 흡수</td></tr>
+        <tr><td>2024-10</td><td>Debezium 전 리더 Gunnar Morling, "CDC Is a Feature Not a Product" : 사용자가 원하는 일은 Snowflake·S3 같은 목적지로 데이터를 옮기는 것</td><td>목적지(대상 DB·레이크)부터 정한다</td></tr>
+        <tr><td>2025-11</td><td>Snowflake, pg_lake 공개(Apache 2.0) : Postgres가 Iceberg 테이블을 직접 관리</td><td>Postgres 쪽 레이크 선택지</td></tr>
+        <tr><td>2026-02</td><td>Kafka 4.2 : Queues for Kafka(KIP-932) 정식, KRaft 전용</td><td>운영은 쉬워졌고, 브로커는 여전히 필요</td></tr>
+        <tr><td>2026-03</td><td>Diskless Topics(KIP-1150) 채택. 2026-08 기준 릴리스에는 아직 없음</td><td>비용 절감은 아직 먼 이야기</td></tr>
+        <tr><td>2026-03-17</td><td>IBM, Confluent 인수 완료(약 110억 달러). 실시간 데이터를 기업 AI·에이전트의 엔진으로 내세움</td><td>Kafka는 대기업 표준으로 굳어짐</td></tr>
+        <tr><td>2026-07</td><td>Debezium Server JDBC 싱크로 Kafka 없는 이행 파이프라인 안내(Debezium 블로그 7-06)</td><td>B안의 공식 근거</td></tr>
+        <tr><td>2026-07~10</td><td>Supabase Pipelines 공개 알파(7-21, BigQuery). 10-02에 ClickHouse·DuckLake·Snowflake 대상 추가</td><td>자사 Supabase 원천의 분석 경로</td></tr>
+        <tr><td>2026-10~11</td><td>Debezium : Beam DebeziumIO(Kafka 불필요), PyDebeziumAI, 플랫폼 경보, 3.7.1에서 재시작 뒤 누락·중복 사례 수정</td><td>AI는 CDC를 받아 쓰는 쪽. 정확성은 성숙한 도구도 계속 고친다</td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>Key Finding</b> : Kafka 없이 원천에서 목적지로 바로 가는 도구가 2026년에 공식 기능으로 자리 잡았다. AI 쪽 흐름은 CDC를 소비하는 방향이다.</div>
+    <div class="src">※ 출처 : 참고 자료 (1/2)·(2/2)</div>
+    <div class="pg">5</div>
+  </section>
+
+  <!-- 질문 1 -->
+  <section class="slide">
+    <header><h2>5. 질문 ① 로그 캡처는 Kafka 없이 되는가</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>공식 문서 ①</div></header>
+    <p class="gov">PostgreSQL·Oracle·Debezium·관리형 서비스 공식 문서 모두 <b>Kafka 없는 로그 캡처</b>를 기본 기능으로 적고 있다</p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:20%">공식 문서</th><th style="width:52%">문서 내용</th><th>dbms.pi에 주는 조건</th></tr>
+        <tr><td>PostgreSQL 18 문서 47.2 논리 디코딩</td><td>WAL을 해석해 테이블 변경을 꺼낸다. 복제 슬롯은 변경을 원래 순서대로 재생하고, 연결과 상관없이 남으며 크래시에도 유지된다</td><td>원천 PG는 Kafka 없이 바로 읽는다</td></tr>
+        <tr><td>같은 문서</td><td>크래시 뒤 슬롯이 이전 LSN으로 돌아가 최근 변경을 다시 보낼 수 있다. 중복 처리는 클라이언트가 맡는다</td><td>마지막 LSN 기록, 멱등 upsert</td></tr>
+        <tr><td>같은 문서(주의)</td><td>슬롯은 소비자가 없어도 WAL을 붙잡는다. 심하면 DB가 멈출 수 있으니 필요 없는 슬롯은 지운다</td><td>슬롯 경보·정리(CDC-R06)</td></tr>
+        <tr><td>Oracle DBMS_LOGMNR</td><td>LogMiner는 온라인·아카이브 redo 로그를 SQL(V$LOGMNR_CONTENTS)로 조회한다</td><td>Oracle 원천도 Kafka 없이 읽는다(보충 로깅·권한 필요)</td></tr>
+        <tr><td>Debezium 엔진 문서</td><td>Kafka 브로커와 Connect 없이 커넥터를 앱 안에 넣어 변경 이벤트를 직접 받는 방법을 안내한다</td><td>Java 워커에 내장한다</td></tr>
+        <tr><td>Debezium 서버 문서</td><td>"Kafka 없이 원천에서 메시징·저장 시스템으로 바로" 보낸다. 싱크 20여 종(JDBC·Iceberg·Pub/Sub·Kinesis·Redis·NATS 등)</td><td>별도 프로세스로도 쓸 수 있다</td></tr>
+        <tr><td>Supabase·Google·Databricks 문서</td><td>Supabase Pipelines, Datastream, Lakeflow Connect 모두 로그 기반 CDC를 Kafka 없이 제공한다. 전달은 최소 1회, Datastream은 순서를 보장하지 않는다</td><td>관리형 선택지</td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>정리</b> : 공식 문서 7곳이 Kafka 없이 로그를 읽는다. 공통 조건은 중복 처리(멱등), 읽은 위치 기록, 슬롯 감시 세 가지다.</div>
+    <div class="src">※ 출처 : 참고 자료 (1/2) 1~4, 11, 16, 18</div>
+    <div class="pg">6</div>
+  </section>
+
+  <!-- 질문 2 -->
+  <section class="slide">
+    <header><h2>6. 질문 ② Kafka가 보장하는 것과 LLM이 보장하지 않는 것</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>공식 문서 ②</div></header>
+    <p class="gov">Kafka는 <b>잃지 않고, 순서대로, 다시 읽게</b> 하는 저장 계층이다. LLM 공식 문서는 <b>같은 입력에도 다른 출력</b>을 인정한다</p>
+    <div class="body" style="grid-template-rows:1fr auto">
+      <div class="body c2">
+        <div class="box"><h3>Kafka 공식 문서(Design, 4.3)</h3><div class="in"><ul>
+          <li>내구성 : 커밋된 메시지는 동기화된 복제본이 하나라도 살아 있으면 잃지 않는다</li>
+          <li>순서 : 한 파티션 안에서 전체 순서를 지킨다</li>
+          <li>보존·재생 : 토픽마다 보존 기간을 정하고, 소비자는 그 안에서 원하는 위치부터 다시 읽는다</li>
+          <li>전달 : 기본은 최소 1회. 멱등 프로듀서와 트랜잭션으로 Kafka 안에서는 정확히 1회. 외부 시스템까지는 그 시스템의 협조가 필요하다</li>
+        </ul></div></div>
+        <div class="box"><h3>Claude API 공식 문서</h3><div class="in"><ul>
+          <li>temperature 0.0에서도 결과가 완전히 결정적이지 않다</li>
+          <li>같은 입력이 호출마다 다른 출력을 낼 수 있다(용어집)</li>
+          <li>Messages API는 상태를 저장하지 않는다. 대화 이력은 매 호출마다 앱이 보낸다. 서버 보관 기능(베타)도 마지막 요청 뒤 5분이면 만료되고, 기준 사본은 앱이 지킨다</li>
+          <li>메시지 보존, 순서 보장, 재생 위치 같은 기능은 문서에 없다</li>
+        </ul></div></div>
+      </div>
+      <div class="box"><h3>업계 공식 구조 : AI는 Kafka·CDC 뒤에서 일한다</h3><div class="in"><ul>
+        <li>Confluent 문서 : Streaming Agents는 Flink 위에서 데이터 스트림 안에 AI 에이전트를 돌리고, Real-Time Context Engine이 Kafka 토픽 데이터를 MCP로 외부 에이전트에 넘긴다</li>
+        <li>Debezium 문서 : 임베딩 변환·PyDebeziumAI로 변경 이벤트를 AI용 데이터로 바꾼다</li>
+      </ul></div></div>
+    </div>
+    <div class="finding"><b>정리</b> : Kafka가 맡는 일은 저장·순서·재생이다. LLM 공식 문서는 이 성질을 보장하지 않고, Confluent·Debezium 문서는 AI를 Kafka·CDC 뒤쪽 소비자로 둔다.</div>
+    <div class="src">※ 출처 : 참고 자료 (1/2) 7~10, 5~6</div>
+    <div class="pg">7</div>
+  </section>
+
+  <!-- 질문 3 -->
+  <section class="slide">
+    <header><h2>7. 질문 ③ Kafka 없는 Debezium과 Debezium AI 기능</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>공식 문서 ③</div></header>
+    <p class="gov">Debezium은 <b>Kafka 없이 돌고</b>, AI 기능도 공식으로 붙어 있다. Kafka Connect가 하던 <b>장애 대응은 워커가 맡는다</b></p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:17%">구성</th><th style="width:47%">공식 문서 내용</th><th style="width:16%">상태</th><th>dbms.pi 적용</th></tr>
+        <tr><td>Debezium 엔진(Java 라이브러리)</td><td>앱 안에 커넥터를 넣는다. 3.2부터 비동기 엔진이 기본. 오프셋 저장소는 파일·DB 등에서 고른다</td><td>정식</td><td>SchemaPiAgent에 내장, 오프셋은 대상 DB</td></tr>
+        <tr><td>장애 대응 차이</td><td>Kafka Connect는 분산 서비스라 한 노드가 죽으면 다른 노드가 커넥터를 다시 띄운다. 모든 앱에 이 수준이 필요하진 않고, 엔진 방식은 앱이 직접 갖춘다</td><td>문서 설명</td><td>워커 재시작·하트비트(Phase 5 프로토콜)</td></tr>
+        <tr><td>Debezium 서버</td><td>Kafka 없이 싱크로 바로 보낸다. JDBC 싱크(upsert), Iceberg 싱크 포함</td><td>정식</td><td>고객망 별도 프로세스 대안</td></tr>
+        <tr><td>임베딩 변환(FieldToEmbedding)</td><td>변경 이벤트의 텍스트 칼럼을 임베딩 벡터로 바꿔 붙인다. 공급자 Hugging Face·Ollama·ONNX MiniLM·OpenAI·Voyage AI. Java 21 이상 필요</td><td>Red Hat 빌드 기준 개발자 미리보기</td><td>레이크 curated층 의미 검색용(선택)</td></tr>
+        <tr><td>PyDebeziumAI</td><td>Python 프로세스 안에서 엔진을 돌려 Kafka 없이 벡터 DB(Chroma·PGVector·Milvus)에 반영한다. 기본 키 기반 멱등 ID</td><td>공식 패키지(2026-10 발표)</td><td>워커가 Java라 해당 없음</td></tr>
+        <tr><td>AI 관련 싱크</td><td>Milvus·Qdrant(벡터 DB), InstructLab</td><td>정식</td><td>필요할 때</td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>정리</b> : Debezium 공식 AI 기능은 변경 데이터를 AI가 쓰기 좋게 바꾸는 쪽이다. 매핑 규칙 작성·검증 같은 이행 AI는 Debezium 범위 밖이다.</div>
+    <div class="src">※ 출처 : 참고 자료 (1/2) 3~6 · Debezium 3.x는 Java 17 이상, 임베딩 변환은 Java 21 이상</div>
+    <div class="pg">8</div>
+  </section>
+
+  <!-- 질문 4 -->
+  <section class="slide">
+    <header><h2>8. 질문 ④ 변경 캡처와 AI를 함께 주는 검증된 솔루션</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>공식 문서 ④</div></header>
+    <p class="gov">변경 캡처와 AI를 함께 주는 제품은 있다. 모두 <b>자기 클라우드가 대상일 때</b> 동작한다</p>
+    <div class="body">
+      <table class="xt">
+        <tr><th style="width:13%">솔루션</th><th style="width:30%">변경 캡처(Kafka 필요 여부)</th><th style="width:26%">AI 기능(공식)</th><th style="width:12%">상태</th><th>dbms.pi 관점</th></tr>
+        <tr><td>Supabase</td><td>Pipelines : 논리 복제, 최소 1회, Kafka 불필요. 대상 BigQuery·ClickHouse·DuckLake·Snowflake. 처리 지역 프랑크푸르트 고정</td><td>자동 임베딩(트리거·pgmq·pg_cron·Edge Functions), pgvector</td><td>Pipelines 공개 알파</td><td>원천이 Supabase여야 한다. 자사 앱 분석용 보조</td></tr>
+        <tr><td>AWS DMS</td><td>전체 적재와 CDC, Kafka 불필요</td><td>Schema Conversion : 규칙 엔진 뒤 생성형 AI(Bedrock)가 남은 객체를 변환. Oracle·SQL Server·SAP ASE → PostgreSQL</td><td>제공 중, AI는 켜서 사용</td><td>대상이 AWS</td></tr>
+        <tr><td>Google DMS·Datastream</td><td>DMS : 덤프 뒤 로그 기반 CDC. Datastream : 서버리스 CDC, 최소 1회, 순서 미보장</td><td>Gemini가 결정적 변환 결과를 보강, 변환 도우미·품질 평가</td><td>제공 중(Gemini 기능은 단계별)</td><td>대상이 Google Cloud</td></tr>
+        <tr><td>Snowflake Openflow</td><td>PostgreSQL·Oracle CDC 커넥터</td><td>Cortex LLM 처리기(PromptSnowflakeCortex)</td><td>제공 중</td><td>대상이 Snowflake</td></tr>
+        <tr><td>Databricks Lakeflow Connect</td><td>MySQL·PostgreSQL·SQL Server·Oracle(LogMiner) 관리형 CDC</td><td>플랫폼 AI 기능은 별도</td><td>커넥터마다 다름</td><td>대상이 Databricks</td></tr>
+        <tr><td>Confluent Cloud(IBM)</td><td>Debezium 기반 CDC 커넥터, Kafka 포함</td><td>Streaming Agents, AI_COMPLETE·AI_EMBEDDING</td><td>제공 중</td><td>Kafka를 쓰는 고객 대상</td></tr>
+        <tr><td>Tibero ProSync</td><td>redo 기반 Tibero·Oracle·PostgreSQL 동기화</td><td>없음</td><td>제공 중(4.6)</td><td>Tibero 원천 연계 후보</td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>정리</b> : 검증된 제품은 모두 "원천에서 그 회사 클라우드로" 가는 경로다. AWS·Google은 규칙 엔진을 먼저 쓰고 AI로 남은 부분을 채운다.</div>
+    <div class="src">※ 출처 : 참고 자료 (1/2) 11~20 · Supabase Pipelines 요금은 파이프라인 시간·적재량 기준</div>
+    <div class="pg">9</div>
+  </section>
+
+  <!-- AI 실측 -->
+  <section class="slide">
+    <header><h2>9. AI가 실제로 하는 일</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>AI 실측 자료</div></header>
+    <p class="gov">AI는 매핑·변환 초안을 빠르게 만든다. 정확도는 <b>결정적 검증을 붙여야 쓸 수 있는</b> 수준이다</p>
+    <div class="body c3">
+      <div class="box"><h3>LLM 매핑·이행 연구 수치</h3><div class="in">
+        <table class="tight">
+          <tr><th>출처</th><th>결과</th></tr>
+          <tr><td>SAGAI 2026 예비 논문(arXiv 2603.28731)</td><td>6개 LLM, 상호운용 시나리오 10개. 다층 안전장치를 쓴 최고 구성 pass@1 0.90</td></tr>
+          <tr><td>SURGeLLM 2026 StructHallu-Drift</td><td>구조화 출력의 약 44%에 의미 환각 1건 이상. 스키마 변화 크기와 관계없이 비슷</td></tr>
+          <tr><td>실무 사례(HackerNoon)</td><td>보험 상품 코드 143개 매핑 중 28.6% 정답. 생성 뒤 결정적 검증기를 권고</td></tr>
+          <tr><td>LIACS 석사 논문(2026-03)</td><td>GPT-4.1 매핑 에이전트. 결과를 가른 요인은 출처 추적(provenance)</td></tr>
+          <tr><td>실무 글(2026-04)</td><td>LLM 이행 오류는 형식·타입·건수 검사를 통과하면서도 틀린 경우가 많다</td></tr>
+        </table>
+      </div></div>
+      <div class="box"><h3>에이전트 도입 현황(2차 인용)</h3><div class="in"><ul>
+        <li>Gartner : 에이전트형 AI 프로젝트의 40% 이상이 2027년까지 취소될 전망(Integrate.io 인용)</li>
+        <li>Forrester : 조직의 86%가 시범 단계를 넘었고, 에이전트 행동을 신뢰하는 곳은 34%(Boomi 인용)</li>
+        <li>업계 설명 : 에이전트에는 신선하고 추적 가능한 데이터가 필요하고, 그 데이터를 CDC·스트리밍이 공급한다(Airbyte·Integrate.io)</li>
+        <li>CDC를 AI로 대체한 운영 사례는 이번 조사에서 찾지 못했다</li>
+      </ul></div></div>
+    </div>
+    <div class="finding"><b>Key Finding</b> : AI는 규칙을 만들고 설명하는 일에 강하다. 같은 입력에 같은 결과를 보장해야 하는 일에는 약하다.</div>
+    <div class="src">※ 출처 : 참고 자료 (2/2) · 벤더 글은 입장으로 읽는다</div>
+    <div class="pg">10</div>
+  </section>
+
+  <!-- 해야 하는 일 -->
+  <section class="slide">
+    <header><h2>10. CDC가 해야 하는 일과 맡을 주체</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>역할 분석</div></header>
+    <p class="gov">CDC가 하는 일 5가지 가운데 Kafka가 꼭 필요한 일은 <b>팬아웃·재생 1가지</b>, AI가 잘하는 일은 <b>규칙·설명 1가지</b>다</p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:22%">해야 하는 일</th><th style="width:22%">어려운 점</th><th style="width:20%">DB 로그·오프셋</th><th style="width:16%">Kafka</th><th>AI(LLM)</th></tr>
+        <tr><td>① 변경을 빠짐없이 읽기(입력·수정·삭제)</td><td>물리 삭제, 긴 트랜잭션의 늦은 커밋</td><td class="good">○ WAL·redo가 원본</td><td class="mid">△ 받은 것을 옮긴다</td><td class="bad">× 로그를 읽는 장치가 없고, 결과가 실행마다 달라질 수 있다</td></tr>
+        <tr><td>② 어디까지 읽었는지 기억(LSN·SCN)</td><td>재시작 뒤 누락·중복(Debezium 3.7.1도 수정)</td><td class="good">○ 오프셋을 대상 DB 테이블에 저장</td><td class="good">○ 토픽에 저장</td><td class="bad">× 상태를 저장하지 않는다</td></tr>
+        <tr><td>③ 장애 뒤 다시 보내기·중복 제거</td><td>대상 DB 장애, 네트워크 단절</td><td class="good">○ 복제 슬롯 보존과 멱등 upsert</td><td class="good">○ 보존 기간 동안 버퍼</td><td class="bad">×</td></tr>
+        <tr><td>④ 여러 대상에 나눠 주기·과거 재생</td><td>대상마다 속도가 다르다</td><td class="mid">△ 슬롯을 늘리면 원천 부담</td><td class="good">◎ 본래 강점</td><td class="bad">×</td></tr>
+        <tr><td>⑤ 매핑·변환 규칙, 스키마 변경 영향, 지연 이상 설명</td><td>사람 손이 많이 간다</td><td class="bad">×</td><td class="bad">×</td><td class="good">◎ 초안과 설명. 사람 승인과 검증이 따라야 한다</td></tr>
+      </table>
+      <div class="box"><h3>AI가 바꾼 것과 그대로인 것</h3><div class="in"><ul>
+        <li>바뀐 것 : 만드는 비용. Kafka 생태계의 큰 장점이던 "만들어진 커넥터"를, 작은 싱크라면 AI로 며칠 안에 직접 만들 수 있다</li>
+        <li>그대로인 것 : 운영 보증. 누락 0, 순서, 재시작 뒤 이어 읽기는 코드가 결정적으로 지켜야 하고, 이 부분은 AI가 대신 지켜 주지 않는다</li>
+      </ul></div></div>
+    </div>
+    <div class="finding"><b>Key Finding</b> : ①~③은 DB 로그와 오프셋이 맡는다. dbms.pi 1차 범위의 대상은 2곳(대상 DB·레이크)이라 ④ 수요가 작다.</div>
+    <div class="pg">11</div>
+  </section>
+
+  <!-- 선택지 비교 -->
+  <section class="slide">
+    <header><h2>11. 선택지 비교</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>선택지</div></header>
+    <p class="gov">1인 운영과 고객망 워커 조건에는 <b>B안(워커에 Debezium 엔진 내장)</b>이 가장 잘 맞는다</p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:14%">기준</th><th style="width:21%">A. Kafka + Debezium + Connect</th><th style="width:23%" class="pick">B. 워커에 Debezium 엔진 내장(Kafka 없음)</th><th style="width:21%">C. 관리형 직결(Supabase Pipelines 등)</th><th>D. AI가 주기적으로 차이 조회</th></tr>
+        <tr><td>누락·순서</td><td class="good">높음</td><td class="pick good">높음 : 오프셋 DB 저장, 최소 1회 전달과 멱등 upsert</td><td class="good">높음(원천별)</td><td class="bad">낮음 : 물리 삭제·늦은 커밋을 놓친다</td></tr>
+        <tr><td>운영 부담(1인)</td><td class="bad">큼 : 브로커·Connect·스키마 레지스트리</td><td class="pick good">작음 : 워커 하나</td><td class="good">작음</td><td class="mid">중간</td></tr>
+        <tr><td>고객망 워커 적합</td><td class="bad">낮음 : 고객사에 클러스터 필요</td><td class="pick good">높음 : SchemaPiAgent(Java)에 라이브러리로 넣는다</td><td class="bad">낮음 : 원천이 그 클라우드에 있어야 한다</td><td class="mid">중간</td></tr>
+        <tr><td>Oracle·Tibero</td><td class="mid">Oracle은 LogMiner, Tibero는 별도</td><td class="pick mid">Oracle은 LogMiner, Tibero는 ProSync 연계나 폴링</td><td class="bad">대부분 Postgres 전용</td><td class="mid">폴링 수준</td></tr>
+        <tr><td>목적지 연결</td><td class="good">싱크 커넥터가 많다</td><td class="pick mid">JDBC 싱크 제공, 레이크 쓰기는 직접 구현</td><td class="mid">BigQuery·ClickHouse·DuckLake·Snowflake(알파), 처리 지역 프랑크푸르트</td><td class="mid">직접 구현</td></tr>
+        <tr><td>비용</td><td class="bad">상시 서버 3대 이상</td><td class="pick good">워커 자원</td><td class="mid">파이프라인 시간·적재량 과금</td><td class="bad">변경량에 비례한 토큰 비용</td></tr>
+        <tr><td>종합</td><td><span class="tag t-m">조건부</span>재검토 신호 때</td><td class="pick"><span class="tag t-h">1순위</span>고객 원천</td><td><span class="tag t-m">보조</span>자사 Supabase 원천의 분석 적재</td><td><span class="tag t-l">배제</span></td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>판단</b> : B안으로 시작하고, 자사 앱(Supabase) 데이터의 분석 적재는 C안을 보조로 쓴다. 고객 온프레미스 원천을 고객이 정한 대상으로 옮기는 영역은 검증된 제품이 비어 있어 dbms.pi가 맡을 자리다.</div>
+    <div class="src">※ 출처 : Debezium 엔진·서버 문서, Supabase Pipelines 설정 문서, Tibero ProSync 4.6 문서(라이선스는 원천·대상 코어 수 기준)</div>
+    <div class="pg">12</div>
+  </section>
+
+  <!-- 재검토 신호 -->
+  <section class="slide">
+    <header><h2>12. Kafka가 다시 필요해지는 신호</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>재검토 조건</div></header>
+    <p class="gov">아래 신호 가운데 <b>2개 이상</b>이 생기면 Kafka 도입을 다시 검토한다</p>
+    <div class="body">
+      <table>
+        <tr><th style="width:34%">신호</th><th style="width:40%">그때 Kafka가 유리해지는 이유</th><th>지금 상태</th></tr>
+        <tr><td>① 같은 변경을 3곳 이상이 받는다(레이크·검색·캐시·알림 등)</td><td>원천 슬롯 하나로 여러 소비자를 각자 속도로 받는다</td><td>2곳(대상 DB·레이크)</td></tr>
+        <tr><td>② 대상 장애가 길어 원천 WAL이 쌓일 위험이 크다</td><td>Kafka가 중간 버퍼가 되어 원천 디스크를 지킨다</td><td>슬롯 경보·정리 절차(CDC-R06)로 관리</td></tr>
+        <tr><td>③ 고객사가 이미 Kafka를 표준으로 운영한다</td><td>그 Kafka에 이벤트를 넣으면 된다. 운영은 고객사가 맡는다</td><td>해당 고객 없음</td></tr>
+        <tr><td>④ 며칠 전 변경까지 다시 돌려야 한다(재처리·재생)</td><td>토픽 보존 기간 안에서 원하는 시점부터 재생</td><td>이행 리허설은 스냅샷과 재시작으로 대응</td></tr>
+        <tr><td>⑤ 초당 수만 건 이상, 원천 여러 개가 합류한다</td><td>파티션으로 나눠 병렬 처리</td><td>1차 원천 1개</td></tr>
+      </table>
+      <div class="box"><h3>지금 할 대비</h3><div class="in"><ul>
+        <li>변경 이벤트는 Debezium 변경 이벤트 형식(before·after·op·source)으로 맞춘다. 나중에 Kafka를 넣어도 바뀌는 곳은 전송 구간 하나다</li>
+        <li>오프셋과 처리 이력은 대상 DB 테이블에 남긴다. Kafka로 옮길 때 시작 지점을 그대로 넘길 수 있다</li>
+      </ul></div></div>
+    </div>
+    <div class="finding"><b>Key Finding</b> : Kafka를 빼는 결정은 되돌릴 수 있다. 이벤트 형식과 오프셋 기록을 지키면 나중에 넣는 비용이 작다.</div>
+    <div class="pg">13</div>
+  </section>
+
+  <!-- 판단과 계획 -->
+  <section class="slide">
+    <header><h2>13. 판단과 단계별 계획</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>판단</div></header>
+    <p class="gov">dbms.pi 7단계는 <b>Kafka 없이</b> 시작하고, AI는 <b>규칙 엔진 다음 자리</b>에서 매핑·검증·설명을 맡는다</p>
+    <div class="body c2">
+      <div class="box"><h3>단계별 계획</h3><div class="in">
+        <table class="tight">
+          <tr><th style="width:18%">단계</th><th>내용</th></tr>
+          <tr><td>1. PoC</td><td>pitel-pg 한 주제영역에서 워커(Debezium 엔진, pgoutput)로 읽어 대상 PG에 JDBC upsert, 레이크 raw층에 Parquet로 쓴다. 오프셋은 대상 DB 테이블</td></tr>
+          <tr><td>2. 폴링 병행</td><td>로그 권한이 없는 원천은 폴링 어댑터(CDC-R00~R02) 유지, 스키마 변경 영향 연동(CDC-R05)</td></tr>
+          <tr><td>3. 원천 확장</td><td>Oracle은 Debezium LogMiner, Tibero는 ProSync 연계나 폴링 중 선택(PRD 10절 #8)</td></tr>
+          <tr><td>4. 재검토</td><td>재검토 신호 2개 이상이면 Kafka(또는 호환 브로커)를 전송 구간에 넣는다</td></tr>
+        </table>
+      </div></div>
+      <div class="box"><h3>AI가 맡는 일 (규칙 엔진 다음, 사람 승인과 결정적 검증을 거침)</h3><div class="in"><ul>
+        <li>PiMig 매핑·변환 규칙 : 표준용어 규칙으로 먼저 매핑하고, 남은 칼럼을 AI가 초안으로 채운 뒤 MIG·DA 승인</li>
+        <li>검증 SQL(건수·합계·샘플 대조) 생성, 판정은 실행 결과로</li>
+        <li>스키마 변경이 닿는 파이프라인 설명</li>
+        <li>지연(lag)·오류 급증의 원인 설명과 조치 제안</li>
+        <li>선택 : curated층 텍스트 칼럼 임베딩(Debezium 임베딩 변환, Java 21)</li>
+        <li>맡기지 않는 일 : 변경 읽기, 오프셋 관리, 적재 성공 판정</li>
+      </ul></div></div>
+    </div>
+    <div class="finding"><b>판단</b> : 전송 구간에서 Kafka를 빼고, 변경 이벤트 형식과 오프셋 기록으로 나중의 선택지를 열어 둔다. AI 사용 순서는 AWS·Google 공식 문서와 같게 규칙 먼저, AI 다음이다.</div>
+    <div class="pg">14</div>
+  </section>
+
+  <!-- 후속 조치 -->
+  <section class="slide">
+    <header><h2>14. 후속 조치와 확정 시험</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>후속 조치</div></header>
+    <p class="gov">판단을 확정하는 시험은 <b>로컬 pitel-pg</b>에서 바로 할 수 있다</p>
+    <div class="body">
+      <table class="tight">
+        <tr><th style="width:18%">할 일</th><th style="width:44%">방법</th><th style="width:25%">통과 기준</th><th>담당</th></tr>
+        <tr><td>PRD 반영</td><td>11.3절에 "1차 전송 구간에 Kafka를 두지 않음" 결정, 재검토 신호 5개, AI 사용 순서(규칙 먼저) 추가</td><td>마스터 승인</td><td>마스터·아소카</td></tr>
+        <tr><td>시험 A 정확성</td><td>pitel-pg 한 주제영역에 변경 10만 건(입력·수정·삭제 섞음)</td><td>누락 0, 중복 반영 0, 키별 순서 유지</td><td>아소카</td></tr>
+        <tr><td>시험 B 재시작</td><td>적재 중 워커를 강제 종료 3회</td><td>재시작 뒤 누락 0</td><td>아소카</td></tr>
+        <tr><td>시험 C 슬롯 보호</td><td>대상 DB를 30분 멈춘다</td><td>WAL 증가량 측정, 경보 동작</td><td>아소카</td></tr>
+        <tr><td>워커 Java 버전</td><td>SchemaPiAgent 빌드 Java를 Debezium 3.x(Java 17 이상), 임베딩 변환(Java 21 이상)과 대조</td><td>같은 런타임에서 동작</td><td>아소카</td></tr>
+        <tr><td>AI 매핑 정확도</td><td>pitel 매핑 50건을 규칙 단독, 규칙 다음 AI 두 방식으로 사람 정답과 대조</td><td>정답률과 검증기 통과율 기록</td><td>아소카</td></tr>
+        <tr><td>Supabase Pipelines 검토</td><td>처리 지역(프랑크푸르트 고정)과 행 데이터 이동을 법무 검토(PRD 10절 #7)에 넣는다</td><td>사용 가능 여부 결정</td><td>마스터</td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>결론</b> : Kafka 없이 시작해도 정확성은 지킬 수 있다. 조건은 DB 로그 기반 캡처, 오프셋 저장, 멱등 적재 세 가지이고, AI는 이 세 가지 위에서 규칙 엔진 다음 자리를 맡는다.</div>
+    <div class="pg">15</div>
+  </section>
+
+  <!-- 참고 자료 1 -->
+  <section class="slide">
+    <header><h2>15. 참고 자료 (1/2)</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>공식 문서</div></header>
+    <p class="gov">질문 ①~④의 근거는 <b>공식 문서</b>에서 가져왔다</p>
+    <ol class="refs">
+      <li><a href="https://www.postgresql.org/docs/current/logicaldecoding-explanation.html">PostgreSQL 18 문서 47.2 논리 디코딩 개념</a></li>
+      <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/arpls/DBMS_LOGMNR.html">Oracle DBMS_LOGMNR(LogMiner)</a></li>
+      <li><a href="https://debezium.io/documentation/reference/stable/development/engine.html">Debezium 엔진 문서</a></li>
+      <li><a href="https://debezium.io/documentation/reference/stable/operations/debezium-server.html">Debezium 서버 문서</a></li>
+      <li><a href="https://debezium.io/documentation/reference/stable/ai/embeddings.html">Debezium 임베딩 변환 문서</a></li>
+      <li><a href="https://debezium.io/documentation/reference/stable/ai/debezium-ai-python.html">PyDebeziumAI 문서</a></li>
+      <li><a href="https://kafka.apache.org/43/design/design/">Apache Kafka 4.3 Design 문서</a></li>
+      <li><a href="https://platform.claude.com/docs/en/api/messages/create">Claude API : Create a Message(temperature)</a></li>
+      <li><a href="https://docs.claude.com/en/docs/build-with-claude/working-with-messages">Claude Docs : Messages API는 상태를 저장하지 않음</a></li>
+      <li><a href="https://docs.confluent.io/cloud/current/ai/streaming-agents/overview.html">Confluent : Streaming Agents</a></li>
+      <li><a href="https://supabase.com/blog/realtime-or-etl-how-to-choose-the-right-tool">Supabase : Realtime or Pipelines(전달 보장 비교)</a></li>
+      <li><a href="https://supabase.com/docs/guides/storage/analytics/replication">Supabase : Pipelines 설정(대상·지역·요금)</a></li>
+      <li><a href="https://supabase.com/docs/guides/ai/automatic-embeddings">Supabase : 자동 임베딩</a></li>
+      <li><a href="https://docs.aws.amazon.com/dms/latest/userguide/schema-conversion-convert.databaseobjects.html">AWS DMS : 생성형 AI로 객체 변환</a></li>
+      <li><a href="https://docs.cloud.google.com/database-migration/docs/convert-sql-with-dms">Google DMS : Gemini 변환</a></li>
+      <li><a href="https://docs.cloud.google.com/datastream/docs/behavior-overview">Google Datastream 핵심 개념</a></li>
+      <li><a href="https://docs.snowflake.com/en/user-guide/data-integration/openflow/connectors/postgres/about">Snowflake Openflow PostgreSQL 커넥터</a></li>
+      <li><a href="https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/cdc-overview">Databricks Lakeflow Connect 데이터베이스 커넥터</a></li>
+      <li><a href="https://docs.tibero.com/prosync">Tibero ProSync 문서(v4.6)</a></li>
+      <li><a href="https://supabase.com/blog/supabase-pipelines-public-alpha">Supabase Pipelines 공개 알파(10-02 대상 추가)</a></li>
+    </ol>
+    <div class="finding" style="margin-top:auto"><b>확인 범위</b> : 공식 문서는 2026-11-14에 조회했다. 상태(알파·미리보기·정식)는 바뀔 수 있어 도입 전에 다시 확인한다.</div>
+    <div class="pg">16</div>
+  </section>
+
+  <!-- 참고 자료 2 -->
+  <section class="slide">
+    <header><h2>15. 참고 자료 (2/2)</h2><div class="crumb">dbms.pi<br>CDC 방향 검토<br>기타 자료</div></header>
+    <p class="gov">업계 변화와 AI 실측은 발표·블로그·연구에서 가져왔고, 벤더 글은 <b>입장</b>으로 읽었다</p>
+    <ol class="refs">
+      <li><a href="https://clickhouse.com/blog/clickhouse-welcomes-peerdb-adding-the-fastest-postgres-cdc-to-the-fastest-olap-database">ClickHouse : PeerDB 인수(2024-07)</a></li>
+      <li><a href="https://www.morling.dev/blog/cdc-is-a-feature-not-a-product/">Gunnar Morling : CDC Is a Feature Not a Product(2024-10)</a></li>
+      <li><a href="https://www.snowflake.com/en/engineering-blog/pg-lake-postgres-lakehouse-integration/">Snowflake : Introducing pg_lake</a></li>
+      <li><a href="https://kafka.apache.org/blog/2026/02/17/apache-kafka-4.2.0-release-announcement/">Apache Kafka 4.2.0 릴리스 공지</a></li>
+      <li><a href="https://aiven.io/blog/kip-1150-accepted-and-the-road-ahead">Aiven : KIP-1150 accepted(2026-03)</a></li>
+      <li><a href="https://pulse2.com/ibm-11-billion-acquisition-of-confluent-completed/">IBM, Confluent 인수 완료(2026-03-17)</a></li>
+      <li><a href="https://daily.dev/posts/building-kafka-less-data-integration-pipelines-with-debezium-5yi0fimdi">Debezium : Kafka 없는 파이프라인(2026-07-06, 요약본)</a></li>
+      <li><a href="https://debezium.io/blog/">Debezium 블로그(3.6.4·3.7.1·3.8.0.Alpha1, Beam, PyDebeziumAI)</a></li>
+      <li><a href="https://arxiv.org/html/2603.28731v1">arXiv 2603.28731(SAGAI 2026)</a></li>
+      <li><a href="https://aclanthology.org/2026.surgellm-1.22/">SURGeLLM 2026 : StructHallu-Drift</a></li>
+      <li><a href="https://theses.liacs.nl/pdf/2025-2026-CelikT.pdf">LIACS 석사 논문 : 스키마 매핑 에이전트</a></li>
+      <li><a href="https://tianpan.co/blog/2026-04-20-llm-powered-data-migrations-schema-evolution">LLM-Powered Data Migrations(2026-04)</a></li>
+      <li><a href="https://boomi.com/?p=65011">Boomi : 에이전트 신뢰 조사 인용</a></li>
+      <li><a href="https://www.integrate.io/blog/agentic-data-integration.md">Integrate.io : Agentic Data Integration</a></li>
+      <li><a href="https://dev.to/heywalter/why-we-replaced-debezium-kafka-in-our-large-scale-real-time-pipeline-2dc1">DEV : Debezium + Kafka를 바꾼 이유(운영 비용)</a></li>
+      <li><a href="https://camel.apache.org/components/next/debezium-oracle-component.html">Apache Camel : Debezium Oracle(엔진 방식)</a></li>
+    </ol>
+    <div class="finding" style="margin-top:auto"><b>확인 범위</b> : Debezium JDBC 싱크 글(7)은 원문 대신 요약본으로 확인했다. 연구 수치는 과제·모델·지표가 서로 달라 직접 비교하지 않는다.</div>
+    <div class="pg">17</div>
+  </section>
+
+</div>
+</body>
+</html>
