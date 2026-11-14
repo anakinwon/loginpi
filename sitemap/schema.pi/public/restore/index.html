@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- PC 포맷 뒤 개발 환경 복원 현황판 — 정적 스냅샷(2026-11-14), 값은 손으로 갱신. 공개 경로라 비밀번호·키·개인 경로 금지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restore 현황판 — 포맷 뒤 개발 환경 복원</title>
+<style>
+  :root { --bg:#f7f7f5; --card:#fff; --ink:#1f2328; --sub:#59636e; --line:#e3e3df; --ok:#1a7f37; --okbg:#e6f4ea; --warn:#9a6700; --warnbg:#fff4d6; --off:#59636e; --offbg:#eef0f2; --bad:#c62828; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111315; --card:#1a1d21; --ink:#e6e8eb; --sub:#9aa3ad; --line:#2c3137; --ok:#4ac26b; --okbg:#12301c; --warn:#d4a72c; --warnbg:#33290d; --off:#9aa3ad; --offbg:#24282d; --bad:#ff6b6b; } }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.6 system-ui, 'Malgun Gothic', sans-serif }
+  main { max-width:1080px; margin:0 auto; padding:28px 16px 48px }
+  h1 { font-size:22px; margin:0 0 4px }
+  .meta { color:var(--sub); margin:0 0 20px }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:20px }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px 14px }
+  .kpi b { display:block; font-size:22px; font-variant-numeric:tabular-nums }
+  .kpi span { color:var(--sub); font-size:12px }
+  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px; margin-bottom:14px }
+  h2 { font-size:16px; margin:0 0 10px; display:flex; gap:8px; align-items:center }
+  table { width:100%; border-collapse:collapse; font-size:13px }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top }
+  th { color:var(--sub); font-weight:600 }
+  td.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  code { font:12px ui-monospace, Consolas, monospace; background:var(--offbg); padding:1px 4px; border-radius:4px }
+  .b { display:inline-block; font-size:12px; font-weight:600; padding:1px 8px; border-radius:10px; white-space:nowrap }
+  .ok { color:var(--ok); background:var(--okbg) } .warn { color:var(--warn); background:var(--warnbg) } .off { color:var(--off); background:var(--offbg) }
+  ul { margin:6px 0 0; padding-left:20px }
+  .bar { height:8px; background:var(--offbg); border-radius:4px; overflow:hidden; min-width:80px }
+  .bar i { display:block; height:100%; background:var(--ok) }
+  .bar.old i { background:var(--sub) }
+  .tbd { color:var(--bad) }
+  footer { color:var(--sub); font-size:12px; margin-top:18px }
+</style>
+</head>
+<body>
+<main>
+  <h1>Restore 현황판</h1>
+  <p class="meta">PC 포맷 뒤 개발 환경 복원 · 기준 2026-11-14 15:10 (KST) · 원본 백업 = 외장 디스크 백업본 · 정적 스냅샷</p>
+
+  <div class="kpis">
+    <div class="kpi"><span>전체 항목</span><b>8 / 8</b><span>복원 완료(조치 필요 3건 별도)</span></div>
+    <div class="kpi"><span>Claude 플러그인</span><b>18</b><span>마켓플레이스 10</span></div>
+    <div class="kpi"><span>MCP 서버</span><b>12 / 17</b><span>연결 · 5건 로그인·키 필요</span></div>
+    <div class="kpi"><span>Docker DB</span><b>6</b><span>pitel-pg 가동 · 샘플 5 중지</span></div>
+    <div class="kpi"><span>pitel 재구축</span><b>3시간 37분</b><span>11억 행 · 지난 주말 7시간 40분</span></div>
+  </div>
+
+  <section>
+    <h2>1. 복원 항목 요약</h2>
+    <table>
+      <tr><th>항목</th><th>내용</th><th>상태</th></tr>
+      <tr><td>Claude Code 설정</td><td>agents·skills·hooks·settings 백업본에서 복원(자격증명 파일 제외)</td><td><span class="b ok">완료</span></td></tr>
+      <tr><td>플러그인</td><td>마켓플레이스 10 추가 · 플러그인 18 활성</td><td><span class="b ok">완료</span></td></tr>
+      <tr><td>MCP 서버</td><td>사용자 2(agentmemory·rea) + 프로젝트 15</td><td><span class="b warn">조치 필요</span></td></tr>
+      <tr><td>런타임·도구</td><td>Node v26.13.1 · pnpm 11.4.0 · Python 3.12/3.13 · uv · 전역 CLI(codex·vercel 등)</td><td><span class="b ok">완료</span></td></tr>
+      <tr><td>Git 로컬 브랜치</td><td>번들에서 3개 복원 : <code>feature/roles-r1</code> <code>feature/ship-hauler</code> <code>test/seminar-night-r1-t09</code></td><td><span class="b ok">완료</span></td></tr>
+      <tr><td>Docker Desktop</td><td>Docker 29.9.3 · WSL 3.0.5 · 8 CPU · 8.2 GB</td><td><span class="b ok">완료</span></td></tr>
+      <tr><td>샘플 DB 5종 + DBeaver</td><td>가이드 v3.1 순서 설치 · DBeaver 26.2.4 접속 7개 · JDBC 21개 파일</td><td><span class="b ok">완료</span></td></tr>
+      <tr><td>pitel 샘플 DB</td><td>배율 1 재구축 · 검증 전부 기대값 일치</td><td><span class="b ok">완료</span></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>2. MCP 서버</h2>
+    <table>
+      <tr><th>서버</th><th>상태</th><th>비고</th></tr>
+      <tr><td>exa · context7 · serena · playwright · sequential-thinking · gemini · filesystem · shadcn · ruflo · ecc-memory-vault · agentmemory · rea</td><td><span class="b ok">연결</span></td><td>—</td></tr>
+      <tr><td>vercel · sentry · supabase</td><td><span class="b warn">로그인 필요</span></td><td>OAuth — 처음 쓸 때 인증</td></tr>
+      <tr><td>github</td><td><span class="b warn">키 필요</span></td><td>환경변수 <code>GITHUB_MCP_PAT</code> 설정</td></tr>
+      <tr><td>cloudinary</td><td><span class="b warn">키 필요</span></td><td>환경변수 <code>CLOUDINARY_URL</code> 설정</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. Docker 컨테이너</h2>
+    <table>
+      <tr><th>이름</th><th>이미지</th><th>포트</th><th>용도</th><th>상태</th></tr>
+      <tr><td>pitel-pg</td><td>postgres:17</td><td class="n">55432</td><td>pitel 샘플 DB(pitel·pitel_dev)</td><td><span class="b ok">가동</span></td></tr>
+      <tr><td>postgres</td><td>postgres</td><td class="n">5432</td><td>가이드 실습</td><td><span class="b off">중지</span></td></tr>
+      <tr><td>mysql</td><td>mysql</td><td class="n">3306</td><td>가이드 실습</td><td><span class="b off">중지</span></td></tr>
+      <tr><td>mariadb</td><td>mariadb</td><td class="n">3307</td><td>가이드 실습(3306 충돌로 변경)</td><td><span class="b off">중지</span></td></tr>
+      <tr><td>sql-server</td><td>mssql/server:2022</td><td class="n">1433</td><td>가이드 실습</td><td><span class="b off">중지</span></td></tr>
+      <tr><td>oracle21c</td><td>oracle21c</td><td class="n">1521</td><td>가이드 실습(SID ORCLCDB)</td><td><span class="b off">중지</span></td></tr>
+    </table>
+    <ul>
+      <li>샘플 5종은 pitel 재구축 동안 메모리 부족 방지로 중지 — 8 GB PC 라 oracle21c(약 4 GB)와 pitel-pg 동시 가동은 권하지 않음</li>
+      <li>포트 55432~55439 는 Windows 동적 예약과 겹쳐 관리자 예약(<code>excludedportrange</code>)으로 고정</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. pitel 재구축 단계별 소요</h2>
+    <p class="meta" style="margin:0 0 8px">2026-11-14 08:19:24 → 11:55:54 · 막대 = 지난 주말 최장 단계(data 4시간 43분) 대비</p>
+    <table>
+      <tr><th>단계</th><th>이번</th><th></th><th>지난 주말</th><th></th></tr>
+      <tr><td>container·db·ddl</td><td class="n">7초</td><td><div class="bar"><i style="width:0.1%"></i></div></td><td class="n">—</td><td></td></tr>
+      <tr><td>data (생성·적재)</td><td class="n">2시간 22분 50초</td><td><div class="bar"><i style="width:50.5%"></i></div></td><td class="n">4시간 43분</td><td><div class="bar old"><i style="width:100%"></i></div></td></tr>
+      <tr><td>constraints (PK·인덱스 532)</td><td class="n">44분 24초</td><td><div class="bar"><i style="width:15.7%"></i></div></td><td class="n">1시간 15분</td><td><div class="bar old"><i style="width:26.5%"></i></div></td></tr>
+      <tr><td>analyze</td><td class="n">8분 34초</td><td><div class="bar"><i style="width:3%"></i></div></td><td class="n">13분</td><td><div class="bar old"><i style="width:4.6%"></i></div></td></tr>
+      <tr><td>verify</td><td class="n">20분 34초</td><td><div class="bar"><i style="width:7.3%"></i></div></td><td class="n">약 1시간 23분</td><td><div class="bar old"><i style="width:29.3%"></i></div></td></tr>
+      <tr><th>합계</th><th class="n">3시간 36분 30초</th><th></th><th class="n">약 7시간 40분</th><th></th></tr>
+    </table>
+    <table style="margin-top:12px">
+      <tr><th>검증 항목</th><th>결과</th><th>기대</th><th>판정</th></tr>
+      <tr><td>행 수(추정)</td><td class="n">1,101,161,856</td><td class="n">1,101,170,707 ±0.01%</td><td><span class="b ok">일치 0.0008%</span></td></tr>
+      <tr><td>테이블 · 하위 파티션</td><td class="n">214 · 2,306</td><td class="n">214 · 2,306</td><td><span class="b ok">일치</span></td></tr>
+      <tr><td>인덱스(PK + 보조) · 무효</td><td class="n">532 · 0</td><td class="n">532 · 0</td><td><span class="b ok">일치</span></td></tr>
+      <tr><td>DEFAULT 파티션 행</td><td class="n">0</td><td class="n">0</td><td><span class="b ok">일치</span></td></tr>
+      <tr><td>FK 고아 비율(434개 FK)</td><td class="n">0.039%</td><td class="n">약 0.05%</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td>DB 크기</td><td class="n">264 GB</td><td class="n">—</td><td>—</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. 남은 조치</h2>
+    <table>
+      <tr><th>할 일</th><th>담당</th><th>상태</th></tr>
+      <tr><td>github·cloudinary MCP 키 설정</td><td>마스터</td><td><span class="b warn">대기</span></td></tr>
+      <tr><td>vercel·sentry·supabase MCP OAuth 로그인</td><td>마스터</td><td><span class="b warn">대기</span></td></tr>
+      <tr><td>schema.pi 운영 메타 적재(loader) — pitel <code>REBUILD.md</code> 8절</td><td>마스터 직접</td><td><span class="b warn">대기</span></td></tr>
+      <tr><td>샘플 DB 필요 시 개별 기동(<code>docker start &lt;이름&gt;</code>)</td><td>필요할 때</td><td><span class="b off">선택</span></td></tr>
+    </table>
+  </section>
+
+  <footer>근거 : pitel <code>REBUILD.md</code> 12절(커밋 e48461f5) · 재구축 로그 · 복원 작업 세션 기록. 값은 스냅샷이며 자동 갱신하지 않음.</footer>
+</main>
+</body>
+</html>
