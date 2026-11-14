@@ -37,13 +37,13 @@
 <body>
 <main>
   <h1>Restore 현황판</h1>
-  <p class="meta">PC 포맷 뒤 개발 환경 복원 · 기준 2026-11-14 15:10 (KST) · 원본 백업 = 외장 디스크 백업본 · 정적 스냅샷</p>
+  <p class="meta">PC 포맷 뒤 개발 환경 복원 · 기준 2026-11-14 19:20 (KST) · 원본 백업 = 외장 디스크 백업본 · 정적 스냅샷</p>
 
   <div class="kpis">
-    <div class="kpi"><span>전체 항목</span><b>8 / 8</b><span>복원 완료(조치 필요 3건 별도)</span></div>
+    <div class="kpi"><span>전체 항목</span><b>8 / 8</b><span>복원 완료(조치 필요 2건 별도)</span></div>
     <div class="kpi"><span>Claude 플러그인</span><b>18</b><span>마켓플레이스 10</span></div>
-    <div class="kpi"><span>MCP 서버</span><b>12 / 17</b><span>연결 · 5건 로그인·키 필요</span></div>
-    <div class="kpi"><span>Docker DB</span><b>6</b><span>pitel-pg 가동 · 샘플 5 중지</span></div>
+    <div class="kpi"><span>MCP 서버</span><b>14 / 17</b><span>github 재시작 대기 · 미사용 2</span></div>
+    <div class="kpi"><span>Docker DB</span><b>6</b><span>전부 가동</span></div>
     <div class="kpi"><span>pitel 재구축</span><b>3시간 37분</b><span>11억 행 · 지난 주말 7시간 40분</span></div>
   </div>
 
@@ -53,7 +53,7 @@
       <tr><th>항목</th><th>내용</th><th>상태</th></tr>
       <tr><td>Claude Code 설정</td><td>agents·skills·hooks·settings 백업본에서 복원(자격증명 파일 제외)</td><td><span class="b ok">완료</span></td></tr>
       <tr><td>플러그인</td><td>마켓플레이스 10 추가 · 플러그인 18 활성</td><td><span class="b ok">완료</span></td></tr>
-      <tr><td>MCP 서버</td><td>사용자 2(agentmemory·rea) + 프로젝트 15</td><td><span class="b warn">조치 필요</span></td></tr>
+      <tr><td>MCP 서버</td><td>사용자 2(agentmemory·rea) + 프로젝트 15</td><td><span class="b warn">재시작 대기</span></td></tr>
       <tr><td>런타임·도구</td><td>Node v26.13.1 · pnpm 11.4.0 · Python 3.12/3.13 · uv · 전역 CLI(codex·vercel 등)</td><td><span class="b ok">완료</span></td></tr>
       <tr><td>Git 로컬 브랜치</td><td>번들에서 3개 복원 : <code>feature/roles-r1</code> <code>feature/ship-hauler</code> <code>test/seminar-night-r1-t09</code></td><td><span class="b ok">완료</span></td></tr>
       <tr><td>Docker Desktop</td><td>Docker 29.9.3 · WSL 3.0.5 · 8 CPU · 8.2 GB</td><td><span class="b ok">완료</span></td></tr>
@@ -67,9 +67,9 @@
     <table>
       <tr><th>서버</th><th>상태</th><th>비고</th></tr>
       <tr><td>exa · context7 · serena · playwright · sequential-thinking · gemini · filesystem · shadcn · ruflo · ecc-memory-vault · agentmemory · rea</td><td><span class="b ok">연결</span></td><td>—</td></tr>
-      <tr><td>vercel · sentry · supabase</td><td><span class="b warn">로그인 필요</span></td><td>OAuth — 처음 쓸 때 인증</td></tr>
-      <tr><td>github</td><td><span class="b warn">키 필요</span></td><td>환경변수 <code>GITHUB_MCP_PAT</code> 설정</td></tr>
-      <tr><td>cloudinary</td><td><span class="b warn">키 필요</span></td><td>환경변수 <code>CLOUDINARY_URL</code> 설정</td></tr>
+      <tr><td>vercel · supabase</td><td><span class="b ok">로그인 완료</span></td><td>OAuth 인증(2026-11-14)</td></tr>
+      <tr><td>github</td><td><span class="b warn">재시작 대기</span></td><td>환경변수 <code>GITHUB_MCP_PAT</code> 설정 완료 — Claude Code 재시작 뒤 연결</td></tr>
+      <tr><td>sentry · cloudinary</td><td><span class="b off">미사용</span></td><td>앱 코드에서 쓰지 않음(오류 수집·이미지 CDN) — 연결 불필요</td></tr>
     </table>
   </section>
 
@@ -78,14 +78,14 @@
     <table>
       <tr><th>이름</th><th>이미지</th><th>포트</th><th>용도</th><th>상태</th></tr>
       <tr><td>pitel-pg</td><td>postgres:17</td><td class="n">55432</td><td>pitel 샘플 DB(pitel·pitel_dev)</td><td><span class="b ok">가동</span></td></tr>
-      <tr><td>postgres</td><td>postgres</td><td class="n">5432</td><td>가이드 실습</td><td><span class="b off">중지</span></td></tr>
-      <tr><td>mysql</td><td>mysql</td><td class="n">3306</td><td>가이드 실습</td><td><span class="b off">중지</span></td></tr>
-      <tr><td>mariadb</td><td>mariadb</td><td class="n">3307</td><td>가이드 실습(3306 충돌로 변경)</td><td><span class="b off">중지</span></td></tr>
-      <tr><td>sql-server</td><td>mssql/server:2022</td><td class="n">1433</td><td>가이드 실습</td><td><span class="b off">중지</span></td></tr>
-      <tr><td>oracle21c</td><td>oracle21c</td><td class="n">1521</td><td>가이드 실습(SID ORCLCDB)</td><td><span class="b off">중지</span></td></tr>
+      <tr><td>postgres</td><td>postgres</td><td class="n">5432</td><td>가이드 실습</td><td><span class="b ok">가동</span></td></tr>
+      <tr><td>mysql</td><td>mysql</td><td class="n">3306</td><td>가이드 실습</td><td><span class="b ok">가동</span></td></tr>
+      <tr><td>mariadb</td><td>mariadb</td><td class="n">3307</td><td>가이드 실습(3306 충돌로 변경)</td><td><span class="b ok">가동</span></td></tr>
+      <tr><td>sql-server</td><td>mssql/server:2022</td><td class="n">1433</td><td>가이드 실습</td><td><span class="b ok">가동</span></td></tr>
+      <tr><td>oracle21c</td><td>oracle21c</td><td class="n">1521</td><td>가이드 실습(SID ORCLCDB)</td><td><span class="b ok">가동</span></td></tr>
     </table>
     <ul>
-      <li>샘플 5종은 pitel 재구축 동안 메모리 부족 방지로 중지 — 8 GB PC 라 oracle21c(약 4 GB)와 pitel-pg 동시 가동은 권하지 않음</li>
+      <li>샘플 5종은 pitel 재구축 동안 중지했다가 15:20 재기동 — 6개 동시 가동 메모리 약 5 GB / 7.6 GB(oracle21c 2.0 · pitel-pg 2.0 · sql-server 0.7), pitel 대량 조회 때 부족하면 <code>docker stop oracle21c</code> 먼저</li>
       <li>포트 55432~55439 는 Windows 동적 예약과 겹쳐 관리자 예약(<code>excludedportrange</code>)으로 고정</li>
     </ul>
   </section>
@@ -117,10 +117,10 @@
     <h2>5. 남은 조치</h2>
     <table>
       <tr><th>할 일</th><th>담당</th><th>상태</th></tr>
-      <tr><td>github·cloudinary MCP 키 설정</td><td>마스터</td><td><span class="b warn">대기</span></td></tr>
-      <tr><td>vercel·sentry·supabase MCP OAuth 로그인</td><td>마스터</td><td><span class="b warn">대기</span></td></tr>
+      <tr><td>github MCP — Claude Code 재시작 뒤 <code>claude mcp list</code> 로 연결 확인</td><td>마스터</td><td><span class="b warn">대기</span></td></tr>
+      <tr><td>vercel·supabase MCP OAuth 로그인</td><td>마스터</td><td><span class="b ok">완료</span></td></tr>
       <tr><td>schema.pi 운영 메타 적재(loader) — pitel <code>REBUILD.md</code> 8절</td><td>마스터 직접</td><td><span class="b warn">대기</span></td></tr>
-      <tr><td>샘플 DB 필요 시 개별 기동(<code>docker start &lt;이름&gt;</code>)</td><td>필요할 때</td><td><span class="b off">선택</span></td></tr>
+      <tr><td>샘플 DB 5종 재기동</td><td>—</td><td><span class="b ok">완료</span></td></tr>
     </table>
   </section>
 
