@@ -683,7 +683,7 @@ function SiteEdit({
           onChange={(e) => setShip(e.target.value)}
         >
           <option value="">
-            {tsh(SHIP_DEFAULT)} — {t('shipFree')}
+            {tsh(SHIP_DEFAULT)} : {t('shipFree')}
           </option>
           {shipReady &&
             SHIP_CD.map((c) => (

@@ -35,7 +35,7 @@
     "viewLabel": "Promijeni prikaz",
     "viewBubble": "Mjehurići",
     "viewTable": "Tablica",
-    "canvasLabel": "Mjehurići stranica — veličina prikazuje plan (oglas/vlastiti), boja prikazuje promjenu prikaza. Tab za pomicanje, Enter za otvaranje",
+    "canvasLabel": "Mjehurići stranice: veličina je plan (oglas/vlastiti), boja je povećanje/smanjenje prikaza. Tab za pomicanje, Enter za detalje",
     "ad": "Oglas",
     "own": "Vlastiti",
     "sample": "Uzorak",
@@ -177,7 +177,7 @@
     "views": "{count, plural, one {# pregled} few {# pregleda} other {# pregleda}}",
     "contact": "Kontakt",
     "visit": "Posjeti stranicu",
-    "leaveTitle": "Warp spreman — napuštanje vanjske stranice",
+    "leaveTitle": "Priprema za warp: Premještate se na vanjsku stranicu",
     "leaveBody": "Napuštate sitemap.pi i idete na donju stranicu. Njezin sadržaj i plaćanja odgovornost su njezinog operatora.",
     "leaveConfirm": "Skoči",
     "hudDest": "Odredište",
@@ -283,16 +283,16 @@
     "planLocked": "Plan se ne može mijenjati dok je u upotrebi.",
     "spk": "Dodatak za sjaj",
     "spkHint": "Čini vaš početni mjehurić sjajnim. Plaćeno zajedno s naknadom za korištenje, ili uključeno u Uredi dok je u upotrebi s posebnim plaćanjem.",
-    "spkPaid": "Plaćeno — ostaje uključeno tijekom razdoblja korištenja.",
+    "spkPaid": "Plaćanje dovršeno: održava se tijekom razdoblja korištenja.",
     "efct": "Efekt mjehurića",
     "efctNone": "Nijedan",
-    "efctHint": "Jedan po planu — Orbita (satelit kruži oko mjehurića), Puls (pulsirajući val), Komet (repni trag). Plaćeno s naknadom za korištenje, ili odabrano u Uredi dok je u upotrebi s posebnim plaćanjem. Može se kombinirati sa Sjajem.",
-    "efctPaid": "Plaćeno — ostaje uključeno tijekom razdoblja korištenja.",
+    "efctHint": "Jedna vrsta po planu: Orbita (satelit kruži oko mjehurića), Puls (val poput disanja), Komet (trag repa). Plaćeno s naknadom za korištenje, a tijekom korištenja može se odabrati i dodatno platiti u izmjenama. Može se koristiti sa Sparkleom.",
+    "efctPaid": "Plaćanje dovršeno: održava se tijekom razdoblja korištenja.",
     "ship": "Warp svemirski brod",
     "shipFree": "Osnovno·Besplatno",
     "shipSoon": "Plaćeni warp brodovi su u pripremi. Za sada su prikazani kao osnovne disk krstarice.",
     "shipHint": "Ovo je Warp svemirski brod za navođenje koji se pojavljuje kada posjetitelji dođu na vašu stranicu. Osnovna opcija je Krstarica tanjur (besplatno), a možete odabrati jednu od četiri plaćene opcije. Plaćanje se vrši zajedno s naknadom za korištenje, a možete odabrati i izvršiti dodatna plaćanja tijekom korištenja.",
-    "shipPaid": "Plaćanje dovršeno — održava se tijekom razdoblja korištenja."
+    "shipPaid": "Plaćanje dovršeno: održava se tijekom razdoblja korištenja."
   },
   "admin": {
     "title": "Administracija stranice",
@@ -314,7 +314,7 @@
     "dismiss": "Odbaci",
     "verifyToken": "Token za vlasništvo domene",
     "verifyStep1": "Otvorite ovu adresu u Pi Browseru i potvrdite da se točno podudara s tokenom",
-    "verifyStep2": "Ako se razlikuje ili se ne otvara, odbijte s razlogom \"Vlasništvo domene nije potvrđeno\" — isti vlasnik ne može ponovno podnijeti zahtjev za ovu domenu",
+    "verifyStep2": "Ako nije isto ili se ne otvori, bit će odbijeno (nije moguće provjeriti vlasništvo domene). Isti registrator ne može ponovno podnijeti zahtjev za ovu domenu.",
     "verifyStep3": "Potvrdite da se sadržaj stranice podudara s popisom i pravilima zabranjenih kategorija",
     "paid": "Plaćeno",
     "unpaid": "Neplaćeno",
@@ -393,7 +393,7 @@
     "LINK_TRY_LIMIT": "Previše netočnih kodova veze. Pokušajte ponovno za 15 minuta."
   },
   "cfg": {
-    "intro": "Tajmeri stanja naknade za korištenje (sati, 0.01–720). Spremljene vrijednosti stižu do obavijesti unutar nekoliko minuta (predmemorija 30 s–2,5 min); automatski prijelazi će ih pročitati nakon što cron (P5) bude isporučen. Za testiranje uređaja, smanjite na 0,05, pokrenite cijeli tok, a zatim vratite.",
+    "intro": "Tajmeri stanja naknade za korištenje (sati, 0.01~720). Spremljene vrijednosti stižu do obavijesti unutar nekoliko minuta (predmemorija 30 s : 2,5 min); automatski prijelazi će ih pročitati nakon što cron (P5) bude isporučen. Za testiranje uređaja, smanjite na 0,05, pokrenite cijeli tok, a zatim vratite.",
     "loading": "Učitavanje postavki…",
     "hourUnit": "sat(i)",
     "save": "Spremi",
@@ -414,7 +414,7 @@
   },
   "ship": {
     "SAUCER": "Krstarica tanjur",
-    "BRIDGE": "Zapovjedni most – zaslon",
+    "BRIDGE": "Zapovjedni most : zaslon",
     "TWIN": "Presretač s dvostrukim krilima",
     "DAGGER": "Jurišni borac bodež",
     "CROSS": "Borbeni zrakoplov s križnim krilima"
@@ -425,7 +425,7 @@
     "hide": "Sakrij izbornik",
     "footer": "Veze podnožja",
     "etc": "Ostali zasloni",
-    "dynHint": "{path} — otvara se nakon što odaberete stavku, stoga ova veza vodi na nadređeni zaslon",
+    "dynHint": "{path}: Ovaj se zaslon povezuje s nadređenim zaslonom jer je to zaslon na kojem odabirete stavku nakon unosa.",
     "auth": {
       "login": "Prijava",
       "admin": "Administrator",

@@ -299,13 +299,13 @@ function MySitesInner() {
                 {s.site_sts_cd === 'REJECTED' && s.rjct_rsn_cd && (
                   <p className="text-destructive text-sm">
                     {t('rejectReason')}: {tr(s.rjct_rsn_cd)}
-                    {s.rjct_rsn_cont ? ` — ${s.rjct_rsn_cont}` : ''}
+                    {s.rjct_rsn_cont ? `. ${s.rjct_rsn_cont}` : ''}
                   </p>
                 )}
                 {s.site_sts_cd === 'SUSPENDED' && (
                   <p className="text-destructive text-sm">
                     {t('suspendedNote')}
-                    {s.rjct_rsn_cont ? ` — ${s.rjct_rsn_cont}` : ''}
+                    {s.rjct_rsn_cont ? `. ${s.rjct_rsn_cont}` : ''}
                   </p>
                 )}
                 {s.vrfy_tkn && s.site_sts_cd !== 'WITHDRAWN' && (
@@ -517,7 +517,7 @@ function SiteForm({
               <option key={p} value={p}>
                 {tp(p)}
                 {f
-                  ? ` — ${term} · ${f.pi_amt} Pi${discount ? ` (${discount})` : ''}`
+                  ? ` : ${term} · ${f.pi_amt} Pi${discount ? ` (${discount})` : ''}`
                   : ''}
               </option>
             )
@@ -581,7 +581,7 @@ function SiteForm({
           onChange={(e) => setShip(e.target.value)}
         >
           <option value="">
-            {tsh(SHIP_DEFAULT)} — {t('shipFree')}
+            {tsh(SHIP_DEFAULT)} : {t('shipFree')}
           </option>
           {shipReady &&
             SHIP_CD.map((c) => (

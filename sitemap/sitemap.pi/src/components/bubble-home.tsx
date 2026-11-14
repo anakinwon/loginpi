@@ -582,7 +582,7 @@ function BubbleTable({
                         LV{lv}
                       </span>
                     ) : (
-                      <span className="text-white/40">—</span>
+                      <span className="text-white/40">-</span>
                     )}
                   </td>
                   <td className="px-2 py-2 whitespace-nowrap">

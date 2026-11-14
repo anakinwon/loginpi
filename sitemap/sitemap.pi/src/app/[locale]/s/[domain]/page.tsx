@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Params
 }): Promise<Metadata> {
   const { domain } = await params
-  return { title: `${decodeDomain(domain)} — sitemap.pi` }
+  return { title: `${decodeDomain(domain)} · sitemap.pi` }
 }
 
 export default async function SitePage({ params }: { params: Params }) {
