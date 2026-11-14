@@ -8,3 +8,6 @@
 *.ico binary
 *.woff binary
 *.woff2 binary
+
+# Git LFS — 5MB 넘는 가이드 원본(커밋 전 검사 상한 회피, 2026-11-14)
+sitemap/schema.pi/guide/*.pptx filter=lfs diff=lfs merge=lfs -text
