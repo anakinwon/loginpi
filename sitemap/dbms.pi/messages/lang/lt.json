@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analizė ir ežeras",
     "intro": "dbms veiklos KPI, trijų sluoksnių ežero dizainas ir duomenų rinkinių katalogas vienoje vietoje.",
-    "storageNotice": "Ežero saugykla (kliento pusės arba debesies) dar nenuspręsta (PRD 10 skyrius #7). Kol kas saugomi tik dizainai ir pavadinimų atitikmenys – jokių eilučių duomenų.",
+    "storageNotice": "Ežero saugykla (kliento pusės arba debesies) dar nenuspręsta (PRD 10 skyrius #7). Kol kas saugomi tik dizainai ir pavadinimų atitikmenys : jokių eilučių duomenų.",
     "noLink": "Pirmiausia pasirinkite arba užregistruokite schema.pi nuorodą.",
     "goConnect": "Registruoti nuorodą",
     "loading": "Įkeliama…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP analizė — Modelis↔DB",
+    "title": "GAP analizė: Modelis↔DB",
     "intro": "Palyginkite schema.pi dizaino modelį ir DDL taikymo istoriją su gyvu DB katalogu, kad rastumėte poslinkį, ir įvertinkite, ar suprojektuoti indeksai iš tikrųjų naudojami. Kliento eilučių duomenys niekada neskaitomi ir nesaugomi.",
     "needLink": "Pirmiausia pasirinkite schema.pi nuorodą aukščiau. Jei neturite, užregistruokite žetoną meniu „Nuoroda“.",
     "needConn": "Pasirinkite DB ryšį, kurį norite palyginti aukščiau.",
@@ -188,7 +188,7 @@
     "model": "Modelis",
     "reqNo": "Užklausa {id}",
     "notSaved": "Nepavyko išsaugoti šio vykdymo istorijoje (rezultatai rodomi normaliai).",
-    "capped": "Per daug elementų – rodomi pirmieji {cap} kiekviename skyriuje (skaičiai yra išsamūs).",
+    "capped": "Per daug elementų : rodomi pirmieji {cap} kiekviename skyriuje (skaičiai yra išsamūs).",
     "statsMissing": "Indekso naudojimo statistika nebuvo prieinama, todėl naudojimo negalima įvertinti.",
     "sum": {
       "missingTables": "Lentelės, kurių trūksta DB",
@@ -230,7 +230,7 @@
       "USED": "Naudojama",
       "NO_STATS": "Nėra statistikos",
       "CONSTRAINT": "Unikalumo apribojimas (palikti)",
-      "NO_DATA": "Nėra duomenų arba statistika nesurinkta — negalima įvertinti",
+      "NO_DATA": "Nėra duomenų arba statistika nesurinkta: negalima nustatyti",
       "OBSERVING": "Stebima (mažiau nei 7 dienos)",
       "UNUSED_CAND": "Nenaudojamas kandidatas"
     },
@@ -245,14 +245,14 @@
       "RATE": "Per daug užklausų. Bandykite dar kartą po minutės."
     },
     "schema": "Schema",
-    "schemaHint": "Palyginamos tik įprastos ir padalintos lentelės šioje schemoje (išskyrus rodinius). Numatytasis public — Supabase vidinės schemos (auth, storage ir kt.) yra praleidžiamos.",
-    "truncated": "{names} pasiekė {max} eilučių limitą ir buvo sutrumpinti — kai kurie „nėra DB“ / „nėra modelyje“ rezultatai gali būti klaidingi. Susiaurinkite schemą ir paleiskite iš naujo.",
+    "schemaHint": "Palyginamos tik įprastos ir suskirstytos lentelės šioje schemoje (išskyrus rodinius). Numatytasis public: Supabase vidinės schemos (auth, storage ir kt.) neįtraukiamos.",
+    "truncated": "{names} užklausa sutrumpinta iki {max} eilučių. Kai kurie „Nėra DB“ / „Nėra modelyje“ aptikimai gali būti klaidingi. Susiaurinkite schemą ir aptikite iš naujo.",
     "colUnchecked": "Kadangi stulpelių užklausa buvo sutrumpinta, {n} trūkstamų/papildomų stulpelių rezultatai laikomi nepatikrinamais ir neįtraukiami į stulpelių neatitikimų skaičių.",
-    "renamed": "{n} PK indeksas (-ai), pritaikytas (-i) pagal seną pavadinimo taisyklę (_PKEY), egzistuoja DB su nauju pavadinimu (PK_) — normalu",
-    "superseded": "{n} senesnė (-ės) užklausa (-os) buvo atmesta (-os), nes vėlesnė užklausa iš naujo sukūrė tą pačią lentelę (DROP … CASCADE) — normalu",
+    "renamed": "{n} PK indeksų, pritaikytų pagal senąją pavadinimų konvenciją (_PKEY), DB yra su nauju pavadinimu (PK_). Normalu.",
+    "superseded": "{n} ankstesnės užklausos buvo neįtrauktos į palyginimą, nes vėlesnės užklausos iš naujo sukūrė tą pačią lentelę (DROP … CASCADE). Normalu.",
     "supersededItem": "Užklausa {id} → pakeista užklausa {by}",
     "sysCols": "{n} sistemos stulpelis (-iai), automatiškai pridėtas (-i) DDL generavimo metu, pagal numatytuosius nustatymus nėra modelyje ir yra neįtraukiami į neatitikimus",
-    "groupOwn": "Projekto priešdėlis {pfx} — kandidatai, kurių trūksta modelyje",
+    "groupOwn": "Šis projekto priešdėlis {pfx}: modelyje trūkstami kandidatai",
     "groupOther": "Kita sistema {pfx}",
     "basis": "Apskaičiuota eilučių {rows} · nuo {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Jei objektai vis dar dingsta po pakartotinio pritaikymo, įtarkite rankinį ištrynimą arba atšaukimą ir patikrinkite ryšio paskyros veiklą su savo DBA."
       },
       "extraTables": {
-        "s1": "Šis projekto prefiksų paketas = trūkstami modelio kandidatai – importuokite juos į modelį per schema.pi → Nustatymai → Atvirkštinis, arba nuspręskite, ar juos ištrinti, jei tai nenaudojamos lentelės.",
-        "s2": "Kitos priešdėlių grupės = kitos sistemos, naudojančios tą pačią DB — nėra šio projekto veiksmų elementai.",
+        "s1": "Šios projekto priešdėlių grupės = modelyje trūkstami kandidatai: importuokite į modelį per schema.pi → Nustatymai → Atvirkštinis, arba nuspręskite, ar ištrinti, jei lentelė nenaudojama.",
+        "s2": "Kitos priešdėlių grupės = kitos sistemos, naudojančios tą pačią DB: šis projektas nesiima veiksmų.",
         "s3": "Jei tikslinė schema nėra public, pakeiskite lauką „Schema“ aukščiau ir paleiskite iš naujo."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Tipas/NULL skiriasi = suderinkite su modeliu (tiesos šaltiniu); prieš mažindami ilgį arba pereidami prie NOT NULL, patvirtinkite, kad esamos eilutės tai atitinka."
       },
       "idxUsage": {
-        "s1": "Prieš pašalindami, patikrinkite ①, ar statistikos langas apima bent vieną verslo ciklą (pvz., mėnesio pabaigos partiją) — žr. „nuo“.",
+        "s1": "Prieš ištrindami patikrinkite ①, ar statistikos rinkimo laikotarpis yra bent vienas veikimo ciklas (pvz., mėnesio pabaigos paketas): žr. nuorodos datą.",
         "s2": "② Tai nėra unikalus/PK indeksas (jie rodomi atskirai kaip „unikalumo apribojimas“).",
         "s3": "③ EXPLAIN lentelės reprezentatyvų SQL SQL derinime ir patvirtinkite, kad šis indeksas nenaudojamas.",
         "s4": "Patvirtinus visus tris, pašalinkite indeksą iš modelio schema.pi ir pritaikykite per DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Kaip išduoti ryšio žetoną",
     "how1": "Prisijunkite prie schema.pi ir atidarykite dalykinę sritį, prie kurios norite prisijungti",
     "how2": "Eikite į Dalykinė sritis → Nustatymai → Ryšio žetonas ir paspauskite „Išduoti žetoną“ (srities administratoriaus arba DA vaidmuo)",
-    "how3": "Nukopijuokite žetoną, prasidedantį slk_ – jis rodomas tik vieną kartą, kai išduodamas",
+    "how3": "Nukopijuokite išduotą slk_ prasidedantį žetoną. Originalas rodomas tik vieną kartą išdavimo metu.",
     "how4": "Įklijuokite jį žemiau ir užregistruokite",
     "openSchema": "Atidaryti schema.pi",
     "registerTitle": "Registruoti ryšį",
@@ -381,7 +381,7 @@
     "retry": "Bandyti dar kartą",
     "pickerLink": "Nuoroda",
     "pickerConn": "Ryšys",
-    "pickerEmpty": "Nėra ryšių –",
+    "pickerEmpty": "Nėra ryšių.",
     "pickerGo": "užregistruokite vieną adresu /connect",
     "errors": {
       "LINK_AUTH": "Ryšio žetonas baigėsi arba buvo atšauktas. Išduokite naują žetoną schema.pi ir užregistruokite iš naujo",
@@ -401,14 +401,14 @@
   },
   "migration": {
     "title": "Duomenų migracija (PiMig)",
-    "intro": "Apskaičiuoja lentelių įkėlimo tvarką iš schema.pi dizaino modelio ryšių, organizuoja dalių dydį, lygiagretumą ir perjungimo kontrolinį sąrašą, bei generuoja patvirtinimo SQL, kurį patys vykdote šaltinyje ir tiksle. Šis ekranas tik planuoja ir tikrina – jis neperkelia duomenų ir neskaito kliento DB eilučių.",
+    "intro": "Apskaičiuoja lentelių įkėlimo tvarką iš schema.pi dizaino modelio ryšių, organizuoja dalių dydį, lygiagretumą ir perjungimo kontrolinį sąrašą, bei generuoja patvirtinimo SQL, kurį patys vykdote šaltinyje ir tiksle. Šis ekranas tik planuoja ir tikrina : jis neperkelia duomenų ir neskaito kliento DB eilučių.",
     "needLink": "Pirmiausia pasirinkite schema.pi nuorodą aukščiau. Jei neturite, užregistruokite žetoną meniu „Prisijungti“.",
     "loading": "Įkeliama…",
     "newPlan": "Naujas migracijos planas",
     "project": "Projektas",
     "projectPick": "Pasirinkite projektą",
     "planNm": "Plano pavadinimas",
-    "planNmHint": "Numatytasis – projekto pavadinimas",
+    "planNmHint": "Numatytasis : projekto pavadinimas",
     "create": "Sukurti planą",
     "creating": "Kuriama…",
     "snapHint": "Šio momento dizainas (lentelės, stulpelių ir ryšių pavadinimai) yra užfiksuotas kaip momentinė nuotrauka. Kai modelis pasikeičia, sukurkite naują planą.",
@@ -429,8 +429,8 @@
     "optsHint": "Lygiagretumas yra vienu metu įkeliamų lentelių skaičius tame pačiame lygyje. Bloko dydis yra įrašymo vienetas (eilutės), kurį naudos vykdymo variklis.",
     "order": "Įkėlimo tvarka",
     "orderHint": "Topologiškai surūšiuota pagal projektavimo ryšius (ne fizinius FK), kad tėvinės lentelės būtų pirmos. To paties lygio lentelės nepriklauso viena nuo kitos ir gali būti įkeliamos lygiagrečiai.",
-    "cycles": "{n} ciklinė (-ės) grupė (-ės) – patalpinta (-os) tame pačiame lygyje. Nustatykite jų tvarką rankiniu būdu ir atidėkite nuorodų patikrinimus iki įkėlimo pabaigos.",
-    "selfRefs": "Savaime besireferuojančios (hierarchinės) lentelės – pirmiausia įkelkite tėvines eilutes lentelėje",
+    "cycles": "{n} ciklų: patalpinta tame pačiame etape. Rankiniu būdu nustatykite įkėlimo tvarką ir atidėkite nuorodų patikrinimus iki įkėlimo pabaigos.",
+    "selfRefs": "Savaime besireferuojančios (hierarchinės) lentelės: tėvų eilutės pirmiausia toje pačioje lentelėje.",
     "level": "Lygis {n}",
     "checklist": "Perėjimo kontrolinis sąrašas",
     "toReady": "Pažymėti kaip paruoštą",
@@ -468,7 +468,7 @@
     },
     "verify": "Patvirtinimo SQL",
     "verifyHint": "Generuoja skaičiavimo, skaitmeninių stulpelių sumos, pasikartojančių raktų ir raktų maišos užklausas kiekvienai lentelei įkėlimo tvarka. Paleiskite jas patys šaltinyje ir tikslinėje sistemoje ir palyginkite (šiame ekrane jos nevykdomos).",
-    "noHashOracle": "Oracle·Tibero maišos funkcijos ir teksto atvaizdavimas skiriasi nuo PostgreSQL, todėl maišos užklausos praleidžiamos – palyginkite skaičius, sumas ir pasikartojančius raktus.",
+    "noHashOracle": "Oracle ir Tibero praleidžia maišos paiešką, nes maišos funkcijos ir simbolių atvaizdavimas skiriasi nuo PostgreSQL. Palyginkite pagal skaičių, sumą ir raktų dubliavimą.",
     "copy": "Kopijuoti",
     "copied": "Nukopijuota",
     "copyFail": "Nepavyko nukopijuoti. Pasirinkite tekstą ir nukopijuokite jį rankiniu būdu.",
@@ -501,7 +501,7 @@
       "1440": "24 valandos"
     },
     "loading": "Įkeliama…",
-    "rulesNote": "Taisyklės išsaugomos šiam ryšiui ir įvertinamos kiekvieną kartą atnaujinus lentą (DB sesija, užrakto laukimas, talpyklos pataikymo dažnis – kas 1 minutę; DB dydis, URL atsako laikas, gedimas – kas 5 minutes). Pažeisti signalai eskaluojami iki pavojaus ir pažymimi „Mano taisyklė“ (pranešimų siuntimas yra kitas žingsnis). Paslaugos (APP) metrikos taisyklės nevertinamos. DB dydžio (MB) taisyklės (>) taip pat naudojamos kaip talpos limitai.",
+    "rulesNote": "Taisyklės išsaugomos šiam ryšiui ir įvertinamos kiekvieną kartą atnaujinus lentą (DB sesija, užrakto laukimas, talpyklos pataikymo dažnis : kas 1 minutę; DB dydis, URL atsako laikas, gedimas : kas 5 minutes). Pažeisti signalai eskaluojami iki pavojaus ir pažymimi „Mano taisyklė“ (pranešimų siuntimas yra kitas žingsnis). Paslaugos (APP) metrikos taisyklės nevertinamos. DB dydžio (MB) taisyklės (>) taip pat naudojamos kaip talpos limitai.",
     "notEvaluated": "Neįvertinta",
     "metric": "Metrika",
     "conn": "Prisijungimas",
@@ -546,6 +546,7 @@
       "INVALID_INPUT": "Užklausos reikšmė neteisinga."
     },
     "board": {
+      "subtitle": "Ką daryti dabar šioje DB: Iš pirmo žvilgsnio matykite 14 signalų normalią, įspėjamąją ir rizikos būseną bei jų sprendimus.",
       "refresh": {
         "updated": "Atnaujinta {time} · atnaujinama kas minutę",
         "now": "Atnaujinti dabar",
@@ -560,10 +561,11 @@
         "NA": "Netaikoma"
       },
       "overall": {
-        "RISK": "Rizika – reikia imtis veiksmų dabar",
-        "WARN": "Įspėjimas – kai kuriuos elementus reikia peržiūrėti",
-        "UNKNOWN": "Nežinoma – patikrinkite ryšį",
-        "OK": "Gerai – visi signalai yra ribose",
+        "RISK": "Rizika: Reikia nedelsiant imtis veiksmų",
+        "WARN": "Įspėjimas: Yra elementų, kuriuos reikia peržiūrėti",
+        "UNKNOWN": "Negalima patvirtinti: Patikrinkite ryšio būseną",
+        "OK": "Normalu: Visi signalai atitinka kriterijus",
+        "CONN_DOWN": "Negalima prisijungti prie DB. Pirmiausia patikrinkite ryšį.",
         "NA": "Netaikoma"
       },
       "kpi": {
@@ -578,7 +580,7 @@
         "less": "Rodyti mažiau",
         "setup": "Nustatykite tai, kad matytumėte daugiau",
         "none": "Šiuo metu nėra rizikos ar įspėjimo elementų, kuriems reikėtų veiksmų.",
-        "unknown": "Nepavyko patikrinti {n} signalo (-ų) – priežastį žr. kortelėse.",
+        "unknown": "Negalima patvirtinti {n} elementų: Patikrinkite priežastį kortelėje.",
         "myRule": "Mano taisyklė pažeista: {rule}",
         "copySql": "Kopijuoti SQL",
         "copied": "Nukopijuota"
@@ -617,34 +619,34 @@
         "REPL": "Replikacijos vėlavimas"
       },
       "fix": {
-        "AVAIL": "Lėtas atsakas arba neseniai įvykęs perkrovimas – patikrinkite prisijungimo nustatymus ir DB serverio būseną.",
-        "AVAIL_DOWN": "Nepavyko prisijungti prie DB – patikrinkite prisijungimo nustatymus ir ar DB serveris veikia.",
-        "CONN_USE": "{sess}/{max} sesijų šioje DB (ne visame klasteryje – kitos duomenų bazės neįtrauktos) – uždarykite nenaudojamus ryšius arba pridėkite ryšių telkinį (pgbouncer).",
-        "URL": "{n} patikrintų URL nepavyko · maksimalus atsakas {ms}ms – priežastį žr. schema.pi monitoriuje.",
-        "LONG_QRY": "Užklausa vykdoma {sec}s – peržiūrėkite jos planą ir sureguliuokite, arba paprašykite DBA ją atšaukti.",
-        "IDLE_TX": "Transakcija nenaudojama {sec}s – raskite trūkstamą patvirtinimą programoje ir nustatykite laiko limitą.",
-        "LOCK_WAIT": "{n} sesijų laukia užraktų – raskite blokuojančią sesiją ir užbaikite jos transakciją.",
-        "CACHE_HIT": "Talpyklos pataikymo dažnis {pct}% – ieškokite didelių lentelių visų nuskaitymų arba peržiūrėkite shared_buffers.",
-        "XACT_ERR": "Atšaukimo dažnis {pct}%, {dlck} aklavietės – patikrinkite nepavykusias transakcijas ir programos klaidų žurnalus.",
-        "SLOW_SQL": "Yra užklausa, kurios vykdymas trunka iki {ms} ms – peržiūrėkite vykdymo planą ir suderinkite ją, pradedant nuo didžiausio vieno vykdymo laiko.",
-        "STORAGE": "DB ({gb} GB) artėja prie savo limito (liko dienų {days}) – išvalykite dideles lenteles arba padidinkite talpą.",
-        "VACUUM": "{tbl} turi daug negyvų eilučių arba pasenusių statistikų – peržiūrėkite VACUUM (ANALYZE) ir autovacuum nustatymus.",
-        "INDEX": "{n} indekso radinių (neteisingi, nenaudojami, visi nuskaitymai) – tikslus žr. lentelės ir indekso būklės skirtuke.",
-        "BACKUP": "WAL archyvavimas išjungtas arba sustabdytas – patikrinkite archive_mode, archive_command ir atsarginės kopijos būseną.",
-        "REPL": "Replikacijos vėlavimas {sec}s – patikrinkite budėjimo režimo būseną ir tinklą.",
-        "PGSS": "pg_stat_statements neįdiegta, todėl lėtas SQL nepasiekiamas – įjunkite jį naudodami žemiau esantį SQL (reikalingas serverio perkrovimas)."
+        "AVAIL": "Lėtas atsakas arba ką tik paleista iš naujo. Patikrinkite ryšio informaciją ir DB serverio būseną.",
+        "AVAIL_DOWN": "Nepavyko prisijungti prie DB. Patikrinkite ryšio informaciją ir ar DB serveris veikia.",
+        "CONN_USE": "Ši DB sesija {sess}/{max} (ne viso klasterio, kitos DB jungtys neįtrauktos): Išvalykite nenaudojamas jungtis arba nustatykite jungčių telkinį (pgbouncer).",
+        "URL": "{n} URL patikrinimai nepavyko · Maksimalus atsakas {ms}ms: Patikrinkite priežastį schema.pi monitoriuje.",
+        "LONG_QRY": "Užklausa veikia {sec} sekundžių. Peržiūrėkite vykdymo planą ir sureguliuokite, arba paprašykite DBA ją sustabdyti.",
+        "IDLE_TX": "Transakcija atidaryta ir neveikia {sec} sekundžių. Raskite trūkstamus patvirtinimus programoje ir nustatykite laiko limitą.",
+        "LOCK_WAIT": "{n} sesijų laukia užraktų: Raskite blokuojančią sesiją ir užbaikite jos transakciją.",
+        "CACHE_HIT": "Talpyklos pataikymo rodiklis {pct}%: Ieškokite didelių lentelių visų lentelių nuskaitymų arba peržiūrėkite shared_buffers.",
+        "XACT_ERR": "Atšaukimo rodiklis {pct}%, {dlck} užstrigimų: Patikrinkite nepavykusias transakcijas ir programos klaidų žurnalus.",
+        "SLOW_SQL": "Yra užklausa, kurios maksimalus laikas yra {ms}ms. Peržiūrėkite vykdymo planą ir sureguliuokite nuo didžiausio vieno maksimalaus laiko.",
+        "STORAGE": "DB {gb}GB artėja prie ribos (liko {days} dienų). Išvalykite dideles lenteles arba padidinkite talpą.",
+        "VACUUM": "{tbl} turi daug negyvų eilučių arba pasenusią statistiką. Peržiūrėkite VACUUM (ANALYZE) ir autovacuum nustatymus.",
+        "INDEX": "{n} indeksų patikrinimai (negaliojantys, nenaudojami, pilnas nuskaitymas): Patikrinkite tikslus lentelės/indekso būsenos skirtuke.",
+        "BACKUP": "WAL archyvavimas išjungtas arba sustabdytas. Patikrinkite archive_mode, archive_command ir atsarginės kopijos būseną.",
+        "REPL": "Replikacijos vėlavimas {sec} sekundžių: Patikrinkite budėjimo serverio būseną ir tinklą.",
+        "PGSS": "pg_stat_statements plėtinys trūksta, todėl lėto SQL negalima peržiūrėti. Įjunkite jį naudodami žemiau pateiktą SQL (reikalingas serverio perkrovimas)."
       },
       "reason": {
         "CONN_DOWN": "Neįvertinta, nes DB ryšys neveikia.",
         "PGSS": "pg_stat_statements plėtinio nėra.",
         "VER": "Galima naudoti tik su PostgreSQL 13 ar naujesne versija.",
         "SAMPLE": "Dar nepakanka pavyzdžių.",
-        "NO_LIMIT": "Nėra dydžio limito, todėl naudojimas nevertinamas – pridėkite DB dydžio (MB) taisyklę (>) norėdami ją naudoti kaip limitą.",
+        "NO_LIMIT": "Naudojimas nenustatomas, nes nėra talpos limito. Pridėjus DB dydžio (MB) taisyklę (>) ji bus naudojama kaip limitas.",
         "RESET": "Statistika atnaujinta mažiau nei prieš 7 dienas, todėl nenaudojami indeksai nevertinami.",
         "STALE": "Nėra naujausių patikrinimo įrašų.",
         "STANDBY": "Netaikoma budėjimo režimo serveryje.",
         "NONE": "Nėra ko tikrinti.",
-        "GRANT": "Trūksta privilegijų – suteikite pg_monitor rolę prisijungimo paskyrai.",
+        "GRANT": "Negalima peržiūrėti dėl teisių trūkumo. Suteikite pg_monitor rolę prisijungimo paskyrai.",
         "LINK": "schema.pi užklausa nepavyko ({code})"
       },
       "steps": {
@@ -719,7 +721,7 @@
           "3": "Jei srautas nevyksta, patikrinkite budėjimo režimo serverio žurnalus."
         }
       },
-      "sqlNote": "Žemiau pateiktas SQL yra skirtas tik skaitymui ir tikrinimui – pataisymus (VACUUM, DROP INDEX, pg_terminate_backend) atlieka DBA.",
+      "sqlNote": "Žemiau pateiktas SQL skirtas tik skaitymo patikrinimui. Veiksmus (VACUUM, DROP INDEX, pg_terminate_backend) tiesiogiai vykdo DBA.",
       "go": {
         "activity": "Veikla ir užraktai",
         "top": "Lėtos užklausos",
@@ -761,8 +763,8 @@
           "tree": "Kas užima vietą ir ką reikia išvalyti?"
         },
         "asTable": "Rodyti kaip lentelę",
-        "needHistory": "Dar nėra tendencijos – palikite šį ekraną atidarytą kelias minutes.",
-        "needPerf": "Nėra dydžio istorijos – rinkite našumo skirtuke arba palikite šį ekraną atidarytą.",
+        "needHistory": "Dar nėra tendencijos. Ji bus nupiešta, jei paliksite šį ekraną atidarytą kelias minutes.",
+        "needPerf": "Nėra talpos istorijos. Surinkite ją iš skirtuko „Performance“ arba palikite šį ekraną atidarytą.",
         "noSess": "Nėra sesijų.",
         "noWait": "Nėra laukimų",
         "noData": "Nėra duomenų rodymui.",
@@ -835,17 +837,17 @@
         "noStat": "Nėra statistikos"
       },
       "empty": {
-        "noConn": "Ši taksonomija neturi PostgreSQL serverio ryšio stebėjimui – rodomi tik URL ir paslaugos būsena.",
+        "noConn": "Šioje taksonomijoje nėra PostgreSQL serverio jungčių, kurias būtų galima stebėti. Rodoma tik URL ir susiejimo būsena.",
         "unsupported": "Šis ryšys nepalaiko stebėjimo (tik PostgreSQL serverio ryšiai).",
-        "connFail": "Nepavyko prisijungti prie duomenų bazės – patikrinkite prisijungimo nustatymus ir DB būseną.",
-        "linkDown": "Nepavyko pasiekti schema.pi – automatiškai bandoma dar kartą.",
-        "linkAuth": "Ryšio prieigos raktas pasibaigė – išduokite naują prieigos raktą schema.pi ir užregistruokite jį.",
-        "timeout": "Atsakymai lėti – automatiškai bandoma dar kartą.",
+        "connFail": "Nepavyko prisijungti prie DB. Patikrinkite ryšio informaciją ir DB būseną.",
+        "linkDown": "Nepavyko prisijungti prie schema.pi. Netrukus bus automatiškai bandoma dar kartą.",
+        "linkAuth": "Ryšio žetonas pasibaigė. Iš naujo išduokite ir užregistruokite žetoną iš schema.pi.",
+        "timeout": "Atsakas lėtas. Netrukus bus automatiškai bandoma dar kartą.",
         "rate": "Per daug užklausų, todėl atnaujinimo intervalas buvo padidintas."
       },
       "aux": {
         "rules": "Mano įspėjimo taisyklės ({n} aktyvios)",
-        "schemaSvc": "Paslaugos būsena – schema.pi atsakymai",
+        "schemaSvc": "Susiejimo būsena: schema.pi paslaugos atsakas",
         "schemaSvcNote": "Programos metrikos už paskutines 60 minučių, saugomos schema.pi.",
         "source": "Duomenų šaltinis: tikslinė DB skaitoma tik per schema.pi pavadintas užklausas (tik skaitymui); tendencijos saugo statistiką tik dbms.pi (nėra eilučių duomenų)."
       }
@@ -860,10 +862,10 @@
     "noRun": "Dar nėra diagnostikos. Paspauskite „Vykdyti diagnostiką“",
     "lastRun": "Paskutinė diagnostika {dtm}",
     "readOnly": "Diagnostika tik skaito (SELECT). Patarimai yra gairės ir priklauso nuo serverio atminties, apkrovos ir darbo krūvio",
-    "truncated": "Per daug objektų – patikrinti tik pirmieji 500",
+    "truncated": "Per daug objektų : patikrinti tik pirmieji 500",
     "paramsNote": "Bendra serverio atmintis nežinoma, todėl ji apskaičiuojama iš shared_buffers ≈ 25% RAM. random_page_cost daroma prielaida, kad naudojamas SSD",
     "auditNote": "Lentelės su išjungtu RLS ir nenaudojamos paskyros bus patikrintos, kai nuorodos užklausa jas palaikys",
-    "replNote": "Bazinė linija yra Active-Standby (A-S) – vienas pirminis + atsarginis. Atkūrimo vėlavimas ≥ 5s = įspėjimas, ≥ 60s = rizika (išmatuota RPO nuoroda)",
+    "replNote": "Pagrindinis kriterijus yra Active-Standby (A-S): 1 pirminis + budėjimo režimas. Įspėjimas, jei atkūrimo vėlavimas >= 5 sekundės, rizika, jei >= 60 sekundžių (žr. faktinį RPO matavimą).",
     "lagIdle": "Jokių pakeitimų",
     "pager": "Puslapiavimas",
     "prev": "Ankstesnis",
@@ -933,11 +935,11 @@
       "st_ok": "Sakinio laiko limitas nustatytas",
       "iit_off": "Nėra neaktyvaus transakcijos laiko limito (0). Gali sukelti užrakto laikymą ir išsipūtimą",
       "iit_ok": "Nustatytas neaktyvaus transakcijos laiko limitas",
-      "ckpt_short": "Kontrolinio taško intervalas yra 5 minutės ar mažiau. Apsvarstykite 10–15 minučių esant dideliam rašymo krūviui",
+      "ckpt_short": "Kontrolinio taško intervalas yra 5 minutės ar mažiau. Apsvarstykite 10~15 minučių esant dideliam rašymo krūviui",
       "ckpt_ok": "Protingame diapazone",
       "wal_minimal": "wal_level=minimal neleidžia PITR ir replikacijos. Naudokite replica arba aukštesnį lygį",
       "wal_ok": "WAL lygis palaiko PITR ir replikaciją",
-      "rpc_hdd": "HDD numatytasis (4). SSD atveju rekomenduojama 1.1–2",
+      "rpc_hdd": "HDD numatytasis (4). SSD atveju rekomenduojama 1.1~2",
       "rpc_ok": "Tinka SSD",
       "super_many": "Du ar daugiau supervartotojų. Palikite vieną administravimui ir suteikite tik reikalingas privilegijas kitiems",
       "super_ok": "Daugiausia vienas supervartotojas",
@@ -1012,7 +1014,7 @@
       "intro": "Dabar surinkimas vieną kartą nuskaito populiariausių užklausų statistiką, lenteles, indeksus ir dydžius ir išsaugo juos kaip momentinę kopiją. Surinkite bent du kartus, kad pamatytumėte pokyčius ir dydžio tendencijas",
       "run": "Surinkti dabar",
       "running": "Renkama…",
-      "done": "Surinkta {dtm} – {qry} užklausų · {tbl} lentelių · {idx} indeksų",
+      "done": "Rinkimas baigtas {dtm}: {qry} užklausos · {tbl} lentelės · {idx} indeksai",
       "auto": {
         "title": "Automatinis rinkimas",
         "desc": "Įjungus, šio ryšio statistika automatiškai renkama kiekvieną dieną 3 val. ryto (Korėjos laiku). Po 7 ar daugiau dienų galite pasikliauti lėtų užklausų reitingu ir nenaudojamų indeksų sąrašu.",
@@ -1034,13 +1036,13 @@
       "sortCalls": "Iškvietimai",
       "empty": "Dar nėra momentinių kopijų. Paspauskite „Surinkti dabar“ skirtuke „Surinkti“",
       "range": "Pokytis tarp {from} → {to}",
-      "first": "Pirma momentinė kopija {dtm} – kaupiamosios reikšmės (pokyčiai nuo kitos momentinės kopijos)",
+      "first": "Pirmasis rinkimas {dtm}: Kaupiamasis (padidėjimas/sumažėjimas nuo kito rinkimo)",
       "query": "Užklausa (literalai užmaskuoti)",
       "calls": "Iškvietimai",
       "totalMs": "Bendra ms",
       "meanMs": "Vid. ms",
       "rows": "Eilutės",
-      "reset": "Aptiktas statistikos nustatymas iš naujo – rodoma kaip kaupiamoji",
+      "reset": "Aptiktas statistikos atstatymas: Rodoma kaip kaupiamoji",
       "src": "Šaltinis",
       "srcToggle": "Rodyti arba slėpti šaltinio detales",
       "openSqlLab": "Atidaryti SQL derinime",
@@ -1048,7 +1050,7 @@
       "sortMax": "Maksimalus vieno vykdymo laikas",
       "maxMs": "Maks. vieno ms",
       "diagToggle": "Diagnozuoti priežastį",
-      "noMax": "Nėra maksimalios vertės – {n} elementų yra iš senesnių rinkinių be maksimalios vertės, todėl jie laikinai rūšiuojami pagal vidurkį (ne pagal bendrą laiką). Dabar renkant bus užpildyta maksimali vertė."
+      "noMax": "Nėra maksimalios vertės: {n} elementų yra seni rinkiniai be vienos maksimalios vertės, todėl jie laikinai rūšiuojami pagal vieną vidurkį (ne pagal bendrą laiką). Maksimalios vertės bus užpildytos dabartiniu rinkimu."
     },
     "health": {
       "empty": "Dar nėra momentinių nuotraukų. Skirtuke „Rinkti“ paspauskite „Rinkti dabar“",
@@ -1056,9 +1058,9 @@
       "unusedIdx": "Nenaudojami indeksai",
       "unusedIdxHint": "Indeksai, kurie niekada nebuvo naudojami nuo paskutinio statistikos nustatymo iš naujo (pagal dydį). Nemeskite PK ar unikalių apribojimų indeksų",
       "fullScan": "Per didelis pilnas nuskaitymas",
-      "fullScanHint": "Lentelės su 1 000+ aktyvių eilučių, kuriose pilnas nuskaitymas sudaro bent pusę – peržiūrėkite indeksus filtravimo stulpeliuose",
+      "fullScanHint": "Lentelės, turinčios 1 000+ efektyvių eilučių ir daugiau nei pusę visų nuskaitymų: Peržiūrėkite indeksus sąlygų stulpeliuose.",
       "dead": "Per daug negyvų kortelių",
-      "deadHint": "Negyvų kortelių santykis 20% ar daugiau – patikrinkite VACUUM ir autovacuum nustatymus",
+      "deadHint": "Negyvų įrašų santykis viršija 20%: Peržiūrėkite VACUUM ir autovacuum nustatymus.",
       "none": "Nėra",
       "scans": "nuskaitymai"
     },
@@ -1074,7 +1076,7 @@
     },
     "activity": {
       "refresh": "Atnaujinti",
-      "live": "Tiesioginė užklausa – nesaugoma",
+      "live": "Realaus laiko užklausa: Neišsaugota",
       "sessions": "Seanso veikla",
       "locks": "Užraktai",
       "none": "Nėra"
@@ -1101,7 +1103,7 @@
         "BATCH": "Panašu, kad tai paketas arba suplanuotas darbas. Paskirstykite vykdymo laikus, kad išvengtumėte verslo piko, ir sumažinkite darbo apimtį vienam įsipareigojimui. Patikrinkite indeksus ir statistiką (ANALYZE) tikslinėse lentelėse ir padalinkite ilgas transakcijas. Įdėjus užduoties pavadinimą į application_name, kitas klasifikavimas bus tikslesnis.",
         "PROGRAM": "Atrodo, kad tai yra programos vykdyta užklausa. Patikrinkite vykdymo planą SQL derinime. Jei maksimalus vieno vykdymo laikas yra ilgas, pirmiausia peržiūrėkite indeksus ir sujungimo tvarką. Jei vienas vykdymas yra trumpas, bet iškvietimų skaičius didelis, peržiūrėkite pasikartojančius iškvietimus (N+1) ir talpyklą. Įdėkite paslaugos pavadinimą į ryšio telkinio application_name.",
         "PLATFORM": "Panašu, kad tai DB arba platformos vidinis darbas, pvz., autovacuum arba replikacija. Paprastai nereikia jokių veiksmų. Jei jis išlieka viršuje, peržiūrėkite autovacuum slenksčius ir maintenance_work_mem.",
-        "MONITOR": "Tai dbms.pi savarankiško rinkimo užklausa – schema.pi ryšys yra fiksuotas teiginys, kuris skaito tik statistinius rodinius/katalogus (pg_stat_*·pg_catalog), todėl tai nėra verslo užklausa ir nereikia jokių kliento veiksmų. Jei tikslinės duomenų bazės apkrova yra problema, sumažinkite rinkimo mygtuko/stebėjimo ekrano atidarymo skaičių. Čia taip pat grupuojami teiginiai iš kitų stebėjimo įrankių, kurie skaito tuos pačius statistinius rodinius.",
+        "MONITOR": "dbms.pi nuosava rinkimo užklausa. schema.pi jungtis nuskaito tik statistinius rodinius ir katalogus (pg_stat_*, pg_catalog) su fiksuotais teiginiais, todėl tai nėra verslo užklausa ir nereikia jokių klientų veiksmų. Jei tikslinės duomenų bazės apkrova yra problema, sumažinkite rinkimo mygtuko arba stebėjimo ekrano atidarymo dažnumą. Čia taip pat grupuojami teiginiai iš kitų stebėjimo įrankių, kurie nuskaito tuos pačius statistinius rodinius.",
         "UNKNOWN": "Nėra jokių užuominų apie šaltinį. Nustatykite application_name kiekvienam ryšiui ir padalinkite paskyras pagal paskirtį; ji bus klasifikuojama iš kitų pavyzdžių."
       },
       "detail": {
@@ -1112,7 +1114,7 @@
         "period": "Stebėta",
         "none": "(tuščia)"
       },
-      "noSample": "Kol kas nėra pavyzdžių – veikiančios sesijos imamos, kai peržiūrite stebėjimo lentą arba skirtuką „Veikla ir užraktai“. Kol kas ji klasifikuojama tik pagal paskyros pavadinimą.",
+      "noSample": "Dar nėra pavyzdžių. Veikiančios sesijos kaupiasi kaip pavyzdžiai, kai peržiūrimi stebėjimo lentos arba aktyvumo/užraktų skirtukai. Šiuo metu jie klasifikuojami tik pagal paskyros pavadinimą nuorodai.",
       "verOff": "Ši DB yra senesnė nei PostgreSQL 14, todėl veikiančios sesijos neturi užklausos ID. Rodoma tik paskyra (tikra).",
       "privOff": "Susiejimo paskyra negali matyti kitų paskyrų sesijos detalių, todėl pavyzdžiai nerenkami. Paprašykite DB administratoriaus paleisti GRANT pg_read_all_stats TO {user};",
       "linkUsr": "susiejimo paskyra",
@@ -1123,11 +1125,11 @@
     "diag": {
       "title": "Diagnozuoti priežastį",
       "fix": "Veiksmas:",
-      "none": "Statistika neatskleidė priežasties – patikrinkite vykdymo planą SQL derinime.",
-      "cum": "Šiuo intervalu iškvietimų nebuvo – kaupiamasis (nuo statistikos atstatymo)",
-      "basis": "Pagrindas – maks. 1 kartas {max}ms · vid. {mean}ms · iškvietimai {calls} · eilučių per iškvietimą {rpc} · disko skaitymo santykis {read} · laikini blokai {tmp}",
+      "none": "Statistika neatskleidė priežasties. Atidarykite vykdymo planą SQL Tuning, kad patikrintumėte.",
+      "cum": "Šiame intervale nėra iškvietimų: Kaupiamasis (nuo statistikos atstatymo)",
+      "basis": "Pagrindas: Maksimalus vienas {max}ms · Vidutinis {mean}ms · Iškvietimai {calls} · Eilutės per iškvietimą {rpc} · Disko skaitymo santykis {read} · Laikinieji blokai {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi savarankiško rinkimo užklausa – stebėjimo teiginys, kuris nuskaito tik statistinius rodinius/katalogus.",
+        "cause": "dbms.pi nuosava rinkimo užklausa: Stebėjimo teiginys, kuris nuskaito tik statistinius rodinius ir katalogus.",
         "fix": "Nereikia jokių kliento veiksmų. Jei tikslinės duomenų bazės apkrova yra problema, sumažinkite rinkimo/stebėjimo ekrano peržiūrų skaičių."
       },
       "NO_MAX": {
@@ -1135,31 +1137,31 @@
         "fix": "Dabar vieną kartą spustelėkite „Rinkti“, kad užpildytumėte maksimalias vertes tiksliai diagnozei."
       },
       "SLOW_EACH": {
-        "cause": "Visada lėtas – kiekvieną kartą užtrunka ilgai, maksimaliai {max}ms ir vidutiniškai {mean}ms.",
+        "cause": "Lėta kiekvieną kartą: Kiekvienas vykdymas užtrunka ilgai, maksimaliai {max}ms ir vidutiniškai {mean}ms.",
         "fix": "① Atidarykite vykdymo planą „Atidaryti SQL derinime“. ② Jei yra pilnų nuskaitymų (Seq Scan) arba didelių rūšiavimų, peržiūrėkite indeksus WHERE/JOIN sąlygų stulpeliuose. ③ Susiaurinkite sąlygas, kad būtų skaitomi tik reikalingi stulpeliai/eilutės."
       },
       "SPIKE": {
-        "cause": "Protarpinis vėlavimas – vidutiniškai {mean}ms, bet kartais užtrunka ilgai, maksimaliai {max}ms ({x} kartų daugiau nei vidurkis).",
+        "cause": "Pertraukiamas vėlavimas: Vidutiniškai {mean}ms, bet kartais užtrunka ilgai, maksimaliai {max}ms ({x} kartų daugiau nei vidurkis).",
         "fix": "① Kai lėtai, patikrinkite užrakto laukimus (wait_event) skirtuke „Veikla/Užraktai“. ② Jei tik pirmas vykdymas yra lėtas, talpykla buvo tuščia ir buvo skaitoma iš disko. ③ Palyginkite tą pačią užklausą su skirtingomis vertėmis SQL derinime, kad pamatytumėte, ar vykdymo planas keičiasi priklausomai nuo verčių."
       },
       "DISK_READ": {
-        "cause": "Talpyklos praleidimas – {pct}% ({read} blokų) perskaitytų blokų buvo perskaityta iš disko, o ne iš atminties.",
+        "cause": "Talpyklos praleidimas: {pct}% ({read} blokų) perskaitytų blokų buvo perskaityta iš disko, o ne iš atminties.",
         "fix": "① Sumažinkite skaitymo diapazoną naudodami indeksus. ② Susiaurinkite užklausos laikotarpį/sąlygas. ③ Jei dažnai skaitomų duomenų kiekis išlieka didelis, peržiūrėkite shared_buffers (atmintį)."
       },
       "TEMP_SPILL": {
-        "cause": "Atminties perpildymas – rūšiavimas/maišymas viršijo work_mem ir įrašė {blk} blokus (apie {mb}MB, {perCall} blokų per iškvietimą) į laikinus failus.",
+        "cause": "Atminties perpildymas: Rūšiavimas/maišymas viršijo work_mem ir įrašė {blk} blokų (apie {mb}MB, {perCall} blokų per iškvietimą) į laikinuosius failus.",
         "fix": "① Indeksų įdėjimas į ORDER BY/GROUP BY stulpelius praleidžia rūšiavimą. ② Pirmiausia sumažinkite rūšiuojamų eilučių skaičių (LIMIT viduje). ③ Jei absoliučiai būtina, padidinkite SET LOCAL work_mem tik šiai užklausos transakcijai."
       },
       "MANY_ROWS": {
-        "cause": "Per didelis duomenų gavimas – vienu iškvietimu gaunama {perCall} eilučių.",
+        "cause": "Per didelė užklausa: Atkuria {perCall} eilučių per iškvietimą.",
         "fix": "① Ekrano sąrašai gaunami puslapiais. ② SELECT pasirenka tik naudojamus stulpelius. ③ Agregavimas atliekamas duomenų bazėje, ir gaunami tik rezultatai."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST įterptojo filtro (!inner) teiginys – filtruojant tėvus pagal vaikų sąlygas, gali būti nuskaitytas visas rinkinys prieš klasifikavimo sąlygas.",
+        "cause": "PostgREST įterptojo filtro (!inner) teiginys: Tėvų filtravimas pagal vaikų sąlygas gali nuskaityti visą lentelę prieš klasifikavimo sąlygą.",
         "fix": "① Patikrinkite, ar yra indeksų sujungimo raktams ir filtravimo stulpeliams. ② Perkelkite filtrus į tėvinės lentelės sąlygas. ③ Įterpkite vaikus į jau esamą tėvinę užklausą arba sujunkite juos į vieną duomenų bazės funkciją."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET puslapiavimas – palaipsniui lėtėja, nes skaito ir atmeta ankstesnes eilutes vėlesniems puslapiams.",
+        "cause": "OFFSET puslapiavimas: Vėlesni puslapiai nuskaito ir atmeta ankstesnes eilutes, todėl palaipsniui lėtėja.",
         "fix": "Pakeiskite į raktų rinkinio puslapiavimą (WHERE id > last_id ORDER BY id LIMIT n), kuris skaito nuo rakto po paskutinio gauto rakto."
       }
     }
@@ -1192,8 +1194,8 @@
       "toDraft": "Sukurti duomenų srauto juodraštį iš {n} pasirinktų"
     },
     "ready": {
-      "ok": "WAL loginis replikavimas paruoštas – lentelės su PK gali naudoti LOGICAL",
-      "no": "WAL loginis replikavimas neparuoštas – fiksavimas apklausos ar raktų palyginimo būdu",
+      "ok": "WAL loginė replikacija paruošta: Lentelės su PK gali naudoti LOGICAL metodą.",
+      "no": "WAL loginė replikacija neparuošta: Rinkite naudodami apklausos/raktų palyginimo metodą.",
       "senders": "{n} replikavimo ryšiai"
     },
     "adapter": {
@@ -1208,20 +1210,20 @@
       "HAS_SOFT_DEL": "Turi minkštojo ištrynimo stulpelį",
       "NO_SOFT_DEL": "Neturi minkštojo ištrynimo stulpelio",
       "HAS_PK": "Turi pirminį raktą",
-      "NO_PK": "Neturi pirminio rakto – pakeistos eilutės negali būti identifikuotos",
+      "NO_PK": "Nėra PK: Negalima identifikuoti pakeistų eilučių.",
       "DELETE_UNSEEN": "Apklausa negali fiksuoti fizinių DELETE (rekomenduojamas minkštojo ištrynimo stulpelis)",
       "LOGICAL_NOT_READY": "Gali persijungti į LOGICAL, kai WAL loginis replikavimas bus paruoštas",
-      "FULL_RELOAD_ONLY": "Nėra PK ar pakeitimo laiko stulpelio, todėl negalimas inkrementinis fiksavimas – pridėkite PK",
+      "FULL_RELOAD_ONLY": "Nėra PK/pakeitimo laiko žymės, todėl negalimas laipsniškas rinkimas: rekomenduojama pridėti PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level nėra logical (pakeitimui reikia DB perkrovimo)",
       "NO_SLOTS": "max_replication_slots yra 0",
       "NO_SENDERS": "max_wal_senders yra 0",
-      "IS_STANDBY": "Budėjimo serveris – paimkite loginį replikavimą iš pirminio",
+      "IS_STANDBY": "Budėjimo serveris: Gaukite loginę replikaciją iš pirminio serverio.",
       "SETTINGS_UNKNOWN": "Nepavyko nuskaityti nustatymų, parengtumas nežinomas"
     },
     "ed": {
       "title": "Duomenų srauto apibrėžimai",
-      "draftOnly": "Tik projektavimas – išsaugoma kaip juodraščiai (DRAFT)",
+      "draftOnly": "Tik dizainas: Išsaugoti tik kaip JUODRAŠTĮ.",
       "new": "Naujas duomenų srautas",
       "empty": "Nėra išsaugotų duomenų srautų",
       "manual": "Rankinis",
@@ -1289,8 +1291,8 @@
     },
     "warn": {
       "none": "Nėra jokių pastebimų įspėjimų.",
-      "SEQ_SCAN_LARGE": "Pilnas nuskaitymas {relation} (apie {rows} eilučių) – apsvarstykite indeksą filtravimo stulpeliuose.",
-      "NESTED_LOOP_HIGH": "Įdėtoji kilpa sukuria apie {rows} eilučių – apsvarstykite maišos arba sujungimo prisijungimą, arba indeksą prisijungimo sąlygoje.",
+      "SEQ_SCAN_LARGE": "Lentelė {relation} atlieka pilną nuskaitymą (apytiksliai {rows} eilučių): Peržiūrėkite indeksus sąlygų stulpeliuose.",
+      "NESTED_LOOP_HIGH": "Įdėtojo ciklo rezultatas yra apytiksliai {rows} eilučių. Peržiūrėkite maišos/sujungimo sujungimus arba indeksus sujungimo sąlygose.",
       "SORT_SPILL": "Rūšiavimo dydis yra apie {kb}KB, viršijantis numatytąjį work_mem (4MB); jis gali išsilieti į diską."
     },
     "lint": {
@@ -1304,14 +1306,14 @@
         "char": "simbolis"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * – pasirinkite tik reikalingus stulpelius (papildomas I/O, nėra dengiančio indekso).",
-        "FUNC_ON_COLUMN": "Filtravimo stulpelis {column} yra apgaubtas funkcija ar išraiška, todėl jo indekso negalima naudoti – vietoj to transformuokite konstantą.",
-        "LEADING_WILDCARD": "LIKE su pradiniu % negali naudoti B-medžio indekso – apsvarstykite pg_trgm GIN indeksą.",
-        "OR_DIFF_COLUMNS": "OR sąlygos skirtingiems stulpeliams – apsvarstykite galimybę atskirti su UNION (pridėkite pasikartojimo išskyrimo sąlygą, jei UNION ALL) arba peržiūrėkite kiekvieno stulpelio indeksus.",
-        "IMPLICIT_CAST": "{column} lyginamas su skaičiumi kabutėse – suderinkite stulpelio ir konstantos tipus (numanomas tipų keitimas).",
-        "NOT_IN_SUBQUERY": "NOT IN (subquery) nieko negrąžina, kai yra NULL reikšmių, ir yra lėtas – naudokite NOT EXISTS.",
-        "NO_WHERE": "Nėra WHERE sąlygos – didelėje lentelėje tai yra pilnas nuskaitymas (pridėkite sąlygą arba LIMIT).",
-        "DOMAIN_MISMATCH": "{column} yra {expected} tipo pagal standartinį domeną, bet lyginamas su kitokio tipo konstanta – numanomas tipų keitimas gali užkirsti kelią indekso naudojimui."
+        "SELECT_STAR": "SELECT *: Pasirinkite tik reikalingus stulpelius (nereikalingas I/O, negalimas dengiantis indeksas).",
+        "FUNC_ON_COLUMN": "Sąlygos stulpelis {column} apdorojamas funkcija/operacija, todėl indeksų negalima naudoti. Apdorokite konstantos pusę.",
+        "LEADING_WILDCARD": "LIKE su pradiniu % negali naudoti B-medžio indekso. Peržiūrėkite pg_trgm GIN indeksus.",
+        "OR_DIFF_COLUMNS": "Skirtingų stulpelių sąlygos sugrupuotos su OR. Peržiūrėkite UNION atskyrimą (pridėkite dublikatų išskyrimo sąlygą, jei UNION ALL) arba indeksus kiekvienam stulpeliui.",
+        "IMPLICIT_CAST": "{column} lyginamas su skaičiumi kabutėse. Suderinkite stulpelio tipą ir konstantos tipą (numanomas tipo konvertavimas).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) gali būti tuščias ir lėtas, jei sumaišomi NULL. Pakeiskite į NOT EXISTS.",
+        "NO_WHERE": "Nėra WHERE sąlygos. Jei tai didelė lentelė, tai yra pilnas nuskaitymas (pridėkite LIMIT arba sąlygas).",
+        "DOMAIN_MISMATCH": "{column} tipas yra {expected} pagal standartinį domeną, bet lyginamas su skirtingo tipo konstanta. Numanomas tipo konvertavimas gali užkirsti kelią indekso naudojimui."
       }
     },
     "saved": {
@@ -1337,12 +1339,12 @@
     },
     "ai": {
       "title": "AI derinimo patarimai",
-      "intro": "Pasirinkite vieną išsaugotą planą, kad sugeneruotumėte patarimą. Siunčiami tik SQL ir planai, kuriuose konstantos užmaskuotos kaip „?“ (taisyklėmis pagrįstas patarimas, jei nėra rakto arba nepavyksta). Kai ryšio savininkas patvirtina, pakartotinai paleiskite to paties SQL paaiškinimą, išsaugokite jį ir išmatuokite poveikį su vėlesniu planu – tik tada jis įrašomas kaip pritaikytas.",
+      "intro": "Pasirinkite vieną išsaugotą planą, kad sugeneruotumėte patarimą. Siunčiami tik SQL ir planai, kuriuose konstantos užmaskuotos kaip „?“ (taisyklėmis pagrįstas patarimas, jei nėra rakto arba nepavyksta). Kai ryšio savininkas patvirtina, pakartotinai paleiskite to paties SQL paaiškinimą, išsaugokite jį ir išmatuokite poveikį su vėlesniu planu : tik tada jis įrašomas kaip pritaikytas.",
       "pickPlan": "Pasirinkite išsaugotą planą patarimui",
       "create": "Generuoti patarimą",
       "creating": "Generuojama... (iki 30 s)",
       "noPlans": "Nėra išsaugotų planų. Peržiūrėkite paaiškinimo planą aukščiau ir išsaugokite jį.",
-      "note": "Vienam planui skiriamas vienas patarimas. Norėdami sugeneruoti iš naujo, ištrinkite esamą patarimą. DDL tik siūlomas – pritaikykite jį schema.pi.",
+      "note": "Vienam planui skiriamas vienas patarimas. Norėdami sugeneruoti iš naujo, ištrinkite esamą patarimą. DDL tik siūlomas : pritaikykite jį schema.pi.",
       "empty": "Dar nėra patarimų.",
       "noItems": "Šiam planui patobulinimų nerasta.",
       "cost": "Ankstesnė kaina",
@@ -1384,10 +1386,10 @@
       "copy": "Kopijuoti",
       "copied": "Nukopijuota",
       "rule": {
-        "SEQ_SCAN_INDEX": "Visas {relation} nuskaitymas – sukurkite indeksą filtro stulpelyje {column} (indekso pavadinime NN pakeiskite eilės numeriu).",
-        "SEQ_SCAN_STATS": "Visas {relation} nuskaitymas – patikrinkite filtro stulpelius ir įsitikinkite, kad statistika (ANALYZE) yra naujausia.",
-        "NESTED_LOOP": "Įdėtasis ciklas tikisi {rows} eilučių – atnaujinkite statistiką ir apsvarstykite jungties rakto indeksus arba maišos jungtį.",
-        "SORT_SPILL": "Rūšiavimas apie {kb} KB gali persipildyti į diską – apsvarstykite galimybę padidinti sesijos work_mem arba indeksuoti rūšiavimo stulpelius.",
+        "SEQ_SCAN_INDEX": "{relation} pilnas nuskaitymas: Sukurkite indeksą sąlygos stulpelyje {column} (indekso pavadinimas NN bus pakeistas eilės numeriu).",
+        "SEQ_SCAN_STATS": "{relation} pilnas nuskaitymas: Patikrinkite sąlygos stulpelius ir įsitikinkite, kad statistika (ANALYZE) yra atnaujinta.",
+        "NESTED_LOOP": "Įdėtojo ciklo rezultatas yra apytiksliai {rows} eilučių: Atnaujinkite statistiką ir peržiūrėkite sujungimo sąlygos indeksus arba maišos sujungimus.",
+        "SORT_SPILL": "Rūšiavimas gali išsilieti į diską maždaug {kb}KB. Peržiūrėkite sesijos work_mem padidinimą arba indeksus rūšiavimo stulpeliuose.",
         "SELECT_STAR": "Pasirinkite tik reikalingus stulpelius, o ne SELECT * (mažiau I/O, galimi dengiantys indeksai).",
         "FUNC_ON_COLUMN": "Perkelkite funkciją/išraišką filtro stulpelyje {column} į konstantos pusę (įgalina indekso naudojimą).",
         "IMPLICIT_CAST": "Suderinkite {column} ir konstantos tipus (pašalinkite numanomą tipo konvertavimą).",
@@ -1447,9 +1449,9 @@
     },
     "desc": {
       "FREE": "Naršyti ir mokytis",
-      "D1": "Operatorius – tikrina, ar duomenų bazė dabar veikia tinkamai",
-      "D2": "Kūrėjas ir derintojas – taiso lėtas SQL užklausas",
-      "D3": "DBA ir DA – nuo veiklos saugumo iki įgyvendinimo ir duomenų ežero"
+      "D1": "Operatorius: Tikrina, ar duomenų bazė dabar yra sveika.",
+      "D2": "Kūrėjas/derintojas: Taiso lėtą SQL.",
+      "D3": "DBA/DA: Operacinis saugumas, migracija ir net duomenų ežeras."
     },
     "feat": {
       "FREE": "Stebėjimo lenta, vykdymo plano peržiūra, pagrindinis mokymasis",
@@ -1492,7 +1494,7 @@
       "required": "Ši funkcija pasiekiama nuo {plan} plano.",
       "limit": "Išnaudojote visus galimus bandymus šiam laikotarpiui. Galite naudoti daugiau, atnaujinę į {plan} planą.",
       "limitTop": "Išnaudojote visus galimus bandymus šiam laikotarpiui. Galėsite naudoti dar kartą kitą laikotarpį.",
-      "expired": "Jūsų schema.pi planas baigėsi – prašome atlikti mokėjimą schema.pi plano ekrane.",
+      "expired": "Jūsų schema.pi planas pasibaigė. Prašome apmokėti schema.pi plano ekrane.",
       "go": "Peržiūrėti planą",
       "close": "Uždaryti"
     }

@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analytiikka ja järvi",
     "intro": "dbms-toiminnan KPI:t, kolmikerroksinen järvisuunnittelu ja tietojoukkoluettelo yhdessä paikassa.",
-    "storageNotice": "Järven tallennustila (asiakaspuolella tai pilvessä) ei ole vielä päätetty (PRD-osio 10 #7). Toistaiseksi tallennetaan vain suunnitelmat ja nimikartoitukset – ei rivitietoja.",
+    "storageNotice": "Järven tallennustila (asiakaspuolella tai pilvessä) ei ole vielä päätetty (PRD-osio 10 #7). Toistaiseksi tallennetaan vain suunnitelmat ja nimikartoitukset : ei rivitietoja.",
     "noLink": "Valitse tai rekisteröi ensin schema.pi-linkki.",
     "goConnect": "Rekisteröi linkki",
     "loading": "Ladataan…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP-analyysi — Malli↔DB",
+    "title": "GAP-analyysi: Malli↔DB",
     "intro": "Vertaa schema.pi-suunnittelumallia ja DDL-sovellushistoriaa live-DB-luetteloon löytääksesi driftin ja mittaa, käytetäänkö suunniteltuja indeksejä todella. Asiakkaan rivitietoja ei koskaan lueta tai tallenneta.",
     "needLink": "Valitse ensin schema.pi-linkki ylhäältä. Jos sinulla ei ole sellaista, rekisteröi tunnus 'Linkki'-valikossa.",
     "needConn": "Valitse ylhäältä vertailtava DB-yhteys.",
@@ -188,7 +188,7 @@
     "model": "Malli",
     "reqNo": "Pyynnön {id}",
     "notSaved": "Tätä ajoa ei voitu tallentaa historiaan (tulokset näytetään normaalisti).",
-    "capped": "Liian monta kohdetta – näytetään ensimmäiset {cap} per osio (määrät ovat täydellisiä).",
+    "capped": "Liian monta kohdetta : näytetään ensimmäiset {cap} per osio (määrät ovat täydellisiä).",
     "statsMissing": "Indeksin käyttötilastoja ei ollut saatavilla, joten käyttöä ei voitu arvioida.",
     "sum": {
       "missingTables": "Taulukot puuttuvat DB:stä",
@@ -230,7 +230,7 @@
       "USED": "Käytössä",
       "NO_STATS": "Ei tilastoja",
       "CONSTRAINT": "Yksilöllisyysrajoitus (säilytä)",
-      "NO_DATA": "Ei tietoja tai tilastoja ei kerätty — ei voida arvioida",
+      "NO_DATA": "Ei tietoja tai tilastoja kerätty: ei voida määrittää",
       "OBSERVING": "Tarkkailussa (alle 7 päivää)",
       "UNUSED_CAND": "Käyttämätön ehdokas"
     },
@@ -245,14 +245,14 @@
       "RATE": "Liian monta pyyntöä. Yritä uudelleen minuutin kuluttua."
     },
     "schema": "Skeema",
-    "schemaHint": "Vain tämän skeeman tavalliset ja osioidut taulukot verrataan (näkymät pois lukien). Oletus public — Supabasen sisäiset skeemat (auth, storage, …) jätetään pois.",
-    "truncated": "{names} saavutti {max}-rivin rajan ja katkaistiin — jotkin \"ei DB:ssä\" / \"ei mallissa\" -tulokset voivat olla virheellisiä. Rajaa skeemaa ja suorita uudelleen.",
+    "schemaHint": "Vertailee vain tämän skeeman tavallisia ja osioituja tauluja (näkymät pois lukien). Oletus public: Supabasen sisäiset skeemat (auth, storage jne.) on suljettu pois.",
+    "truncated": "{names}-kysely katkaistiin {max} rivin ylärajalla. Jotkin 'Ei DB:ssä'/'Ei mallissa' -tunnistukset voivat olla vääriä positiivisia. Tarkenna skeemaa ja tunnista uudelleen.",
     "colUnchecked": "Koska sarakekysely katkaistiin, {n} puuttuvaa/ylimääräistä saraketulosta käsitellään vahvistamattomina ja ne on suljettu pois sarakkeiden ristiriitojen määrästä.",
-    "renamed": "{n} PK-indeksiä, jotka on sovellettu vanhan nimeämissäännön (_PKEY) mukaisesti, ovat DB:ssä uudella nimellä (PK_) — normaali",
-    "superseded": "{n} vanhempaa pyyntöä suljettiin pois, koska myöhempi pyyntö loi saman taulukon uudelleen (DROP … CASCADE) — normaali",
+    "renamed": "{n} PK-indeksiä, jotka on sovellettu vanhalla nimeämiskäytännöllä (_PKEY), ovat DB:ssä uudella nimellä (PK_). Normaali.",
+    "superseded": "{n} edellistä pyyntöä suljettiin pois vertailusta, koska myöhemmät pyynnöt loivat saman taulun uudelleen (DROP … CASCADE). Normaali.",
     "supersededItem": "Pyyntö {id} → korvattu pyynnöllä {by}",
     "sysCols": "{n} järjestelmäsaraketta, jotka lisättiin automaattisesti DDL-generoinnin yhteydessä, eivät ole mallissa suunnittelun mukaan ja ne on suljettu pois ristiriidoista",
-    "groupOwn": "Projektin etuliite {pfx} — mallista puuttuvat ehdokkaat",
+    "groupOwn": "Tämän projektin etuliite {pfx}: mallista puuttuvat ehdokkaat",
     "groupOther": "Muut järjestelmät {pfx}",
     "basis": "Arvioituja rivejä {rows} · alkaen {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Jos objektit katoavat edelleen uudelleen soveltamisen jälkeen, epäile manuaalista poistoa tai palautusta ja tarkista yhteyden tilin toimintahistoria DBA:n kanssa."
       },
       "extraTables": {
-        "s1": "Tämä projektin etuliitepaketti = puuttuvat malliehdokkaat – tuo ne malliin schema.pi → Asetukset → Käänteinen, tai päätä poistaa ne, jos ne ovat käyttämättömiä taulukoita.",
-        "s2": "Muut etuliite-ryhmät = muut järjestelmät, jotka jakavat tämän DB:n — eivät ole tämän projektin toimenpiteitä.",
+        "s1": "Tämän projektin etuliiteryhmä = mallista puuttuvat ehdokkaat: tuo malliin schema.pi → Asetukset → Käänteinen kautta, tai päätä poistetaanko taulu, jos sitä ei käytetä.",
+        "s2": "Muut etuliiteryhmät = muut järjestelmät, jotka käyttävät samaa DB:tä: eivät kuulu tämän projektin toimenpiteiden piiriin.",
         "s3": "Jos kohdeskeema ei ole public, muuta yllä olevaa \"Skeema\"-kenttää ja suorita uudelleen."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Tyyppi/NULL eroaa = kohdista malliin (totuuden lähde); ennen pituuden pienentämistä tai NOT NULL -tilaan siirtymistä, varmista, että olemassa olevat rivit täyttävät sen."
       },
       "idxUsage": {
-        "s1": "Ennen poistamista, tarkista ① että tilastoikkuna kattaa vähintään yhden liiketoimintasyklin (esim. kuun lopun eräajo) — katso \"alkaen\".",
+        "s1": "Ennen poistamista tarkista ①, onko tilastojen keräysjakso vähintään yksi toimintajakso (esim. kuun lopun eräajo): katso viitepäivämäärää.",
         "s2": "② Se ei ole yksilöllinen/PK-indeksi (ne näkyvät erikseen \"yksilöllisyysrajoituksena\").",
         "s3": "③ EXPLAIN taulukon edustava SQL SQL Tuningissa ja varmista, ettei tätä indeksiä käytetä.",
         "s4": "Kun kaikki kolme on vahvistettu, poista indeksi mallista schema.pi:ssä ja sovelleta DDL:n kautta."
@@ -354,7 +354,7 @@
     "howTitle": "Yhteystunnuksen myöntäminen",
     "how1": "Kirjaudu schema.pi:hin ja avaa yhdistettävä aihealue",
     "how2": "Siirry kohtaan Aihealue → Asetukset → Yhteystunnus ja paina 'Myönnä tunnus' (alueen järjestelmänvalvoja tai DA-rooli)",
-    "how3": "Kopioi slk_-alkuinen tunnus – se näytetään vain kerran myönnettäessä",
+    "how3": "Kopioi myönnetty slk_-alkuinen tunnus. Alkuperäinen näytetään vain kerran myöntämisen yhteydessä.",
     "how4": "Liitä se alle ja rekisteröi",
     "openSchema": "Avaa schema.pi",
     "registerTitle": "Rekisteröi yhteys",
@@ -384,7 +384,7 @@
     "retry": "Yritä uudelleen",
     "pickerLink": "Linkki",
     "pickerConn": "Yhteys",
-    "pickerEmpty": "Ei yhteyksiä –",
+    "pickerEmpty": "Ei yhteyksiä.",
     "pickerGo": "rekisteröi osoitteessa /connect",
     "errors": {
       "LINK_AUTH": "Yhteystunnus on vanhentunut tai peruutettu. Myönnä uusi tunnus schema.pi:ssä ja rekisteröi uudelleen",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Tietojen siirto (PiMig)",
-    "intro": "Laskee taulukon latausjärjestyksen schema.pi-suunnittelumallisi suhteista, järjestää palakoon, rinnakkaisuuden ja siirtymän tarkistuslistan sekä luo varmennus-SQL:n, jonka suoritat itse lähteessä ja kohteessa. Tämä näyttö vain suunnittelee ja tarkistaa – se ei siirrä tietoja tai lue asiakkaan DB-rivejä.",
+    "intro": "Laskee taulukon latausjärjestyksen schema.pi-suunnittelumallisi suhteista, järjestää palakoon, rinnakkaisuuden ja siirtymän tarkistuslistan sekä luo varmennus-SQL:n, jonka suoritat itse lähteessä ja kohteessa. Tämä näyttö vain suunnittelee ja tarkistaa : se ei siirrä tietoja tai lue asiakkaan DB-rivejä.",
     "needLink": "Valitse ensin schema.pi-linkki ylhäältä. Jos sinulla ei ole sellaista, rekisteröi tunnus 'Yhdistä'-valikossa.",
     "loading": "Ladataan…",
     "newPlan": "Uusi siirtosuunnitelma",
@@ -432,8 +432,8 @@
     "optsHint": "Rinnakkaisuus on samanaikaisesti ladattavien taulujen määrä samalla tasolla. Palakoko on suoritusmoottorin käyttämä commit-yksikkö (rivit).",
     "order": "Latausjärjestys",
     "orderHint": "Topologisesti järjestetty suunnittelusuhteiden (ei fyysisten FK:iden) mukaan, joten vanhemmat taulut tulevat ensin. Samalla tasolla olevat taulut eivät riipu toisistaan ja ne voidaan ladata rinnakkain.",
-    "cycles": "{n} sykliryhmää — sijoitettu samalle tasolle. Aseta niiden järjestys manuaalisesti ja lykkää viite tarkistuksia latauksen jälkeiseen aikaan.",
-    "selfRefs": "Itsensä viittaavat (hierarkkiset) taulut — lataa vanhemmat rivit ensin taulun sisällä",
+    "cycles": "{n} sykliä: sijoitettu samaan vaiheeseen. Aseta latausjärjestys manuaalisesti ja lykkää viite tarkistuksia latauksen jälkeiseen aikaan.",
+    "selfRefs": "Itsensä viittaavat (hierarkkiset) taulut: vanhemman rivit ensin samassa taulussa.",
     "level": "Taso {n}",
     "checklist": "Siirtymän tarkistuslista",
     "toReady": "Merkitse valmiiksi",
@@ -471,7 +471,7 @@
     },
     "verify": "Vahvistus-SQL",
     "verifyHint": "Luo laskenta-, numeerisen sarakkeen summan, kaksoiskappaleavaimen ja avaimen hash-kyselyt taulukoittain latausjärjestyksessä. Suorita ne itse lähteessä ja kohteessa ja vertaa (tämä näyttö ei suorita niitä).",
-    "noHashOracle": "Oracle·Tibero-hash-funktiot ja tekstin renderöinti eroavat PostgreSQL:stä, joten hash-kyselyt jätetään pois — vertaa määriä, summia ja kaksoiskappaleavaimia.",
+    "noHashOracle": "Oracle ja Tibero jättävät hajautushaun pois, koska hajautusfunktiot ja merkkiesitykset eroavat PostgreSQL:stä. Vertaa määrän, summan ja avaimen kaksoiskappaleiden perusteella.",
     "copy": "Kopioi",
     "copied": "Kopioitu",
     "copyFail": "Kopiointi epäonnistui. Valitse teksti ja kopioi se manuaalisesti.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Pyynnön arvo on virheellinen."
     },
     "board": {
-      "subtitle": "Mitä tällä DB:llä pitäisi tehdä juuri nyt – 14 signaalia OK, varoitus tai riski, ratkaisuineen, yhdellä silmäyksellä.",
+      "subtitle": "Mitä tehdä nyt tässä DB:ssä: Katso 14 signaalin normaali-, varoitus- ja riskitila sekä niiden ratkaisut yhdellä silmäyksellä.",
       "refresh": {
         "updated": "Tilanne {time} · päivittyy minuutin välein",
         "now": "Päivitä nyt",
@@ -564,11 +564,11 @@
         "NA": "Ei sovellettavissa"
       },
       "overall": {
-        "RISK": "Riski – toimenpiteitä tarvitaan nyt",
-        "WARN": "Varoitus – joitakin kohteita on tarkasteltava",
-        "UNKNOWN": "Tuntematon – tarkista yhteys",
-        "OK": "OK – kaikki signaalit ovat rajojen sisällä",
-        "CONN_DOWN": "DB:hen ei saada yhteyttä – tarkista ensin yhteys",
+        "RISK": "Riski: Välitön toimenpide vaaditaan",
+        "WARN": "Varoitus: Tarkistettavia kohteita",
+        "UNKNOWN": "Ei voida vahvistaa: Tarkista yhteystila",
+        "OK": "Normaali: Kaikki signaalit ovat kriteerien sisällä",
+        "CONN_DOWN": "Ei voida yhdistää DB:hen. Tarkista yhteys ensin.",
         "NA": "Ei sovellettavissa"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Näytä vähemmän",
         "setup": "Määritä nämä nähdäksesi lisää",
         "none": "Ei riski- tai varoituskohteita, jotka vaatisivat toimenpiteitä juuri nyt.",
-        "unknown": "Ei voitu tarkistaa {n} signaalia – katso syy korteista.",
+        "unknown": "Ei voida vahvistaa {n} kohdetta: Tarkista syy kortista.",
         "myRule": "Oma sääntö rikottu: {rule}",
         "copySql": "Kopioi SQL",
         "copied": "Kopioitu"
@@ -622,34 +622,34 @@
         "REPL": "Replikointiviive"
       },
       "fix": {
-        "AVAIL": "Hidas vastaus tai äskettäinen uudelleenkäynnistys – tarkista yhteysasetukset ja DB-palvelimen tila.",
-        "AVAIL_DOWN": "Tietokantaan ei saatu yhteyttä – tarkista yhteysasetukset ja että DB-palvelin on käynnissä.",
-        "CONN_USE": "{sess}/{max} istuntoa tässä DB:ssä (ei klusterinlaajuinen – muut tietokannat on suljettu pois) – sulje tyhjäkäynnillä olevat yhteydet tai lisää yhteyspooleri (pgbouncer).",
-        "URL": "{n} tarkistettua URL-osoitetta epäonnistuu · maksimivastaus {ms}ms – katso syy schema.pi-monitorista.",
-        "LONG_QRY": "Kysely on ollut käynnissä {sec}s – tarkista sen suunnitelma ja viritä se, tai pyydä DBA:ta peruuttamaan se.",
-        "IDLE_TX": "Transaktio on ollut tyhjäkäynnillä {sec}s – etsi puuttuva commit sovelluksesta ja aseta aikakatkaisu.",
-        "LOCK_WAIT": "{n} istuntoa odottaa lukituksia – etsi estävä istunto ja lopeta sen transaktio.",
-        "CACHE_HIT": "Välimuistin osumaprosentti {pct}% – etsi suurten taulukoiden täysiä skannauksia tai tarkista shared_buffers.",
-        "XACT_ERR": "Palautusprosentti {pct}%, {dlck} lukkiutumista – tarkista epäonnistuneet transaktiot ja sovelluksen virhelokit.",
-        "SLOW_SQL": "On olemassa kysely, joka kestää jopa {ms}ms per suoritus – tarkastele suoritussuunnitelmaa ja viritä sitä, aloittaen korkeimmasta yksittäisestä suoritusajasta.",
-        "STORAGE": "DB ({gb} GB) on lähellä rajaansa (päiviä jäljellä {days}) – siivoa suuria taulukoita tai lisää kapasiteettia.",
-        "VACUUM": "{tbl}:ssä on paljon kuolleita rivejä tai vanhentuneita tilastoja – tarkista VACUUM (ANALYZE) ja autovacuum-asetukset.",
-        "INDEX": "{n} indeksilöydöstä (virheellinen, käyttämätön, täydet skannaukset) – katso taulukon ja indeksin kunto -välilehdeltä kohteet.",
-        "BACKUP": "WAL-arkistointi on pois päältä tai pysähtynyt – tarkista archive_mode, archive_command ja varmuuskopioinnin tila.",
-        "REPL": "Replikointiviive {sec}s – tarkista valmiustilan tila ja verkko.",
-        "PGSS": "pg_stat_statements ei ole asennettu, joten hidas SQL ei ole käytettävissä – ota se käyttöön alla olevalla SQL:llä (palvelimen uudelleenkäynnistys vaaditaan)."
+        "AVAIL": "Hidas vastaus tai juuri käynnistetty uudelleen. Tarkista yhteystiedot ja DB-palvelimen tila.",
+        "AVAIL_DOWN": "Yhteys DB:hen epäonnistui. Tarkista yhteystiedot ja onko DB-palvelin käynnissä.",
+        "CONN_USE": "Tämä DB-istunto {sess}/{max} (ei klusterin laajuinen, muut DB-yhteydet pois lukien): Siivoa käyttämättömät yhteydet tai aseta yhteyspooleri (pgbouncer).",
+        "URL": "{n} URL-tarkistusta epäonnistui · Max vastaus {ms}ms: Tarkista syy schema.pi-monitorista.",
+        "LONG_QRY": "Kysely on ollut käynnissä {sec} sekuntia. Tarkista suoritussuunnitelma ja viritä se, tai pyydä DBA:ta pysäyttämään se.",
+        "IDLE_TX": "Transaktio on ollut auki ja käyttämättömänä {sec} sekuntia. Etsi puuttuvat commitit sovelluksesta ja aseta aikakatkaisu.",
+        "LOCK_WAIT": "{n} istuntoa odottaa lukkoja: Etsi estävä istunto ja lopeta sen transaktio.",
+        "CACHE_HIT": "Välimuistin osumaprosentti {pct}%: Etsi suurten taulujen täysiä taulukansioita tai tarkista shared_buffers.",
+        "XACT_ERR": "Palautusprosentti {pct}%, {dlck} lukkiutumista: Tarkista epäonnistuvat transaktiot ja sovelluksen virhelokit.",
+        "SLOW_SQL": "On kysely, jonka yksittäinen maksimiaika on {ms}ms. Tarkista suoritussuunnitelma ja viritä ylhäältä yksittäisen maksimiajan mukaan.",
+        "STORAGE": "DB {gb}GB on lähellä rajaansa (jäljellä {days} päivää). Siivoa suuria tauluja tai lisää kapasiteettia.",
+        "VACUUM": "{tbl}:ssä on paljon kuolleita rivejä tai vanhentuneita tilastoja. Tarkista VACUUM (ANALYZE) ja autovacuum-asetukset.",
+        "INDEX": "{n} indeksitarkistusta (virheellinen, käyttämätön, täysi skannaus): Tarkista kohteet taulu/indeksi-terveys-välilehdeltä.",
+        "BACKUP": "WAL-arkistointi on pois päältä tai pysäytetty. Tarkista archive_mode, archive_command ja varmuuskopion tila.",
+        "REPL": "Replikaation viive {sec} sekuntia: Tarkista valmiustilapalvelimen tila ja verkko.",
+        "PGSS": "pg_stat_statements-laajennus puuttuu, joten hitaita SQL-kyselyitä ei voi tarkastella. Ota se käyttöön alla olevalla SQL:llä (palvelimen uudelleenkäynnistys vaaditaan)."
       },
       "reason": {
         "CONN_DOWN": "Ei arvioitu, koska DB-yhteys on poikki.",
         "PGSS": "pg_stat_statements-laajennusta ei ole.",
         "VER": "Saatavilla PostgreSQL 13 tai uudemmassa.",
         "SAMPLE": "Näytteitä ei ole vielä tarpeeksi.",
-        "NO_LIMIT": "Ei kokorajaa, joten käyttöä ei arvioida – lisää DB-koko (MB) -sääntö (>) käyttääksesi sitä rajana.",
+        "NO_LIMIT": "Käyttöä ei määritetä, koska kapasiteettirajoitusta ei ole. DB-koon (MB) säännön (>) lisääminen käyttää sitä rajana.",
         "RESET": "Tilastoja ei ole nollattu alle 7 päivää sitten, joten käyttämättömiä indeksejä ei arvioida.",
         "STALE": "Ei viimeaikaisia tarkistustietoja.",
         "STANDBY": "Ei sovellettavissa valmiustilapalvelimella.",
         "NONE": "Ei tarkistettavaa.",
-        "GRANT": "Puuttuvat oikeudet – myönnä pg_monitor-rooli yhteystilille.",
+        "GRANT": "Ei voi tarkastella käyttöoikeuksien puutteen vuoksi. Myönnä pg_monitor-rooli yhteystilille.",
         "LINK": "schema.pi-kysely epäonnistui ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Jos se ei suoratoista, tarkista valmiustilan lokit."
         }
       },
-      "sqlNote": "Alla oleva SQL on vain luku -tarkistusta varten – korjaukset (VACUUM, DROP INDEX, pg_terminate_backend) suorittaa DBA.",
+      "sqlNote": "Alla oleva SQL on vain luku -tarkistusta varten. Toimenpiteet (VACUUM, DROP INDEX, pg_terminate_backend) suorittaa suoraan DBA.",
       "go": {
         "activity": "Toiminta ja lukitukset",
         "top": "Hitaat kyselyt",
@@ -766,8 +766,8 @@
           "tree": "Mikä vie tilaa ja mikä tarvitsee siivousta?"
         },
         "asTable": "Näytä taulukkona",
-        "needHistory": "Ei trendiä vielä – pidä tämä näyttö auki muutaman minuutin ajan.",
-        "needPerf": "Ei kokohistoriaa – kerää suorituskyky-välilehdeltä tai pidä tämä näyttö auki.",
+        "needHistory": "Ei vielä trendiä. Se piirretään, jos jätät tämän näytön auki muutamaksi minuutiksi.",
+        "needPerf": "Ei kapasiteettihistoriaa. Kerää se Suorituskyky-välilehdeltä tai jätä tämä näyttö auki.",
         "noSess": "Ei istuntoja.",
         "noWait": "Ei odotuksia",
         "noData": "Ei näytettävää dataa.",
@@ -840,17 +840,17 @@
         "noStat": "Ei tilastoja"
       },
       "empty": {
-        "noConn": "Tässä taksonomiassa ei ole PostgreSQL-palvelinyhteyttä valvottavaksi – näytetään vain URL-osoitteet ja palvelun tila.",
+        "noConn": "Tässä taksonomiassa ei ole PostgreSQL-palvelinyhteyksiä valvottavaksi. Vain URL- ja linkitystila näytetään.",
         "unsupported": "Tämä yhteys ei tue valvontaa (vain PostgreSQL-palvelinyhteydet).",
-        "connFail": "Tietokantaan ei saatu yhteyttä – tarkista yhteysasetukset ja DB-tila.",
-        "linkDown": "schema.pi-yhteyttä ei saatu – yritetään automaattisesti uudelleen.",
-        "linkAuth": "Yhteystunnus on vanhentunut – myönnä uusi tunnus schema.pi:ssä ja rekisteröi se.",
-        "timeout": "Vastaukset ovat hitaita – yritetään automaattisesti uudelleen.",
+        "connFail": "Yhteys DB:hen epäonnistui. Tarkista yhteystiedot ja DB:n tila.",
+        "linkDown": "Yhteys schema.pi:hin epäonnistui. Yritetään automaattisesti uudelleen pian.",
+        "linkAuth": "Yhteystunnus vanhentui. Uudelleenmyönnä ja rekisteröi tunnus schema.pi:stä.",
+        "timeout": "Vastaus on hidas. Yritetään automaattisesti uudelleen pian.",
         "rate": "Liian monta pyyntöä, joten päivitysväliä pidennettiin."
       },
       "aux": {
         "rules": "Omat hälytyssäännöt ({n} aktiivista)",
-        "schemaSvc": "Palvelun tila – schema.pi-vastaukset",
+        "schemaSvc": "Linkitystila: schema.pi-palvelun vastaus",
         "schemaSvcNote": "schema.pi:n tallentamat sovellusmittarit viimeiseltä 60 minuutin ajalta.",
         "source": "Tietolähde: kohde-DB on vain luku schema.pi:n nimettyjen kyselyjen kautta (vain luku); trendit tallentavat tilastoja vain dbms.pi:hin (ei rividataa)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Ei diagnoosia vielä. Paina \"Suorita diagnoosi\"",
     "lastRun": "Viimeisin diagnoosi {dtm}",
     "readOnly": "Diagnoosi lukee vain (SELECT). Neuvot ovat ohjeellisia ja riippuvat palvelimen muistista, kuormituksesta ja työkuormasta.",
-    "truncated": "Liian monta kohdetta – vain ensimmäiset 500 tarkistettiin",
+    "truncated": "Liian monta kohdetta : vain ensimmäiset 500 tarkistettiin",
     "paramsNote": "Palvelimen kokonaismuisti on tuntematon, joten se arvioidaan shared_buffers ≈ 25% RAM-muistista. random_page_cost olettaa SSD:n.",
     "auditNote": "Taulut, joissa RLS on pois päältä, ja käyttämättömät tilit tarkistetaan, kun linkkikysely tukee niitä.",
-    "replNote": "Perustaso on Active-Standby (A-S) — yksi ensisijainen + valmiustila. Toistoviive ≥ 5s = varoitus, ≥ 60s = riski (mitattu RPO-viite).",
+    "replNote": "Ensisijainen kriteeri on Active-Standby (A-S): 1 Primary + Standby. Varoitus, jos toistoviive >= 5 sekuntia, riski, jos >= 60 sekuntia (katso todellista RPO-mittausta).",
     "lagIdle": "Ei muutoksia",
     "pager": "Sivutus",
     "prev": "Edellinen",
@@ -938,11 +938,11 @@
       "st_ok": "Lausekkeen aikakatkaisu on asetettu.",
       "iit_off": "Ei idle-in-transaction-aikakatkaisua (0). Voi aiheuttaa lukituksen pitämistä ja turpoamista.",
       "iit_ok": "Idle-in-transaction-aikakatkaisu on asetettu.",
-      "ckpt_short": "Tarkistuspisteen väli on 5 minuuttia tai vähemmän. Harkitse 10–15 minuuttia kirjoitusintensiivisille kuormille.",
+      "ckpt_short": "Tarkistuspisteen väli on 5 minuuttia tai vähemmän. Harkitse 10~15 minuuttia kirjoitusintensiivisille kuormille.",
       "ckpt_ok": "Kohtuullisella alueella",
       "wal_minimal": "wal_level=minimal tekee PITR:n ja replikoinnin mahdottomaksi. Käytä replicaa tai korkeampaa.",
       "wal_ok": "WAL-taso tukee PITR:ää ja replikointia.",
-      "rpc_hdd": "HDD-oletus (4). SSD:lle suositellaan 1.1–2.",
+      "rpc_hdd": "HDD-oletus (4). SSD:lle suositellaan 1.1~2.",
       "rpc_ok": "Sopii SSD:lle.",
       "super_many": "Kaksi tai useampi superuseria. Pidä yksi hallinnointia varten ja myönnä vain tarvittavat oikeudet muille.",
       "super_ok": "Enintään yksi superuser.",
@@ -1020,7 +1020,7 @@
       "intro": "Kerää nyt lukee tärkeimmät kyselytilastot, taulut, indeksit ja koot kerran ja tallentaa ne tilannekuvana. Kerää vähintään kahdesti nähdäksesi muutokset ja kokotrendit.",
       "run": "Kerää nyt",
       "running": "Kerätään…",
-      "done": "Kerätty {dtm} — {qry} kyselyä · {tbl} taulua · {idx} indeksiä",
+      "done": "Keräys valmis {dtm}: {qry} kyselyä · {tbl} taulua · {idx} indeksiä",
       "auto": {
         "title": "Automaattinen keräys",
         "desc": "Kun tämä on päällä, tämän yhteyden tiedot kerätään automaattisesti joka päivä klo 3 (Korean aikaa). Kun tietoja on kerätty vähintään 7 päivän ajan, voit luottaa hitaiden kyselyjen sijoitukseen ja käyttämättömien indeksien luetteloon.",
@@ -1042,13 +1042,13 @@
       "sortCalls": "Kutsut",
       "empty": "Ei tilannekuvia vielä. Paina Kerää nyt Kerää-välilehdellä.",
       "range": "Muutos välillä {from} → {to}",
-      "first": "Ensimmäinen tilannekuva {dtm} — kumulatiiviset arvot (muutokset seuraavasta tilannekuvasta).",
+      "first": "Ensimmäinen keräys {dtm}: Kumulatiivinen (kasvu/vähennys seuraavasta keräyksestä)",
       "query": "Kysely (literaalit maskattu)",
       "calls": "Kutsut",
       "totalMs": "Kokonais-ms",
       "meanMs": "Keskim. ms",
       "rows": "Rivit",
-      "reset": " Tilastojen nollaus havaittu – näytetään kumulatiivisena",
+      "reset": "Tilastojen nollaus havaittu: Näytetään kumulatiivisena",
       "src": "Lähde",
       "srcToggle": "Näytä tai piilota lähteen tiedot",
       "openSqlLab": "Avaa SQL Tuningissa",
@@ -1056,7 +1056,7 @@
       "sortMax": "Maksimi yksittäinen suoritusaika",
       "maxMs": "Maksimi yksittäinen ms",
       "diagToggle": "Diagnosoi syy",
-      "noMax": "Ei enimmäisarvoa – {n} kohdetta on vanhemmista kokoelmista ilman enimmäisarvoa, joten ne on lajiteltu väliaikaisesti keskiarvon mukaan (ei kokonaisajan mukaan). Nyt kerääminen täyttää enimmäisarvon."
+      "noMax": "Ei maksimiarvoa: {n} kohdetta on vanhoja keräyksiä ilman yksittäistä maksimiarvoa, joten ne on väliaikaisesti lajiteltu yksittäisen keskiarvon mukaan (ei kokonaisajan mukaan). Maksimiarvot täytetään nykyisellä keräyksellä."
     },
     "health": {
       "empty": "Ei tilannekuvia vielä. Paina Kerää nyt Kerää-välilehdellä",
@@ -1064,9 +1064,9 @@
       "unusedIdx": "Käyttämättömät indeksit",
       "unusedIdxHint": "Indeksit, joita ei ole käytetty tilastojen viimeisen nollauksen jälkeen (koon mukaan). Älä poista PK- tai yksilöllisen rajoituksen indeksejä",
       "fullScan": "Liialliset täydet skannaukset",
-      "fullScanHint": "Taulukot, joissa on yli 1 000 aktiivista riviä ja joissa täydet skannaukset ovat vähintään puolet – tarkista suodatuskolumnien indeksit",
+      "fullScanHint": "Taulut, joissa on yli 1 000 tehokasta riviä ja yli puolet täysistä skannauksista: Tarkista indeksit ehtosarakkeissa.",
       "dead": "Liialliset kuolleet tuplet",
-      "deadHint": "Kuolleiden tuplien suhde 20 % tai enemmän – tarkista VACUUM- ja autovacuum-asetukset",
+      "deadHint": "Kuolleiden tuplien suhde yli 20%: Tarkista VACUUM- ja autovacuum-asetukset.",
       "none": "Ei mitään",
       "scans": "skannausta"
     },
@@ -1083,7 +1083,7 @@
     },
     "activity": {
       "refresh": "Päivitä",
-      "live": "Live-kysely – ei tallennettu",
+      "live": "Reaaliaikainen kysely: Ei tallenneta",
       "sessions": "Istunnon aktiviteetti",
       "locks": "Lukot",
       "none": "Ei mitään"
@@ -1110,7 +1110,7 @@
         "BATCH": "Näyttää eräajolta tai ajoitetulta työltä. Jaa ajoajat pois liiketoiminnan ruuhkahuipuista ja pienennä työtä per commit. Tarkista indeksit ja tilastot (ANALYZE) kohdetaulukoista ja jaa pitkät transaktiot. Työn nimen lisääminen application_nameen tekee seuraavasta luokittelusta tarkemman",
         "PROGRAM": "Tämä näyttää olevan sovelluksen suorittama kysely. Tarkista suoritussuunnitelma SQL-virityksessä. Jos maksimi yksittäinen suoritusaika on pitkä, tarkastele ensin indeksejä ja liitosjärjestystä. Jos yksittäinen suoritus on lyhyt, mutta kutsumäärä on suuri, tarkastele toistuvia kutsuja (N+1) ja välimuistia. Aseta palvelun nimi yhteyspoolin application_name-kenttään.",
         "PLATFORM": "Näyttää DB:n tai alustan sisäiseltä työltä, kuten autovacuum tai replikointi. Yleensä toimenpiteitä ei tarvita. Jos se pysyy kärjessä, tarkista autovacuum-kynnysarvot ja maintenance_work_mem",
-        "MONITOR": "Tämä on dbms.pi:n itsekeräyskysely — schema.pi-yhteys on kiinteä lause, joka lukee vain tilastollisia näkymiä/luetteloita (pg_stat_*·pg_catalog), joten se ei ole liiketoimintakysely eikä vaadi asiakkaan toimenpiteitä. Jos kohdetietokannan kuormitus on ongelma, vähennä keräyspainikkeen/valvontanäytön avaamiskertoja. Myös muiden valvontatyökalujen lauseet, jotka lukevat samoja tilastollisia näkymiä, ryhmitellään tähän.",
+        "MONITOR": "dbms.pi:n oma keräyskysely. schema.pi-yhteys lukee vain tilastollisia näkymiä ja luetteloita (pg_stat_*, pg_catalog) kiinteillä lausekkeilla, joten se ei ole liiketoimintakysely eikä asiakkaan toimenpiteitä tarvita. Jos kohdetietokannan kuormitus on ongelma, vähennä keräyspainikkeen tai valvontanäytön avaamistiheyttä. Muiden valvontatyökalujen lausekkeet, jotka lukevat samoja tilastollisia näkymiä, ryhmitellään myös tähän.",
         "UNKNOWN": "Lähteestä ei ole vihjettä. Aseta application_name jokaiselle yhteydelle ja jaa tilit tarkoituksen mukaan; se luokitellaan seuraavista näytteistä"
       },
       "detail": {
@@ -1121,7 +1121,7 @@
         "period": "Havainnoitu",
         "none": "(tyhjä)"
       },
-      "noSample": "Ei vielä näytteitä — käynnissä olevat istunnot näytteistetään, kun tarkastelet valvontataulua tai Activity & locks -välilehteä. Toistaiseksi se luokitellaan vain tilin nimen perusteella",
+      "noSample": "Ei vielä näytteitä. Käynnissä olevat istunnot kertyvät näytteiksi, kun tarkastellaan valvontapaneelia tai Toiminta/Lukot-välilehtiä. Tällä hetkellä ne luokitellaan vain tilin nimen mukaan viitteeksi.",
       "verOff": "Tämä DB on vanhempi kuin PostgreSQL 14, joten käynnissä olevilla istunnoilla ei ole kysely-ID:tä. Vain tili (varma) näytetään",
       "privOff": "Linkkitili ei voi nähdä muiden tilien istuntotietoja, joten näytteitä ei kerätä. Pyydä DB-järjestelmänvalvojaa suorittamaan GRANT pg_read_all_stats TO {user};",
       "linkUsr": "linkkitili",
@@ -1132,11 +1132,11 @@
     "diag": {
       "title": "Diagnosoi syy",
       "fix": "Toimenpide:",
-      "none": "Tilastot eivät paljastaneet syytä – tarkista suoritussuunnitelma SQL-virityksessä.",
-      "cum": "Ei kutsuja tällä aikavälillä – kumulatiivinen (tilastojen nollauksen jälkeen)",
-      "basis": "Perusta – Enimmäis 1-kertainen {max}ms · Keskimäärin {mean}ms · Kutsuja {calls} · Rivejä per kutsu {rpc} · Levylukusuhde {read} · Väliaikaiset lohkot {tmp}",
+      "none": "Tilastot eivät paljastaneet syytä. Avaa suoritussuunnitelma SQL-virityksessä tarkistaaksesi.",
+      "cum": "Ei kutsuja tällä aikavälillä: Kumulatiivinen (tilastojen nollauksen jälkeen)",
+      "basis": "Perusta: Max yksittäinen {max}ms · Keskimääräinen {mean}ms · Kutsuja {calls} · Rivejä per kutsu {rpc} · Levylukusuhde {read} · Väliaikaiset lohkot {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi:n itsekokoamiskysely – valvontalause, joka lukee vain tilastollisia näkymiä/luetteloita.",
+        "cause": "dbms.pi:n oma keräyskysely: Valvontalauseke, joka lukee vain tilastollisia näkymiä ja luetteloita.",
         "fix": "Asiakkaan toimenpiteitä ei tarvita. Jos kohdetietokannan kuormitus on ongelma, vähennä keräys-/valvontanäytön avaamiskertoja."
       },
       "NO_MAX": {
@@ -1144,31 +1144,31 @@
         "fix": "Napsauta 'Kerää' kerran nyt täyttääksesi enimmäisarvot tarkkaa diagnoosia varten."
       },
       "SLOW_EACH": {
-        "cause": "Aina hidas – Kestää kauan joka kerta, kun se suoritetaan, enintään {max}ms ja keskimäärin {mean}ms.",
+        "cause": "Hidas joka kerta: Kestää kauan jokaisella suorituksella maksimissaan {max}ms ja keskimäärin {mean}ms.",
         "fix": "① Avaa suoritussuunnitelma 'Avaa SQL-virityksessä'. ② Jos on täysiä skannauksia (Seq Scan) tai suuria lajitteluja, tarkista indeksit WHERE/JOIN-ehtosarakkeissa. ③ Kavenna ehtoja lukeaksesi vain tarvittavat sarakkeet/rivit."
       },
       "SPIKE": {
-        "cause": "Satunnainen viive – Keskimäärin {mean}ms, mutta kestää toisinaan kauan enintään {max}ms (keskiarvon {x}-kertainen).",
+        "cause": "Satunnainen viive: Keskimäärin {mean}ms, mutta joskus kestää kauan maksimissaan {max}ms ({x} kertaa keskiarvo).",
         "fix": "① Kun hidas, tarkista lukitusodotukset (wait_event) Toiminta/Lukitukset-välilehdeltä. ② Jos vain ensimmäinen suoritus on hidas, välimuisti oli tyhjä ja levyä luettiin. ③ Vertaa samaa kyselyä eri arvoilla SQL-virityksessä nähdäksesi, muuttuuko suoritussuunnitelma arvojen perusteella."
       },
       "DISK_READ": {
-        "cause": "Välimuistihuti – {pct}% ({read} lohkoa) luetuista lohkoista luettiin levyltä, ei muistista.",
+        "cause": "Välimuistin ohitus: {pct}% ({read} lohkoa) luetuista lohkoista luettiin levyltä, ei muistista.",
         "fix": "① Vähennä lukualuetta indekseillä. ② Kavenna kyselyjaksoa/ehtoja. ③ Jos usein luetun datan määrä pysyy korkeana, tarkista shared_buffers (muisti)."
       },
       "TEMP_SPILL": {
-        "cause": "Muistin ylivuoto – Lajittelu/hajautus ylitti work_memin ja kirjoitti {blk} lohkoa (noin {mb}MB, {perCall} lohkoa per kutsu) väliaikaisiin tiedostoihin.",
+        "cause": "Muistin ylivuoto: Lajittelu/hajautus ylitti work_mem:n ja kirjoitti {blk} lohkoa (noin {mb}MB, {perCall} lohkoa per kutsu) väliaikaisiin tiedostoihin.",
         "fix": "① Indeksien sijoittaminen ORDER BY/GROUP BY -sarakkeisiin ohittaa lajittelun. ② Vähennä ensin lajiteltavien rivien määrää (LIMIT sisällä). ③ Jos ehdottoman välttämätöntä, lisää SET LOCAL work_mem vain tälle kyselytransaktiolle."
       },
       "MANY_ROWS": {
-        "cause": "Liiallinen haku – Hakee {perCall} riviä per kutsu.",
+        "cause": "Liiallinen kysely: Hakee {perCall} riviä per kutsu.",
         "fix": "① Näyttölistat haetaan sivu kerrallaan. ② SELECT valitsee vain käytetyt sarakkeet. ③ Aggregaatiot suoritetaan tietokannassa, ja vain tulokset vastaanotetaan."
       },
       "PGRST_EMBED": {
-        "cause": "PostgRESTin upotettu suodatin (!inner) -lause – vanhempien suodattaminen lapsiehtojen perusteella voi skannata koko joukon ennen luokitteluehtoja.",
+        "cause": "PostgREST upotettu suodatin (!inner) lauseke: Vanhempien suodattaminen lapsiehtojen perusteella voi skannata koko taulun ennen luokitteluehtoa.",
         "fix": "① Tarkista, onko liitosavaimissa ja suodatussarakkeissa indeksejä. ② Siirrä suodattimet päätaulun ehtoihin. ③ Upota lapset jo olemassa olevaan pääkyselyyn tai yhdistä ne yhdeksi tietokantafunktioksi."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET-sivutus – Muuttuu asteittain hitaammaksi, kun se lukee ja hylkää edeltäviä rivejä myöhemmillä sivuilla.",
+        "cause": "OFFSET-sivutus: Myöhemmät sivut lukevat ja hylkäävät aikaisemmat rivit, hidastuen asteittain.",
         "fix": "Vaihda avainsivutukseen (WHERE id > last_id ORDER BY id LIMIT n), joka lukee viimeksi vastaanotetun avaimen jälkeisestä avaimesta."
       }
     }
@@ -1201,8 +1201,8 @@
       "toDraft": "Luo putkiluonnos {n} valitusta"
     },
     "ready": {
-      "ok": "WAL-looginen replikointi valmis – taulukot, joissa on PK, voivat käyttää LOGICAL-menetelmää",
-      "no": "WAL-looginen replikointi ei valmis – kaappaa kyselyllä tai avainten vertailulla",
+      "ok": "WAL-looginen replikaatio valmis: Taulut, joissa on PK, voivat käyttää LOGICAL-menetelmää.",
+      "no": "WAL-looginen replikaatio ei valmis: Kerää käyttämällä kysely-/avainvertailumenetelmää.",
       "senders": "{n} replikointiyhteyttä"
     },
     "adapter": {
@@ -1217,20 +1217,20 @@
       "HAS_SOFT_DEL": "Sisältää pehmeän poiston sarakkeen",
       "NO_SOFT_DEL": "Ei pehmeän poiston saraketta",
       "HAS_PK": "Sisältää ensisijaisen avaimen",
-      "NO_PK": "Ei ensisijaista avainta – muutettuja rivejä ei voida tunnistaa",
+      "NO_PK": "Ei PK:ta: Ei voi tunnistaa muuttuneita rivejä.",
       "DELETE_UNSEEN": "Kysely ei voi kaapata fyysisiä DELETE-komentoja (pehmeän poiston sarake suositellaan)",
       "LOGICAL_NOT_READY": "Voidaan vaihtaa LOGICAL-tilaan, kun WAL-looginen replikointi on valmis",
-      "FULL_RELOAD_ONLY": "Ei PK:ta tai muutosajankohdan saraketta, joten ei inkrementaalista kaappausta – lisää PK",
+      "FULL_RELOAD_ONLY": "Ei PK:ta/muutosleimaa, joten inkrementaalinen keräys ei mahdollista: PK:n lisäämistä suositellaan.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level ei ole logical (sen muuttaminen vaatii DB:n uudelleenkäynnistyksen)",
       "NO_SLOTS": "max_replication_slots on 0",
       "NO_SENDERS": "max_wal_senders on 0",
-      "IS_STANDBY": "Valmiustilapalvelin – ota looginen replikointi ensisijaisesta",
+      "IS_STANDBY": "Valmiustilapalvelin: Vastaanota looginen replikaatio ensisijaiselta palvelimelta.",
       "SETTINGS_UNKNOWN": "Asetuksia ei voitu lukea, valmius tuntematon"
     },
     "ed": {
       "title": "Putkimääritykset",
-      "draftOnly": "Vain suunnittelu – tallennettu luonnoksina (DRAFT)",
+      "draftOnly": "Vain suunnittelu: Tallenna vain LUONNOS-tilassa.",
       "new": "Uusi putki",
       "empty": "Ei tallennettuja putkia",
       "manual": "Manuaalinen",
@@ -1299,8 +1299,8 @@
     },
     "warn": {
       "none": "Ei merkittäviä varoituksia.",
-      "SEQ_SCAN_LARGE": "Täysi skannaus taulukossa {relation} (noin {rows} riviä) – harkitse indeksin lisäämistä suodatuskolumneihin.",
-      "NESTED_LOOP_HIGH": "Sisäkkäinen silmukka tuottaa noin {rows} riviä – harkitse hash- tai merge-liitosta tai indeksiä liitosehtoon.",
+      "SEQ_SCAN_LARGE": "Taulu {relation} suorittaa täyden skannauksen (arvioitu {rows} riviä): Tarkista indeksit ehtosarakkeissa.",
+      "NESTED_LOOP_HIGH": "Sisäkkäisen silmukan tulos on arvioitu {rows} riviä. Tarkista hajautus-/yhdistämisliitokset tai indeksit liitosehdoissa.",
       "SORT_SPILL": "Lajittelun koko on noin {kb}KB, mikä ylittää oletusarvoisen work_mem (4MB); se voi vuotaa levylle."
     },
     "lint": {
@@ -1314,14 +1314,14 @@
         "char": "merkki"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * – valitse vain tarvitsemasi sarakkeet (ylimääräinen I/O, ei kattavaa indeksiä).",
-        "FUNC_ON_COLUMN": "Suodatuskolumni {column} on kääritty funktioon tai lausekkeeseen, joten sen indeksiä ei voi käyttää – muunna sen sijaan vakio.",
-        "LEADING_WILDCARD": "LIKE, jossa on edessä %, ei voi käyttää B-puuindeksiä – harkitse pg_trgm GIN-indeksiä.",
-        "OR_DIFF_COLUMNS": "OR-ehdot eri sarakkeissa – harkitse jakamista UNIONilla (lisää kaksoiskappaleen poissulkemisehto, jos UNION ALL) tai sarakekohtaisten indeksien tarkistamista.",
-        "IMPLICIT_CAST": "{column} verrataan lainattuun numeroon – vastaa sarakkeen ja vakion tyyppejä (implisiittinen tyyppimuunnos).",
-        "NOT_IN_SUBQUERY": "NOT IN (aläkysely) ei palauta mitään, kun NULL-arvoja on läsnä, ja on hidas – käytä NOT EXISTS -operaattoria.",
-        "NO_WHERE": "Ei WHERE-lausetta – suuressa taulukossa tämä on täysi skannaus (lisää ehto tai LIMIT).",
-        "DOMAIN_MISMATCH": "{column} on standardidomainin mukaan {expected}-tyyppiä, mutta sitä verrataan toisen tyyppiseen vakioon – implisiittinen tyyppimuunnos voi estää indeksin käytön."
+        "SELECT_STAR": "SELECT *: Valitse vain tarvittavat sarakkeet (tarpeeton I/O, peittävä indeksi ei mahdollinen).",
+        "FUNC_ON_COLUMN": "Ehtosaraketta {column} käsitellään funktiolla/operaatiolla, joten indeksejä ei voi käyttää. Käsittele vakion puolta.",
+        "LEADING_WILDCARD": "LIKE, jossa on edessä %, ei voi käyttää B-puuindeksiä. Tarkista pg_trgm GIN-indeksit.",
+        "OR_DIFF_COLUMNS": "Eri sarakkeiden ehdot on ryhmitelty OR-operaattorilla. Tarkista UNION-erottelu (lisää kaksoiskappaleiden poissulkemisehto, jos UNION ALL) tai sarakekohtaiset indeksit.",
+        "IMPLICIT_CAST": "{column} verrataan lainausmerkeissä olevaan numeroon. Yhdistä sarakkeen tyyppi ja vakion tyyppi (implisiittinen tyyppimuunnos).",
+        "NOT_IN_SUBQUERY": "NOT IN (aläkysely) voi olla tyhjä ja hidas, jos NULL-arvoja on sekoitettu. Muuta NOT EXISTS:iksi.",
+        "NO_WHERE": "Ei WHERE-ehtoa. Jos kyseessä on suuri taulu, se on täysi skannaus (lisää LIMIT tai ehtoja).",
+        "DOMAIN_MISMATCH": "{column} on tyyppiä {expected} standardidomainin mukaan, mutta sitä verrataan eri tyyppiseen vakioon. Implisiittinen tyyppimuunnos voi estää indeksin käytön."
       }
     },
     "saved": {
@@ -1347,12 +1347,12 @@
     },
     "ai": {
       "title": "AI-viritysneuvoja",
-      "intro": "Valitse yksi tallennettu suunnitelma neuvojen luomiseksi. Vain SQL ja suunnitelmat, joissa vakiot on peitetty ?-merkillä, lähetetään (sääntöihin perustuva neuvonta, jos avainta ei ole tai epäonnistuu). Kun linkin omistaja hyväksyy, suorita explain uudelleen samalle SQL:lle, tallenna se ja mittaa vaikutus myöhemmällä suunnitelmalla – vasta sitten se kirjataan sovelletuksi.",
+      "intro": "Valitse yksi tallennettu suunnitelma neuvojen luomiseksi. Vain SQL ja suunnitelmat, joissa vakiot on peitetty ?-merkillä, lähetetään (sääntöihin perustuva neuvonta, jos avainta ei ole tai epäonnistuu). Kun linkin omistaja hyväksyy, suorita explain uudelleen samalle SQL:lle, tallenna se ja mittaa vaikutus myöhemmällä suunnitelmalla : vasta sitten se kirjataan sovelletuksi.",
       "pickPlan": "Valitse tallennettu suunnitelma neuvoja varten",
       "create": "Luo neuvoja",
       "creating": "Luodaan… (enintään 30 s)",
       "noPlans": "Ei tallennettuja suunnitelmia. Tarkastele explain-suunnitelmaa yllä ja tallenna se.",
-      "note": "Yksi neuvo per suunnitelma. Poista olemassa olevat neuvot luodaksesi uudelleen. DDL on vain ehdotus – sovelta se schema.pi:ssä.",
+      "note": "Yksi neuvo per suunnitelma. Poista olemassa olevat neuvot luodaksesi uudelleen. DDL on vain ehdotus : sovelta se schema.pi:ssä.",
       "empty": "Ei vielä neuvoja.",
       "noItems": "Tälle suunnitelmalle ei löytynyt parannuksia.",
       "cost": "Ennen kustannus",
@@ -1394,10 +1394,10 @@
       "copy": "Kopioi",
       "copied": "Kopioitu",
       "rule": {
-        "SEQ_SCAN_INDEX": "{relation}-taulun täysi skannaus – luo indeksi suodatussarakkeeseen {column} (korvaa NN indeksin nimessä järjestysnumerolla).",
-        "SEQ_SCAN_STATS": "{relation}-taulun täysi skannaus – tarkista suodatussarakkeet ja varmista, että tilastot (ANALYZE) ovat ajantasaisia.",
-        "NESTED_LOOP": "Sisäkkäinen silmukka odottaa {rows} riviä – päivitä tilastot ja harkitse liitosavaimen indeksejä tai hajautusliitosta.",
-        "SORT_SPILL": "Noin {kb} KB:n lajittelu voi vuotaa levylle – harkitse session work_mem-arvon nostamista tai lajittelusarakkeiden indeksointia.",
+        "SEQ_SCAN_INDEX": "{relation} täysi skannaus: Luo indeksi ehtosarakkeeseen {column} (indeksin nimi NN korvataan järjestysnumerolla).",
+        "SEQ_SCAN_STATS": "{relation} täysi skannaus: Tarkista ehtosarakkeet ja varmista, että tilastot (ANALYZE) ovat ajan tasalla.",
+        "NESTED_LOOP": "Sisäkkäisen silmukan tulos on arvioitu {rows} riviä: Päivitä tilastot ja tarkista liitosehtojen indeksit tai hajautusliitokset.",
+        "SORT_SPILL": "Lajittelu voi vuotaa levylle noin {kb}KB. Tarkista istunnon work_mem:n lisääminen tai lajittelusarakkeiden indeksit.",
         "SELECT_STAR": "Valitse vain tarvitsemasi sarakkeet SELECT * -komennon sijaan (vähemmän I/O:ta, kattavat indeksit mahdollisia).",
         "FUNC_ON_COLUMN": "Siirrä funktio/lauseke suodatussarakkeessa {column} vakion puolelle (mahdollistaa indeksin käytön).",
         "IMPLICIT_CAST": "Yhdistä sarakkeen {column} ja vakion tyypit (poista implisiittinen tyyppimuunnos).",
@@ -1457,9 +1457,9 @@
     },
     "desc": {
       "FREE": "Tutustu ja opi",
-      "D1": "Operaattori – Tarkistaa, onko tietokanta kunnossa nyt",
-      "D2": "Kehittäjä ja virittäjä – Korjaa hitaat SQL-kyselyt",
-      "D3": "DBA ja DA – Käyttöturvallisuudesta toteutukseen ja datajärveen"
+      "D1": "Operaattori: Tarkistaa, onko tietokanta nyt kunnossa.",
+      "D2": "Kehittäjä/virittäjä: Korjaa hitaat SQL-kyselyt.",
+      "D3": "DBA/DA: Toiminnallinen turvallisuus, migraatio ja jopa data lake."
     },
     "feat": {
       "FREE": "Valvontapaneeli, suorituskykysuunnitelman näkymä, perusoppiminen",
@@ -1502,7 +1502,7 @@
       "required": "Tämä ominaisuus on käytettävissä {plan}-tilauksesta alkaen.",
       "limit": "Olet käyttänyt kaikki käytettävissä olevat yritykset tällä jaksolla. Voit käyttää enemmän päivittämällä {plan}-tilaukseen.",
       "limitTop": "Olet käyttänyt kaikki käytettävissä olevat yritykset tällä jaksolla. Voit käyttää sitä uudelleen seuraavalla jaksolla.",
-      "expired": "schema.pi-tilauksesi on vanhentunut – suorita maksu schema.pi-tilausnäytöllä.",
+      "expired": "schema.pi-tilauksesi on vanhentunut. Maksa schema.pi-tilausnäytöllä.",
       "go": "Näytä tilaus",
       "close": "Sulje"
     }

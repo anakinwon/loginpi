@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analitika və Göl",
     "intro": "dbms fəaliyyət KPI-ları, üç qatlı göl dizaynı və məlumat dəsti kataloqu bir yerdə.",
-    "storageNotice": "Göl yaddaşı (müştəri tərəfində və ya buludda) hələ müəyyən edilməyib (PRD bölmə 10 #7). Hələlik yalnız dizaynlar və ad xəritələri saxlanılır — sətir məlumatları yoxdur.",
+    "storageNotice": "Göl yaddaşı (müştəri tərəfində və ya buludda) hələ müəyyən edilməyib (PRD bölmə 10 #7). Hələlik yalnız dizaynlar və ad xəritələri saxlanılır : sətir məlumatları yoxdur.",
     "noLink": "Əvvəlcə schema.pi bağlantısını seçin və ya qeyd edin.",
     "goConnect": "Bağlantı qeyd edin",
     "loading": "Yüklənir…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP Analizi — Model↔DB",
+    "title": "GAP Təhlili: Model↔DB",
     "intro": "schema.pi dizayn modelini və DDL tətbiq tarixçəsini canlı DB kataloqu ilə müqayisə edərək drifti tapın və dizayn edilmiş indekslərin həqiqətən istifadə edilib-edilmədiyini ölçün. Müştəri sətir məlumatları heç vaxt oxunmur və ya saxlanılmır.",
     "needLink": "Əvvəlcə yuxarıdan bir schema.pi bağlantısı seçin. Əgər yoxdursa, 'Bağlantı' menyusunda bir token qeyd edin.",
     "needConn": "Yuxarıdan müqayisə etmək üçün DB bağlantısını seçin.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Sorğu {id}",
     "notSaved": "Bu işi tarixçəyə saxlamaq mümkün olmadı (nəticələr normal göstərilir).",
-    "capped": "Çoxlu element var — hər bölmə üçün ilk {cap} göstərilir (saylar tamdır).",
+    "capped": "Çoxlu element var : hər bölmə üçün ilk {cap} göstərilir (saylar tamdır).",
     "statsMissing": "İndeks istifadə statistikası mövcud deyildi, buna görə də istifadəni qiymətləndirmək mümkün olmadı.",
     "sum": {
       "missingTables": "DB-də olmayan cədvəllər",
@@ -230,7 +230,7 @@
       "USED": "İstifadədədir",
       "NO_STATS": "Statistika yoxdur",
       "CONSTRAINT": "Unikallıq məhdudiyyəti (saxla)",
-      "NO_DATA": "Məlumat yoxdur və ya statistika toplanmayıb — mühakimə etmək mümkün deyil",
+      "NO_DATA": "Məlumat yoxdur və ya statistika toplanmayıb: müəyyən etmək mümkün deyil",
       "OBSERVING": "Müşahidə altında (7 gündən az)",
       "UNUSED_CAND": "İstifadə edilməmiş namizəd"
     },
@@ -245,14 +245,14 @@
       "RATE": "Çoxlu sorğu var. Zəhmət olmasa, bir dəqiqədən sonra yenidən cəhd edin."
     },
     "schema": "Sxem",
-    "schemaHint": "Yalnız bu sxemdəki adi və bölməli cədvəllər müqayisə edilir (görünüşlər istisna olmaqla). Varsayılan public — Supabase daxili sxemləri (auth, storage, …) kənarda qalır.",
-    "truncated": "{names} {max} sətir limitinə çatdı və kəsildi — bəzi \"DB-də yoxdur\" / \"modeldə yoxdur\" nəticələri yanlış ola bilər. Sxemi daraldın və yenidən işə salın.",
+    "schemaHint": "Yalnız bu sxemdəki adi və bölünmüş cədvəlləri müqayisə edir (görünüşlər istisna olmaqla). Defolt public: Supabase daxili sxemləri (auth, storage və s.) istisna edilir.",
+    "truncated": "{names} sorğusu {max} sətir həddinə çatdığı üçün kəsildi. Bəzi 'DB-də yoxdur'/'Modeldə yoxdur' aşkarlamaları səhv ola bilər. Sxemi daraldın və yenidən aşkarlayın.",
     "colUnchecked": "Sütun sorğusu kəsildiyi üçün, {n} çatışmayan/əlavə sütun nəticəsi təsdiqlənməz hesab edilir və sütun uyğunsuzluğu sayından çıxarılır.",
-    "renamed": "Köhnə adlandırma qaydası (_PKEY) altında tətbiq edilmiş {n} PK indeksi yeni adla (PK_) DB-də mövcuddur — normaldır",
-    "superseded": "{n} köhnə sorğu daha sonra eyni cədvəli yenidən yaratdığı üçün (DROP … CASCADE) müqayisədən çıxarıldı — normaldır",
+    "renamed": "Köhnə adlandırma konvensiyası (_PKEY) ilə tətbiq edilmiş {n} PK indeksi DB-də yeni adla (PK_) mövcuddur. Normal.",
+    "superseded": "Əvvəlki {n} sorğu müqayisədən kənarlaşdırıldı, çünki sonrakı sorğular eyni cədvəli yenidən yaratdı (DROP … CASCADE). Normal.",
     "supersededItem": "Sorğu {id} → sorğu {by} ilə əvəz edildi",
     "sysCols": "DDL yaradılması zamanı avtomatik əlavə edilmiş {n} sistem sütunu dizaynla modeldə yoxdur və uyğunsuzluqlardan çıxarılır.",
-    "groupOwn": "Layihə prefiksi {pfx} — modeldən çatışmayan namizədlər",
+    "groupOwn": "Bu layihə prefiksi {pfx}: modeldə çatışmayan namizədlər",
     "groupOther": "Digər sistem {pfx}",
     "basis": "Təxmini sətirlər {rows} · {since} tarixindən",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Yenidən tətbiq etdikdən sonra obyektlər hələ də yox olursa, əl ilə silinmə və ya geri qaytarılmadan şübhələnin və DBA-nızla əlaqə hesabının fəaliyyətini yoxlayın."
       },
       "extraTables": {
-        "s1": "Bu layihə prefiks paketi = modeldə çatışmayan namizədlər — onları schema.pi → Parametrlər → Reverse vasitəsilə modelə idxal edin və ya istifadə olunmayan cədvəllərdirsə, silmək qərarına gəlin.",
-        "s2": "Digər prefiks qrupları = bu DB-ni paylaşan digər sistemlər — bu layihə üçün fəaliyyət maddələri deyil.",
+        "s1": "Bu layihə prefiks qrupu = modeldə çatışmayan namizədlər: schema.pi → Parametrlər → Reverse vasitəsilə modelə idxal edin və ya cədvəl istifadə edilmirsə silmək qərarı verin.",
+        "s2": "Digər prefiks qrupları = eyni DB-dən istifadə edən digər sistemlər: bu layihə tərəfindən tədbir görülməli deyil.",
         "s3": "Əgər hədəf sxem public deyilsə, yuxarıdakı \"Sxem\" sahəsini dəyişdirin və yenidən işə salın."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Növ/NULL fərqlidir = modelə uyğunlaşdırın (həqiqət mənbəyi); uzunluğu azaltmadan və ya NOT NULL-a keçməzdən əvvəl mövcud sətirlərin buna uyğun olduğunu təsdiqləyin."
       },
       "idxUsage": {
-        "s1": "Silməzdən əvvəl yoxlayın: ① statistika pəncərəsi ən azı bir iş dövrünü (məsələn, ay sonu partiyası) əhatə edir — \"tarixdən bəri\" hissəsinə baxın.",
+        "s1": "Silməzdən əvvəl yoxlayın ① statistika toplama müddətinin ən azı bir əməliyyat dövrü (məsələn, ay sonu partiyası) olub-olmadığını: istinad tarixinə baxın.",
         "s2": "② Bu, unikal/PK indeksi deyil (bunlar ayrıca \"unikallıq məhdudiyyəti\" kimi göstərilir).",
         "s3": "③ SQL Tuning-də cədvəlin təmsilçi SQL-ni EXPLAIN edin və bu indeksin istifadə edilmədiyini təsdiqləyin.",
         "s4": "Hər üçü təsdiqləndikdən sonra, indeksi schema.pi-də modeldən silin və DDL vasitəsilə tətbiq edin."
@@ -354,7 +354,7 @@
     "howTitle": "Bağlantı tokenini necə vermək olar",
     "how1": "schema.pi-yə daxil olun və qoşulmaq üçün mövzu sahəsini açın",
     "how2": "Mövzu sahəsi → Parametrlər → Bağlantı tokeni bölməsinə keçin və 'Token ver' düyməsini basın (sahə admini və ya DA rolu)",
-    "how3": "slk_ ilə başlayan tokeni kopyalayın — o, yalnız verildikdə bir dəfə göstərilir",
+    "how3": "Verilmiş slk_ ilə başlayan tokeni kopyalayın. Orijinal yalnız verildiyi zaman bir dəfə göstərilir.",
     "how4": "Aşağıya yapışdırın və qeyd edin",
     "openSchema": "schema.pi açın",
     "registerTitle": "Bağlantı qeyd edin",
@@ -384,7 +384,7 @@
     "retry": "Yenidən cəhd edin",
     "pickerLink": "Bağlantı",
     "pickerConn": "Bağlantı",
-    "pickerEmpty": "Bağlantı yoxdur —",
+    "pickerEmpty": "Bağlantı yoxdur.",
     "pickerGo": "/connect ünvanında birini qeyd edin",
     "errors": {
       "LINK_AUTH": "Bağlantı tokeninin müddəti bitmiş və ya ləğv edilmişdir. schema.pi-də yeni token verin və yenidən qeyd edin",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Məlumat Miqrasiyası (PiMig)",
-    "intro": "schema.pi dizayn modelinizdəki əlaqələrdən cədvəl yükləmə ardıcıllığını hesablayır, hissə ölçüsünü, paralelliyi və kəsmə yoxlama siyahısını təşkil edir və mənbə və hədəfdə özünüz işə salacağınız doğrulama SQL-i yaradır. Bu ekran yalnız planlaşdırır və yoxlayır — məlumatları köçürmür və ya müştəri DB sətirlərini oxumur.",
+    "intro": "schema.pi dizayn modelinizdəki əlaqələrdən cədvəl yükləmə ardıcıllığını hesablayır, hissə ölçüsünü, paralelliyi və kəsmə yoxlama siyahısını təşkil edir və mənbə və hədəfdə özünüz işə salacağınız doğrulama SQL-i yaradır. Bu ekran yalnız planlaşdırır və yoxlayır : məlumatları köçürmür və ya müştəri DB sətirlərini oxumur.",
     "needLink": "Əvvəlcə yuxarıdan bir schema.pi bağlantısı seçin. Əgər yoxdursa, 'Bağlantı' menyusunda bir token qeyd edin.",
     "loading": "Yüklənir…",
     "newPlan": "Yeni miqrasiya planı",
@@ -432,8 +432,8 @@
     "optsHint": "Paralellik eyni səviyyədə eyni anda yüklənən cədvəllərin sayıdır. Blok ölçüsü icra mühərrikinin istifadə edəcəyi komit vahididir (sətirlər).",
     "order": "Yükləmə sırası",
     "orderHint": "Parent cədvəllərinin əvvəldə gəlməsi üçün dizayn əlaqələri (fiziki FK-lar deyil) ilə topoloji olaraq sıralanmışdır. Eyni səviyyədəki cədvəllər bir-birindən asılı deyil və paralel yüklənə bilər.",
-    "cycles": "{n} dövri qrup(lar) — eyni səviyyədə yerləşdirilib. Onların sırasını əl ilə təyin edin və yükləmədən sonra istinad yoxlamalarını təxirə salın.",
-    "selfRefs": "Özünə istinad edən (hierarxik) cədvəllər — cədvəl daxilində əvvəlcə parent sətirlərini yükləyin",
+    "cycles": "{n} dövr: eyni mərhələdə yerləşdirilib. Yükləmə sırasını əl ilə təyin edin və yükləmədən sonra istinad yoxlamalarını təxirə salın.",
+    "selfRefs": "Özünə istinad edən (hierarxik) cədvəllər: eyni cədvəldə əvvəlcə valideyn sətirləri.",
     "level": "Səviyyə {n}",
     "checklist": "Keçid yoxlama siyahısı",
     "toReady": "Hazır olaraq qeyd et",
@@ -471,7 +471,7 @@
     },
     "verify": "Doğrulama SQL",
     "verifyHint": "Yükləmə sırasına görə hər cədvəl üçün say, rəqəmsal sütun cəmi, dublikat açar və açar heş sorğuları yaradır. Onları mənbə və hədəfdə özünüz işlədin və müqayisə edin (bu ekran onları icra etmir).",
-    "noHashOracle": "Oracle·Tibero heş funksiyaları və mətn göstərilməsi PostgreSQL-dən fərqlənir, buna görə heş sorğuları buraxılır — sayları, cəmləri və dublikat açarları müqayisə edin.",
+    "noHashOracle": "Oracle və Tibero, hash funksiyaları və simvol təsvirləri PostgreSQL-dən fərqli olduğu üçün hash axtarışını buraxır. Say, cəm və açar dublikatı ilə müqayisə edin.",
     "copy": "Kopyala",
     "copied": "Kopyalandı",
     "copyFail": "Kopyalamaq mümkün olmadı. Mətni seçin və əl ilə kopyalayın.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Sorğu etibarsızdır."
     },
     "board": {
-      "subtitle": "Bu DB-də hazırda nə etməli olduğunuzu — 14 siqnalın normal, xəbərdarlıq və risk və həll yollarını bir baxışda görün.",
+      "subtitle": "Bu DB-də indi nə etməli: 14 siqnalın normal, xəbərdarlıq və risk statusunu və həllərini bir baxışda görün.",
       "refresh": {
         "updated": "{time} tarixinə · hər dəqiqə yenilənir",
         "now": "İndi yenilə",
@@ -564,11 +564,11 @@
         "NA": "Tətbiq edilmir"
       },
       "overall": {
-        "RISK": "Risk — indi tədbir görülməlidir",
-        "WARN": "Xəbərdarlıq — bəzi elementlərə baxmaq lazımdır",
-        "UNKNOWN": "Naməlum — qoşulmanı yoxlayın",
-        "OK": "OK — hər bir siqnal limitlər daxilindədir",
-        "CONN_DOWN": "DB-yə qoşulmaq mümkün deyil — əvvəlcə bağlantını yoxlayın",
+        "RISK": "Risk: Dərhal tədbir tələb olunur",
+        "WARN": "Xəbərdarlıq: Nəzərdən keçiriləcək maddələr",
+        "UNKNOWN": "Təsdiq edilə bilməz: Bağlantı vəziyyətini yoxlayın",
+        "OK": "Normal: Bütün siqnallar meyarlar daxilindədir",
+        "CONN_DOWN": "DB-yə qoşulmaq mümkün deyil. Əvvəlcə bağlantını yoxlayın.",
         "NA": "Tətbiq edilmir"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Daha az göstər",
         "setup": "Daha çox görmək üçün bunları quraşdırın",
         "none": "Hazırda heç bir risk və ya xəbərdarlıq elementi tədbir tələb etmir.",
-        "unknown": "{n} siqnal yoxlanıla bilmədi — səbəbi kartlarda görün.",
+        "unknown": "{n} maddə təsdiq edilə bilməz: Səbəbi kartda yoxlayın.",
         "myRule": "Mənim qaydam pozuldu: {rule}",
         "copySql": "SQL-i kopyala",
         "copied": "Kopyalandı"
@@ -622,34 +622,34 @@
         "REPL": "Replikasiya gecikməsi"
       },
       "fix": {
-        "AVAIL": "Yavaş cavab və ya son yenidən başlatma — qoşulma parametrlərini və DB server statusunu yoxlayın.",
-        "AVAIL_DOWN": "DB-yə qoşulmaq mümkün olmadı — qoşulma parametrlərini və DB serverinin işlək olduğunu yoxlayın.",
-        "CONN_USE": "Bu DB-də {sess}/{max} sessiya (klaster miqyasında deyil — digər verilənlər bazaları istisna edilir) — boş qoşulmaları bağlayın və ya qoşulma hovuzu (pgbouncer) əlavə edin.",
-        "URL": "{n} yoxlanmış URL uğursuz oldu · maksimum cavab {ms}ms — səbəbi schema.pi monitorunda görün.",
-        "LONG_QRY": "Bir sorğu {sec} saniyədir işləyir — planını nəzərdən keçirin və tənzimləyin, ya da bir DBA-ya ləğv etdirin.",
-        "IDLE_TX": "Bir əməliyyat {sec} saniyədir boş vəziyyətdədir — tətbiqdə çatışmayan commit-i tapın və vaxt aşımı təyin edin.",
-        "LOCK_WAIT": "{n} sessiya kilidləri gözləyir — bloklayan sessiyanı tapın və əməliyyatını bitirin.",
-        "CACHE_HIT": "Keş hit dərəcəsi {pct}% — böyük cədvəllərin tam skanlarını axtarın və ya shared_buffers-i nəzərdən keçirin.",
-        "XACT_ERR": "Geri qaytarma dərəcəsi {pct}%, {dlck} ölü kilid — uğursuz əməliyyatları və tətbiq xəta loglarını yoxlayın.",
-        "SLOW_SQL": "Hər icra üçün {ms}ms-ə qədər vaxt aparan sorğu var — icra planına baxın və ən yüksək tək icra vaxtından başlayaraq onu tənzimləyin.",
-        "STORAGE": "DB ({gb} GB) limitinə yaxındır (qalan günlər {days}) — böyük cədvəlləri təmizləyin və ya tutum əlavə edin.",
-        "VACUUM": "{tbl} çoxlu ölü sətirlərə və ya köhnəlmiş statistikalara malikdir — VACUUM (ANALYZE) və autovacuum parametrlərini nəzərdən keçirin.",
-        "INDEX": "{n} indeks tapıntısı (etibarsız, istifadəsiz, tam skanlar) — hədəflər üçün cədvəl və indeks sağlamlığı tabına baxın.",
-        "BACKUP": "WAL arxivləməsi bağlıdır və ya dayanıb — archive_mode, archive_command və ehtiyat nüsxəsi statusunu yoxlayın.",
-        "REPL": "Replikasiya gecikməsi {sec}s — gözləmə statusunu və şəbəkəni yoxlayın.",
-        "PGSS": "pg_stat_statements quraşdırılmayıb, buna görə də yavaş SQL mövcud deyil — aşağıdakı SQL ilə aktivləşdirin (serverin yenidən başladılması tələb olunur)."
+        "AVAIL": "Cavab yavaşdır və ya yenicə yenidən başladıldı. Bağlantı məlumatlarını və DB serverinin vəziyyətini yoxlayın.",
+        "AVAIL_DOWN": "DB-yə qoşulmaq alınmadı. Bağlantı məlumatlarını və DB serverinin aktiv olub olmadığını yoxlayın.",
+        "CONN_USE": "Bu DB sessiyası {sess}/{max} (klaster miqyasında deyil, digər DB bağlantıları istisna olmaqla): Boş bağlantıları təmizləyin və ya bağlantı hovuzu (pgbouncer) qurun.",
+        "URL": "{n} URL yoxlaması uğursuz oldu · Maksimum cavab {ms}ms: Səbəbi schema.pi monitorunda yoxlayın.",
+        "LONG_QRY": "Bir sorğu {sec} saniyədir işləyir. İcra planını nəzərdən keçirin və tənzimləyin, ya da bir DBA-nın onu dayandırmasını təmin edin.",
+        "IDLE_TX": "Bir əməliyyat {sec} saniyədir açıq və boş vəziyyətdədir. Tətbiqdə çatışmayan commitləri tapın və vaxt aşımı təyin edin.",
+        "LOCK_WAIT": "{n} sessiya kilidləri gözləyir: Bloklayan sessiyanı tapın və onun əməliyyatını bitirin.",
+        "CACHE_HIT": "Keş hit dərəcəsi {pct}%: Böyük cədvəllərin tam skanlarını axtarın və ya shared_buffers-i nəzərdən keçirin.",
+        "XACT_ERR": "Rollback dərəcəsi {pct}%, {dlck} deadlocks: Uğursuz əməliyyatları və tətbiq xəta loglarını yoxlayın.",
+        "SLOW_SQL": "Maksimum bir dəfə {ms}ms olan bir sorğu var. İcra planını nəzərdən keçirin və ən yüksək bir dəfəlik maksimum vaxtdan tənzimləyin.",
+        "STORAGE": "DB {gb}GB həddinə yaxındır (qalan {days} gün). Böyük cədvəlləri təmizləyin və ya tutumu artırın.",
+        "VACUUM": "{tbl} çoxlu ölü sətirlərə və ya köhnəlmiş statistikaya malikdir. VACUUM (ANALYZE) və autovacuum parametrlərini nəzərdən keçirin.",
+        "INDEX": "{n} indeks yoxlaması (etibarsız, istifadə edilməmiş, tam skan): Cədvəl/indeks sağlamlığı tabında hədəfləri yoxlayın.",
+        "BACKUP": "WAL arxivləməsi bağlıdır və ya dayandırılıb. archive_mode, archive_command və backup vəziyyətini yoxlayın.",
+        "REPL": "Replikasiya gecikməsi {sec} saniyə: Gözləmə serverinin vəziyyətini və şəbəkəni yoxlayın.",
+        "PGSS": "pg_stat_statements genişləndirməsi yoxdur, buna görə yavaş SQL-ə baxmaq mümkün deyil. Aşağıdakı SQL ilə aktivləşdirin (serverin yenidən başladılması tələb olunur)."
       },
       "reason": {
         "CONN_DOWN": "DB qoşulması kəsildiyi üçün qiymətləndirilmədi.",
         "PGSS": "pg_stat_statements quraşdırılmayıb.",
         "VER": "Yalnız PostgreSQL 13 və ya daha yeni versiyalarda mövcuddur.",
         "SAMPLE": "Hələ kifayət qədər nümunə yoxdur.",
-        "NO_LIMIT": "Ölçü limiti yoxdur, buna görə də istifadə qiymətləndirilmir — limit kimi istifadə etmək üçün DB ölçüsü (MB) qaydası (>) əlavə edin.",
+        "NO_LIMIT": "Tutqunluq həddi olmadığı üçün istifadə müəyyən edilmir. DB ölçüsü (MB) qaydası (>) əlavə etsəniz, o, hədd kimi istifadə ediləcək.",
         "RESET": "Statistikalar 7 gündən az əvvəl sıfırlandığı üçün istifadəsiz indekslər qiymətləndirilmir.",
         "STALE": "Son yoxlama qeydləri yoxdur.",
         "STANDBY": "Gözləmə serverində tətbiq edilmir.",
         "NONE": "Yoxlanılacaq heç nə yoxdur.",
-        "GRANT": "Çatışmayan imtiyazlar — qoşulma hesabına pg_monitor rolunu verin.",
+        "GRANT": "İcazə çatışmazlığı səbəbindən baxmaq mümkün deyil. Bağlantı hesabına pg_monitor rolunu verin.",
         "LINK": "schema.pi sorğusu uğursuz oldu ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Əgər axın etmirsə, gözləmə serverinin loglarını yoxlayın."
         }
       },
-      "sqlNote": "Aşağıdakı SQL yalnız oxumaq üçündür, yoxlamaq üçündür — düzəlişlər (VACUUM, DROP INDEX, pg_terminate_backend) bir DBA tərəfindən icra edilir.",
+      "sqlNote": "Aşağıdakı SQL yalnız oxumaq üçün yoxlama üçündür. Əməliyyatlar (VACUUM, DROP INDEX, pg_terminate_backend) bir DBA tərəfindən birbaşa icra edilir.",
       "go": {
         "activity": "Fəaliyyət və kilidlər",
         "top": "Yavaş sorğular",
@@ -766,8 +766,8 @@
           "tree": "Nə yer tutur və nə təmizlənməlidir?"
         },
         "asTable": "Cədvəl kimi bax",
-        "needHistory": "Hələ trend yoxdur — bu ekranı bir neçə dəqiqə açıq saxlayın.",
-        "needPerf": "Ölçü tarixi yoxdur — performans tabında toplayın və ya bu ekranı açıq saxlayın.",
+        "needHistory": "Hələ trend yoxdur. Bu ekranı bir neçə dəqiqə açıq saxlasanız, çəkiləcək.",
+        "needPerf": "Tutqunluq tarixi yoxdur. Performans tabından toplayın və ya bu ekranı açıq saxlayın.",
         "noSess": "Sessiya yoxdur.",
         "noWait": "Gözləmələr yoxdur",
         "noData": "Göstəriləcək heç nə yoxdur.",
@@ -840,17 +840,17 @@
         "noStat": "Statistika yoxdur"
       },
       "empty": {
-        "noConn": "Bu taksonomiyada monitorinq üçün PostgreSQL server qoşulması yoxdur — yalnız URL-lər və xidmət statusu göstərilir.",
+        "noConn": "Bu taksonomiyada monitorinq ediləcək PostgreSQL server bağlantısı yoxdur. Yalnız URL və əlaqə vəziyyəti göstərilir.",
         "unsupported": "Bu qoşulma monitorinqi dəstəkləmir (yalnız PostgreSQL server qoşulmaları).",
-        "connFail": "Verilənlər bazasına qoşulmaq mümkün olmadı — qoşulma parametrlərini və DB statusunu yoxlayın.",
-        "linkDown": "schema.pi-yə çatmaq mümkün olmadı — avtomatik olaraq yenidən cəhd edilir.",
-        "linkAuth": "Qoşulma tokeninin müddəti bitib — schema.pi-də yeni token verin və qeydiyyatdan keçirin.",
-        "timeout": "Cavablar yavaşdır — avtomatik olaraq yenidən cəhd edilir.",
+        "connFail": "DB-yə qoşulmaq alınmadı. Bağlantı məlumatlarını və DB vəziyyətini yoxlayın.",
+        "linkDown": "schema.pi-yə qoşulmaq alınmadı. Qısa müddətdən sonra avtomatik olaraq yenidən cəhd ediləcək.",
+        "linkAuth": "Bağlantı tokeni müddəti bitmişdir. schema.pi-dən tokeni yenidən verin və qeydiyyatdan keçirin.",
+        "timeout": "Cavab yavaşdır. Qısa müddətdən sonra avtomatik olaraq yenidən cəhd ediləcək.",
         "rate": "Çoxlu sorğular var, buna görə də yeniləmə intervalı artırıldı."
       },
       "aux": {
         "rules": "Mənim xəbərdarlıq qaydalarım ({n} aktiv)",
-        "schemaSvc": "Xidmət statusu — schema.pi cavabları",
+        "schemaSvc": "Əlaqə vəziyyəti: schema.pi xidmət cavabı",
         "schemaSvcNote": "schema.pi tərəfindən saxlanılan son 60 dəqiqəlik tətbiq metrikaları.",
         "source": "Məlumat mənbəyi: hədəf DB yalnız schema.pi adlı sorğular vasitəsilə oxunur (yalnız oxumaq); trendlər yalnız dbms.pi-də statistika saxlayır (sətir məlumatı yoxdur)."
       }
@@ -866,10 +866,10 @@
     "noRun": "Hələ diaqnoz yoxdur. \"Diaqnozu işə sal\" düyməsini basın",
     "lastRun": "Son diaqnoz {dtm}",
     "readOnly": "Diaqnoz yalnız oxuyur (SELECT). Məsləhət bir bələdçidir və server yaddaşından, yükündən və iş yükündən asılıdır",
-    "truncated": "Çox obyekt var — yalnız ilk 500 yoxlanıldı",
+    "truncated": "Çox obyekt var : yalnız ilk 500 yoxlanıldı",
     "paramsNote": "Ümumi server yaddaşı məlum deyil, buna görə shared_buffers ≈ RAM-ın 25%-i ilə təxmin edilir. random_page_cost SSD-ni nəzərdə tutur",
     "auditNote": "RLS-i söndürülmüş cədvəllər və istifadə olunmayan hesablar bağlantı sorğusu onları dəstəklədikdən sonra yoxlanılacaq",
-    "replNote": "Baza Active-Standby (A-S) — bir əsas + gözləmə. Replay gecikməsi ≥ 5s = xəbərdarlıq, ≥ 60s = risk (ölçülmüş RPO istinadı)",
+    "replNote": "Əsas meyar Aktiv-Gözləmə (A-S): 1 Əsas + Gözləmə. Replay gecikməsi >= 5 saniyə üçün xəbərdarlıq, >= 60 saniyə üçün risk (faktiki RPO ölçüsünə baxın).",
     "lagIdle": "Dəyişiklik yoxdur",
     "pager": "Səhifələmə",
     "prev": "Əvvəlki",
@@ -943,7 +943,7 @@
       "ckpt_ok": "Məqbul diapazonda",
       "wal_minimal": "wal_level=minimal PITR və replikasiyanı qeyri-mümkün edir. replica və ya daha yüksək istifadə edin",
       "wal_ok": "WAL səviyyəsi PITR və replikasiyanı dəstəkləyir",
-      "rpc_hdd": "HDD varsayılanı (4). SSD üçün 1.1–2 tövsiyə olunur",
+      "rpc_hdd": "HDD varsayılanı (4). SSD üçün 1.1~2 tövsiyə olunur",
       "rpc_ok": "SSD üçün uyğundur",
       "super_many": "İki və ya daha çox superuser. İdarəetmə üçün birini saxlayın və digərlərinə yalnız lazım olan imtiyazları verin",
       "super_ok": "Ən çox bir superuser",
@@ -1022,7 +1022,7 @@
       "intro": "İndi topla düyməsini basmaqla ən yaxşı sorğu statistikalarını, cədvəlləri, indeksləri və ölçüləri bir dəfə oxuyur və onları anlıq görüntü kimi saxlayır. Dəyişiklikləri və ölçü tendensiyalarını görmək üçün ən azı iki dəfə toplayın",
       "run": "İndi topla",
       "running": "Toplanır…",
-      "done": "{dtm} tarixində toplandı — {qry} sorğu · {tbl} cədvəl · {idx} indeks",
+      "done": "{dtm} toplama tamamlandı: {qry} sorğu · {tbl} cədvəl · {idx} indeks",
       "auto": {
         "title": "Avtomatik toplama",
         "desc": "Aktiv olduqda, bu əlaqənin statistikası hər gün səhər saat 3-də (Koreya vaxtı ilə) avtomatik olaraq toplanır. 7 və ya daha çox gün toplandıqdan sonra, yavaş sorğu reytinqinə və istifadə olunmayan indekslər siyahısına etibar edə bilərsiniz.",
@@ -1044,13 +1044,13 @@
       "sortCalls": "Zənglər",
       "empty": "Hələ heç bir anlıq görüntü yoxdur. Topla sekmesinde İndi topla düyməsini basın",
       "range": "{from} → {to} arasında dəyişiklik",
-      "first": "{dtm} tarixində ilk anlıq görüntü — kumulyativ dəyərlər (növbəti anlıq görüntüdən dəyişikliklər)",
+      "first": "İlk toplama {dtm}: Yığılmış (növbəti toplamadan artım/azalma)",
       "query": "Sorğu (literallar maskalanmışdır)",
       "calls": "Zənglər",
       "totalMs": "Ümumi ms",
       "meanMs": "Orta ms",
       "rows": "Sətirlər",
-      "reset": "Statistika sıfırlanması aşkarlandı — kümülatif olaraq göstərilir",
+      "reset": "Statistika sıfırlanması aşkar edildi: Yığılmış kimi göstərilir",
       "src": "Mənbə",
       "srcToggle": "Mənbə detallarını göstər və ya gizlət",
       "openSqlLab": "SQL Tuning-də açın",
@@ -1058,7 +1058,7 @@
       "sortMax": "Maksimum tək icra vaxtı",
       "maxMs": "Maksimum tək ms",
       "diagToggle": "Səbəbi diaqnoz edin",
-      "noMax": "Maksimum dəyər yoxdur — {n} element maksimum dəyəri olmayan köhnə kolleksiyalardandır, buna görə də müvəqqəti olaraq orta dəyərə görə sıralanır (ümumi vaxta görə deyil). İndi toplamaq maksimum dəyəri dolduracaq."
+      "noMax": "Maksimum dəyər yoxdur: {n} maddə tək maksimum dəyəri olmayan köhnə kolleksiyalardır, buna görə müvəqqəti olaraq tək orta ilə sıralanır (ümumi vaxta görə deyil). Maksimum dəyərlər cari kolleksiya ilə doldurulacaq."
     },
     "health": {
       "empty": "Hələ heç bir anlıq görüntü yoxdur. Topla sekmesinde İndi topla düyməsini basın",
@@ -1066,9 +1066,9 @@
       "unusedIdx": "İstifadə olunmayan indekslər",
       "unusedIdxHint": "Son statistika sıfırlanmasından bəri heç vaxt istifadə olunmayan indekslər (ölçüyə görə). PK və ya unikal məhdudiyyət indekslərini silməyin",
       "fullScan": "Həddindən artıq tam skanlar",
-      "fullScanHint": "1000-dən çox canlı sətri olan və tam skanların ən azı yarısını təşkil edən cədvəllər — filtr sütunlarındakı indeksləri nəzərdən keçirin",
+      "fullScanHint": "1000-dən çox effektiv sətri olan və yarısından çoxu tam skan olan cədvəllər: Şərt sütunlarındakı indeksləri nəzərdən keçirin.",
       "dead": "Həddindən artıq ölü tuple",
-      "deadHint": "Ölü tuple nisbəti 20% və ya daha çox — VACUUM və autovacuum parametrlərini yoxlayın",
+      "deadHint": "Ölü tuple nisbəti 20%-dən çox: VACUUM və autovacuum parametrlərini nəzərdən keçirin.",
       "none": "Heç biri",
       "scans": "skanlar"
     },
@@ -1085,7 +1085,7 @@
     },
     "activity": {
       "refresh": "Yenilə",
-      "live": "Canlı sorğu — saxlanılmır",
+      "live": "Real-vaxt sorğusu: Saxlanılmır",
       "sessions": "Sessiya fəaliyyəti",
       "locks": "Kilidlər",
       "none": "Heç biri"
@@ -1112,7 +1112,7 @@
         "BATCH": "Görünür ki, bir partiya və ya planlaşdırılmış işdir. İşləmə müddətlərini iş piklərindən uzaqlaşdırın və hər commit üçün işi azaldın. Hədəf cədvəllərdə indeksləri və statistikaları (ANALYZE) yoxlayın və uzun əməliyyatları bölün. İş adını application_name-ə daxil etmək növbəti təsnifatı daha dəqiq edir.",
         "PROGRAM": "Bu, tətbiq tərəfindən icra edilən sorğu kimi görünür. SQL tənzimləməsində icra planını yoxlayın. Əgər maksimum tək icra vaxtı uzundursa, əvvəlcə indekslərə və birləşmə sırasına baxın. Əgər tək icra qısa, lakin çağırış sayı yüksəkdirsə, təkrarlanan çağırışlara (N+1) və keşləməyə baxın. Xidmət adını bağlantı hovuzunun application_name-inə daxil edin.",
         "PLATFORM": "Görünür ki, autovacuum və ya replikasiya kimi DB və ya platforma daxili işdir. Adətən heç bir tədbirə ehtiyac yoxdur. Əgər yuxarıda qalırsa, autovacuum həddlərini və maintenance_work_mem-i nəzərdən keçirin.",
-        "MONITOR": "Bu, dbms.pi öz-özünə toplama sorğusudur — schema.pi bağlantısı yalnız statistik görünüşləri/kataloqları (pg_stat_*·pg_catalog) oxuyan sabit bir ifadə olduğundan, bu, iş sorğusu deyil və müştəri tərəfindən heç bir tədbir tələb olunmur. Əgər hədəf verilənlər bazasının yüklənməsi problemdirsə, toplama düyməsini/monitorinq ekranını açma sayını azaldın. Eyni statistik görünüşləri oxuyan digər monitorinq alətlərindən gələn ifadələr də burada qruplaşdırılır.",
+        "MONITOR": "dbms.pi-nin öz toplama sorğusu. schema.pi bağlantısı yalnız statistik görünüşləri və kataloqları (pg_stat_*, pg_catalog) sabit ifadələrlə oxuyur, buna görə də bu, iş sorğusu deyil və müştəri tərəfindən heç bir tədbir tələb olunmur. Əgər hədəf verilənlər bazasının yüklənməsi problemdirsə, toplama düyməsini və ya monitorinq ekranını açma tezliyini azaldın. Eyni statistik görünüşləri oxuyan digər monitorinq alətlərindən gələn ifadələr də burada qruplaşdırılır.",
         "UNKNOWN": "Mənbəyə dair heç bir ipucu yoxdur. Hər əlaqədə application_name təyin edin və hesabları məqsədə görə bölün; növbəti nümunələrdən təsnif ediləcək."
       },
       "detail": {
@@ -1123,7 +1123,7 @@
         "period": "Müşahidə edildi",
         "none": "(boş)"
       },
-      "noSample": "Hələ nümunələr yoxdur — monitorinq lövhəsini və ya Fəaliyyət və kilidlər sekmesini görüntülədiyiniz zaman işləyən sessiyalar nümunə götürülür. Hələlik yalnız hesab adına görə təsnif edilir.",
+      "noSample": "Hələ nümunələr yoxdur. Monitorinq Paneli və ya Fəaliyyət/Kilidlər tablarına baxarkən işləyən sessiyalar nümunələr kimi toplanır. Hal-hazırda, onlar yalnız istinad üçün hesab adına görə təsnif edilir.",
       "verOff": "Bu DB PostgreSQL 14-dən köhnədir, buna görə işləyən sessiyalarda sorğu ID-si yoxdur. Yalnız hesab (dəqiq) göstərilir.",
       "privOff": "Bağlantı hesabı digər hesabların sessiya detallarını görə bilmir, buna görə nümunələr toplanmır. DB administratorundan GRANT pg_read_all_stats TO {user}; əmrini işə salmasını xahiş edin.",
       "linkUsr": "bağlantı hesabı",
@@ -1134,11 +1134,11 @@
     "diag": {
       "title": "Səbəbi diaqnoz edin",
       "fix": "Fəaliyyət:",
-      "none": "Statistikalarla heç bir səbəb aşkar edilməyib — SQL Tuning-də icra planını yoxlayın.",
-      "cum": "Bu intervalda zəng yoxdur — kumulyativ (statistikalar sıfırlandıqdan sonra)",
-      "basis": "Əsas — Maksimum 1 dəfə {max}ms · Orta {mean}ms · Zənglər {calls} · Hər zəngə düşən sətirlər {rpc} · Disk oxuma nisbəti {read} · Müvəqqəti bloklar {tmp}",
+      "none": "Statistika ilə heç bir səbəb aşkar edilməyib. Yoxlamaq üçün SQL Tuning-də icra planını açın.",
+      "cum": "Bu intervalda zənglər yoxdur: Yığılmış (statistika sıfırlanmasından bəri)",
+      "basis": "Əsas: Maksimum tək {max}ms · Orta {mean}ms · Zənglər {calls} · Hər zəngə düşən sətirlər {rpc} · Disk oxuma nisbəti {read} · Müvəqqəti bloklar {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi öz-özünə toplama sorğusu — yalnız statistik görünüşləri/kataloqları oxuyan monitorinq ifadəsi.",
+        "cause": "dbms.pi-nin öz toplama sorğusu: Yalnız statistik görünüşləri və kataloqları oxuyan monitorinq ifadəsi.",
         "fix": "Müştəri tədbiri tələb olunmur. Əgər hədəf verilənlər bazasının yüklənməsi problemdirsə, toplama/monitorinq ekranını açma sayını azaldın."
       },
       "NO_MAX": {
@@ -1146,31 +1146,31 @@
         "fix": "Dəqiq diaqnoz üçün maksimum dəyərləri doldurmaq üçün indi bir dəfə 'Topla' düyməsini basın."
       },
       "SLOW_EACH": {
-        "cause": "Həmişə Yavaş — Hər dəfə işləyəndə uzun çəkir, maksimum {max}ms və orta {mean}ms.",
+        "cause": "Hər dəfə yavaş: Hər icra zamanı maksimum {max}ms və orta {mean}ms ilə uzun çəkir.",
         "fix": "① 'SQL Tuning-də aç' ilə icra planını açın. ② Əgər tam skanlar (Seq Scan) və ya böyük sıralamalar varsa, WHERE/JOIN şərt sütunlarındakı indeksləri nəzərdən keçirin. ③ Yalnız zəruri sütunları/sətirləri oxumaq üçün şərtləri daraldın."
       },
       "SPIKE": {
-        "cause": "Aralıqlı Gecikmə — Orta {mean}ms, lakin bəzən maksimum {max}ms ({x} dəfə orta) ilə uzun çəkir.",
+        "cause": "Fasiləli gecikmə: Orta {mean}ms, lakin bəzən maksimum {max}ms ({x} dəfə orta) ilə uzun çəkir.",
         "fix": "① Yavaş olduqda, Fəaliyyət/Kilidlər tabında kilid gözləmələrini (wait_event) yoxlayın. ② Əgər yalnız ilk icra yavaşdırsa, keş boş idi və disk oxundu. ③ İcra planının dəyərlərə əsasən dəyişib-dəyişmədiyini görmək üçün SQL Tuning-də eyni sorğunu müxtəlif dəyərlərlə müqayisə edin."
       },
       "DISK_READ": {
-        "cause": "Keş Miss — Oxunan blokların {pct}%-i ({read} blok) yaddaşdan deyil, diskdən oxundu.",
+        "cause": "Keş miss: Oxunan blokların {pct}%-i ({read} blok) yaddaşdan deyil, diskdən oxundu.",
         "fix": "① İndekslərlə oxuma diapazonunu azaldın. ② Sorğu müddətini/şərtlərini daraldın. ③ Əgər tez-tez oxunan məlumatlar yüksək qalırsa, shared_buffers (yaddaş) nəzərdən keçirin."
       },
       "TEMP_SPILL": {
-        "cause": "Yaddaş Daşması — Sıralama/heş work_mem-i aşdı və müvəqqəti fayllara {blk} blok (təxminən {mb}MB, hər zəngə {perCall} blok) yazdı.",
+        "cause": "Yaddaş daşqını: Sıralama/hash work_mem-i aşdı və müvəqqəti fayllara {blk} blok (təxminən {mb}MB, hər zəngə {perCall} blok) yazdı.",
         "fix": "① ORDER BY/GROUP BY sütunlarına indekslər yerləşdirmək sıralamanı atlayır. ② Əvvəlcə sıralanacaq sətirlərin sayını azaldın (LIMIT daxilində). ③ Tamamilə zəruridirsə, yalnız bu sorğu əməliyyatı üçün SET LOCAL work_mem-i artırın."
       },
       "MANY_ROWS": {
-        "cause": "Həddindən artıq Çıxarış — Hər zəngə {perCall} sətir gətirir.",
+        "cause": "Həddindən artıq sorğu: Hər zəngə {perCall} sətir gətirir.",
         "fix": "① Ekran siyahıları səhifə-səhifə alınır. ② SELECT yalnız istifadə olunan sütunları seçir. ③ Aqreqasiyalar verilənlər bazasında aparılır və yalnız nəticələr alınır."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST daxili filtr (!inner) ifadəsi — uşaq şərtləri ilə valideynləri filtrləmək təsnifat şərtlərindən əvvəl bütün dəsti skan edə bilər.",
+        "cause": "PostgREST daxili filtr (!inner) ifadəsi: Uşaq şərtlərinə görə valideynləri filtrləmək, təsnifat şərtindən əvvəl bütün cədvəli skan edə bilər.",
         "fix": "① Birləşmə açarları və filtr sütunlarında indekslərin olub olmadığını yoxlayın. ② Filtləri ana cədvəlin şərtlərinə köçürün. ③ Uşaqları artıq mövcud olan ana sorğuya daxil edin və ya onları tək bir verilənlər bazası funksiyasına birləşdirin."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET Səhifələmə — Sonrakı səhifələr üçün əvvəlki sətirləri oxuyub atdığı üçün getdikcə yavaşlayır.",
+        "cause": "OFFSET səhifələmə: Sonrakı səhifələr əvvəlki sətirləri oxuyur və atır, getdikcə daha yavaş olur.",
         "fix": "Son qəbul edilmiş açardan sonra oxuyan açar dəsti səhifələməsinə (WHERE id > last_id ORDER BY id LIMIT n) dəyişdirin."
       }
     }
@@ -1203,8 +1203,8 @@
       "toDraft": "Seçilmiş {n} ədədindən boru kəməri qaralaması yarat"
     },
     "ready": {
-      "ok": "WAL məntiqi replikasiya hazırdır — PK olan cədvəllər LOGICAL istifadə edə bilər",
-      "no": "WAL məntiqi replikasiya hazır deyil — sorğu və ya açar müqayisəsi ilə tutun",
+      "ok": "WAL məntiqi replikasiya hazırdır: PK-si olan cədvəllər LOGICAL metodundan istifadə edə bilər.",
+      "no": "WAL məntiqi replikasiya hazır deyil: Polinq/açar müqayisə metodu ilə toplayın.",
       "senders": "{n} replikasiya bağlantısı"
     },
     "adapter": {
@@ -1219,20 +1219,20 @@
       "HAS_SOFT_DEL": "Yumşaq silmə sütunu var",
       "NO_SOFT_DEL": "Yumşaq silmə sütunu yoxdur",
       "HAS_PK": "Əsas açar var",
-      "NO_PK": "Əsas açar yoxdur — dəyişdirilmiş sətirlər müəyyən edilə bilməz",
+      "NO_PK": "PK yoxdur: Dəyişdirilmiş sətirləri müəyyən etmək mümkün deyil.",
       "DELETE_UNSEEN": "Sorğu fiziki DELETE-ləri tuta bilməz (yumşaq silmə sütunu tövsiyə olunur)",
       "LOGICAL_NOT_READY": "WAL məntiqi replikasiya hazır olduqdan sonra LOGICAL-a keçə bilər",
-      "FULL_RELOAD_ONLY": "PK və ya dəyişiklik vaxtı sütunu yoxdur, buna görə artan tutma yoxdur — PK əlavə edin",
+      "FULL_RELOAD_ONLY": "PK/dəyişiklik vaxtı yoxdur, buna görə artan toplama mümkün deyil: PK əlavə etmək tövsiyə olunur.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level logical deyil (dəyişdirmək DB-nin yenidən başlamasını tələb edir)",
       "NO_SLOTS": "max_replication_slots 0-dır",
       "NO_SENDERS": "max_wal_senders 0-dır",
-      "IS_STANDBY": "Gözləmə serveri — əsasdan məntiqi replikasiya götürün",
+      "IS_STANDBY": "Gözləmə serveri: Əsas serverdən məntiqi replikasiya qəbul edin.",
       "SETTINGS_UNKNOWN": "Parametrlər oxuna bilmədi, hazırlıq vəziyyəti naməlumdur"
     },
     "ed": {
       "title": "Boru kəməri tərifləri",
-      "draftOnly": "Yalnız dizayn — qaralama (DRAFT) kimi saxlanılır",
+      "draftOnly": "Yalnız dizayn: Yalnız DRAFT kimi saxlayın.",
       "new": "Yeni boru kəməri",
       "empty": "Saxlanmış boru kəmərləri yoxdur",
       "manual": "Əl ilə",
@@ -1301,8 +1301,8 @@
     },
     "warn": {
       "none": "Qeyri-adi xəbərdarlıq yoxdur.",
-      "SEQ_SCAN_LARGE": "{relation} üzərində tam skan (təxminən {rows} sətir) — filtr sütunlarında bir indeks nəzərdən keçirin.",
-      "NESTED_LOOP_HIGH": "İç-içə dövrə təxminən {rows} sətir istehsal edir — bir hash və ya birləşmə birləşməsi, ya da birləşmə şərtində bir indeks nəzərdən keçirin.",
+      "SEQ_SCAN_LARGE": "{relation} cədvəli tam skan edir (təxmini {rows} sətir): Şərt sütunlarındakı indeksləri nəzərdən keçirin.",
+      "NESTED_LOOP_HIGH": "Daxili dövr nəticəsi təxminən {rows} sətirdir. Hash/merge birləşmələrini və ya birləşmə şərtləri üzrə indeksləri nəzərdən keçirin.",
       "SORT_SPILL": "Sıralama ölçüsü təxminən {kb}KB-dır, standart work_mem (4MB) üzərindədir; diskə yayıla bilər."
     },
     "lint": {
@@ -1316,14 +1316,14 @@
         "char": "simvol"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — yalnız ehtiyac duyduğunuz sütunları seçin (əlavə I/O, əhatə edən indeks yoxdur).",
-        "FUNC_ON_COLUMN": "Filtr sütunu {column} bir funksiya və ya ifadəyə bükülmüşdür, buna görə indeksi istifadə edilə bilməz — əvəzinə sabiti çevirin.",
-        "LEADING_WILDCARD": "Önündə % olan LIKE B-tree indeksini istifadə edə bilməz — pg_trgm GIN indeksini nəzərdən keçirin.",
-        "OR_DIFF_COLUMNS": "Fərqli sütun şərtləri OR ilə birləşdirilib — UNION ilə ayırmağı (UNION ALL olarsa, dublikat istisna şərti əlavə etməyi) və ya sütun üzrə indeksləri nəzərdən keçirməyi düşünün.",
-        "IMPLICIT_CAST": "{column} dırnaq içindəki bir rəqəmlə müqayisə edilir — sütun və sabit tiplərini uyğunlaşdırın (örtülü çevrilmə).",
-        "NOT_IN_SUBQUERY": "NOT IN (alt sorğu) NULL-lar mövcud olduqda heç nə qaytarmır və yavaşdır — NOT EXISTS istifadə edin.",
-        "NO_WHERE": "WHERE bəndi yoxdur — böyük bir cədvəldə bu tam skandır (bir şərt və ya LIMIT əlavə edin).",
-        "DOMAIN_MISMATCH": "{column} standart domenə görə {expected} tipidir, lakin başqa bir tip sabitlə müqayisə edilir — örtülü çevrilmə indeks istifadəsini əngəlləyə bilər."
+        "SELECT_STAR": "SELECT *: Yalnız zəruri sütunları seçin (lazımsız I/O, əhatə edən indeks mümkün deyil).",
+        "FUNC_ON_COLUMN": "Şərt sütunu {column} funksiya/əməliyyatla işlənir, buna görə indekslər istifadə edilə bilməz. Sabit tərəfi işləyin.",
+        "LEADING_WILDCARD": "Önündə % olan LIKE B-tree indeksindən istifadə edə bilməz. pg_trgm GIN indekslərini nəzərdən keçirin.",
+        "OR_DIFF_COLUMNS": "Fərqli sütun şərtləri OR ilə qruplaşdırılıb. UNION ayrılmasını (UNION ALL olarsa dublikat istisna şərti əlavə edin) və ya sütun üzrə indeksləri nəzərdən keçirin.",
+        "IMPLICIT_CAST": "{column} dırnaq içindəki rəqəmlə müqayisə edilir. Sütun tipini və sabit tipini uyğunlaşdırın (örtülü tip çevrilməsi).",
+        "NOT_IN_SUBQUERY": "NOT IN (alt sorğu) NULL-lar qarışdırılarsa boş və yavaş ola bilər. NOT EXISTS-ə dəyişdirin.",
+        "NO_WHERE": "WHERE şərti yoxdur. Böyük cədvəldirsə, tam skandır (LIMIT və ya şərtlər əlavə edin).",
+        "DOMAIN_MISMATCH": "{column} standart domenə görə {expected} tipindədir, lakin fərqli tipdə bir sabitlə müqayisə edilir. Örtülü tip çevrilməsi indeks istifadəsini əngəlləyə bilər."
       }
     },
     "saved": {
@@ -1349,12 +1349,12 @@
     },
     "ai": {
       "title": "AI tənzimləmə məsləhəti",
-      "intro": "Məsləhət yaratmaq üçün yadda saxlanmış planlardan birini seçin. Yalnız SQL və sabitləri ? kimi maskalanmış planlar göndərilir (əgər açar yoxdursa və ya uğursuz olarsa, qayda əsaslı məsləhət). Link sahibi təsdiq etdikdən sonra, eyni SQL üçün izahı yenidən işə salın, onu yadda saxlayın və daha sonra həmin planla təsirini ölçün — yalnız bundan sonra tətbiq edilmiş kimi qeydə alınır.",
+      "intro": "Məsləhət yaratmaq üçün yadda saxlanmış planlardan birini seçin. Yalnız SQL və sabitləri ? kimi maskalanmış planlar göndərilir (əgər açar yoxdursa və ya uğursuz olarsa, qayda əsaslı məsləhət). Link sahibi təsdiq etdikdən sonra, eyni SQL üçün izahı yenidən işə salın, onu yadda saxlayın və daha sonra həmin planla təsirini ölçün : yalnız bundan sonra tətbiq edilmiş kimi qeydə alınır.",
       "pickPlan": "Məsləhət üçün yadda saxlanmış planı seçin",
       "create": "Məsləhət yarat",
       "creating": "Yaradılır… (30 saniyəyə qədər)",
       "noPlans": "Yadda saxlanmış plan yoxdur. Yuxarıda izah planına baxın və onu yadda saxlayın.",
-      "note": "Hər plana bir məsləhət. Yenidən yaratmaq üçün mövcud məsləhəti silin. DDL yalnız təklif olunur — onu schema.pi-də tətbiq edin.",
+      "note": "Hər plana bir məsləhət. Yenidən yaratmaq üçün mövcud məsləhəti silin. DDL yalnız təklif olunur : onu schema.pi-də tətbiq edin.",
       "empty": "Hələ məsləhət yoxdur.",
       "noItems": "Bu plan üçün heç bir təkmilləşdirmə tapılmadı.",
       "cost": "Əvvəlki xərc",
@@ -1396,10 +1396,10 @@
       "copy": "Kopyala",
       "copied": "Kopyalandı",
       "rule": {
-        "SEQ_SCAN_INDEX": "{relation} tam skanı — filtr sütunu {column} üzərində indeks yaradın (indeks adındakı NN-i ardıcıllıq nömrəsi ilə əvəz edin).",
-        "SEQ_SCAN_STATS": "{relation} tam skanı — filtr sütunlarını yoxlayın və statistikaların (ANALYZE) aktual olduğundan əmin olun.",
-        "NESTED_LOOP": "Daxili dövrə {rows} sətir gözləyir — statistikaları yeniləyin və birləşmə açarı indekslərini və ya heş birləşməsini nəzərdən keçirin.",
-        "SORT_SPILL": "Təxminən {kb} KB ölçüsündə çeşidləmə diskə yayıla bilər — sessiya work_mem-i artırmağı və ya çeşidləmə sütunlarını indeksləməyi nəzərdən keçirin.",
+        "SEQ_SCAN_INDEX": "{relation} tam skan: Şərt sütunu {column} üzərində indeks yaradın (indeks adı NN ardıcıl nömrə ilə əvəz olunacaq).",
+        "SEQ_SCAN_STATS": "{relation} tam skan: Şərt sütunlarını yoxlayın və statistikanın (ANALYZE) aktual olduğundan əmin olun.",
+        "NESTED_LOOP": "Daxili dövr nəticəsi təxminən {rows} sətirdir: Statistikaları yeniləyin və birləşmə şərtləri indekslərini və ya hash birləşmələrini nəzərdən keçirin.",
+        "SORT_SPILL": "Sıralama təxminən {kb}KB ilə diskə daşına bilər. Sessiya work_mem-i artırmağı və ya sıralama sütunları üzərində indeksləri nəzərdən keçirin.",
         "SELECT_STAR": "SELECT * əvəzinə yalnız ehtiyacınız olan sütunları seçin (daha az I/O, əhatə edən indekslər mümkündür).",
         "FUNC_ON_COLUMN": "Filtr sütunu {column} üzərindəki funksiyanı/ifadəni sabit tərəfə keçirin (indeks istifadəsini təmin edir).",
         "IMPLICIT_CAST": "{column} və sabitin tiplərini uyğunlaşdırın (gizli tip çevrilməsini aradan qaldırın).",
@@ -1459,9 +1459,9 @@
     },
     "desc": {
       "FREE": "Kəşf et və öyrən",
-      "D1": "Operator — Verilənlər bazasının indi yaxşı olub-olmadığını yoxlayır",
-      "D2": "Tərtibatçı və Tənzimləyici — Yavaş SQL-i düzəldir",
-      "D3": "DBA və DA — Əməliyyat təhlükəsizliyindən tətbiqə və gölə qədər"
+      "D1": "Operator: Verilənlər bazasının indi sağlam olub olmadığını yoxlayır.",
+      "D2": "Tərtibatçı/Tənzimləyici: Yavaş SQL-i düzəldir.",
+      "D3": "DBA/DA: Əməliyyat təhlükəsizliyi, miqrasiya və hətta data lake."
     },
     "feat": {
       "FREE": "Monitorinq lövhəsi, icra planı görünüşü, əsas öyrənmə",
@@ -1504,7 +1504,7 @@
       "required": "Bu funksiya {plan} planından etibarən mövcuddur.",
       "limit": "Bu dövr üçün bütün mövcud cəhdlərdən istifadə etdiniz. {plan} planına yüksəltməklə daha çox istifadə edə bilərsiniz.",
       "limitTop": "Bu dövr üçün bütün mövcud cəhdlərdən istifadə etdiniz. Növbəti dövrdə yenidən istifadə edə bilərsiniz.",
-      "expired": "schema.pi planınızın müddəti bitmişdir — zəhmət olmasa, schema.pi plan ekranında ödəniş edin.",
+      "expired": "schema.pi planınızın müddəti bitmişdir. Zəhmət olmasa schema.pi plan ekranında ödəniş edin.",
       "go": "Plana bax",
       "close": "Bağla"
     }

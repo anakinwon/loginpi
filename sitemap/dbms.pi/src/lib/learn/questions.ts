@@ -78,7 +78,7 @@ export const QUESTIONS: Question[] = [
     plan: { 'Node Type': 'Nested Loop', 'Plan Rows': 50, 'Actual Rows': 50000, Plans: [{ 'Node Type': 'Seq Scan', 'Plan Rows': 50, 'Actual Rows': 50000 }, { 'Node Type': 'Index Scan', 'Actual Loops': 50000 }] },
     choices: ['인덱스가 너무 많다', '선행 테이블 통계가 낡아 건수를 1,000배 과소 추정했다', '디스크가 느리다', 'Nested Loop 는 항상 나쁘다'],
     answer: 1,
-    expl: '예상 50 대 실제 50,000 — 카디널리티 오추정이 조인 방식 선택을 망쳤다. ANALYZE 로 통계를 갱신하면 Hash Join 으로 바뀔 가능성이 크다.',
+    expl: '예상 50 대 실제 50,000 : 카디널리티 오추정이 조인 방식 선택을 망쳤다. ANALYZE 로 통계를 갱신하면 Hash Join 으로 바뀔 가능성이 크다.',
   },
   {
     id: 'q09', topic: 'PARTITION', level: 1,
@@ -112,14 +112,14 @@ export const QUESTIONS: Question[] = [
   {
     id: 'q13', topic: 'NORMAL', level: 2,
     q: '주문상품(주문번호, 상품번호, 수량, 상품명) 에서 주식별자는 (주문번호, 상품번호) 이다. 상품명 때문에 위반되는 정규형은?',
-    choices: ['1NF', '2NF — 상품명이 상품번호에만 종속(부분 종속)', '3NF', '위반 없음'],
+    choices: ['1NF', '2NF : 상품명이 상품번호에만 종속(부분 종속)', '3NF', '위반 없음'],
     answer: 1,
     expl: '상품명은 복합 식별자의 일부(상품번호)에만 종속되므로 부분 함수 종속, 2NF 위반이다. 상품 엔터티로 분리한다.',
   },
   {
     id: 'q14', topic: 'NORMAL', level: 2,
     q: '사원(사원번호, 부서코드, 부서명) 에서 부서명은 부서코드에 종속된다. 위반한 정규형과 해결은?',
-    choices: ['1NF — 칼럼 분할', '2NF — 식별자 변경', '3NF — 부서 엔터티로 분리(이행 종속 제거)', 'BCNF — 사원번호 삭제'],
+    choices: ['1NF : 칼럼 분할', '2NF : 식별자 변경', '3NF : 부서 엔터티로 분리(이행 종속 제거)', 'BCNF : 사원번호 삭제'],
     answer: 2,
     expl: '사원번호 → 부서코드 → 부서명 의 이행 함수 종속이다. 부서(부서코드, 부서명) 로 분리해 3NF 를 만족시킨다.',
   },
@@ -161,7 +161,7 @@ export const QUESTIONS: Question[] = [
   {
     id: 'q20', topic: 'LOCK', level: 1,
     q: '세션 A 가 행 X 를, 세션 B 가 행 Y 를 잠근 뒤 A 는 Y, B 는 X 를 기다린다. 이 상황과 DBMS 의 처리는?',
-    choices: ['라이브락 — 둘 다 무한 대기', '교착 상태(Deadlock) — DBMS 가 감지해 한쪽 트랜잭션을 오류로 끝낸다', '정상 대기 — 곧 풀린다', '테이블 잠금으로 자동 승격'],
+    choices: ['라이브락 : 둘 다 무한 대기', '교착 상태(Deadlock) : DBMS 가 감지해 한쪽 트랜잭션을 오류로 끝낸다', '정상 대기 : 곧 풀린다', '테이블 잠금으로 자동 승격'],
     answer: 1,
     expl: 'PostgreSQL 은 deadlock_timeout 뒤 순환 대기를 감지해 한쪽에 40P01 오류를 낸다. 예방책은 여러 행을 항상 같은 순서(예: 키 오름차순)로 잠그는 것이다.',
   },

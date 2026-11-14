@@ -502,7 +502,7 @@ function TopTab({
                       </td>
                       <td className={`${TD} text-right`}>{fmtNum(r.calls)}</td>
                       <td className={`${TD} text-right`}>
-                        {r.maxMs == null ? '—' : fmtNum(r.maxMs)}
+                        {r.maxMs == null ? '-' : fmtNum(r.maxMs)}
                       </td>
                       <td className={`${TD} text-right`}>
                         {fmtNum(r.totalMs)}
@@ -582,7 +582,7 @@ function SrcBadge({
       type="button"
       className="flex min-h-9 flex-col items-start gap-0.5 text-left"
       aria-expanded={open}
-      aria-label={`${t('top.srcToggle')} — ${label}`}
+      aria-label={`${t('top.srcToggle')} : ${label}`}
       onClick={onToggle}
     >
       <span
@@ -616,7 +616,7 @@ function DiagBlock({ r: row }: { r: TopRow }) {
   })
   const fmtP = (p: Record<string, number>) =>
     Object.fromEntries(Object.entries(p).map(([k, v]) => [k, fmtNum(v)]))
-  const na = '—'
+  const na = '-'
   const readPct =
     r.blkHit != null && r.blkRead != null && r.blkHit + r.blkRead > 0
       ? `${fmtNum((r.blkRead / (r.blkHit + r.blkRead)) * 100)}%`

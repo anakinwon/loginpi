@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analitik & Tasik",
     "intro": "KPI aktiviti dbms, reka bentuk tasik tiga lapisan dan katalog set data di satu tempat.",
-    "storageNotice": "Storan tasik (pihak pelanggan atau awan) belum diputuskan (PRD seksyen 10 #7). Hanya reka bentuk dan pemetaan nama disimpan buat masa ini — tiada data baris.",
+    "storageNotice": "Storan tasik (pihak pelanggan atau awan) belum diputuskan (PRD seksyen 10 #7). Hanya reka bentuk dan pemetaan nama disimpan buat masa ini : tiada data baris.",
     "noLink": "Pilih atau daftar pautan schema.pi terlebih dahulu.",
     "goConnect": "Daftar pautan",
     "loading": "Memuatkan…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Analisis GAP — Model↔DB",
+    "title": "Analisis GAP: Model↔DB",
     "intro": "Bandingkan model reka bentuk schema.pi dan sejarah aplikasi DDL dengan katalog DB langsung untuk mencari drift, dan ukur sama ada indeks yang direka bentuk sebenarnya digunakan. Data baris pelanggan tidak pernah dibaca atau disimpan.",
     "needLink": "Pilih pautan schema.pi di atas terlebih dahulu. Jika anda tiada, daftar token dalam menu 'Pautan'.",
     "needConn": "Pilih sambungan DB untuk dibandingkan di atas.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Permintaan {id}",
     "notSaved": "Gagal menyimpan larian ini ke sejarah (hasil ditunjukkan seperti biasa).",
-    "capped": "Terlalu banyak item — menunjukkan {cap} yang pertama setiap bahagian (kiraan adalah lengkap).",
+    "capped": "Terlalu banyak item : menunjukkan {cap} yang pertama setiap bahagian (kiraan adalah lengkap).",
     "statsMissing": "Statistik penggunaan indeks tidak tersedia, jadi penggunaan tidak dapat dinilai.",
     "sum": {
       "missingTables": "Jadual tiada dalam DB",
@@ -230,7 +230,7 @@
       "USED": "Digunakan",
       "NO_STATS": "Tiada statistik",
       "CONSTRAINT": "Kekangan keunikan (kekalkan)",
-      "NO_DATA": "Tiada data atau statistik tidak dikumpul — tidak dapat menilai",
+      "NO_DATA": "Tiada data atau statistik tidak dikumpul: tidak dapat ditentukan",
       "OBSERVING": "Memerhati (kurang 7 hari)",
       "UNUSED_CAND": "Calon tidak digunakan"
     },
@@ -245,14 +245,14 @@
       "RATE": "Terlalu banyak permintaan. Sila cuba lagi dalam seminit."
     },
     "schema": "Skema",
-    "schemaHint": "Hanya jadual biasa dan berpartisi dalam skema ini dibandingkan (paparan dikecualikan). Lalai public — skema dalaman Supabase (auth, storage, …) ditinggalkan.",
-    "truncated": "{names} mencapai had {max} baris dan dipotong — beberapa hasil \"tiada dalam DB\" / \"tiada dalam model\" mungkin palsu. Kecilkan skema dan jalankan semula.",
+    "schemaHint": "Hanya membandingkan jadual biasa dan berpartisi dalam skema ini (tidak termasuk paparan). Lalai awam: Skema dalaman Supabase (auth, storage, dll.) dikecualikan.",
+    "truncated": "Pertanyaan {names} dipotong pada {max} baris. Sesetengah pengesanan 'Tiada dalam DB'/'Tiada dalam Model' mungkin positif palsu. Kecilkan skema dan kesan semula.",
     "colUnchecked": "Oleh kerana pertanyaan lajur dipotong, {n} hasil lajur hilang/tambahan dianggap tidak dapat disahkan dan dikecualikan daripada kiraan ketidakpadanan lajur.",
-    "renamed": "{n} indeks PK yang digunakan di bawah peraturan penamaan lama (_PKEY) wujud dalam DB di bawah nama baharu (PK_) — normal",
-    "superseded": "{n} permintaan lama dikecualikan kerana permintaan kemudian mencipta semula jadual yang sama (DROP … CASCADE) — normal",
+    "renamed": "{n} indeks PK yang digunakan dengan konvensyen penamaan lama (_PKEY) berada dalam DB dengan nama baharu (PK_). Normal.",
+    "superseded": "{n} permintaan sebelumnya dikecualikan daripada perbandingan kerana permintaan kemudian mencipta semula jadual yang sama (DROP … CASCADE). Normal.",
     "supersededItem": "Permintaan {id} → digantikan oleh permintaan {by}",
     "sysCols": "{n} lajur sistem (ditambah secara automatik semasa penjanaan DDL) tiada dalam model mengikut reka bentuk dan dikecualikan daripada ketidakpadanan",
-    "groupOwn": "Awalan projek {pfx} — calon hilang daripada model",
+    "groupOwn": "Awalan projek ini {pfx}: calon model yang hilang",
     "groupOther": "Sistem lain {pfx}",
     "basis": "Anggaran baris {rows} · sejak {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Jika objek masih hilang selepas penggunaan semula, syak penghapusan manual atau penggulungan semula dan semak aktiviti akaun sambungan dengan DBA anda."
       },
       "extraTables": {
-        "s1": "Gabungan awalan projek ini = calon model yang hilang — importnya ke dalam model melalui schema.pi → Tetapan → Songsang, atau putuskan sama ada untuk memadamkannya jika ia adalah jadual yang tidak digunakan.",
-        "s2": "Kumpulan awalan lain = sistem lain yang berkongsi DB ini — bukan item tindakan untuk projek ini.",
+        "s1": "Kumpulan awalan projek ini = calon model yang hilang: import ke model melalui schema.pi → Tetapan → Songsang, atau putuskan sama ada untuk memadam jika jadual tidak digunakan.",
+        "s2": "Kumpulan awalan lain = sistem lain yang menggunakan DB yang sama: bukan subjek tindakan oleh projek ini.",
         "s3": "Jika skema sasaran bukan public, tukar medan \"Skema\" di atas dan jalankan semula."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Jenis/NULL berbeza = selaraskan dengan model (sumber kebenaran); sebelum mengecilkan panjang atau beralih ke NOT NULL, sahkan baris sedia ada memenuhinya."
       },
       "idxUsage": {
-        "s1": "Sebelum mengalih keluar, semak ① tetingkap statistik meliputi sekurang-kurangnya satu kitaran perniagaan (cth. kelompok akhir bulan) — lihat \"sejak\".",
+        "s1": "Sebelum memadam, semak ① sama ada tempoh pengumpulan statistik sekurang-kurangnya satu kitaran operasi (cth., kelompok akhir bulan): rujuk tarikh rujukan.",
         "s2": "② Ia bukan indeks unik/PK (yang menunjukkan secara berasingan sebagai \"kekangan keunikan\").",
         "s3": "③ EXPLAIN SQL wakil jadual dalam SQL Tuning dan sahkan indeks ini tidak digunakan.",
         "s4": "Setelah ketiga-tiganya disahkan, alih keluar indeks daripada model dalam schema.pi dan gunakan melalui DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Cara mengeluarkan token sambungan",
     "how1": "Log masuk ke schema.pi dan buka bidang subjek untuk disambungkan",
     "how2": "Pergi ke Bidang subjek → Tetapan → Token sambungan dan tekan 'Keluarkan token' (pentadbir kawasan atau peranan DA)",
-    "how3": "Salin token yang bermula dengan slk_ — ia hanya ditunjukkan sekali apabila dikeluarkan",
+    "how3": "Salin token yang bermula dengan slk_ yang telah dikeluarkan. Yang asal hanya dipaparkan sekali pada masa pengeluaran.",
     "how4": "Tampal di bawah dan daftar",
     "openSchema": "Buka schema.pi",
     "registerTitle": "Daftar sambungan",
@@ -384,7 +384,7 @@
     "retry": "Cuba lagi",
     "pickerLink": "Pautan",
     "pickerConn": "Sambungan",
-    "pickerEmpty": "Tiada sambungan —",
+    "pickerEmpty": "Tiada sambungan.",
     "pickerGo": "daftar satu di /connect",
     "errors": {
       "LINK_AUTH": "Token sambungan telah tamat tempoh atau dibatalkan. Keluarkan token baharu dalam schema.pi dan daftar semula",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Migrasi Data (PiMig)",
-    "intro": "Mengira susunan muatan jadual dari hubungan dalam model reka bentuk schema.pi anda, menyusun saiz cebisan, paralelisme dan senarai semak cutover, dan menjana SQL pengesahan yang anda jalankan sendiri pada sumber dan sasaran. Skrin ini hanya merancang dan menyemak — ia tidak memindahkan data atau membaca baris DB pelanggan.",
+    "intro": "Mengira susunan muatan jadual dari hubungan dalam model reka bentuk schema.pi anda, menyusun saiz cebisan, paralelisme dan senarai semak cutover, dan menjana SQL pengesahan yang anda jalankan sendiri pada sumber dan sasaran. Skrin ini hanya merancang dan menyemak : ia tidak memindahkan data atau membaca baris DB pelanggan.",
     "needLink": "Pilih pautan schema.pi di atas terlebih dahulu. Jika anda tiada, daftar token di bawah 'Sambung'.",
     "loading": "Memuatkan…",
     "newPlan": "Pelan migrasi baharu",
@@ -432,8 +432,8 @@
     "optsHint": "Paralelisme ialah bilangan jadual yang dimuatkan pada masa yang sama dalam satu tahap. Saiz ketulan ialah unit komit (baris) yang akan digunakan oleh enjin pelaksanaan.",
     "order": "Susunan muatan",
     "orderHint": "Disusun secara topologi mengikut hubungan reka bentuk (bukan FK fizikal) supaya jadual induk didahulukan. Jadual dalam tahap yang sama tidak bergantung antara satu sama lain dan boleh dimuatkan secara selari.",
-    "cycles": "{n} kumpulan kitaran — diletakkan pada tahap yang sama. Tetapkan susunan secara manual dan tangguhkan semakan rujukan sehingga selepas pemuatan.",
-    "selfRefs": "Jadual rujukan sendiri (hierarki) — muatkan baris induk dahulu dalam jadual",
+    "cycles": "{n} kitaran: diletakkan pada peringkat yang sama. Tetapkan susunan pemuatan secara manual dan tangguhkan semakan rujukan sehingga selepas pemuatan.",
+    "selfRefs": "Jadual rujukan sendiri (hierarki): baris induk dahulu dalam jadual yang sama.",
     "level": "Tahap {n}",
     "checklist": "Senarai semak cutover",
     "toReady": "Tandakan sebagai sedia",
@@ -471,7 +471,7 @@
     },
     "verify": "SQL Pengesahan",
     "verifyHint": "Menjana kiraan, jumlah lajur berangka, kunci pendua dan pertanyaan hash kunci bagi setiap jadual mengikut susunan muatan. Jalankan sendiri pada sumber dan sasaran dan bandingkan (skrin ini tidak melaksanakannya).",
-    "noHashOracle": "Fungsi hash Oracle·Tibero dan pemaparan teks berbeza daripada PostgreSQL, jadi pertanyaan hash diabaikan — bandingkan kiraan, jumlah dan kunci pendua.",
+    "noHashOracle": "Oracle dan Tibero meninggalkan carian hash kerana fungsi hash dan perwakilan aksara berbeza daripada PostgreSQL. Bandingkan mengikut kiraan, jumlah, dan penduaan kunci.",
     "copy": "Salin",
     "copied": "Disalin",
     "copyFail": "Tidak dapat menyalin. Pilih teks dan salin secara manual.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Permintaan tidak sah."
     },
     "board": {
-      "subtitle": "Apa yang perlu dilakukan pada DB ini sekarang — 14 isyarat OK, amaran atau risiko, dengan pembetulan, sepintas lalu.",
+      "subtitle": "Apa yang perlu dilakukan sekarang dalam DB ini: Lihat status normal, amaran, dan risiko 14 isyarat dan penyelesaiannya sepintas lalu.",
       "refresh": {
         "updated": "Sehingga {time} · disegarkan setiap minit",
         "now": "Segarkan sekarang",
@@ -564,11 +564,11 @@
         "NA": "T/A"
       },
       "overall": {
-        "RISK": "Risiko — tindakan diperlukan sekarang",
-        "WARN": "Amaran — beberapa item perlu dilihat",
-        "UNKNOWN": "Tidak diketahui — semak sambungan",
-        "OK": "OK — setiap isyarat berada dalam had",
-        "CONN_DOWN": "Tidak dapat mencapai DB — semak sambungan dahulu",
+        "RISK": "Risiko: Tindakan segera diperlukan",
+        "WARN": "Amaran: Item untuk disemak",
+        "UNKNOWN": "Tidak dapat mengesahkan: Semak status sambungan",
+        "OK": "Normal: Semua isyarat berada dalam kriteria",
+        "CONN_DOWN": "Tidak dapat menyambung ke DB. Semak sambungan dahulu.",
         "NA": "T/A"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Tunjukkan kurang",
         "setup": "Sediakan ini untuk melihat lebih banyak",
         "none": "Tiada item risiko atau amaran yang memerlukan tindakan sekarang.",
-        "unknown": "Tidak dapat menyemak {n} isyarat — lihat kad untuk sebabnya.",
+        "unknown": "Tidak dapat mengesahkan {n} item: Semak sebab pada kad.",
         "myRule": "Peraturan saya dilanggar: {rule}",
         "copySql": "Salin SQL",
         "copied": "Disalin"
@@ -622,34 +622,34 @@
         "REPL": "Kelewatan replikasi"
       },
       "fix": {
-        "AVAIL": "Respons perlahan atau permulaan semula baru-baru ini — semak tetapan sambungan dan status pelayan DB.",
-        "AVAIL_DOWN": "Tidak dapat menyambung ke DB — semak tetapan sambungan dan pastikan pelayan DB berfungsi.",
-        "CONN_USE": "{sess}/{max} sesi pada DB ini (bukan seluruh kluster — pangkalan data lain dikecualikan) — tutup sambungan terbiar atau tambah pengumpul sambungan (pgbouncer).",
-        "URL": "{n} URL yang disemak gagal · respons maks {ms}ms — lihat monitor schema.pi untuk puncanya.",
-        "LONG_QRY": "Pertanyaan telah berjalan selama {sec}s — semak rancangannya dan sesuaikannya, atau minta DBA membatalkannya.",
-        "IDLE_TX": "Transaksi telah terbiar selama {sec}s — cari komit yang hilang dalam aplikasi dan tetapkan had masa.",
-        "LOCK_WAIT": "{n} sesi sedang menunggu kunci — cari sesi yang menyekat dan tamatkan transaksinya.",
-        "CACHE_HIT": "Kadar capaian cache {pct}% — cari imbasan penuh jadual besar atau semak shared_buffers.",
-        "XACT_ERR": "Kadar rollback {pct}%, {dlck} deadlock — semak transaksi yang gagal dan log ralat aplikasi.",
-        "SLOW_SQL": "Terdapat pertanyaan yang mengambil masa sehingga {ms}ms setiap pelaksanaan — lihat pelan pelaksanaan dan tala, bermula dari masa pelaksanaan tunggal tertinggi.",
-        "STORAGE": "DB ({gb} GB) hampir mencapai hadnya (hari tinggal {days}) — bersihkan jadual besar atau tambah kapasiti.",
-        "VACUUM": "{tbl} mempunyai banyak baris mati atau statistik lapuk — semak tetapan VACUUM (ANALYZE) dan autovacuum.",
-        "INDEX": "{n} penemuan indeks (tidak sah, tidak digunakan, imbasan penuh) — lihat tab kesihatan jadual & indeks untuk sasaran.",
-        "BACKUP": "Pengarkiban WAL dimatikan atau terhenti — semak archive_mode, archive_command dan status sandaran.",
-        "REPL": "Kelewatan replikasi {sec}s — semak status siap sedia dan rangkaian.",
-        "PGSS": "pg_stat_statements tidak dipasang, jadi SQL perlahan tidak tersedia — dayakannya dengan SQL di bawah (memerlukan permulaan semula pelayan)."
+        "AVAIL": "Respons perlahan atau baru dimulakan semula. Semak maklumat sambungan dan status pelayan DB.",
+        "AVAIL_DOWN": "Gagal menyambung ke DB. Semak maklumat sambungan dan sama ada pelayan DB hidup.",
+        "CONN_USE": "Sesi DB ini {sess}/{max} (bukan seluruh kluster, sambungan DB lain dikecualikan): Bersihkan sambungan terbiar atau sediakan penyambung sambungan (pgbouncer).",
+        "URL": "{n} semakan URL gagal · Respons maksimum {ms}ms: Semak punca dalam monitor schema.pi.",
+        "LONG_QRY": "Pertanyaan telah berjalan selama {sec} saat. Semak pelan pelaksanaan dan tala, atau minta DBA menghentikannya.",
+        "IDLE_TX": "Transaksi telah dibuka dan terbiar selama {sec} saat. Cari komit yang hilang dalam aplikasi dan tetapkan had masa.",
+        "LOCK_WAIT": "{n} sesi sedang menunggu kunci: Cari sesi yang menyekat dan tamatkan transaksinya.",
+        "CACHE_HIT": "Kadar hit cache {pct}%: Cari imbasan jadual penuh bagi jadual besar atau semak shared_buffers.",
+        "XACT_ERR": "Kadar rollback {pct}%, {dlck} kebuntuan: Semak transaksi yang gagal dan log ralat aplikasi.",
+        "SLOW_SQL": "Terdapat pertanyaan dengan masa maksimum tunggal {ms}ms. Semak pelan pelaksanaan dan tala dari masa maksimum tunggal teratas.",
+        "STORAGE": "DB {gb}GB hampir mencapai hadnya (baki {days} hari). Bersihkan jadual besar atau tingkatkan kapasiti.",
+        "VACUUM": "{tbl} mempunyai banyak baris mati atau statistik yang lapuk. Semak tetapan VACUUM (ANALYZE) dan autovacuum.",
+        "INDEX": "{n} semakan indeks (tidak sah, tidak digunakan, imbasan penuh): Semak sasaran dalam tab kesihatan jadual/indeks.",
+        "BACKUP": "Pengarkiban WAL dimatikan atau dihentikan. Semak archive_mode, archive_command, dan status sandaran.",
+        "REPL": "Kelewatan replikasi {sec} saat: Semak status pelayan siap sedia dan rangkaian.",
+        "PGSS": "Sambungan pg_stat_statements tiada, jadi SQL perlahan tidak dapat dilihat. Dayakannya dengan SQL di bawah (memerlukan mulakan semula pelayan)."
       },
       "reason": {
         "CONN_DOWN": "Tidak dinilai kerana sambungan DB terputus.",
         "PGSS": "pg_stat_statements tidak dipasang.",
         "VER": "Tersedia pada PostgreSQL 13 atau lebih baru.",
         "SAMPLE": "Sampel belum mencukupi.",
-        "NO_LIMIT": "Tiada had saiz, jadi penggunaan tidak dinilai — tambah peraturan saiz DB (MB) (>) untuk menggunakannya sebagai had.",
+        "NO_LIMIT": "Penggunaan tidak ditentukan kerana tiada had kapasiti. Menambah peraturan saiz DB (MB) (>) akan menggunakannya sebagai had.",
         "RESET": "Statistik ditetapkan semula kurang daripada 7 hari yang lalu, jadi indeks yang tidak digunakan tidak dinilai.",
         "STALE": "Tiada rekod semakan baru-baru ini.",
         "STANDBY": "Tidak berkenaan pada pelayan siap sedia.",
         "NONE": "Tiada apa-apa untuk disemak.",
-        "GRANT": "Keistimewaan hilang — berikan peranan pg_monitor kepada akaun sambungan.",
+        "GRANT": "Tidak dapat melihat kerana kekurangan kebenaran. Berikan peranan pg_monitor kepada akaun sambungan.",
         "LINK": "Pertanyaan schema.pi gagal ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Jika ia tidak menstrim, semak log siap sedia."
         }
       },
-      "sqlNote": "SQL di bawah adalah baca sahaja, untuk semakan — pembetulan (VACUUM, DROP INDEX, pg_terminate_backend) dijalankan oleh DBA.",
+      "sqlNote": "SQL di bawah adalah untuk pengesahan baca sahaja. Tindakan (VACUUM, DROP INDEX, pg_terminate_backend) dilaksanakan secara langsung oleh DBA.",
       "go": {
         "activity": "Aktiviti & kunci",
         "top": "Pertanyaan perlahan",
@@ -766,8 +766,8 @@
           "tree": "Apakah yang menggunakan ruang, dan apakah yang perlu dibersihkan?"
         },
         "asTable": "Lihat sebagai jadual",
-        "needHistory": "Tiada trend lagi — biarkan skrin ini terbuka selama beberapa minit.",
-        "needPerf": "Tiada sejarah saiz — kumpul dalam tab prestasi atau biarkan skrin ini terbuka.",
+        "needHistory": "Tiada trend lagi. Ia akan dilukis jika anda membiarkan skrin ini terbuka selama beberapa minit.",
+        "needPerf": "Tiada sejarah kapasiti. Kumpul dari tab Prestasi atau biarkan skrin ini terbuka.",
         "noSess": "Tiada sesi.",
         "noWait": "Tiada tunggu",
         "noData": "Tiada apa-apa untuk ditunjukkan.",
@@ -840,17 +840,17 @@
         "noStat": "Tiada statistik"
       },
       "empty": {
-        "noConn": "Taksonomi ini tiada sambungan pelayan PostgreSQL untuk dipantau — hanya menunjukkan URL dan status perkhidmatan.",
+        "noConn": "Tiada sambungan pelayan PostgreSQL untuk dipantau dalam taksonomi ini. Hanya status URL dan pautan ditunjukkan.",
         "unsupported": "Sambungan ini tidak menyokong pemantauan (sambungan pelayan PostgreSQL sahaja).",
-        "connFail": "Tidak dapat menyambung ke pangkalan data — semak tetapan sambungan dan status DB.",
-        "linkDown": "Tidak dapat mencapai schema.pi — mencuba semula secara automatik.",
-        "linkAuth": "Token sambungan telah tamat tempoh — keluarkan token baharu dalam schema.pi dan daftarkannya.",
-        "timeout": "Respons perlahan — mencuba semula secara automatik.",
+        "connFail": "Gagal menyambung ke DB. Semak maklumat sambungan dan status DB.",
+        "linkDown": "Gagal menyambung ke schema.pi. Akan cuba semula secara automatik tidak lama lagi.",
+        "linkAuth": "Token sambungan tamat tempoh. Keluarkan semula dan daftar token dari schema.pi.",
+        "timeout": "Respons perlahan. Akan cuba semula secara automatik tidak lama lagi.",
         "rate": "Terlalu banyak permintaan, jadi selang penyegaran telah ditingkatkan."
       },
       "aux": {
         "rules": "Peraturan amaran saya ({n} aktif)",
-        "schemaSvc": "Status perkhidmatan — respons schema.pi",
+        "schemaSvc": "Status pautan: respons perkhidmatan schema.pi",
         "schemaSvcNote": "Metrik aplikasi untuk 60 minit terakhir yang disimpan oleh schema.pi.",
         "source": "Sumber data: DB sasaran adalah baca sahaja melalui pertanyaan bernama schema.pi (baca sahaja); trend menyimpan statistik hanya dalam dbms.pi (tiada data baris)."
       }
@@ -866,10 +866,10 @@
     "noRun": "Tiada diagnosis lagi. Tekan \"Jalankan diagnosis\"",
     "lastRun": "Diagnosis terakhir {dtm}",
     "readOnly": "Diagnosis hanya membaca (SELECT). Nasihat adalah panduan dan bergantung pada memori pelayan, beban dan beban kerja",
-    "truncated": "Terlalu banyak objek — hanya 500 yang pertama disemak",
+    "truncated": "Terlalu banyak objek : hanya 500 yang pertama disemak",
     "paramsNote": "Jumlah memori pelayan tidak diketahui, jadi ia dianggarkan daripada shared_buffers ≈ 25% RAM. random_page_cost menganggap SSD",
     "auditNote": "Jadual dengan RLS dimatikan dan akaun yang tidak digunakan akan disemak setelah pertanyaan pautan menyokongnya",
-    "replNote": "Garis dasar ialah Active-Standby (A-S) — satu primary + standby. Lag main semula ≥ 5s = amaran, ≥ 60s = risiko (rujukan RPO yang diukur)",
+    "replNote": "Kriteria utama ialah Active-Standby (A-S): 1 Primary + Standby. Amaran untuk kelewatan main semula >= 5 saat, risiko untuk >= 60 saat (rujuk ukuran RPO sebenar).",
     "lagIdle": "Tiada perubahan",
     "pager": "Penomboran",
     "prev": "Sebelum",
@@ -939,11 +939,11 @@
       "st_ok": "Tamat masa pernyataan ditetapkan",
       "iit_off": "Tiada tamat masa melahu dalam transaksi (0). Boleh menyebabkan pegangan kunci dan pembengkakan",
       "iit_ok": "Tamat masa melahu dalam transaksi ditetapkan",
-      "ckpt_short": "Selang titik semak adalah 5 minit atau kurang. Pertimbangkan 10–15 minit untuk beban tulis yang berat",
+      "ckpt_short": "Selang titik semak adalah 5 minit atau kurang. Pertimbangkan 10~15 minit untuk beban tulis yang berat",
       "ckpt_ok": "Dalam julat yang munasabah",
       "wal_minimal": "wal_level=minimal menjadikan PITR dan replikasi mustahil. Gunakan replika atau lebih tinggi",
       "wal_ok": "Tahap WAL menyokong PITR dan replikasi",
-      "rpc_hdd": "Lalai HDD (4). Untuk SSD, 1.1–2 disyorkan",
+      "rpc_hdd": "Lalai HDD (4). Untuk SSD, 1.1~2 disyorkan",
       "rpc_ok": "Sesuai untuk SSD",
       "super_many": "Dua atau lebih superuser. Simpan satu untuk pentadbiran dan berikan hanya keistimewaan yang diperlukan kepada yang lain",
       "super_ok": "Paling banyak satu superuser",
@@ -1022,7 +1022,7 @@
       "intro": "Kumpul sekarang membaca statistik pertanyaan teratas, jadual, indeks dan saiz sekali dan menyimpannya sebagai capaian pantas. Kumpul sekurang-kurangnya dua kali untuk melihat perubahan dan trend saiz",
       "run": "Kumpul sekarang",
       "running": "Mengumpul…",
-      "done": "Dikumpul pada {dtm} — {qry} pertanyaan · {tbl} jadual · {idx} indeks",
+      "done": "Pengumpulan selesai {dtm}: {qry} pertanyaan · {tbl} jadual · {idx} indeks",
       "auto": {
         "title": "Koleksi automatik",
         "desc": "Apabila dihidupkan, sambungan ini dikumpul secara automatik setiap hari pada jam 3 pagi (waktu Korea). Selepas 7 hari atau lebih, anda boleh bergantung pada kedudukan pertanyaan perlahan dan senarai indeks yang tidak digunakan",
@@ -1044,13 +1044,13 @@
       "sortCalls": "Panggilan",
       "empty": "Tiada capaian pantas lagi. Tekan Kumpul sekarang pada tab Kumpul",
       "range": "Perubahan antara {from} → {to}",
-      "first": "Capaian pantas pertama pada {dtm} — nilai kumulatif (perubahan daripada capaian pantas seterusnya)",
+      "first": "Pengumpulan pertama {dtm}: Kumulatif (peningkatan/penurunan dari pengumpulan seterusnya)",
       "query": "Pertanyaan (literal ditopeng)",
       "calls": "Panggilan",
       "totalMs": "Jumlah ms",
       "meanMs": "Purata ms",
       "rows": "Baris",
-      "reset": "Tetapan semula statistik dikesan — ditunjukkan sebagai kumulatif",
+      "reset": "Pengesanan set semula statistik: Dipaparkan sebagai kumulatif",
       "src": "Sumber",
       "srcToggle": "Tunjukkan atau sembunyikan butiran sumber",
       "openSqlLab": "Buka dalam SQL Tuning",
@@ -1058,7 +1058,7 @@
       "sortMax": "Masa pelaksanaan tunggal maksimum",
       "maxMs": "Maks tunggal ms",
       "diagToggle": "Diagnosis Punca",
-      "noMax": "Tiada nilai tertinggi — {n} item ialah koleksi lama tanpa nilai tertinggi tunggal, jadi ia diisih sementara mengikut purata tunggal (bukan mengikut jumlah masa). Nilai tertinggi akan diisi jika anda mengumpul sekarang."
+      "noMax": "Tiada nilai maksimum: {n} item adalah koleksi lama tanpa nilai maksimum tunggal, jadi ia diisih sementara mengikut purata tunggal (bukan mengikut jumlah masa). Nilai maksimum akan diisi dengan koleksi semasa."
     },
     "health": {
       "empty": "Tiada syot kilat lagi. Tekan Kumpul sekarang pada tab Kumpul",
@@ -1066,9 +1066,9 @@
       "unusedIdx": "Indeks tidak digunakan",
       "unusedIdxHint": "Indeks tidak pernah digunakan sejak tetapan semula statistik terakhir (mengikut saiz). Jangan gugurkan PK atau indeks kekangan unik",
       "fullScan": "Imbasan penuh berlebihan",
-      "fullScanHint": "Jadual dengan 1,000+ baris langsung di mana imbasan penuh sekurang-kurangnya separuh — semak indeks pada lajur penapis",
+      "fullScanHint": "Jadual dengan 1,000+ baris berkesan dan lebih separuh imbasan penuh: Semak indeks pada lajur syarat.",
       "dead": "Tuple mati berlebihan",
-      "deadHint": "Nisbah tuple mati 20% atau lebih — semak tetapan VACUUM dan autovacuum",
+      "deadHint": "Nisbah tuple mati melebihi 20%: Semak tetapan VACUUM dan autovacuum.",
       "none": "Tiada",
       "scans": "imbasan"
     },
@@ -1085,7 +1085,7 @@
     },
     "activity": {
       "refresh": "Muat semula",
-      "live": "Pertanyaan langsung — tidak disimpan",
+      "live": "Pertanyaan masa nyata: Tidak disimpan",
       "sessions": "Aktiviti sesi",
       "locks": "Kunci",
       "none": "Tiada"
@@ -1112,7 +1112,7 @@
         "BATCH": "Kelihatan seperti kelompok atau kerja berjadual. Sebarkan masa jalan jauh dari puncak perniagaan dan kecilkan kerja setiap komit. Semak indeks dan statistik (ANALYZE) pada jadual sasaran, dan bahagikan transaksi panjang. Meletakkan nama kerja dalam application_name menjadikan klasifikasi seterusnya lebih tepat",
         "PROGRAM": "Ini kelihatan seperti pertanyaan yang dilaksanakan oleh aplikasi. Semak pelan pelaksanaan dalam penalaan SQL. Jika masa pelaksanaan tunggal maksimum panjang, mula-mula lihat indeks dan susunan gabungan. Jika satu pelaksanaan pendek tetapi kiraan panggilan tinggi, lihat panggilan berulang (N+1) dan caching. Letakkan nama perkhidmatan dalam application_name bagi kumpulan sambungan.",
         "PLATFORM": "Kelihatan seperti kerja dalaman DB atau platform seperti autovacuum atau replikasi. Biasanya tiada tindakan diperlukan. Jika ia kekal di atas, semak ambang autovacuum dan maintenance_work_mem",
-        "MONITOR": "Ini ialah pertanyaan pengumpulan sendiri dbms.pi — sambungan schema.pi ialah pernyataan tetap yang hanya membaca paparan/katalog statistik (pg_stat_*·pg_catalog), jadi ia bukan pertanyaan perniagaan dan tiada tindakan pelanggan diperlukan. Jika beban pangkalan data sasaran menjadi masalah, kurangkan bilangan kali anda membuka butang pengumpulan/skrin pemantauan. Pernyataan daripada alat pemantauan lain yang membaca paparan statistik yang sama juga dikumpulkan di sini.",
+        "MONITOR": "Pertanyaan pengumpulan dbms.pi sendiri. Sambungan schema.pi hanya membaca paparan statistik dan katalog (pg_stat_*, pg_catalog) dengan pernyataan tetap, jadi ia bukan pertanyaan perniagaan dan tiada tindakan pelanggan diperlukan. Jika beban pangkalan data sasaran adalah masalah, kurangkan kekerapan membuka butang pengumpulan atau skrin pemantauan. Pernyataan daripada alat pemantauan lain yang membaca paparan statistik yang sama juga dikumpulkan di sini.",
         "UNKNOWN": "Tiada petunjuk kepada sumber. Tetapkan application_name pada setiap sambungan dan bahagikan akaun mengikut tujuan; ia akan diklasifikasikan daripada sampel seterusnya"
       },
       "detail": {
@@ -1123,7 +1123,7 @@
         "period": "Diperhatikan",
         "none": "(kosong)"
       },
-      "noSample": "Tiada sampel lagi — sesi berjalan disampel apabila anda melihat papan pemantauan atau tab Aktiviti & kunci. Buat masa ini ia diklasifikasikan daripada nama akaun sahaja",
+      "noSample": "Tiada sampel lagi. Sesi yang sedang berjalan terkumpul sebagai sampel apabila melihat Papan Pemantauan atau tab Aktiviti/Kunci. Pada masa ini, ia hanya dikelaskan mengikut nama akaun untuk rujukan.",
       "verOff": "DB ini lebih lama daripada PostgreSQL 14, jadi sesi berjalan tiada ID pertanyaan. Hanya akaun (pasti) ditunjukkan",
       "privOff": "Akaun pautan tidak dapat melihat butiran sesi akaun lain, jadi tiada sampel dikumpul. Minta pentadbir DB untuk menjalankan GRANT pg_read_all_stats TO {user};",
       "linkUsr": "akaun pautan",
@@ -1134,11 +1134,11 @@
     "diag": {
       "title": "Diagnosis Punca",
       "fix": "Tindakan:",
-      "none": "Tiada punca didedahkan oleh statistik — semak pelan pelaksanaan dalam Penalaan SQL.",
-      "cum": "Tiada panggilan dalam selang ini — kumulatif (sejak tetapan semula statistik)",
-      "basis": "Asas — Maks 1-kali {max}ms · Purata {mean}ms · Panggilan {calls} · Baris setiap panggilan {rpc} · Nisbah bacaan cakera {read} · Blok sementara {tmp}",
+      "none": "Tiada punca didedahkan oleh statistik. Buka pelan pelaksanaan dalam Penalaan SQL untuk menyemak.",
+      "cum": "Tiada panggilan dalam selang ini: Kumulatif (sejak set semula statistik)",
+      "basis": "Asas: Maksimum tunggal {max}ms · Purata {mean}ms · Panggilan {calls} · Baris setiap panggilan {rpc} · Nisbah baca cakera {read} · Blok sementara {tmp}",
       "SELF_MON": {
-        "cause": "Pertanyaan pengumpulan sendiri dbms.pi — pernyataan pemantauan yang hanya membaca pandangan/katalog statistik.",
+        "cause": "Pertanyaan pengumpulan dbms.pi sendiri: Pernyataan pemantauan yang hanya membaca paparan statistik dan katalog.",
         "fix": "Tiada tindakan pelanggan diperlukan. Jika beban pangkalan data sasaran menjadi masalah, kurangkan bilangan kali anda membuka skrin pengumpulan/pemantauan."
       },
       "NO_MAX": {
@@ -1146,31 +1146,31 @@
         "fix": "Klik 'Kumpul' sekali sekarang untuk mengisi nilai maks bagi diagnosis yang tepat."
       },
       "SLOW_EACH": {
-        "cause": "Sentiasa Perlahan — Mengambil masa yang lama setiap kali ia berjalan, dengan maks {max}ms dan purata {mean}ms.",
+        "cause": "Perlahan setiap kali: Mengambil masa yang lama setiap pelaksanaan dengan maksimum {max}ms dan purata {mean}ms.",
         "fix": "① Buka pelan pelaksanaan dalam 'Buka dalam Penalaan SQL'. ② Jika terdapat imbasan penuh (Seq Scan) atau isihan besar, semak indeks pada lajur syarat WHERE/JOIN. ③ Sempitkan syarat untuk membaca hanya lajur/baris yang diperlukan."
       },
       "SPIKE": {
-        "cause": "Kelewatan Berselang — Purata {mean}ms, tetapi kadang-kadang mengambil masa yang lama pada maks {max}ms ({x} kali purata).",
+        "cause": "Kelewatan berselang-seli: Purata {mean}ms, tetapi kadang-kadang mengambil masa yang lama dengan maksimum {max}ms ({x} kali purata).",
         "fix": "① Apabila perlahan, semak untuk menunggu kunci (wait_event) dalam tab Aktiviti/Kunci. ② Jika hanya pelaksanaan pertama yang perlahan, cache kosong dan cakera dibaca. ③ Bandingkan pertanyaan yang sama dengan nilai yang berbeza dalam Penalaan SQL untuk melihat sama ada pelan pelaksanaan berubah berdasarkan nilai."
       },
       "DISK_READ": {
-        "cause": "Cache Miss — {pct}% ({read} blok) blok yang dibaca telah dibaca dari cakera, bukan memori.",
+        "cause": "Cache miss: {pct}% ({read} blok) blok yang dibaca telah dibaca dari cakera, bukan memori.",
         "fix": "① Kurangkan julat bacaan dengan indeks. ② Sempitkan tempoh/syarat pertanyaan. ③ Jika data yang kerap dibaca kekal tinggi, semak shared_buffers (memori)."
       },
       "TEMP_SPILL": {
-        "cause": "Memori Melimpah — Isihan/hash melebihi work_mem dan menulis {blk} blok (kira-kira {mb}MB, {perCall} blok setiap panggilan) ke fail sementara.",
+        "cause": "Limpahan memori: Isih/hash melebihi work_mem dan menulis {blk} blok (kira-kira {mb}MB, {perCall} blok setiap panggilan) ke fail sementara.",
         "fix": "① Meletakkan indeks pada lajur ORDER BY/GROUP BY melangkau isihan. ② Pertama, kurangkan bilangan baris untuk diisih (LIMIT di dalam). ③ Jika benar-benar perlu, tingkatkan SET LOCAL work_mem hanya untuk transaksi pertanyaan ini."
       },
       "MANY_ROWS": {
-        "cause": "Pengambilan Berlebihan — Mengambil {perCall} baris setiap panggilan.",
+        "cause": "Pertanyaan berlebihan: Mengambil {perCall} baris setiap panggilan.",
         "fix": "① Senarai skrin diambil halaman demi halaman. ② SELECT hanya memilih lajur yang digunakan. ③ Agregasi dilakukan dalam pangkalan data, dan hanya hasilnya diterima."
       },
       "PGRST_EMBED": {
-        "cause": "Pernyataan penapis terbenam PostgREST (!inner) — menapis induk mengikut syarat anak boleh mengimbas keseluruhan set sebelum syarat klasifikasi.",
+        "cause": "Pernyataan penapis terbenam PostgREST (!inner): Menapis induk mengikut syarat anak boleh mengimbas seluruh jadual sebelum syarat klasifikasi.",
         "fix": "① Semak sama ada terdapat indeks pada kunci gabungan dan lajur penapis. ② Pindahkan penapis ke syarat jadual induk. ③ Benamkan anak ke dalam pertanyaan induk yang sedia ada atau gabungkan mereka menjadi satu fungsi pangkalan data."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET Paging — Menjadi semakin perlahan kerana ia membaca dan membuang baris sebelumnya untuk halaman kemudian.",
+        "cause": "OFFSET paging: Halaman kemudian membaca dan membuang baris sebelumnya, menjadi semakin perlahan.",
         "fix": "Tukar kepada keyset paging (WHERE id > last_id ORDER BY id LIMIT n) yang membaca dari kunci selepas kunci terakhir yang diterima."
       }
     }
@@ -1203,8 +1203,8 @@
       "toDraft": "Cipta draf saluran paip daripada {n} yang dipilih"
     },
     "ready": {
-      "ok": "Replikasi logik WAL sedia — jadual dengan PK boleh menggunakan LOGICAL",
-      "no": "Replikasi logik WAL tidak sedia — tangkap melalui pengundian atau perbandingan kunci",
+      "ok": "Replikasi logik WAL sedia: Jadual dengan PK boleh menggunakan kaedah LOGICAL.",
+      "no": "Replikasi logik WAL tidak sedia: Kumpul menggunakan kaedah polling/perbandingan kunci.",
       "senders": "{n} sambungan replikasi"
     },
     "adapter": {
@@ -1219,20 +1219,20 @@
       "HAS_SOFT_DEL": "Mempunyai lajur padam lembut",
       "NO_SOFT_DEL": "Tiada lajur padam lembut",
       "HAS_PK": "Mempunyai kunci primer",
-      "NO_PK": "Tiada kunci primer — baris yang diubah tidak dapat dikenal pasti",
+      "NO_PK": "Tiada PK: Tidak dapat mengenal pasti baris yang diubah.",
       "DELETE_UNSEEN": "Pengundian tidak dapat menangkap DELETE fizikal (lajur padam lembut disyorkan)",
       "LOGICAL_NOT_READY": "Boleh bertukar kepada LOGICAL setelah replikasi logik WAL sedia",
-      "FULL_RELOAD_ONLY": "Tiada PK atau lajur masa perubahan, jadi tiada penangkapan tambahan — tambah PK",
+      "FULL_RELOAD_ONLY": "Tiada PK/cap masa perubahan, jadi pengumpulan tambahan tidak mungkin: Penambahan PK disyorkan.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level bukan logik (menukarnya memerlukan mulakan semula DB)",
       "NO_SLOTS": "max_replication_slots ialah 0",
       "NO_SENDERS": "max_wal_senders ialah 0",
-      "IS_STANDBY": "Pelayan siap sedia — ambil replikasi logik daripada primer",
+      "IS_STANDBY": "Pelayan siap sedia: Terima replikasi logik dari pelayan utama.",
       "SETTINGS_UNKNOWN": "Tidak dapat membaca tetapan, kesediaan tidak diketahui"
     },
     "ed": {
       "title": "Definisi saluran paip",
-      "draftOnly": "Reka bentuk sahaja — disimpan sebagai draf (DRAFT)",
+      "draftOnly": "Reka bentuk sahaja: Simpan sebagai DRAFT sahaja.",
       "new": "Saluran paip baharu",
       "empty": "Tiada saluran paip yang disimpan",
       "manual": "Manual",
@@ -1301,8 +1301,8 @@
     },
     "warn": {
       "none": "Tiada amaran yang ketara.",
-      "SEQ_SCAN_LARGE": "Imbasan penuh pada {relation} (kira-kira {rows} baris) — pertimbangkan indeks pada lajur penapis.",
-      "NESTED_LOOP_HIGH": "Gelung bersarang menghasilkan kira-kira {rows} baris — pertimbangkan hash atau gabungan gabungan, atau indeks pada syarat gabungan.",
+      "SEQ_SCAN_LARGE": "Jadual {relation} sedang melakukan imbasan penuh (anggaran {rows} baris): Semak indeks pada lajur syarat.",
+      "NESTED_LOOP_HIGH": "Hasil gelung bersarang adalah anggaran {rows} baris. Semak gabungan hash/merge atau indeks pada syarat gabungan.",
       "SORT_SPILL": "Saiz isihan adalah kira-kira {kb}KB, melebihi work_mem lalai (4MB); ia mungkin tumpah ke cakera."
     },
     "lint": {
@@ -1316,14 +1316,14 @@
         "char": "aksara"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — pilih hanya lajur yang anda perlukan (I/O tambahan, tiada indeks penutup).",
-        "FUNC_ON_COLUMN": "Lajur penapis {column} dibalut dalam fungsi atau ungkapan, jadi indeksnya tidak boleh digunakan — ubah malar sebaliknya.",
-        "LEADING_WILDCARD": "LIKE dengan % pendahulu tidak boleh menggunakan indeks B-tree — pertimbangkan indeks GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Syarat OR pada lajur berbeza — pertimbangkan untuk memisahkan dengan UNION (tambah syarat pengecualian duplikat jika UNION ALL) atau menyemak indeks setiap lajur.",
-        "IMPLICIT_CAST": "{column} dibandingkan dengan nombor yang dipetik — padankan jenis lajur dan malar (pemutus tersirat).",
-        "NOT_IN_SUBQUERY": "NOT IN (subquery) tidak mengembalikan apa-apa apabila NULL hadir dan perlahan — gunakan NOT EXISTS.",
-        "NO_WHERE": "Tiada klausa WHERE — pada jadual besar ini adalah imbasan penuh (tambah syarat atau LIMIT).",
-        "DOMAIN_MISMATCH": "{column} ialah jenis {expected} mengikut domain standard tetapi dibandingkan dengan malar jenis lain — pemutus tersirat mungkin menghalang penggunaan indeks."
+        "SELECT_STAR": "SELECT *: Pilih hanya lajur yang diperlukan (I/O tidak perlu, indeks meliputi tidak mungkin).",
+        "FUNC_ON_COLUMN": "Lajur syarat {column} diproses oleh fungsi/operasi, jadi indeks tidak dapat digunakan. Proses bahagian malar.",
+        "LEADING_WILDCARD": "LIKE dengan % di hadapan tidak dapat menggunakan indeks B-tree. Semak indeks GIN pg_trgm.",
+        "OR_DIFF_COLUMNS": "Syarat lajur yang berbeza dikumpulkan dengan OR. Semak pemisahan UNION (tambah syarat pengecualian duplikat jika UNION ALL) atau indeks setiap lajur.",
+        "IMPLICIT_CAST": "{column} dibandingkan dengan nombor yang dipetik. Padankan jenis lajur dan jenis malar (penukaran jenis implisit).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) boleh kosong dan perlahan jika NULL bercampur. Tukar kepada NOT EXISTS.",
+        "NO_WHERE": "Tiada syarat WHERE. Jika ia adalah jadual besar, ia adalah imbasan penuh (tambah LIMIT atau syarat).",
+        "DOMAIN_MISMATCH": "{column} adalah jenis {expected} mengikut domain standard, tetapi dibandingkan dengan malar jenis yang berbeza. Penukaran jenis implisit mungkin menghalang penggunaan indeks."
       }
     },
     "saved": {
@@ -1349,12 +1349,12 @@
     },
     "ai": {
       "title": "Nasihat penalaan AI",
-      "intro": "Pilih satu pelan yang disimpan untuk menjana nasihat. Hanya SQL dan pelan dengan pemalar yang ditopengkan sebagai ? dihantar (nasihat berasaskan peraturan jika tiada kunci atau gagal). Selepas pemilik pautan meluluskan, jalankan semula penjelasan untuk SQL yang sama, simpan, dan ukur impak dengan pelan kemudian itu — hanya kemudian ia direkodkan sebagai telah digunakan.",
+      "intro": "Pilih satu pelan yang disimpan untuk menjana nasihat. Hanya SQL dan pelan dengan pemalar yang ditopengkan sebagai ? dihantar (nasihat berasaskan peraturan jika tiada kunci atau gagal). Selepas pemilik pautan meluluskan, jalankan semula penjelasan untuk SQL yang sama, simpan, dan ukur impak dengan pelan kemudian itu : hanya kemudian ia direkodkan sebagai telah digunakan.",
       "pickPlan": "Pilih pelan yang disimpan untuk nasihat",
       "create": "Jana nasihat",
       "creating": "Menjana… (sehingga 30 s)",
       "noPlans": "Tiada pelan yang disimpan. Lihat pelan penjelasan di atas dan simpannya.",
-      "note": "Satu nasihat bagi setiap pelan. Padam nasihat sedia ada untuk menjana semula. DDL hanya dicadangkan — gunakannya dalam schema.pi.",
+      "note": "Satu nasihat bagi setiap pelan. Padam nasihat sedia ada untuk menjana semula. DDL hanya dicadangkan : gunakannya dalam schema.pi.",
       "empty": "Tiada nasihat lagi.",
       "noItems": "Tiada penambahbaikan ditemui untuk pelan ini.",
       "cost": "Kos sebelum",
@@ -1396,10 +1396,10 @@
       "copy": "Salin",
       "copied": "Disalin",
       "rule": {
-        "SEQ_SCAN_INDEX": "Imbasan penuh {relation} — buat indeks pada lajur penapis {column} (gantikan NN dalam nama indeks dengan nombor urutan).",
-        "SEQ_SCAN_STATS": "Imbasan penuh {relation} — semak lajur penapis dan pastikan statistik (ANALYZE) adalah terkini.",
-        "NESTED_LOOP": "Gelung bersarang menjangkakan {rows} baris — segarkan statistik dan pertimbangkan indeks kunci gabungan atau gabungan cincang.",
-        "SORT_SPILL": "Isihan sekitar {kb} KB mungkin melimpah ke cakera — pertimbangkan untuk menaikkan work_mem sesi atau mengindeks lajur isihan.",
+        "SEQ_SCAN_INDEX": "Imbasan penuh {relation}: Buat indeks pada lajur syarat {column} (nama indeks NN akan digantikan dengan nombor urutan).",
+        "SEQ_SCAN_STATS": "Imbasan penuh {relation}: Semak lajur syarat dan pastikan statistik (ANALYZE) adalah terkini.",
+        "NESTED_LOOP": "Hasil gelung bersarang adalah anggaran {rows} baris: Kemas kini statistik dan semak indeks syarat gabungan atau gabungan hash.",
+        "SORT_SPILL": "Isih mungkin melimpah ke cakera kira-kira {kb}KB. Semak peningkatan work_mem sesi atau indeks pada lajur isih.",
         "SELECT_STAR": "Pilih hanya lajur yang anda perlukan dan bukannya SELECT * (kurang I/O, indeks meliputi mungkin).",
         "FUNC_ON_COLUMN": "Alihkan fungsi/ungkapan pada lajur penapis {column} ke sisi pemalar (membolehkan penggunaan indeks).",
         "IMPLICIT_CAST": "Padankan jenis {column} dan pemalar (buang pemutus tersirat).",
@@ -1459,9 +1459,9 @@
     },
     "desc": {
       "FREE": "Teroka & Belajar",
-      "D1": "Operator — Menyemak sama ada pangkalan data baik-baik sahaja sekarang",
-      "D2": "Pembangun & Penala — Membaiki SQL yang perlahan",
-      "D3": "DBA & DA — Daripada keselamatan operasi hingga pelaksanaan dan tasik"
+      "D1": "Operator: Menyemak sama ada pangkalan data sihat sekarang.",
+      "D2": "Pembangun/Penala: Memperbaiki SQL yang perlahan.",
+      "D3": "DBA/DA: Keselamatan operasi, migrasi, dan juga data lake."
     },
     "feat": {
       "FREE": "Papan pemantauan, paparan pelan pelaksanaan, pembelajaran asas",
@@ -1504,7 +1504,7 @@
       "required": "Ciri ini tersedia daripada pelan {plan}.",
       "limit": "Anda telah menggunakan semua percubaan yang tersedia untuk tempoh ini. Anda boleh menggunakan lebih banyak dengan menaik taraf kepada pelan {plan}.",
       "limitTop": "Anda telah menggunakan semua percubaan yang tersedia untuk tempoh ini. Anda boleh menggunakannya lagi pada tempoh seterusnya.",
-      "expired": "Pelan schema.pi anda telah tamat tempoh — sila buat pembayaran pada skrin pelan schema.pi.",
+      "expired": "Pelan schema.pi anda telah tamat tempoh. Sila bayar pada skrin pelan schema.pi.",
       "go": "Lihat Pelan",
       "close": "Tutup"
     }

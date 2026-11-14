@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Greining og vatnaskil",
     "intro": "dbms virkni KPI, þriggja laga vatnaskilahönnun og gagnasafnaskrá á einum stað.",
-    "storageNotice": "Geymsla vatnaskila (viðskiptavinahlið eða ský) hefur ekki verið ákveðin enn (PRD kafli 10 #7). Aðeins hönnun og nafnakort eru geymd í bili — engin raðgögn.",
+    "storageNotice": "Geymsla vatnaskila (viðskiptavinahlið eða ský) hefur ekki verið ákveðin enn (PRD kafli 10 #7). Aðeins hönnun og nafnakort eru geymd í bili : engin raðgögn.",
     "noLink": "Veldu eða skráðu schema.pi tengil fyrst.",
     "goConnect": "Skrá tengil",
     "loading": "Hleður…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP greining — Líkan↔DB",
+    "title": "GAP greining: Líkan↔DB",
     "intro": "Berðu saman schema.pi hönnunarlíkan og DDL umsóknarsögu við lifandi DB skrána til að finna reki og mæla hvort hönnuð vísitölur séu í raun notaðar. Raðgögn viðskiptavina eru aldrei lesin eða geymd.",
     "needLink": "Veldu schema.pi tengil hér að ofan fyrst. Ef þú hefur engan, skráðu tákn í 'Tengill' valmyndinni.",
     "needConn": "Veldu DB tenginguna til að bera saman hér að ofan.",
@@ -188,7 +188,7 @@
     "model": "Líkan",
     "reqNo": "Beiðni {id}",
     "notSaved": "Gat ekki vistað þessa keyrslu í sögu (niðurstöður eru sýndar venjulega).",
-    "capped": "Of mörg atriði — sýni fyrstu {cap} á hvern hluta (fjöldi er heill).",
+    "capped": "Of mörg atriði : sýni fyrstu {cap} á hvern hluta (fjöldi er heill).",
     "statsMissing": "Tölfræði um notkun vísitölu var ekki tiltæk, svo ekki var hægt að dæma um notkun.",
     "sum": {
       "missingTables": "Töflur sem vantar í DB",
@@ -230,7 +230,7 @@
       "USED": "Í notkun",
       "NO_STATS": "Engar tölfræði",
       "CONSTRAINT": "Einstakleikaþvingun (halda)",
-      "NO_DATA": "Engin gögn eða tölfræði ekki safnað — ekki hægt að dæma",
+      "NO_DATA": "Engin gögn eða tölfræði ekki safnað: getur ekki ákvarðað",
       "OBSERVING": "Undir athugun (innan 7 daga)",
       "UNUSED_CAND": "Ónotað til skoðunar"
     },
@@ -245,14 +245,14 @@
       "RATE": "Of margar beiðnir. Vinsamlegast reyndu aftur eftir eina mínútu."
     },
     "schema": "Schema",
-    "schemaHint": "Aðeins venjulegar og skiptar töflur í þessu schema eru bornar saman (útsýni undanskilið). Sjálfgefið public — innri schema Supabase (auth, storage, …) eru undanskilin.",
-    "truncated": "{names} náðu {max}-línu takmörkuninni og voru stytt — sumar „ekki í DB“ / „ekki í líkani“ niðurstöður geta verið rangar. Þrengdu schema og keyrðu aftur.",
+    "schemaHint": "Ber aðeins saman venjulegar og skiptar töflur í þessu skema (að undanskildum sýnum). Sjálfgefið opinbert: Supabase innri skema (auth, storage, o.s.frv.) eru undanskilin.",
+    "truncated": "{names} fyrirspurn styttist við {max} raðir. Sumar 'Ekki í DB'/'Ekki í líkani' uppgötvanir gætu verið rangar jákvæðar. Þrengdu skemað og greindu aftur.",
     "colUnchecked": "Vegna þess að dálka fyrirspurnin var stytt, eru {n} dálkar sem vantar/eru aukalega meðhöndlaðir sem óstaðfestanlegir og undanskildir úr fjölda dálkamisræma.",
-    "renamed": "{n} PK vísitölur sem voru notaðar samkvæmt gömlu nafngiftarreglunni (_PKEY) eru til í DB undir nýju nafni (PK_) — eðlilegt",
-    "superseded": "{n} eldri beiðnir voru undanskildar vegna þess að síðari beiðni endurskapaði sömu töflu (DROP … CASCADE) — eðlilegt",
+    "renamed": "{n} PK vísitölur sem notaðar voru með gömlu nafngjöfina (_PKEY) eru í DB með nýja nafninu (PK_). Eðlilegt.",
+    "superseded": "{n} fyrri beiðnir voru undanskildar samanburði vegna þess að síðari beiðnir endursköpuðu sömu töflu (DROP … CASCADE). Eðlilegt.",
     "supersededItem": "Beiðni {id} → skipt út fyrir beiðni {by}",
     "sysCols": "{n} kerfisdálkar (sjálfkrafa bætt við við DDL gerð) eru ekki í líkaninu samkvæmt hönnun og eru undanskildir úr misræmum.",
-    "groupOwn": "Verkefnisforskeyti {pfx} — til skoðunar fyrir líkanútilokun",
+    "groupOwn": "Þetta verkefnafornafn {pfx}: líkan vantar frambjóðendur",
     "groupOther": "Annað kerfi {pfx}",
     "basis": "Áætlaðar raðir {rows} · síðan {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Ef hlutir hverfa enn eftir endurbeitingu, grunaðu handvirka eyðingu eða afturköllun og athugaðu virkni tengingarreikningsins með DBA þínum."
       },
       "extraTables": {
-        "s1": "Þessi verkefnaforgangsröðun = líkan sem vantar — flyttu þau inn í líkanið í gegnum schema.pi → Stillingar → Bakfæra, eða ákveðið hvort þau eigi að vera eydd ef þau eru ónotuð töflur.",
-        "s2": "Aðrir forskeytishópar = önnur kerfi sem deila þessari DB — ekki aðgerðaratriði fyrir þetta verkefni.",
+        "s1": "Þessi verkefnafornafnshópur = líkan vantar frambjóðendur: flyttu inn í líkan í gegnum schema.pi → Stillingar → Bakka, eða ákveðið hvort eyða eigi ef taflan er ekki notuð.",
+        "s2": "Aðrir fornafnshópar = önnur kerfi sem nota sama DB: ekki háð aðgerðum þessa verkefnis.",
         "s3": "Ef markschema er ekki public, breyttu „Schema“ reitnum hér að ofan og keyrðu aftur."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Tegund/NULL er mismunandi = samræmdu við líkanið (uppruna sannleikans); áður en lengd er minnkuð eða skipt yfir í NOT NULL, staðfestu að núverandi raðir uppfylli það."
       },
       "idxUsage": {
-        "s1": "Áður en fjarlægt er, athugaðu ① að tölfræðiglugginn nái yfir að minnsta kosti einn viðskiptalotu (t.d. mánaðarlokahóp) — sjá „síðan“.",
+        "s1": "Áður en eytt er, athugaðu ① hvort tölfræðisöfnunartímabilið sé að minnsta kosti einn rekstrarferill (t.d. mánaðarlok): sjáðu viðmiðunardagsetningu.",
         "s2": "② Það er ekki einstakur/PK vísitala (þeir sýna sig sérstaklega sem „einstakleikaþvingun“).",
         "s3": "③ EXPLAIN dæmigerða SQL töflunnar í SQL Tuning og staðfestu að þessi vísitala sé ekki notuð.",
         "s4": "Þegar allt þrennt hefur verið staðfest, fjarlægðu vísitöluna úr líkaninu í schema.pi og beittu með DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Hvernig á að gefa út tengitákn",
     "how1": "Skráðu þig inn á schema.pi og opnaðu efnisatriðið til að tengjast",
     "how2": "Farðu í Efnisatriði → Stillingar → Tengitákn og ýttu á 'Gefa út tákn' (svæðisstjórnandi eða DA hlutverk)",
-    "how3": "Afritaðu táknið sem byrjar á slk_ — það er aðeins sýnt einu sinni þegar það er gefið út",
+    "how3": "Afritaðu táknið sem byrjar á slk_ sem var gefið út. Upprunalega er aðeins sýnt einu sinni við útgáfu.",
     "how4": "Límdu það hér að neðan og skráðu",
     "openSchema": "Opna schema.pi",
     "registerTitle": "Skrá tengingu",
@@ -384,7 +384,7 @@
     "retry": "Reyna aftur",
     "pickerLink": "Tengill",
     "pickerConn": "Tenging",
-    "pickerEmpty": "Engar tengingar —",
+    "pickerEmpty": "Engar tengingar.",
     "pickerGo": "skráðu einn á /connect",
     "errors": {
       "LINK_AUTH": "Tengitáknið hefur runnið út eða verið afturkallað. Gefðu út nýtt tákn í schema.pi og skráðu aftur",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Gagnaflutningur (PiMig)",
-    "intro": "Reiknar töfluhleðsluröðina út frá samböndum í schema.pi hönnunarlíkaninu þínu, skipuleggur hlutarstærð, samhliða og gátlista fyrir yfirfærslu, og býr til staðfestingar SQL sem þú keyrir sjálfur á uppruna og marki. Þessi skjár skipuleggur og athugar aðeins — hann flytur ekki gögn eða les raðir úr DB viðskiptavina.",
+    "intro": "Reiknar töfluhleðsluröðina út frá samböndum í schema.pi hönnunarlíkaninu þínu, skipuleggur hlutarstærð, samhliða og gátlista fyrir yfirfærslu, og býr til staðfestingar SQL sem þú keyrir sjálfur á uppruna og marki. Þessi skjár skipuleggur og athugar aðeins : hann flytur ekki gögn eða les raðir úr DB viðskiptavina.",
     "needLink": "Veldu schema.pi tengil hér að ofan fyrst. Ef þú hefur engan, skráðu tákn undir 'Tengja'.",
     "loading": "Hleður…",
     "newPlan": "Ný flutningsáætlun",
@@ -432,8 +432,8 @@
     "optsHint": "Samhliða er fjöldi taflna sem eru hlaðnar samtímis innan stigs. Bita stærð er commit einingin (línur) sem framkvæmdarvélin mun nota.",
     "order": "Hleðsluröð",
     "orderHint": "Raðað eftir hönnunartengslum (ekki líkamlegum FKs) þannig að foreldratöflur koma fyrst. Töflur á sama stigi eru ekki háðar hvor annarri og geta hlaðist samhliða.",
-    "cycles": "{n} hringlaga hópur/hópar — settir á sama stig. Stilltu röð þeirra handvirkt og frestaðu athugun á tilvísunum þar til eftir hleðslu.",
-    "selfRefs": "Sjálfsvísandi (stigveldislegar) töflur — hlaða foreldralínum fyrst innan töflunnar",
+    "cycles": "{n} hringrásir: settar á sama stig. Stilltu hleðsluröðina handvirkt og frestaðu viðmiðunarathugunum þar til eftir hleðslu.",
+    "selfRefs": "Sjálfsvísandi (stigveldislegar) töflur: foreldraröðum fyrst innan sömu töflu.",
     "level": "Stig {n}",
     "checklist": "Gátlisti fyrir yfirfærslu",
     "toReady": "Merkja sem tilbúið",
@@ -471,7 +471,7 @@
     },
     "verify": "Staðfestingar SQL",
     "verifyHint": "Býr til fjölda, tölulegan dálkasummu, afrit lykils og lykilhash fyrir hverja töflu í hleðsluröð. Keyrðu þau sjálfur á uppruna og marki og berðu saman (þessi skjár framkvæmir þau ekki).",
-    "noHashOracle": "Oracle·Tibero hash-aðgerðir og textaútgáfa eru frábrugðin PostgreSQL, svo hash-fyrirspurnum er sleppt — berðu saman fjölda, summu og afrit lykla.",
+    "noHashOracle": "Oracle og Tibero sleppa hash leit vegna þess að hash föll og stafaframsetningar eru ólíkar PostgreSQL. Berðu saman eftir fjölda, summu og lykilendurtekningu.",
     "copy": "Afrita",
     "copied": "Afritað",
     "copyFail": "Gat ekki afritað. Veldu textann og afritaðu hann handvirkt.",
@@ -549,6 +549,7 @@
       "INVALID_INPUT": "Beiðnin er ógild."
     },
     "board": {
+      "subtitle": "Hvað á að gera núna í þessu DB: Sjáðu eðlilegt, viðvörunar- og áhættustöðu 14 merkja og lausnir þeirra í fljótu bragði.",
       "refresh": {
         "updated": "Frá {time} · endurnýjast á mínútu fresti",
         "now": "Endurnýja núna",
@@ -563,10 +564,11 @@
         "NA": "Á ekki við"
       },
       "overall": {
-        "RISK": "Hætta — þörf á aðgerð núna",
-        "WARN": "Viðvörun — sumir hlutir þarfnast skoðunar",
-        "UNKNOWN": "Óþekkt — athugaðu tenginguna",
-        "OK": "Í lagi — öll merki eru innan marka",
+        "RISK": "Áhætta: Tafarlaust þarf að grípa til aðgerða",
+        "WARN": "Viðvörun: Atriði til að fara yfir",
+        "UNKNOWN": "Get ekki staðfest: Athugaðu tengingarstöðu",
+        "OK": "Eðlilegt: Öll merki eru innan viðmiðana",
+        "CONN_DOWN": "Get ekki tengst DB. Athugaðu tengingu fyrst.",
         "NA": "Á ekki við"
       },
       "kpi": {
@@ -581,7 +583,7 @@
         "less": "Sýna færri",
         "setup": "Settu þetta upp til að sjá meira",
         "none": "Engin áhættu- eða viðvörunaratriði þarfnast aðgerða núna.",
-        "unknown": "Gat ekki athugað {n} merki — sjáðu spjöldin fyrir ástæðuna.",
+        "unknown": "Get ekki staðfest {n} atriði: Athugaðu ástæðuna á kortinu.",
         "myRule": "Mín regla brotin: {rule}",
         "copySql": "Afrita SQL",
         "copied": "Afritað"
@@ -620,33 +622,34 @@
         "REPL": "Afritunartöf"
       },
       "fix": {
-        "AVAIL": "Hæg svörun eða nýleg endurræsing — athugaðu tengistillingar og DB-netþjónastöðu.",
-        "AVAIL_DOWN": "Gat ekki tengst DB — athugaðu tengistillingar og að DB-netþjónninn sé í gangi.",
-        "CONN_USE": "{sess}/{max} lotur á þessum DB (ekki á klasa — aðrir gagnagrunnar eru undanskildir) — lokaðu óvirkum tengingum eða bættu við tengingarsafni (pgbouncer).",
-        "LONG_QRY": "Fyrirspurn hefur verið í gangi í {sec}s — farðu yfir áætlun hennar og stilltu hana, eða láttu DBA hætta við hana.",
-        "IDLE_TX": "Viðskipti hafa verið óvirk í {sec}s — finndu vantar skuldbindingu í forritinu og stilltu tímamörk.",
-        "LOCK_WAIT": "{n} lotur bíða eftir læsingum — finndu læsandi lotuna og ljúktu viðskiptum hennar.",
-        "CACHE_HIT": "Skyndiminni-hlutfall {pct}% — leitaðu að fullum skönnunum á stórum töflum eða farðu yfir shared_buffers.",
-        "XACT_ERR": "Afturköllunarhlutfall {pct}%, {dlck} dauðalæsingar — athugaðu bilandi viðskipti og villuskrá forritsins.",
-        "SLOW_SQL": "Það er fyrirspurn sem tekur allt að {ms}ms í hverri keyrslu — skoðaðu keyrsluáætlunina og stilltu hana, byrjaðu á hæsta einstaka keyrslutíma.",
-        "STORAGE": "DB ({gb} GB) er nálægt mörkum sínum (dagar eftir {days}) — hreinsaðu stórar töflur eða bættu við afkastagetu.",
-        "VACUUM": "{tbl} hefur margar dauðar raðir eða úreltar tölfræði — farðu yfir VACUUM (ANALYZE) og autovacuum stillingar.",
-        "INDEX": "{n} vísitölufundir (ógildir, ónotaðir, fullar skannanir) — sjáðu flipann um töflu- og vísitölustöðu fyrir markmiðin.",
-        "BACKUP": "WAL-skjalasafn er slökkt eða stöðvað — athugaðu archive_mode, archive_command og afritunarstöðu.",
-        "REPL": "Afritunartöf {sec}s — athugaðu biðstöðu og netið.",
-        "PGSS": "pg_stat_statements er ekki uppsett, svo hægur SQL er ekki í boði — virkjaðu það með SQL hér að neðan (þarf að endurræsa netþjóninn)."
+        "AVAIL": "Hæg svörun eða nýlega endurræst. Athugaðu tengingarupplýsingar og stöðu DB-þjóns.",
+        "AVAIL_DOWN": "Tókst ekki að tengjast DB. Athugaðu tengingarupplýsingar og hvort DB-þjónninn sé virkur.",
+        "CONN_USE": "Þessi DB-lotu {sess}/{max} (ekki yfir allan klasann, aðrar DB-tengingar undanskildar): Hreinsaðu óvirkar tengingar eða settu upp tengingapúlara (pgbouncer).",
+        "URL": "{n} URL-athuganir mistókust · Hámarkssvörun {ms}ms: Athugaðu orsökina í schema.pi skjá.",
+        "LONG_QRY": "Fyrirspurn hefur verið í gangi í {sec} sekúndur. Farðu yfir framkvæmdaráætlunina og stilltu hana, eða láttu DBA stöðva hana.",
+        "IDLE_TX": "Viðskipti hafa verið opin og óvirk í {sec} sekúndur. Finndu vantar skuldbindingar í appinu og stilltu tímamörk.",
+        "LOCK_WAIT": "{n} lotur bíða eftir læsingum: Finndu læsandi lotuna og ljúktu viðskiptum hennar.",
+        "CACHE_HIT": "Skyndiminni hlutfall {pct}%: Leitaðu að fullum töfluskönnunum á stórum töflum eða farðu yfir shared_buffers.",
+        "XACT_ERR": "Rollback hlutfall {pct}%, {dlck} dauðalæsingar: Athugaðu misheppnuð viðskipti og villuskráningar appsins.",
+        "SLOW_SQL": "Það er fyrirspurn með einum hámarkstíma upp á {ms}ms. Farðu yfir framkvæmdaráætlunina og stilltu frá efsta einum hámarkstíma.",
+        "STORAGE": "DB {gb}GB er nálægt mörkum sínum (eftir {days} dagar). Hreinsaðu stórar töflur eða auktu getu.",
+        "VACUUM": "{tbl} hefur margar dauðar raðir eða úreltar tölfræði. Farðu yfir VACUUM (ANALYZE) og autovacuum stillingar.",
+        "INDEX": "{n} vísitöluathuganir (ógildar, ónotaðar, full skönnun): Athugaðu markmið í flipanum fyrir heilsu töflu/vísitölu.",
+        "BACKUP": "WAL skjalasafn er slökkt eða stöðvað. Athugaðu archive_mode, archive_command og stöðu öryggisafritunar.",
+        "REPL": "Afritunartöf {sec} sekúndur: Athugaðu stöðu biðþjóns og netkerfis.",
+        "PGSS": "pg_stat_statements viðbót vantar, svo hægt er ekki að skoða hægar SQL fyrirspurnir. Virkjaðu hana með SQL fyrir neðan (þarf að endurræsa þjóninn)."
       },
       "reason": {
         "CONN_DOWN": "Ekki dæmt vegna þess að DB-tengingin er niðri.",
         "PGSS": "pg_stat_statements er ekki uppsett.",
         "VER": "Fáanlegt á PostgreSQL 13 eða nýrri.",
         "SAMPLE": "Ekki nógu mörg sýni ennþá.",
-        "NO_LIMIT": "Engin stærðartakmörk, svo notkun er ekki dæmd — bættu við DB-stærð (MB) reglu (>) til að nota hana sem takmörk.",
+        "NO_LIMIT": "Notkun er ekki ákvörðuð þar sem engin takmörkun er á getu. Ef DB stærð (MB) regla (>) er bætt við, verður hún notuð sem takmörkun.",
         "RESET": "Tölfræði var endurstillt fyrir minna en 7 dögum, svo ónotaðar vísitölur eru ekki dæmdar.",
         "STALE": "Engar nýlegar athugunarskrár.",
         "STANDBY": "Á ekki við á biðnetþjóni.",
         "NONE": "Ekkert til að athuga.",
-        "GRANT": "Vantar forréttindi — veittu pg_monitor hlutverkið tengingarreikningnum.",
+        "GRANT": "Get ekki skoðað vegna skorts á heimildum. Veittu pg_monitor hlutverkið til tengingarreikningsins.",
         "LINK": "schema.pi fyrirspurn mistókst ({code})"
       },
       "steps": {
@@ -661,6 +664,7 @@
           "3": "Hækkaðu max_connections varlega, með hliðsjón af minni."
         },
         "URL": {
+          "1": "Sjáðu mistök URL og stöðukóða í schema.pi skjá.",
           "2": "Athugaðu uppsetningu forritsins og ytri háðir.",
           "3": "Ef það endurtekur sig, bættu við reglu um fjölda vefslóðabilana (URL_FAIL_CNT)."
         },
@@ -720,7 +724,7 @@
           "3": "Ef það er ekki að streyma, athugaðu biðstöðuskrána."
         }
       },
-      "sqlNote": "SQL hér að neðan er aðeins til skoðunar — lagfæringar (VACUUM, DROP INDEX, pg_terminate_backend) eru keyrðar af DBA.",
+      "sqlNote": "SQL hér að neðan er eingöngu til staðfestingar. Aðgerðir (VACUUM, DROP INDEX, pg_terminate_backend) eru framkvæmdar beint af DBA.",
       "go": {
         "activity": "Virkni og læsingar",
         "top": "Hægar fyrirspurnir",
@@ -762,8 +766,8 @@
           "tree": "Hvað tekur pláss og hvað þarf að hreinsa?"
         },
         "asTable": "Skoða sem töflu",
-        "needHistory": "Engin þróun ennþá — haltu þessum skjá opnum í nokkrar mínútur.",
-        "needPerf": "Engin stærðarsaga — safnaðu í frammistöðuflipanum eða haltu þessum skjá opnum.",
+        "needHistory": "Engin þróun ennþá. Hún verður teiknuð ef þú lætur þennan skjá opinn í nokkrar mínútur.",
+        "needPerf": "Engin getusaga. Safnaðu henni frá Performance flipanum eða láttu þennan skjá opinn.",
         "noSess": "Engar lotur.",
         "noWait": "Engin bið",
         "noData": "Engin gögn til að sýna.",
@@ -836,16 +840,17 @@
         "noStat": "Engar tölfræði"
       },
       "empty": {
+        "noConn": "Engar PostgreSQL þjónatengingar eru til að fylgjast með í þessari flokkun. Aðeins URL og tengingarstaða eru sýnd.",
         "unsupported": "Þessi tenging styður ekki vöktun (aðeins PostgreSQL netþjónatengingar).",
-        "connFail": "Gat ekki tengst gagnagrunninum — athugaðu tengistillingar og DB-stöðu.",
-        "linkDown": "Gat ekki náð í schema.pi — reyni aftur sjálfkrafa.",
-        "linkAuth": "Tengingartákn hefur runnið út — gefðu út nýtt tákn í schema.pi og skráðu það.",
-        "timeout": "Svörun er hæg — reyni aftur sjálfkrafa.",
+        "connFail": "Tókst ekki að tengjast DB. Athugaðu tengingarupplýsingar og DB stöðu.",
+        "linkDown": "Tókst ekki að tengjast schema.pi. Mun sjálfkrafa reyna aftur eftir stutta stund.",
+        "linkAuth": "Tengingartákn rann út. Endurútgefðu og skráðu táknið frá schema.pi.",
+        "timeout": "Svörun er hæg. Mun sjálfkrafa reyna aftur eftir stutta stund.",
         "rate": "Of margar beiðnir, svo endurnýjunartímabilið var aukið."
       },
       "aux": {
         "rules": "Mínar viðvörunarreglur ({n} virkar)",
-        "schemaSvc": "Þjónustustaða — schema.pi svörun",
+        "schemaSvc": "Tengingarstaða: schema.pi þjónustusvörun",
         "schemaSvcNote": "Forritsmælingar síðustu 60 mínútna vistaðar af schema.pi.",
         "source": "Gagnagjafi: mark DB er aðeins lesið í gegnum schema.pi nefndar fyrirspurnir (aðeins lestur); þróun vistar aðeins tölfræði í dbms.pi (engin raðgögn)."
       }
@@ -860,10 +865,10 @@
     "noRun": "Engin greining ennþá. Ýttu á „Keyra greiningu“",
     "lastRun": "Síðasta greining {dtm}",
     "readOnly": "Greining les aðeins (SELECT). Ráðleggingar eru leiðbeiningar og fara eftir minni netþjóns, álagi og vinnuálagi",
-    "truncated": "Of margir hlutir — aðeins fyrstu 500 voru athugaðir",
+    "truncated": "Of margir hlutir : aðeins fyrstu 500 voru athugaðir",
     "paramsNote": "Heildarminni netþjóns er óþekkt, svo það er áætlað út frá shared_buffers ≈ 25% af RAM. random_page_cost gerir ráð fyrir SSD",
     "auditNote": "Töflur með RLS slökkt og ónotaðir reikningar verða athugaðir þegar tengilfyrirspurn styður þá",
-    "replNote": "Grunnlínan er Active-Standby (A-S) — einn aðal + biðstöð. Endurspilunartöf ≥ 5s = viðvörun, ≥ 60s = áhætta (mæld RPO tilvísun)",
+    "replNote": "Aðalviðmið er Active-Standby (A-S): 1 Primary + Standby. Viðvörun fyrir endurspilunartöf >= 5 sekúndur, áhætta fyrir >= 60 sekúndur (sjá raunverulega RPO mælingu).",
     "lagIdle": "Engar breytingar",
     "pager": "Síðuskipting",
     "prev": "Fyrri",
@@ -933,11 +938,11 @@
       "st_ok": "Yfirlýsingartímalokun er stillt",
       "iit_off": "Engin aðgerðalaus-í-viðskiptum tímalokun (0). Getur valdið læsingarhaldi og bólgu",
       "iit_ok": "Aðgerðalaus-í-viðskiptum tímalokun er stillt",
-      "ckpt_short": "Athugunarpunktabil er 5 mínútur eða minna. Íhugaðu 10–15 mínútur fyrir mikla skrifálag",
+      "ckpt_short": "Athugunarpunktabil er 5 mínútur eða minna. Íhugaðu 10~15 mínútur fyrir mikla skrifálag",
       "ckpt_ok": "Innan hæfilegs sviðs",
       "wal_minimal": "wal_level=minimal gerir PITR og afritun ómögulega. Notaðu replica eða hærra",
       "wal_ok": "WAL stig styður PITR og afritun",
-      "rpc_hdd": "HDD sjálfgefið (4). Fyrir SSD er mælt með 1.1–2",
+      "rpc_hdd": "HDD sjálfgefið (4). Fyrir SSD er mælt með 1.1~2",
       "rpc_ok": "Hentar fyrir SSD",
       "super_many": "Tveir eða fleiri superusers. Hafðu einn fyrir stjórnun og veittu aðeins nauðsynleg réttindi til annarra",
       "super_ok": "Að hámarki einn superuser",
@@ -1012,7 +1017,7 @@
       "intro": "Safna núna les efstu fyrirspurnartölfræði, töflur, vísitölur og stærðir einu sinni og vistar þær sem skyndimynd. Safnaðu að minnsta kosti tvisvar til að sjá breytingar og stærðarþróun",
       "run": "Safna núna",
       "running": "Safnar…",
-      "done": "Safnað {dtm} — {qry} fyrirspurnir · {tbl} töflur · {idx} vísitölur",
+      "done": "Söfnun lokið {dtm}: {qry} fyrirspurnir · {tbl} töflur · {idx} vísitölur",
       "auto": {
         "title": "Sjálfvirk söfnun",
         "desc": "Þegar kveikt er á, er þessi tenging sjálfkrafa safnað á hverjum degi klukkan 3 að morgni (Kóreutími). Eftir 7 eða fleiri daga geturðu treyst á röðun hægra fyrirspurna og lista yfir ónotaða vísitölu",
@@ -1034,13 +1039,13 @@
       "sortCalls": "Köll",
       "empty": "Engar skyndimyndir ennþá. Ýttu á Safna núna á Safna flipanum",
       "range": "Breyting á milli {from} → {to}",
-      "first": "Fyrsta skyndimynd klukkan {dtm} — uppsafnað gildi (breytingar frá næstu skyndimynd)",
+      "first": "Fyrsta söfnun {dtm}: Uppsöfnuð (aukning/lækkun frá næstu söfnun)",
       "query": "Fyrirspurn (bókstafir grímuklæddir)",
       "calls": "Köll",
       "totalMs": "Heildar ms",
       "meanMs": "Meðaltal ms",
       "rows": "Raðir",
-      "reset": "Endurstilling tölfræði greind — sýnt sem uppsafnað",
+      "reset": "Tölfræði endurstillt greind: Sýnt sem uppsöfnuð",
       "src": "Uppruni",
       "srcToggle": "Sýna eða fela upprunaupplýsingar",
       "openSqlLab": "Opna í SQL Tuning",
@@ -1048,7 +1053,7 @@
       "sortMax": "Hámark einstaks keyrslutíma",
       "maxMs": "Hámark einstaks ms",
       "diagToggle": "Greina orsök",
-      "noMax": "Engin hámarksgildi — {n} atriði eru úr eldri söfnunum án hámarksgildis, svo þau eru tímabundið raðað eftir meðaltali (ekki eftir heildartíma). Söfnun núna mun fylla út hámarksgildið."
+      "noMax": "Engin hámarksgildi: {n} atriði eru gamlar söfnunir án eins hámarksgildis, svo þau eru tímabundið raðað eftir einu meðaltali (ekki eftir heildartíma). Hámarksgildi verða fyllt út með núverandi söfnun."
     },
     "health": {
       "empty": "Engar skyndimyndir ennþá. Ýttu á Safna núna á Safna flipanum",
@@ -1056,9 +1061,9 @@
       "unusedIdx": "Ónotuð vísitölur",
       "unusedIdxHint": "Vísitölur sem aldrei hafa verið notaðar síðan síðasta endurstilling tölfræði (eftir stærð). Ekki sleppa PK eða einstökum takmörkunarvísitölum",
       "fullScan": "Of mikil heildarskönnun",
-      "fullScanHint": "Töflur með 1.000+ lifandi raðir þar sem heildarskönnun er að minnsta kosti helmingur — skoðaðu vísitölur á síunardálkum",
+      "fullScanHint": "Töflur með 1.000+ virkar raðir og yfir helming fullra skanna: Farðu yfir vísitölur á skilyrðisdálkum.",
       "dead": "Of margar dauðar túplur",
-      "deadHint": "Hlutfall dauðra túpla 20% eða meira — athugaðu VACUUM og autovacuum stillingar",
+      "deadHint": "Hlutfall dauðra túpla yfir 20%: Farðu yfir VACUUM og autovacuum stillingar.",
       "none": "Engin",
       "scans": "skannanir"
     },
@@ -1074,7 +1079,7 @@
     },
     "activity": {
       "refresh": "Endurnýja",
-      "live": "Lifandi fyrirspurn — ekki geymd",
+      "live": "Rauntíma fyrirspurn: Ekki vistuð",
       "sessions": "Virkni lotu",
       "locks": "Læsingar",
       "none": "Engin"
@@ -1101,7 +1106,7 @@
         "BATCH": "Líklega hópur eða tímasett verk. Dreifðu keyrslutímum frá háannatímum og minnkaðu vinnu á hverja skuldbindingu. Athugaðu vísitölur og tölfræði (ANALYZE) á markatöflunum, og skiptu löngum færslum. Að setja nafn verksins í application_name gerir næstu flokkun nákvæmari.",
         "PROGRAM": "Þetta virðist vera fyrirspurn sem forritið keyrði. Athugaðu keyrsluáætlunina í SQL stillingu. Ef hámark einstaks keyrslutíma er langur, skoðaðu fyrst vísitölur og samsetningarröð. Ef ein keyrsla er stutt en fjöldi kalla er mikill, skoðaðu endurtekin köll (N+1) og skyndiminni. Settu þjónustunafnið í application_name tengipottarins.",
         "PLATFORM": "Líklega DB eða innri kerfisvinna eins og autovacuum eða afritun. Venjulega er engin aðgerð nauðsynleg. Ef það heldur áfram að vera efst, skoðaðu autovacuum þröskulda og maintenance_work_mem.",
-        "MONITOR": "Þetta er dbms.pi sjálfsöfnunar fyrirspurn — schema.pi tengingin er föst skipun sem les aðeins tölfræðilegar sýnir/skrár (pg_stat_*·pg_catalog), svo þetta er ekki viðskiptafyrirspurn og engin aðgerð viðskiptavina er nauðsynleg. Ef álag á markgagnagrunninn er vandamál, minnkaðu fjölda skipta sem þú opnar söfnunarhnappinn/eftirlitsskjáinn. Skipanir frá öðrum eftirlitstólum sem lesa sömu tölfræðilegu sýnir eru einnig flokkaðar hér.",
+        "MONITOR": "dbms.pi eigin söfnunarfyrirspurn. schema.pi tengingin les aðeins tölfræðilegar sýnir og skrár (pg_stat_*, pg_catalog) með föstum yfirlýsingum, svo það er ekki viðskiptafyrirspurn og engin aðgerð viðskiptavina er nauðsynleg. Ef álag á markgagnagrunninn er vandamál, minnkaðu tíðni þess að opna söfnunarhnappinn eða eftirlitsskjáinn. Yfirlýsingar frá öðrum eftirlitstólum sem lesa sömu tölfræðilegu sýnir eru einnig flokkaðar hér.",
         "UNKNOWN": "Engin vísbending er um upprunann. Stilltu application_name á hverri tengingu og skiptu reikningum eftir tilgangi; það verður flokkað út frá næstu sýnum."
       },
       "detail": {
@@ -1112,7 +1117,7 @@
         "period": "Athugað tímabil",
         "none": "(tómt)"
       },
-      "noSample": "Engin sýni enn — keyrandi lotur eru sýndar þegar þú skoðar eftirlitsborðið eða Virkni og læsingar flipann. Í bili er það flokkað út frá reikningsnafninu eingöngu.",
+      "noSample": "Engin sýni ennþá. Keyrandi lotur safnast sem sýni þegar skoðað er Monitoring Board eða Activity/Locks flipana. Eins og er eru þau aðeins flokkuð eftir reikningsnafni til viðmiðunar.",
       "verOff": "Þessi DB er eldri en PostgreSQL 14, svo keyrandi lotur hafa enga fyrirspurnarauðkenni. Aðeins reikningurinn (viss) er sýndur.",
       "privOff": "Tengingarreikningurinn getur ekki séð upplýsingar um lotur annarra reikninga, svo engin sýni eru safnað. Biddu DB stjórnanda að keyra GRANT pg_read_all_stats TO {user};",
       "linkUsr": "tengingarreikningur",
@@ -1123,11 +1128,11 @@
     "diag": {
       "title": "Greina orsök",
       "fix": "Aðgerð:",
-      "none": "Engin orsök kom fram í tölfræði — athugaðu framkvæmdaráætlunina í SQL Tuning.",
-      "cum": "Engar kallanir á þessu tímabili — uppsafnað (síðan tölfræði var endurstillt)",
-      "basis": "Grundvöllur — Hámark 1-sinni {max}ms · Meðaltal {mean}ms · Kall {calls} · Raðir á kall {rpc} · Disklestrarhlutfall {read} · Tímabundnir blokkir {tmp}",
+      "none": "Engin orsök kom í ljós af tölfræði. Opnaðu framkvæmdaráætlunina í SQL Tuning til að athuga.",
+      "cum": "Engar kallanir á þessu tímabili: Uppsafnað (síðan tölfræði var endurstillt)",
+      "basis": "Grunnur: Hámark einn {max}ms · Meðaltal {mean}ms · Kallanir {calls} · Raðir á kall {rpc} · Disklestrarhlutfall {read} · Tímabundnir blokkir {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi sjálfsöfnunarfyrirspurn — eftirlitsskipun sem les aðeins tölfræðilegar sýnir/skrár.",
+        "cause": "dbms.pi eigin söfnunarfyrirspurn: Eftirlitsyfirlýsing sem les aðeins tölfræðilegar sýnir og skrár.",
         "fix": "Engin aðgerð viðskiptavina er nauðsynleg. Ef álag á markgagnagrunninn er vandamál, fækkaðu því hversu oft þú opnar söfnunar-/eftirlitsskjáinn."
       },
       "NO_MAX": {
@@ -1135,31 +1140,31 @@
         "fix": "Smelltu á 'Safna' einu sinni núna til að fylla út hámarksgildi fyrir nákvæma greiningu."
       },
       "SLOW_EACH": {
-        "cause": "Alltaf hægt — Tekur langan tíma í hvert skipti sem það keyrir, með hámark {max}ms og meðaltal {mean}ms.",
+        "cause": "Hægt í hvert skipti: Tekur langan tíma í hverri framkvæmd með hámark {max}ms og meðaltal {mean}ms.",
         "fix": "① Opnaðu framkvæmdaráætlunina í 'Opna í SQL Tuning'. ② Ef það eru fullar skannanir (Seq Scan) eða stórar raðanir, skoðaðu vísitölur á WHERE/JOIN skilyrðisdálkum. ③ Þrengdu skilyrði til að lesa aðeins nauðsynlega dálka/raðir."
       },
       "SPIKE": {
-        "cause": "Stöku tafir — Meðaltal {mean}ms, en tekur stundum langan tíma í hámark {max}ms ({x} sinnum meðaltalið).",
+        "cause": "Stöku töf: Meðaltal {mean}ms, en tekur stundum langan tíma með hámark {max}ms ({x} sinnum meðaltalið).",
         "fix": "① Þegar hægt er, athugaðu læsingarbið (wait_event) í Activity/Locks flipanum. ② Ef aðeins fyrsta keyrsla er hæg, var skyndiminnið tómt og diskurinn lesinn. ③ Berðu saman sömu fyrirspurn með mismunandi gildum í SQL Tuning til að sjá hvort framkvæmdaráætlunin breytist eftir gildum."
       },
       "DISK_READ": {
-        "cause": "Skyndiminni missir — {pct}% ({read} blokkir) af lesnum blokkum voru lesnar af diski, ekki minni.",
+        "cause": "Skyndiminni missir: {pct}% ({read} blokkir) af lesnum blokkum voru lesnar af diski, ekki minni.",
         "fix": "① Minnkaðu lestrarbilið með vísitölum. ② Þrengdu fyrirspurnartímabil/skilyrði. ③ Ef oft lesin gögn haldast mikil, skoðaðu shared_buffers (minni)."
       },
       "TEMP_SPILL": {
-        "cause": "Minni yfirflæði — Röðun/hash fór yfir work_mem og skrifaði {blk} blokkir (u.þ.b. {mb}MB, {perCall} blokkir á kall) í tímabundnar skrár.",
+        "cause": "Minni yfirflæði: Röðun/hash fór yfir work_mem og skrifaði {blk} blokkir (u.þ.b. {mb}MB, {perCall} blokkir á kall) í tímabundnar skrár.",
         "fix": "① Að setja vísitölur á ORDER BY/GROUP BY dálka sleppir röðun. ② Fyrst, minnkaðu fjölda raða til að raða (LIMIT innra). ③ Ef algerlega nauðsynlegt, auka SET LOCAL work_mem aðeins fyrir þessa fyrirspurnarfærslu."
       },
       "MANY_ROWS": {
-        "cause": "Of mikil sókn — Sækir {perCall} raðir á kall.",
+        "cause": "Of mikil fyrirspurn: Sækir {perCall} raðir á kall.",
         "fix": "① Skjálistar eru sóttir síðu fyrir síðu. ② SELECT velur aðeins dálka sem eru notaðir. ③ Samanburður er framkvæmdur í gagnagrunninum og aðeins niðurstöðurnar eru mótteknar."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST innbyggð sía (!inner) skipun — að sía foreldra eftir barnaskilyrðum getur skannað allt settið áður en flokkunarskilyrði eru notuð.",
+        "cause": "PostgREST innbyggð sía (!inner) yfirlýsing: Síun foreldra eftir skilyrðum barna getur skannað alla töfluna áður en flokkunarskilyrðið er uppfyllt.",
         "fix": "① Athugaðu hvort það séu vísitölur á sameiningarlyklum og síudálkum. ② Færðu síur yfir í skilyrði foreldratöflunnar. ③ Fella börn inn í núverandi foreldra fyrirspurn eða sameina þau í eina gagnagrunnsaðgerð."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET blaðsíðuskipti — Verður smám saman hægara eftir því sem það les og hendir fyrri röðum fyrir síðari síður.",
+        "cause": "OFFSET blaðsíðun: Síðari síður lesa og henda fyrri röðum, verða smám saman hægari.",
         "fix": "Breyttu í lyklasett blaðsíðuskipti (WHERE id > last_id ORDER BY id LIMIT n) sem les frá lyklinum eftir síðasta móttekna lykil."
       }
     }
@@ -1192,8 +1197,8 @@
       "toDraft": "Búa til pípu drög úr {n} völdum"
     },
     "ready": {
-      "ok": "WAL rökrétt afritun tilbúin — töflur með PK geta notað LOGICAL",
-      "no": "WAL rökrétt afritun ekki tilbúin — safnaðu með könnun eða lykilsamanburði",
+      "ok": "WAL rökrétt afritun tilbúin: Töflur með PK geta notað LOGICAL aðferð.",
+      "no": "WAL rökrétt afritun ekki tilbúin: Safnaðu með polling/lykil samanburðaraðferð.",
       "senders": "{n} afritunartengingar"
     },
     "adapter": {
@@ -1208,20 +1213,20 @@
       "HAS_SOFT_DEL": "Hefur mjúk-eyðingar dálk",
       "NO_SOFT_DEL": "Enginn mjúk-eyðingar dálkur",
       "HAS_PK": "Hefur aðallykil",
-      "NO_PK": "Enginn aðallykill — ekki hægt að bera kennsl á breyttar raðir",
+      "NO_PK": "Enginn PK: Getur ekki auðkennt breyttar raðir.",
       "DELETE_UNSEEN": "Könnun getur ekki fangað líkamlegar DELETEs (mælt með mjúk-eyðingar dálki)",
       "LOGICAL_NOT_READY": "Getur skipt yfir í LOGICAL þegar WAL rökrétt afritun er tilbúin",
-      "FULL_RELOAD_ONLY": "Enginn PK eða breytingatíma dálkur, svo engin stigvaxandi söfnun — bættu við PK",
+      "FULL_RELOAD_ONLY": "Enginn PK/breytingartími, svo stigvaxandi söfnun ekki möguleg: Mælt með PK viðbót.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level er ekki logical (breyting þess þarf endurræsingu DB)",
       "NO_SLOTS": "max_replication_slots er 0",
       "NO_SENDERS": "max_wal_senders er 0",
-      "IS_STANDBY": "Biðþjónn — taktu rökrétta afritun frá aðalþjóni",
+      "IS_STANDBY": "Biðþjónn: Fáðu rökrétta afritun frá aðalþjóninum.",
       "SETTINGS_UNKNOWN": "Gat ekki lesið stillingar, reiðubúnaður óþekktur"
     },
     "ed": {
       "title": "Pípu skilgreiningar",
-      "draftOnly": "Aðeins hönnun — vistuð sem drög (DRAFT)",
+      "draftOnly": "Aðeins hönnun: Vista sem DRAFT aðeins.",
       "new": "Ný pípa",
       "empty": "Engar vistaðar pípur",
       "manual": "Handvirkt",
@@ -1290,8 +1295,8 @@
     },
     "warn": {
       "none": "Engar athyglisverðar viðvaranir.",
-      "SEQ_SCAN_LARGE": "Full skönnun á {relation} (um {rows} raðir) — íhugaðu vísitölu á síunardálkunum.",
-      "NESTED_LOOP_HIGH": "Innbyggð lykkja framleiðir um {rows} raðir — íhugaðu hash eða merge join, eða vísitölu á join skilyrðinu.",
+      "SEQ_SCAN_LARGE": "Tafla {relation} er að framkvæma fulla skönnun (áætlað {rows} raðir): Farðu yfir vísitölur á skilyrðisdálkum.",
+      "NESTED_LOOP_HIGH": "Niðurstaða innbyggðrar lykkju er áætlað {rows} raðir. Farðu yfir hash/merge joins eða vísitölur á join skilyrðum.",
       "SORT_SPILL": "Raðunarstærð er um {kb}KB, yfir sjálfgefnu work_mem (4MB); það gæti lekið á disk."
     },
     "lint": {
@@ -1305,14 +1310,14 @@
         "char": "stafur"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — veldu aðeins dálkana sem þú þarft (auka I/O, engin yfirgripsmikil vísitala).",
-        "FUNC_ON_COLUMN": "Síunardálkurinn {column} er vafinn í fall eða tjáningu, svo vísitala hans er ekki hægt að nota — umbreyttu fastanum í staðinn.",
-        "LEADING_WILDCARD": "LIKE með leiðandi % getur ekki notað B-tré vísitölu — íhugaðu pg_trgm GIN vísitölu.",
-        "OR_DIFF_COLUMNS": "OR-skilyrði á mismunandi dálkum — íhugaðu að skipta með UNION (bættu við skilyrði um útilokun tvítekninga ef UNION ALL) eða fara yfir vísitölur fyrir hvern dálk.",
-        "IMPLICIT_CAST": "{column} er borið saman við tölustaf í gæsalöppum — samsvaraðu dálka- og fastagildistegundum (óbein steypa).",
-        "NOT_IN_SUBQUERY": "NOT IN (undirfyrirspurn) skilar engu þegar NULLs eru til staðar og er hægt — notaðu NOT EXISTS.",
-        "NO_WHERE": "Engin WHERE ákvæði — á stórri töflu er þetta full skönnun (bættu við skilyrði eða LIMIT).",
-        "DOMAIN_MISMATCH": "{column} er {expected} tegund samkvæmt staðlaðri léni en er borið saman við fasta af annarri tegund — óbein steypa getur komið í veg fyrir notkun vísitölu."
+        "SELECT_STAR": "SELECT *: Veldu aðeins nauðsynlega dálka (ónauðsynleg I/O, ekki hægt að nota covering index).",
+        "FUNC_ON_COLUMN": "Skilyrðisdálkur {column} er unninn með falli/aðgerð, svo ekki er hægt að nota vísitölur. Vinndu stöðuga hliðina.",
+        "LEADING_WILDCARD": "LIKE með leiðandi % getur ekki notað B-tré vísitölu. Farðu yfir pg_trgm GIN vísitölur.",
+        "OR_DIFF_COLUMNS": "Mismunandi dálkaskilyrði eru flokkuð með OR. Farðu yfir UNION aðskilnað (bættu við skilyrði fyrir útilokun tvítekninga ef UNION ALL) eða vísitölur á hvern dálk.",
+        "IMPLICIT_CAST": "{column} er borinn saman við tölustaf í gæsalöppum. Passaðu dálkategund og stöðuga tegund (óbein tegundarbreyting).",
+        "NOT_IN_SUBQUERY": "NOT IN (undirfyrirspurn) getur verið tóm og hæg ef NULLs eru blandaðir. Breyttu í NOT EXISTS.",
+        "NO_WHERE": "Engin WHERE skilyrði. Ef það er stór tafla, er það full skönnun (bættu við LIMIT eða skilyrðum).",
+        "DOMAIN_MISMATCH": "{column} er af gerðinni {expected} samkvæmt staðlaðri léni, en er borinn saman við fasta af annarri gerð. Óbein gerðarbreyting getur komið í veg fyrir notkun vísitölu."
       }
     },
     "saved": {
@@ -1338,12 +1343,12 @@
     },
     "ai": {
       "title": "AI ráðleggingar um stillingar",
-      "intro": "Veldu eina vistaða áætlun til að búa til ráðgjöf. Aðeins SQL og áætlanir með föstum gildum dulbúnum sem ? eru sendar (reglubundin ráðgjöf ef enginn lykill eða við bilun). Eftir að eigandi tengilsins samþykkir, keyrðu explain aftur fyrir sama SQL, vistaðu það og mældu áhrifin með þeirri síðari áætlun — aðeins þá er það skráð sem beitt.",
+      "intro": "Veldu eina vistaða áætlun til að búa til ráðgjöf. Aðeins SQL og áætlanir með föstum gildum dulbúnum sem ? eru sendar (reglubundin ráðgjöf ef enginn lykill eða við bilun). Eftir að eigandi tengilsins samþykkir, keyrðu explain aftur fyrir sama SQL, vistaðu það og mældu áhrifin með þeirri síðari áætlun : aðeins þá er það skráð sem beitt.",
       "pickPlan": "Veldu vistaða áætlun fyrir ráðgjöf",
       "create": "Búa til ráðgjöf",
       "creating": "Bý til… (allt að 30 sek.)",
       "noPlans": "Engar vistaðar áætlanir. Skoðaðu explain áætlun hér að ofan og vistaðu hana.",
-      "note": "Ein ráðgjöf á hverja áætlun. Eyða núverandi ráðgjöf til að endurnýja. DDL er aðeins lagt til — beittu því í schema.pi.",
+      "note": "Ein ráðgjöf á hverja áætlun. Eyða núverandi ráðgjöf til að endurnýja. DDL er aðeins lagt til : beittu því í schema.pi.",
       "empty": "Engin ráðgjöf ennþá.",
       "noItems": "Engar endurbætur fundust fyrir þessa áætlun.",
       "cost": "Fyrri kostnaður",
@@ -1385,10 +1390,10 @@
       "copy": "Afrita",
       "copied": "Afritað",
       "rule": {
-        "SEQ_SCAN_INDEX": "Full skönnun á {relation} — búðu til vísitölu á síunarsúlu {column} (skiptu NN í vísitöluheiti út fyrir raðnúmer).",
-        "SEQ_SCAN_STATS": "Full skönnun á {relation} — athugaðu síunarsúlurnar og vertu viss um að tölfræði (ANALYZE) sé uppfærð.",
-        "NESTED_LOOP": "Innbyggð lykkja býst við {rows} röðum — endurnýjaðu tölfræði og íhugaðu join-key vísitölur eða hash join.",
-        "SORT_SPILL": "Röðun um {kb} KB gæti farið yfir á disk — íhugaðu að hækka session work_mem eða vísitölu á röðunarsúlunum.",
+        "SEQ_SCAN_INDEX": "{relation} full skönnun: Búðu til vísitölu á skilyrðisdálki {column} (vísitölunafn NN verður skipt út fyrir raðnúmer).",
+        "SEQ_SCAN_STATS": "{relation} full skönnun: Athugaðu skilyrðisdálka og tryggðu að tölfræði (ANALYZE) sé uppfærð.",
+        "NESTED_LOOP": "Niðurstaða innbyggðrar lykkju er áætlað {rows} raðir: Uppfærðu tölfræði og farðu yfir join skilyrðisvísitölur eða hash joins.",
+        "SORT_SPILL": "Röðun gæti farið yfir á disk um það bil {kb}KB. Farðu yfir aukningu á lotu work_mem eða vísitölur á röðunardálkum.",
         "SELECT_STAR": "Veldu aðeins þær súlur sem þú þarft í stað SELECT * (minna I/O, mögulegar covering vísitölur).",
         "FUNC_ON_COLUMN": "Færðu fallið/segðina á síunarsúlu {column} yfir á fasta hliðina (gerir vísitölu notkun kleift).",
         "IMPLICIT_CAST": "Passaðu saman tegundir {column} og fasta gildisins (fjarlægðu óbeina gerðarbreytingu).",
@@ -1448,9 +1453,9 @@
     },
     "desc": {
       "FREE": "Kanna og læra",
-      "D1": "Rekstraraðili — Athugar hvort gagnagrunnurinn sé í lagi núna",
-      "D2": "Hönnuður og stillir — Lagar hægar SQL fyrirspurnir",
-      "D3": "DBA og DA — Frá rekstraröryggi til innleiðingar og gagnasafns"
+      "D1": "Rekstraraðili: Athugar hvort gagnagrunnurinn sé heilbrigður núna.",
+      "D2": "Hönnuður/Stillingaraðili: Lagar hæga SQL.",
+      "D3": "DBA/DA: Rekstraröryggi, flutningur og jafnvel gagnasafn."
     },
     "feat": {
       "FREE": "Vöktunarborð, skoðun á framkvæmdaráætlun, grunnþjálfun",
@@ -1493,7 +1498,7 @@
       "required": "Þessi eiginleiki er í boði frá {plan} áskriftinni.",
       "limit": "Þú hefur notað allar tiltækar tilraunir fyrir þetta tímabil. Þú getur notað meira með því að uppfæra í {plan} áskriftina.",
       "limitTop": "Þú hefur notað allar tiltækar tilraunir fyrir þetta tímabil. Þú getur notað það aftur á næsta tímabili.",
-      "expired": "schema.pi áskriftin þín er útrunnin — vinsamlegast framkvæmdu greiðslu á schema.pi áskriftarskjánum.",
+      "expired": "schema.pi áætlunin þín er útrunnin. Vinsamlegast greiddu á schema.pi áætlunarskjánum.",
       "go": "Skoða áskrift",
       "close": "Loka"
     }

@@ -28,7 +28,7 @@ import {
 
 const CARD = 'bg-surface rounded-2xl p-4'
 const nf = (v: number | null, d = 1) =>
-  v === null ? '—' : v.toLocaleString(undefined, { maximumFractionDigits: d })
+  v === null ? '-' : v.toLocaleString(undefined, { maximumFractionDigits: d })
 const BIG: Record<Lvl, string> = {
   RISK: 'border-2 border-red-500/60',
   WARN: 'border border-amber-500/50',
@@ -111,10 +111,10 @@ export function KpiNumbers({ kpi }: { kpi: Kpi | null }) {
   const items = [
     {
       k: 'sess',
-      v: kpi?.sess == null ? '—' : `${nf(kpi.sess, 0)} / ${nf(kpi.maxConn, 0)}`,
+      v: kpi?.sess == null ? '-' : `${nf(kpi.sess, 0)} / ${nf(kpi.maxConn, 0)}`,
     },
     { k: 'tps', v: nf(kpi?.tps ?? null, 1) },
-    { k: 'cache', v: kpi?.cachePct == null ? '—' : `${nf(kpi.cachePct, 2)}%` },
+    { k: 'cache', v: kpi?.cachePct == null ? '-' : `${nf(kpi.cachePct, 2)}%` },
     { k: 'size', v: fmtBytes(kpi?.dbSzByte ?? null) },
   ] as const
   return (

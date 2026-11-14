@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analýza a jezero",
     "intro": "KPI aktivity dbms, 3vrstvý návrh jezera a katalog datových sad na jednom místě.",
-    "storageNotice": "Úložiště jezera (na straně zákazníka nebo v cloudu) ještě není rozhodnuto (PRD sekce 10 #7). Prozatím jsou uloženy pouze návrhy a mapování názvů – žádná řádková data.",
+    "storageNotice": "Úložiště jezera (na straně zákazníka nebo v cloudu) ještě není rozhodnuto (PRD sekce 10 #7). Prozatím jsou uloženy pouze návrhy a mapování názvů : žádná řádková data.",
     "noLink": "Nejprve vyberte nebo zaregistrujte propojení schema.pi.",
     "goConnect": "Zaregistrovat propojení",
     "loading": "Načítání…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Analýza GAP — Model↔DB",
+    "title": "Analýza GAP: Model↔DB",
     "intro": "Porovnejte návrhový model schema.pi a historii aplikací DDL s živým katalogem DB, abyste našli odchylky a změřili, zda jsou navržené indexy skutečně používány. Řádková data zákazníků nejsou nikdy čtena ani ukládána.",
     "needLink": "Nejprve si vyberte propojení schema.pi výše. Pokud žádné nemáte, zaregistrujte token v menu 'Propojení'.",
     "needConn": "Vyberte DB připojení pro porovnání výše.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Požadavek {id}",
     "notSaved": "Nepodařilo se uložit toto spuštění do historie (výsledky jsou zobrazeny normálně).",
-    "capped": "Příliš mnoho položek – zobrazuje se prvních {cap} na sekci (počty jsou kompletní).",
+    "capped": "Příliš mnoho položek : zobrazuje se prvních {cap} na sekci (počty jsou kompletní).",
     "statsMissing": "Statistiky využití indexu nebyly k dispozici, takže nebylo možné posoudit využití.",
     "sum": {
       "missingTables": "Tabulky chybějící v DB",
@@ -230,7 +230,7 @@
       "USED": "Používáno",
       "NO_STATS": "Žádné statistiky",
       "CONSTRAINT": "Omezení jedinečnosti (ponechat)",
-      "NO_DATA": "Žádná data nebo neshromážděné statistiky — nelze posoudit",
+      "NO_DATA": "Žádná data nebo neshromážděné statistiky: nelze určit",
       "OBSERVING": "Sledování (méně než 7 dní)",
       "UNUSED_CAND": "Kandidát na nepoužívané"
     },
@@ -245,14 +245,14 @@
       "RATE": "Příliš mnoho požadavků. Zkuste to prosím znovu za minutu."
     },
     "schema": "Schéma",
-    "schemaHint": "Porovnávají se pouze běžné a rozdělené tabulky v tomto schématu (pohledy jsou vyloučeny). Výchozí public — interní schémata Supabase (auth, storage, …) jsou vynechána.",
-    "truncated": "{names} dosáhly limitu {max} řádků a byly zkráceny — některé výsledky „není v DB“ / „není v modelu“ mohou být chybné. Zúžte schéma a spusťte znovu.",
+    "schemaHint": "Porovnává pouze běžné a rozdělené tabulky v tomto schématu (kromě pohledů). Výchozí public: interní schémata Supabase (auth, storage atd.) jsou vyloučena.",
+    "truncated": "Dotaz {names} byl zkrácen na {max} řádků. Některé detekce „Není v DB“/„Není v modelu“ mohou být falešné. Zúžte schéma a znovu detekujte.",
     "colUnchecked": "Protože dotaz na sloupce byl zkrácen, {n} výsledků chybějících/extra sloupců je považováno za neověřitelné a vyloučeno z počtu neshod sloupců.",
-    "renamed": "{n} PK index(y) aplikované podle starého pravidla pojmenování (_PKEY) existují v DB pod novým názvem (PK_) — normální",
-    "superseded": "{n} starších požadavků bylo vyloučeno, protože pozdější požadavek znovu vytvořil stejnou tabulku (DROP … CASCADE) — normální",
+    "renamed": "{n} PK indexů použitých se starou konvencí pojmenování (_PKEY) je v DB s novým názvem (PK_). Normální.",
+    "superseded": "{n} předchozích požadavků bylo vyloučeno z porovnání, protože pozdější požadavky znovu vytvořily stejnou tabulku (DROP … CASCADE). Normální.",
     "supersededItem": "Požadavek {id} → nahrazen požadavkem {by}",
     "sysCols": "{n} systémových sloupců přidaných automaticky při generování DDL není v modelu záměrně a jsou vyloučeny z neshod",
-    "groupOwn": "Předpona projektu {pfx} — kandidáti chybějící v modelu",
+    "groupOwn": "Tento prefix projektu {pfx}: kandidáti chybějící v modelu",
     "groupOther": "Jiný systém {pfx}",
     "basis": "Odhad. řádky {rows} · od {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Pokud objekty po opětovné aplikaci stále mizí, podezřívejte ruční smazání nebo rollback a zkontrolujte aktivitu účtu připojení s vaším DBA."
       },
       "extraTables": {
-        "s1": "Tento balíček předpon projektu = chybějící kandidáti modelu — importujte je do modelu přes schema.pi → Nastavení → Reverzní, nebo se rozhodněte, zda je odstraníte, pokud se jedná o nepoužívané tabulky.",
-        "s2": "Jiné skupiny předpon = jiné systémy sdílející tuto DB — nejsou akčními položkami pro tento projekt.",
+        "s1": "Tato skupina prefixů projektu = kandidáti chybějící v modelu: importujte do modelu přes schema.pi → Nastavení → Reverse, nebo se rozhodněte, zda tabulku smazat, pokud se nepoužívá.",
+        "s2": "Jiné skupiny prefixů = jiné systémy používající stejnou DB: nejsou předmětem akce tohoto projektu.",
         "s3": "Pokud cílové schéma není public, změňte pole „Schéma“ výše a spusťte znovu."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Typ/NULL se liší = zarovnejte s modelem (zdroj pravdy); před zkrácením délky nebo přepnutím na NOT NULL ověřte, zda stávající řádky splňují podmínku."
       },
       "idxUsage": {
-        "s1": "Před odstraněním zkontrolujte ①, zda okno statistik pokrývá alespoň jeden obchodní cyklus (např. dávka na konci měsíce) — viz „od“.",
+        "s1": "Před smazáním zkontrolujte ①, zda je období sběru statistik alespoň jeden provozní cyklus (např. dávka na konci měsíce): viz referenční datum.",
         "s2": "② Není to unikátní/PK index (ty se zobrazují samostatně jako „omezení jedinečnosti“).",
         "s3": "③ EXPLAIN reprezentativní SQL tabulky v SQL Tuning a ověřte, že tento index není použit.",
         "s4": "Jakmile jsou všechny tři potvrzeny, odstraňte index z modelu v schema.pi a aplikujte pomocí DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Jak vydat připojovací token",
     "how1": "Přihlaste se do schema.pi a otevřete předmětovou oblast, kterou chcete připojit",
     "how2": "Přejděte na Předmětová oblast → Nastavení → Připojovací token a stiskněte 'Vydat token' (role správce oblasti nebo DA)",
-    "how3": "Zkopírujte token začínající slk_ — zobrazí se pouze jednou při vydání",
+    "how3": "Zkopírujte vydaný token začínající na slk_. Originál se zobrazí pouze jednou v okamžiku vydání.",
     "how4": "Vložte jej níže a zaregistrujte",
     "openSchema": "Otevřít schema.pi",
     "registerTitle": "Zaregistrovat připojení",
@@ -384,7 +384,7 @@
     "retry": "Zkusit znovu",
     "pickerLink": "Propojení",
     "pickerConn": "Připojení",
-    "pickerEmpty": "Žádná připojení —",
+    "pickerEmpty": "Žádná připojení.",
     "pickerGo": "zaregistrujte jedno na /connect",
     "errors": {
       "LINK_AUTH": "Připojovací token vypršel nebo byl zrušen. Vydání nového tokenu v schema.pi a znovu jej zaregistrujte",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Migrace dat (PiMig)",
-    "intro": "Vypočítá pořadí načítání tabulek z relací ve vašem návrhovém modelu schema.pi, organizuje velikost bloků, paralelismus a kontrolní seznam pro přechod a generuje ověřovací SQL, které sami spustíte na zdroji a cíli. Tato obrazovka pouze plánuje a kontroluje – nepřesouvá data ani nečte řádky zákaznické DB.",
+    "intro": "Vypočítá pořadí načítání tabulek z relací ve vašem návrhovém modelu schema.pi, organizuje velikost bloků, paralelismus a kontrolní seznam pro přechod a generuje ověřovací SQL, které sami spustíte na zdroji a cíli. Tato obrazovka pouze plánuje a kontroluje : nepřesouvá data ani nečte řádky zákaznické DB.",
     "needLink": "Nejprve si vyberte propojení schema.pi výše. Pokud žádné nemáte, zaregistrujte token v menu 'Připojit'.",
     "loading": "Načítání…",
     "newPlan": "Nový plán migrace",
@@ -432,8 +432,8 @@
     "optsHint": "Paralelismus je počet tabulek načítaných současně v rámci jedné úrovně. Velikost bloku je jednotka commitu (řádky), kterou použije spouštěcí engine.",
     "order": "Pořadí načítání",
     "orderHint": "Topologicky seřazeno podle návrhových vztahů (nikoli fyzických FK), takže rodičovské tabulky jsou na prvním místě. Tabulky na stejné úrovni na sobě nezávisí a mohou se načítat paralelně.",
-    "cycles": "{n} kruhových skupin — umístěno na stejné úrovni. Nastavte jejich pořadí ručně a odložte kontroly referencí až po načtení.",
-    "selfRefs": "Tabulky s vlastními referencemi (hierarchické) — nejprve načtěte rodičovské řádky v rámci tabulky",
+    "cycles": "{n} cyklů: umístěno ve stejné fázi. Ručně nastavte pořadí načítání a odložte kontroly referencí až po načtení.",
+    "selfRefs": "Tabulky s vlastními referencemi (hierarchické): nejprve nadřazené řádky v rámci stejné tabulky.",
     "level": "Úroveň {n}",
     "checklist": "Kontrolní seznam pro přechod",
     "toReady": "Označit jako připraveno",
@@ -471,7 +471,7 @@
     },
     "verify": "Ověřovací SQL",
     "verifyHint": "Generuje dotazy na počet, součet číselných sloupců, duplicitní klíče a hash klíčů pro každou tabulku v pořadí načítání. Spusťte je sami na zdroji a cíli a porovnejte (tato obrazovka je nespouští).",
-    "noHashOracle": "Hashovací funkce a vykreslování textu v Oracle·Tibero se liší od PostgreSQL, takže hashovací dotazy jsou vynechány – porovnejte počty, součty a duplicitní klíče.",
+    "noHashOracle": "Oracle a Tibero vynechávají vyhledávání hash, protože hashovací funkce a reprezentace znaků se liší od PostgreSQL. Porovnejte podle počtu, součtu a duplikace klíčů.",
     "copy": "Kopírovat",
     "copied": "Zkopírováno",
     "copyFail": "Nepodařilo se zkopírovat. Vyberte text a zkopírujte jej ručně.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Požadavek je neplatný."
     },
     "board": {
-      "subtitle": "Co dělat s touto DB právě teď — 14 signálů OK, varování nebo rizika s řešeními, na první pohled.",
+      "subtitle": "Co dělat nyní v této DB: Na první pohled uvidíte normální, varovný a rizikový stav 14 signálů a jejich řešení.",
       "refresh": {
         "updated": "Aktuální k {time} · obnovuje se každou minutu",
         "now": "Obnovit nyní",
@@ -564,11 +564,11 @@
         "NA": "N/A"
       },
       "overall": {
-        "RISK": "Riziko – je třeba okamžitá akce",
-        "WARN": "Varování – některé položky vyžadují kontrolu",
-        "UNKNOWN": "Neznámé – zkontrolujte připojení",
-        "OK": "OK – každý signál je v mezích",
-        "CONN_DOWN": "Nelze se připojit k DB — nejprve zkontrolujte připojení",
+        "RISK": "Riziko: Je nutná okamžitá akce",
+        "WARN": "Varování: Položky k revizi",
+        "UNKNOWN": "Nelze potvrdit: Zkontrolujte stav připojení",
+        "OK": "Normální: Všechny signály jsou v rámci kritérií",
+        "CONN_DOWN": "Nelze se připojit k DB. Nejprve zkontrolujte připojení.",
         "NA": "N/A"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Zobrazit méně",
         "setup": "Nastavte tyto položky, abyste viděli více",
         "none": "Žádné rizikové nebo varovné položky nevyžadují okamžitou akci.",
-        "unknown": "Nelze zkontrolovat {n} {n, plural, one {signál} few {signály} many {signálů} other {signálů}} – důvod naleznete v kartách.",
+        "unknown": "Nelze potvrdit {n} položek: Zkontrolujte důvod na kartě.",
         "myRule": "Moje pravidlo porušeno: {rule}",
         "copySql": "Kopírovat SQL",
         "copied": "Zkopírováno"
@@ -622,34 +622,34 @@
         "REPL": "Zpoždění replikace"
       },
       "fix": {
-        "AVAIL": "Pomalá odezva nebo nedávný restart – zkontrolujte nastavení připojení a stav DB serveru.",
-        "AVAIL_DOWN": "Nepodařilo se připojit k DB – zkontrolujte nastavení připojení a zda je DB server spuštěn.",
-        "CONN_USE": "{sess}/{max} relací na této DB (ne v celém clusteru – ostatní databáze jsou vyloučeny) – zavřete nečinná připojení nebo přidejte pooler připojení (pgbouncer).",
-        "URL": "{n} {n, plural, one {zkontrolovaná URL selhává} few {zkontrolované URL selhávají} many {zkontrolovaných URL selhává} other {zkontrolovaných URL selhává}} · maximální odezva {ms}ms – příčinu naleznete v monitoru schema.pi.",
-        "LONG_QRY": "Dotaz běží {sec}s – zkontrolujte jeho plán a optimalizujte ho, nebo ho nechte zrušit DBA.",
-        "IDLE_TX": "Transakce je nečinná {sec}s – najděte chybějící commit v aplikaci a nastavte časový limit.",
-        "LOCK_WAIT": "{n} {n, plural, one {relace čeká} few {relace čekají} many {relací čeká} other {relací čeká}} na zámky – najděte blokující relaci a ukončete její transakci.",
-        "CACHE_HIT": "Míra zásahů do mezipaměti {pct}% – hledejte plné skenování velkých tabulek nebo zkontrolujte shared_buffers.",
-        "XACT_ERR": "Míra vrácení {pct}%, {dlck} uváznutí — zkontrolujte selhávající transakce a protokoly chyb aplikace.",
-        "SLOW_SQL": "Existuje dotaz, který trvá až {ms}ms na jedno spuštění — prohlédněte si plán spuštění a nalaďte jej, začněte od nejvyššího času jednoho spuštění.",
-        "STORAGE": "DB ({gb} GB) se blíží limitu (zbývá {days} dní) — vyčistěte velké tabulky nebo zvyšte kapacitu.",
-        "VACUUM": "{tbl} má mnoho mrtvých řádků nebo zastaralé statistiky – zkontrolujte nastavení VACUUM (ANALYZE) a autovacuum.",
-        "INDEX": "{n} {n, plural, one {nález indexu} few {nálezy indexů} many {nálezů indexů} other {nálezů indexů}} (neplatné, nepoužívané, plné skenování) – cíle naleznete na kartě stavu tabulek a indexů.",
-        "BACKUP": "Archivace WAL je vypnutá nebo zastavená – zkontrolujte archive_mode, archive_command a stav zálohy.",
-        "REPL": "Zpoždění replikace {sec}s – zkontrolujte stav standby a síť.",
-        "PGSS": "pg_stat_statements není nainstalováno, takže pomalé SQL není k dispozici – povolte jej pomocí níže uvedeného SQL (vyžaduje restart serveru)."
+        "AVAIL": "Pomalá odezva nebo právě restartováno. Zkontrolujte informace o připojení a stav DB serveru.",
+        "AVAIL_DOWN": "Nepodařilo se připojit k DB. Zkontrolujte informace o připojení a zda je DB server aktivní.",
+        "CONN_USE": "Tato DB relace {sess}/{max} (ne v rámci celého clusteru, ostatní DB připojení vyloučena): Ukliďte nečinná připojení nebo nastavte connection pooler (pgbouncer).",
+        "URL": "{n} kontrol URL selhalo · Max. odezva {ms}ms: Zkontrolujte příčinu v monitoru schema.pi.",
+        "LONG_QRY": "Dotaz běží {sec} sekund. Zkontrolujte plán provedení a optimalizujte ho, nebo ho nechte zastavit DBA.",
+        "IDLE_TX": "Transakce je otevřená a nečinná po dobu {sec} sekund. Najděte chybějící commity v aplikaci a nastavte časový limit.",
+        "LOCK_WAIT": "{n} relací čeká na zámky: Najděte blokující relaci a ukončete její transakci.",
+        "CACHE_HIT": "Míra zásahů do cache {pct}%: Hledejte úplné skenování velkých tabulek nebo zkontrolujte shared_buffers.",
+        "XACT_ERR": "Míra rollbacků {pct}%, {dlck} deadlocků: Zkontrolujte selhávající transakce a chybové protokoly aplikace.",
+        "SLOW_SQL": "Existuje dotaz s jednorázovým maximálním časem {ms}ms. Zkontrolujte plán provedení a optimalizujte od nejvyššího jednorázového maximálního času.",
+        "STORAGE": "DB {gb}GB se blíží limitu (zbývá {days} dní). Ukliďte velké tabulky nebo zvyšte kapacitu.",
+        "VACUUM": "{tbl} má mnoho mrtvých řádků nebo zastaralé statistiky. Zkontrolujte nastavení VACUUM (ANALYZE) a autovacuum.",
+        "INDEX": "{n} kontrol indexů (neplatné, nepoužívané, úplné skenování): Zkontrolujte cíle na kartě stavu tabulky/indexu.",
+        "BACKUP": "Archivace WAL je vypnutá nebo zastavená. Zkontrolujte archive_mode, archive_command a stav zálohy.",
+        "REPL": "Zpoždění replikace {sec} sekund: Zkontrolujte stav pohotovostního serveru a sítě.",
+        "PGSS": "Chybí rozšíření pg_stat_statements, takže nelze zobrazit pomalé SQL. Povolte jej pomocí níže uvedeného SQL (vyžaduje restart serveru)."
       },
       "reason": {
         "CONN_DOWN": "Nebylo posouzeno, protože připojení k DB je nefunkční.",
         "PGSS": "Rozšíření pg_stat_statements chybí.",
         "VER": "K dispozici na PostgreSQL 13 nebo novějším.",
         "SAMPLE": "Zatím není dostatek vzorků.",
-        "NO_LIMIT": "Žádný limit velikosti, takže využití není posuzováno – přidejte pravidlo velikosti DB (MB) (>) pro použití jako limit.",
+        "NO_LIMIT": "Využití není určeno, protože není kapacitní limit. Přidání pravidla velikosti DB (MB) (>) jej použije jako limit.",
         "RESET": "Statistiky byly resetovány před méně než 7 dny, takže nepoužívané indexy nejsou posuzovány.",
         "STALE": "Žádné nedávné záznamy kontroly.",
         "STANDBY": "Není použitelné na standby serveru.",
         "NONE": "Nic ke kontrole.",
-        "GRANT": "Chybějící oprávnění – udělte roli pg_monitor účtu připojení.",
+        "GRANT": "Nelze zobrazit z důvodu nedostatku oprávnění. Udělte roli pg_monitor účtu připojení.",
         "LINK": "Dotaz schema.pi selhal ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Pokud nestreamuje, zkontrolujte protokoly standby."
         }
       },
-      "sqlNote": "Níže uvedené SQL je pouze pro čtení, pro kontrolu – opravy (VACUUM, DROP INDEX, pg_terminate_backend) provádí DBA.",
+      "sqlNote": "Níže uvedené SQL je pouze pro ověření jen pro čtení. Akce (VACUUM, DROP INDEX, pg_terminate_backend) provádí přímo DBA.",
       "go": {
         "activity": "Aktivita a zámky",
         "top": "Pomalé dotazy",
@@ -766,8 +766,8 @@
           "tree": "Co zabírá místo a co je třeba vyčistit?"
         },
         "asTable": "Zobrazit jako tabulku",
-        "needHistory": "Zatím žádný trend – nechte tuto obrazovku otevřenou několik minut.",
-        "needPerf": "Žádná historie velikosti – shromažďujte na kartě výkonu nebo nechte tuto obrazovku otevřenou.",
+        "needHistory": "Zatím žádný trend. Bude nakreslen, pokud necháte tuto obrazovku otevřenou několik minut.",
+        "needPerf": "Žádná historie kapacity. Shromážděte ji z karty Výkon nebo nechte tuto obrazovku otevřenou.",
         "noSess": "Žádné relace.",
         "noWait": "Žádné čekání",
         "noData": "Žádná data k zobrazení.",
@@ -840,17 +840,17 @@
         "noStat": "Žádné statistiky"
       },
       "empty": {
-        "noConn": "Tato taxonomie nemá připojení k serveru PostgreSQL k monitorování – zobrazují se pouze URL a stav služby.",
+        "noConn": "V této taxonomii nejsou žádná připojení k serveru PostgreSQL k monitorování. Zobrazuje se pouze stav URL a propojení.",
         "unsupported": "Toto připojení nepodporuje monitorování (pouze připojení k serveru PostgreSQL).",
-        "connFail": "Nepodařilo se připojit k databázi – zkontrolujte nastavení připojení a stav DB.",
-        "linkDown": "Nepodařilo se dosáhnout schema.pi – automaticky se opakuje.",
-        "linkAuth": "Token připojení vypršel – vydejte nový token v schema.pi a zaregistrujte jej.",
-        "timeout": "Odezvy jsou pomalé – automaticky se opakuje.",
+        "connFail": "Nepodařilo se připojit k DB. Zkontrolujte informace o připojení a stav DB.",
+        "linkDown": "Nepodařilo se připojit k schema.pi. Automaticky se brzy pokusí znovu.",
+        "linkAuth": "Token připojení vypršel. Znovu vydejte a zaregistrujte token z schema.pi.",
+        "timeout": "Odezva je pomalá. Automaticky se brzy pokusí znovu.",
         "rate": "Příliš mnoho požadavků, takže interval obnovení byl zvýšen."
       },
       "aux": {
         "rules": "Moje pravidla upozornění ({n} {n, plural, one {aktivní} few {aktivní} many {aktivních} other {aktivních}})",
-        "schemaSvc": "Stav služby – odezvy schema.pi",
+        "schemaSvc": "Stav propojení: odezva služby schema.pi",
         "schemaSvcNote": "Metriky aplikace za posledních 60 minut uložené schema.pi.",
         "source": "Zdroj dat: cílová DB je pouze pro čtení prostřednictvím pojmenovaných dotazů schema.pi (pouze pro čtení); trendy ukládají statistiky pouze do dbms.pi (žádná data řádků)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Zatím žádná diagnostika. Stiskněte „Spustit diagnostiku“",
     "lastRun": "Poslední diagnostika {dtm}",
     "readOnly": "Diagnostika pouze čte (SELECT). Doporučení je vodítkem a závisí na paměti serveru, zatížení a pracovní zátěži.",
-    "truncated": "Příliš mnoho objektů – zkontrolováno bylo pouze prvních 500",
+    "truncated": "Příliš mnoho objektů : zkontrolováno bylo pouze prvních 500",
     "paramsNote": "Celková paměť serveru není známa, takže je odhadnuta z shared_buffers ≈ 25 % RAM. random_page_cost předpokládá SSD.",
     "auditNote": "Tabulky s vypnutým RLS a nepoužívané účty budou zkontrolovány, jakmile je podpoří dotaz odkazu.",
-    "replNote": "Základem je Active-Standby (A-S) – jeden primární + standby. Zpoždění replaye ≥ 5s = varování, ≥ 60s = riziko (měřená reference RPO).",
+    "replNote": "Primárním kritériem je Active-Standby (A-S): 1 Primary + Standby. Varování pro zpoždění přehrávání >= 5 sekund, riziko pro >= 60 sekund (viz skutečné měření RPO).",
     "lagIdle": "Žádné změny",
     "pager": "Stránkování",
     "prev": "Předchozí",
@@ -938,11 +938,11 @@
       "st_ok": "Časový limit příkazu je nastaven.",
       "iit_off": "Žádný časový limit pro nečinnost v transakci (0). Může způsobit držení zámků a nafouknutí.",
       "iit_ok": "Časový limit pro nečinnost v transakci je nastaven.",
-      "ckpt_short": "Interval kontrolního bodu je 5 minut nebo méně. Zvažte 10–15 minut pro zátěže s vysokým zápisem.",
+      "ckpt_short": "Interval kontrolního bodu je 5 minut nebo méně. Zvažte 10~15 minut pro zátěže s vysokým zápisem.",
       "ckpt_ok": "V rozumném rozsahu",
       "wal_minimal": "wal_level=minimal znemožňuje PITR a replikaci. Použijte replica nebo vyšší.",
       "wal_ok": "Úroveň WAL podporuje PITR a replikaci.",
-      "rpc_hdd": "Výchozí hodnota HDD (4). Pro SSD se doporučuje 1.1–2.",
+      "rpc_hdd": "Výchozí hodnota HDD (4). Pro SSD se doporučuje 1.1~2.",
       "rpc_ok": "Vhodné pro SSD.",
       "super_many": "Dva nebo více superuživatelů. Ponechte jednoho pro správu a ostatním udělte pouze potřebná oprávnění.",
       "super_ok": "Maximálně jeden superuživatel.",
@@ -1020,7 +1020,7 @@
       "intro": "Sbírat nyní přečte statistiky nejčastějších dotazů, tabulky, indexy a velikosti jednou a uloží je jako snímek. Sbírejte alespoň dvakrát, abyste viděli změny a trendy velikosti.",
       "run": "Sbírat nyní",
       "running": "Sbírání…",
-      "done": "Shromážděno {dtm} — {qry} dotazů · {tbl} tabulek · {idx} indexů",
+      "done": "Sběr dokončen {dtm}: {qry} dotazů · {tbl} tabulek · {idx} indexů",
       "auto": {
         "title": "Automatický sběr",
         "desc": "Pokud je zapnuto, toto připojení se automaticky shromažďuje každý den ve 3:00 (korejského času). Po 7 a více dnech se můžete spolehnout na pořadí pomalých dotazů a seznam nepoužívaných indexů.",
@@ -1042,13 +1042,13 @@
       "sortCalls": "Volání",
       "empty": "Zatím žádné snímky. Stiskněte „Sbírat nyní“ na kartě „Sbírat“.",
       "range": "Změna mezi {from} → {to}",
-      "first": "První snímek v {dtm} — kumulativní hodnoty (změny od dalšího snímku)",
+      "first": "První sběr {dtm}: Kumulativní (zvýšení/snížení od dalšího sběru)",
       "query": "Dotaz (literály maskované)",
       "calls": "Volání",
       "totalMs": "Celkem ms",
       "meanMs": "Průměr ms",
       "rows": "Řádky",
-      "reset": "Zjištěno resetování statistik – zobrazeno jako kumulativní",
+      "reset": "Detekováno resetování statistik: Zobrazeno jako kumulativní",
       "src": "Zdroj",
       "srcToggle": "Zobrazit nebo skrýt podrobnosti zdroje",
       "openSqlLab": "Otevřít v SQL Tuning",
@@ -1056,7 +1056,7 @@
       "sortMax": "Max. čas jednoho spuštění",
       "maxMs": "Max. jedno ms",
       "diagToggle": "Diagnostikovat příčinu",
-      "noMax": "Žádná maximální hodnota – {n} položek pochází ze starších sbírek bez maximální hodnoty, takže jsou dočasně seřazeny podle průměru (nikoli podle celkového času). Shromáždění nyní vyplní maximální hodnotu."
+      "noMax": "Žádná maximální hodnota: {n} položek jsou staré sběry bez jednorázové maximální hodnoty, takže jsou dočasně seřazeny podle jednorázového průměru (ne podle celkového času). Maximální hodnoty budou doplněny aktuálním sběrem."
     },
     "health": {
       "empty": "Zatím žádné snímky. Stiskněte „Shromáždit nyní“ na kartě „Shromáždit“",
@@ -1064,9 +1064,9 @@
       "unusedIdx": "Nepoužité indexy",
       "unusedIdxHint": "Indexy, které nebyly nikdy použity od posledního resetování statistik (podle velikosti). Neklesejte PK nebo indexy s unikátním omezením",
       "fullScan": "Nadměrné plné skenování",
-      "fullScanHint": "Tabulky s 1 000+ živými řádky, kde plné skenování tvoří alespoň polovinu – zkontrolujte indexy na sloupcích filtru",
+      "fullScanHint": "Tabulky s 1 000+ efektivními řádky a více než polovinou úplných skenů: Zkontrolujte indexy na sloupcích podmínek.",
       "dead": "Nadměrné mrtvé n-tice",
-      "deadHint": "Poměr mrtvých n-tic 20 % nebo více – zkontrolujte nastavení VACUUM a autovacuum",
+      "deadHint": "Poměr mrtvých tuplů přes 20%: Zkontrolujte nastavení VACUUM a autovacuum.",
       "none": "Žádné",
       "scans": "skenování"
     },
@@ -1083,7 +1083,7 @@
     },
     "activity": {
       "refresh": "Obnovit",
-      "live": "Živý dotaz – neuloženo",
+      "live": "Dotaz v reálném čase: Neuloženo",
       "sessions": "Aktivita relací",
       "locks": "Zámky",
       "none": "Žádné"
@@ -1110,7 +1110,7 @@
         "BATCH": "Vypadá to jako dávka nebo naplánovaná úloha. Rozložte doby běhu mimo obchodní špičky a zmenšete práci na jeden commit. Zkontrolujte indexy a statistiky (ANALYZE) na cílových tabulkách a rozdělte dlouhé transakce. Zadání názvu úlohy do application_name zpřesní další klasifikaci.",
         "PROGRAM": "Zdá se, že se jedná o dotaz spuštěný aplikací. Zkontrolujte plán spuštění v ladění SQL. Pokud je maximální doba jednoho spuštění dlouhá, nejprve se podívejte na indexy a pořadí spojení. Pokud je jedno spuštění krátké, ale počet volání je vysoký, podívejte se na opakovaná volání (N+1) a cachování. Název služby uveďte do application_name v connection poolu.",
         "PLATFORM": "Vypadá to jako interní práce DB nebo platformy, jako je autovacuum nebo replikace. Obvykle není potřeba žádná akce. Pokud zůstává na vrcholu, zkontrolujte prahové hodnoty autovacuum a maintenance_work_mem.",
-        "MONITOR": "Toto je samoobslužný sběrný dotaz dbms.pi — připojení schema.pi je pevně daný příkaz, který čte pouze statistická zobrazení/katalogy (pg_stat_*·pg_catalog), takže se nejedná o obchodní dotaz a není vyžadována žádná akce zákazníka. Pokud je problémem zatížení cílové databáze, snižte počet otevření tlačítka sběru/obrazovky monitorování. Zde jsou také seskupeny příkazy z jiných monitorovacích nástrojů, které čtou stejná statistická zobrazení.",
+        "MONITOR": "Vlastní sběrný dotaz dbms.pi. Připojení schema.pi čte pouze statistické pohledy a katalogy (pg_stat_*, pg_catalog) s pevnými příkazy, takže se nejedná o obchodní dotaz a není vyžadována žádná akce zákazníka. Pokud je problémem zatížení cílové databáze, snižte frekvenci otevírání tlačítka sběru nebo obrazovky monitorování. Příkazy z jiných monitorovacích nástrojů, které čtou stejné statistické pohledy, jsou zde také seskupeny.",
         "UNKNOWN": "Není žádná stopa ke zdroji. Nastavte application_name na každém připojení a rozdělte účty podle účelu; bude klasifikováno z dalších vzorků."
       },
       "detail": {
@@ -1121,7 +1121,7 @@
         "period": "Pozorováno",
         "none": "(prázdné)"
       },
-      "noSample": "Zatím žádné vzorky — běžící relace jsou vzorkovány, když si prohlížíte monitorovací panel nebo kartu Aktivita a zámky. Prozatím je klasifikováno pouze podle názvu účtu.",
+      "noSample": "Zatím žádné vzorky. Běžící relace se hromadí jako vzorky při prohlížení karet Monitoring Board nebo Activity/Locks. V současné době jsou pouze klasifikovány podle názvu účtu pro referenci.",
       "verOff": "Tato DB je starší než PostgreSQL 14, takže běžící relace nemají ID dotazu. Zobrazuje se pouze účet (jistý).",
       "privOff": "Propojený účet nemůže vidět podrobnosti relací jiných účtů, takže se neshromažďují žádné vzorky. Požádejte správce DB, aby spustil GRANT pg_read_all_stats TO {user};",
       "linkUsr": "propojený účet",
@@ -1132,11 +1132,11 @@
     "diag": {
       "title": "Diagnostikovat příčinu",
       "fix": "Akce:",
-      "none": "Statistiky neodhalily žádnou příčinu – zkontrolujte plán provedení v SQL Tuning.",
-      "cum": "V tomto intervalu žádné volání – kumulativní (od resetování statistik)",
-      "basis": "Základ – Max. 1x {max}ms · Průměr {mean}ms · Volání {calls} · Řádků na volání {rpc} · Poměr čtení z disku {read} · Dočasné bloky {tmp}",
+      "none": "Statistiky neodhalily žádnou příčinu. Otevřete plán provedení v SQL Tuning a zkontrolujte.",
+      "cum": "Žádné volání v tomto intervalu: Kumulativní (od resetování statistik)",
+      "basis": "Základ: Max. jednorázově {max}ms · Průměr {mean}ms · Volání {calls} · Řádky na volání {rpc} · Poměr čtení disku {read} · Dočasné bloky {tmp}",
       "SELF_MON": {
-        "cause": "Samo-sběrný dotaz dbms.pi – monitorovací příkaz, který čte pouze statistická zobrazení/katalogy.",
+        "cause": "Vlastní sběrný dotaz dbms.pi: Monitorovací příkaz, který čte pouze statistické pohledy a katalogy.",
         "fix": "Není vyžadována žádná akce zákazníka. Pokud je problémem zatížení cílové databáze, snižte počet otevření obrazovky sběru/monitorování."
       },
       "NO_MAX": {
@@ -1144,31 +1144,31 @@
         "fix": "Klikněte nyní jednou na „Shromáždit“, abyste vyplnili maximální hodnoty pro přesnou diagnostiku."
       },
       "SLOW_EACH": {
-        "cause": "Vždy pomalé – Pokaždé, když se spustí, trvá to dlouho, s maximem {max}ms a průměrem {mean}ms.",
+        "cause": "Pomalé pokaždé: Každé provedení trvá dlouho s max. {max}ms a průměrem {mean}ms.",
         "fix": "① Otevřete plán provedení v „Otevřít v SQL Tuning“. ② Pokud existují úplné skeny (Seq Scan) nebo velké řazení, zkontrolujte indexy na sloupcích podmínek WHERE/JOIN. ③ Zúžte podmínky tak, aby se četly pouze potřebné sloupce/řádky."
       },
       "SPIKE": {
-        "cause": "Přerušované zpoždění – Průměr {mean}ms, ale občas trvá dlouho při maximu {max}ms ({x}násobek průměru).",
+        "cause": "Přerušované zpoždění: Průměr {mean}ms, ale občas trvá dlouho s max. {max}ms ({x}násobek průměru).",
         "fix": "① Když je pomalé, zkontrolujte čekání na zámek (wait_event) na kartě Aktivita/Zámky. ② Pokud je pomalé pouze první provedení, byla mezipaměť prázdná a disk byl čten. ③ Porovnejte stejný dotaz s různými hodnotami v SQL Tuning, abyste zjistili, zda se plán provedení mění na základě hodnot."
       },
       "DISK_READ": {
-        "cause": "Chyba mezipaměti – {pct}% ({read} bloků) přečtených bloků bylo přečteno z disku, nikoli z paměti.",
+        "cause": "Cache miss: {pct}% ({read} bloků) přečtených bloků bylo přečteno z disku, nikoli z paměti.",
         "fix": "① Zmenšete rozsah čtení pomocí indexů. ② Zúžte období/podmínky dotazu. ③ Pokud často čtená data zůstávají vysoká, zkontrolujte shared_buffers (paměť)."
       },
       "TEMP_SPILL": {
-        "cause": "Přetečení paměti – Řazení/hash překročilo work_mem a zapsalo {blk} bloků (přibližně {mb}MB, {perCall} bloků na volání) do dočasných souborů.",
+        "cause": "Přetečení paměti: Řazení/hash překročilo work_mem a zapsalo {blk} bloků (přibližně {mb}MB, {perCall} bloků na volání) do dočasných souborů.",
         "fix": "① Umístění indexů na sloupce ORDER BY/GROUP BY přeskočí řazení. ② Nejprve snižte počet řádků k řazení (LIMIT uvnitř). ③ Pokud je to naprosto nezbytné, zvyšte SET LOCAL work_mem pouze pro tuto transakci dotazu."
       },
       "MANY_ROWS": {
-        "cause": "Nadměrné načítání – Načítá {perCall} řádků na volání.",
+        "cause": "Nadměrný dotaz: Načítá {perCall} řádků na volání.",
         "fix": "① Seznamy obrazovek se načítají po stránkách. ② SELECT vybírá pouze použité sloupce. ③ Agregace se provádějí v databázi a přijímají se pouze výsledky."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST vložený filtr (!inner) příkaz – filtrování rodičů podle podmínek potomků může skenovat celou sadu před podmínkami klasifikace.",
+        "cause": "PostgREST vložený filtr (!inner) příkaz: Filtrování rodičů podle podmínek dětí může skenovat celou tabulku před podmínkou klasifikace.",
         "fix": "① Zkontrolujte, zda existují indexy na spojovacích klíčích a sloupcích filtru. ② Přesuňte filtry do podmínek nadřazené tabulky. ③ Vložte podřízené prvky do již existujícího nadřazeného dotazu nebo je zkombinujte do jedné databázové funkce."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET stránkování – Postupně se zpomaluje, protože čte a zahazuje předchozí řádky pro pozdější stránky.",
+        "cause": "OFFSET stránkování: Pozdější stránky čtou a zahazují dřívější řádky, čímž se postupně zpomalují.",
         "fix": "Změňte na stránkování klíčovou sadou (WHERE id > last_id ORDER BY id LIMIT n), které čte od klíče po posledním přijatém klíči."
       }
     }
@@ -1201,8 +1201,8 @@
       "toDraft": "Vytvořit návrh pipeline z {n} vybraných"
     },
     "ready": {
-      "ok": "WAL logická replikace připravena – tabulky s PK mohou použít LOGICAL",
-      "no": "WAL logická replikace není připravena – zachycení pomocí pollingu nebo porovnání klíčů",
+      "ok": "WAL logická replikace připravena: Tabulky s PK mohou používat metodu LOGICAL.",
+      "no": "WAL logická replikace není připravena: Shromažďujte pomocí metody dotazování/porovnávání klíčů.",
       "senders": "{n} replikačních připojení"
     },
     "adapter": {
@@ -1217,20 +1217,20 @@
       "HAS_SOFT_DEL": "Má sloupec soft-delete",
       "NO_SOFT_DEL": "Nemá sloupec soft-delete",
       "HAS_PK": "Má primární klíč",
-      "NO_PK": "Nemá primární klíč – změněné řádky nelze identifikovat",
+      "NO_PK": "Žádný PK: Nelze identifikovat změněné řádky.",
       "DELETE_UNSEEN": "Polling nemůže zachytit fyzické DELETE (doporučuje se sloupec soft-delete)",
       "LOGICAL_NOT_READY": "Lze přepnout na LOGICAL, jakmile bude WAL logická replikace připravena",
-      "FULL_RELOAD_ONLY": "Žádný PK nebo sloupec času změny, takže žádné inkrementální zachycení – přidejte PK",
+      "FULL_RELOAD_ONLY": "Žádný PK/časová značka změny, takže inkrementální sběr není možný: Doporučuje se přidání PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level není logical (změna vyžaduje restart DB)",
       "NO_SLOTS": "max_replication_slots je 0",
       "NO_SENDERS": "max_wal_senders je 0",
-      "IS_STANDBY": "Standby server – logickou replikaci získejte z primárního serveru",
+      "IS_STANDBY": "Standby server: Přijímat logickou replikaci z primárního serveru.",
       "SETTINGS_UNKNOWN": "Nelze přečíst nastavení, připravenost neznámá"
     },
     "ed": {
       "title": "Definice pipeline",
-      "draftOnly": "Pouze návrh – uloženo jako koncepty (DRAFT)",
+      "draftOnly": "Pouze návrh: Uložit pouze jako DRAFT.",
       "new": "Nová pipeline",
       "empty": "Žádné uložené pipelines",
       "manual": "Ruční",
@@ -1299,8 +1299,8 @@
     },
     "warn": {
       "none": "Žádná významná varování.",
-      "SEQ_SCAN_LARGE": "Úplné skenování tabulky {relation} (přibližně {rows} řádků) – zvažte index na sloupcích filtru.",
-      "NESTED_LOOP_HIGH": "Vnořená smyčka produkuje přibližně {rows} řádků – zvažte hash nebo merge join, nebo index na podmínce spojení.",
+      "SEQ_SCAN_LARGE": "Tabulka {relation} provádí úplné skenování (odhadem {rows} řádků): Zkontrolujte indexy na sloupcích podmínek.",
+      "NESTED_LOOP_HIGH": "Výsledek vnořené smyčky je odhadem {rows} řádků. Zkontrolujte hash/merge joiny nebo indexy na join podmínkách.",
       "SORT_SPILL": "Velikost řazení je přibližně {kb}KB, nad výchozí work_mem (4MB); může se přelít na disk."
     },
     "lint": {
@@ -1314,14 +1314,14 @@
         "char": "znak"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * – vybírejte pouze sloupce, které potřebujete (extra I/O, žádný krycí index).",
-        "FUNC_ON_COLUMN": "Sloupec filtru {column} je zabalen do funkce nebo výrazu, takže jeho index nelze použít – místo toho transformujte konstantu.",
-        "LEADING_WILDCARD": "LIKE s úvodním % nemůže použít B-stromový index – zvažte pg_trgm GIN index.",
-        "OR_DIFF_COLUMNS": "Podmínky OR na různých sloupcích — zvažte rozdělení pomocí UNION (přidejte podmínku vyloučení duplicit, pokud UNION ALL) nebo zkontrolujte indexy pro jednotlivé sloupce.",
-        "IMPLICIT_CAST": "{column} je porovnáván s číslem v uvozovkách – srovnejte typy sloupce a konstanty (implicitní přetypování).",
-        "NOT_IN_SUBQUERY": "NOT IN (poddotaz) nevrací nic, když jsou přítomny NULL hodnoty a je pomalý – použijte NOT EXISTS.",
-        "NO_WHERE": "Žádná klauzule WHERE – na velké tabulce se jedná o úplné skenování (přidejte podmínku nebo LIMIT).",
-        "DOMAIN_MISMATCH": "{column} je podle standardní domény typu {expected}, ale je porovnáván s konstantou jiného typu – implicitní přetypování může zabránit použití indexu."
+        "SELECT_STAR": "SELECT *: Vyberte pouze potřebné sloupce (zbytečné I/O, krycí index není možný).",
+        "FUNC_ON_COLUMN": "Sloupec podmínky {column} je zpracován funkcí/operací, takže indexy nelze použít. Zpracujte konstantní stranu.",
+        "LEADING_WILDCARD": "LIKE s úvodním % nemůže použít B-stromový index. Zkontrolujte pg_trgm GIN indexy.",
+        "OR_DIFF_COLUMNS": "Podmínky různých sloupců jsou seskupeny s OR. Zkontrolujte oddělení UNION (přidejte podmínku vyloučení duplikátů, pokud UNION ALL) nebo indexy pro jednotlivé sloupce.",
+        "IMPLICIT_CAST": "{column} je porovnáván s číslem v uvozovkách. Shodujte typ sloupce a typ konstanty (implicitní přetypování).",
+        "NOT_IN_SUBQUERY": "NOT IN (poddotaz) může být prázdný a pomalý, pokud jsou smíchány NULLy. Změňte na NOT EXISTS.",
+        "NO_WHERE": "Žádná podmínka WHERE. Pokud se jedná o velkou tabulku, jedná se o úplné skenování (přidejte LIMIT nebo podmínky).",
+        "DOMAIN_MISMATCH": "{column} je typu {expected} podle standardní domény, ale je porovnáván s konstantou jiného typu. Implicitní přetypování může zabránit použití indexu."
       }
     },
     "saved": {
@@ -1347,12 +1347,12 @@
     },
     "ai": {
       "title": "AI doporučení pro ladění",
-      "intro": "Vyberte jeden uložený plán pro vygenerování doporučení. Odesílají se pouze SQL a plány s konstantami maskovanými jako ? (doporučení založené na pravidlech, pokud není klíč nebo při selhání). Poté, co vlastník odkazu schválí, znovu spusťte EXPLAIN pro stejné SQL, uložte jej a změřte dopad s tímto pozdějším plánem – teprve poté je zaznamenáno jako aplikované.",
+      "intro": "Vyberte jeden uložený plán pro vygenerování doporučení. Odesílají se pouze SQL a plány s konstantami maskovanými jako ? (doporučení založené na pravidlech, pokud není klíč nebo při selhání). Poté, co vlastník odkazu schválí, znovu spusťte EXPLAIN pro stejné SQL, uložte jej a změřte dopad s tímto pozdějším plánem : teprve poté je zaznamenáno jako aplikované.",
       "pickPlan": "Vyberte uložený plán pro doporučení",
       "create": "Generovat doporučení",
       "creating": "Generování… (až 30 s)",
       "noPlans": "Žádné uložené plány. Zobrazte EXPLAIN plán výše a uložte jej.",
-      "note": "Jedno doporučení na plán. Chcete-li znovu vygenerovat, odstraňte stávající doporučení. DDL je pouze navrženo – aplikujte jej v schema.pi.",
+      "note": "Jedno doporučení na plán. Chcete-li znovu vygenerovat, odstraňte stávající doporučení. DDL je pouze navrženo : aplikujte jej v schema.pi.",
       "empty": "Zatím žádné doporučení.",
       "noItems": "Pro tento plán nebyly nalezeny žádné zlepšení.",
       "cost": "Předchozí náklady",
@@ -1394,10 +1394,10 @@
       "copy": "Kopírovat",
       "copied": "Zkopírováno",
       "rule": {
-        "SEQ_SCAN_INDEX": "Úplné skenování {relation} – vytvořte index na sloupci filtru {column} (nahraďte NN v názvu indexu pořadovým číslem).",
-        "SEQ_SCAN_STATS": "Úplné skenování {relation} – zkontrolujte sloupce filtru a ujistěte se, že statistiky (ANALYZE) jsou aktuální.",
-        "NESTED_LOOP": "Vnořená smyčka očekává {rows} řádků – obnovte statistiky a zvažte indexy spojovacích klíčů nebo hash join.",
-        "SORT_SPILL": "Řazení přibližně {kb} KB může přetéct na disk – zvažte zvýšení session work_mem nebo indexování sloupců pro řazení.",
+        "SEQ_SCAN_INDEX": "{relation} úplné skenování: Vytvořte index na sloupci podmínky {column} (název indexu NN bude nahrazen pořadovým číslem).",
+        "SEQ_SCAN_STATS": "{relation} úplné skenování: Zkontrolujte sloupce podmínek a ujistěte se, že statistiky (ANALYZE) jsou aktuální.",
+        "NESTED_LOOP": "Výsledek vnořené smyčky je odhadem {rows} řádků: Aktualizujte statistiky a zkontrolujte indexy join podmínek nebo hash joiny.",
+        "SORT_SPILL": "Řazení může přetéct na disk o přibližně {kb}KB. Zkontrolujte zvýšení session work_mem nebo indexy na sloupcích řazení.",
         "SELECT_STAR": "Vyberte pouze sloupce, které potřebujete, namísto SELECT * (méně I/O, možné pokrytí indexy).",
         "FUNC_ON_COLUMN": "Přesuňte funkci/výraz na sloupci filtru {column} na stranu konstanty (umožňuje použití indexu).",
         "IMPLICIT_CAST": "Sladte typy {column} a konstanty (odstraňte implicitní přetypování).",
@@ -1457,9 +1457,9 @@
     },
     "desc": {
       "FREE": "Prozkoumat a učit se",
-      "D1": "Operátor — Zkontroluje, zda je databáze v pořádku.",
-      "D2": "Vývojář a ladič – Opravuje pomalé SQL",
-      "D3": "DBA a DA – Od provozní bezpečnosti po implementaci a lake"
+      "D1": "Operátor: Kontroluje, zda je databáze nyní v pořádku.",
+      "D2": "Vývojář/Tuner: Opravuje pomalé SQL.",
+      "D3": "DBA/DA: Provozní bezpečnost, migrace a dokonce i data lake."
     },
     "feat": {
       "FREE": "Monitorovací panel, zobrazení plánu spuštění, základní učení",
@@ -1502,7 +1502,7 @@
       "required": "Tato funkce je dostupná od plánu {plan}.",
       "limit": "Využili jste všechny dostupné pokusy pro toto období. Více můžete použít upgradem na plán {plan}.",
       "limitTop": "Využili jste všechny dostupné pokusy pro toto období. Můžete to znovu použít v příštím období.",
-      "expired": "Váš plán schema.pi vypršel – proveďte platbu na obrazovce plánu schema.pi.",
+      "expired": "Váš plán schema.pi vypršel. Zaplaťte prosím na obrazovce plánu schema.pi.",
       "go": "Zobrazit plán",
       "close": "Zavřít"
     }

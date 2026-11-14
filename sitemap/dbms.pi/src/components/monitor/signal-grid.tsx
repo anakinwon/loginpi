@@ -120,13 +120,13 @@ const nf = (v: number, d = 1) =>
   v.toLocaleString(undefined, { maximumFractionDigits: d })
 export const fmtBytes = (v: number | null) =>
   v === null
-    ? '—'
+    ? '-'
     : v >= 1024 ** 3
       ? `${nf(v / 1024 ** 3, 2)} GB`
       : `${nf(v / 1024 ** 2, 1)} MB`
 export function fmtVal(s: Pick<Signal, 'value' | 'unit' | 'id'>) {
   const v = s.value
-  if (v === null) return '—'
+  if (v === null) return '-'
   switch (s.unit) {
     case 'ms':
       return `${nf(v, 0)} ms`

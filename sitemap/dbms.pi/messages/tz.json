@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Uchambuzi & Ziwa",
     "intro": "KPI za shughuli za dbms, usanifu wa ziwa wa tabaka tatu na katalogi ya hifadhidata katika sehemu moja.",
-    "storageNotice": "Hifadhi ya ziwa (upande wa mteja au wingu) bado haijaamuliwa (PRD sehemu ya 10 #7). Kwa sasa, miundo na ramani za majina pekee ndizo zinazohifadhiwa — hakuna data ya safu.",
+    "storageNotice": "Hifadhi ya ziwa (upande wa mteja au wingu) bado haijaamuliwa (PRD sehemu ya 10 #7). Kwa sasa, miundo na ramani za majina pekee ndizo zinazohifadhiwa : hakuna data ya safu.",
     "noLink": "Chagua au sajili kiungo cha schema.pi kwanza.",
     "goConnect": "Sajili kiungo",
     "loading": "Inapakia…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Uchambuzi wa GAP — Model↔DB",
+    "title": "Uchambuzi wa GAP: Model↔DB",
     "intro": "Linganisha modeli ya usanifu ya schema.pi na historia ya utumiaji wa DDL na katalogi ya DB hai ili kupata mkengeuko, na pima kama faharisi zilizoundwa zinatumika kweli. Data ya safu wima ya mteja haisomwi au kuhifadhiwa kamwe.",
     "needLink": "Chagua kiungo cha schema.pi hapo juu kwanza. Ikiwa huna, sajili tokeni kwenye menyu ya 'Kiungo'.",
     "needConn": "Chagua muunganisho wa DB wa kulinganisha hapo juu.",
@@ -188,7 +188,7 @@
     "model": "Modeli",
     "reqNo": "Ombi {id}",
     "notSaved": "Imeshindwa kuhifadhi utekelezaji huu kwenye historia (matokeo yanaonyeshwa kawaida).",
-    "capped": "Vipengee vingi sana — vinaonyesha {cap} vya kwanza kwa kila sehemu (hesabu zimekamilika).",
+    "capped": "Vipengee vingi sana : vinaonyesha {cap} vya kwanza kwa kila sehemu (hesabu zimekamilika).",
     "statsMissing": "Takwimu za matumizi ya faharisi hazikupatikana, kwa hivyo matumizi hayakuweza kuhukumiwa.",
     "sum": {
       "missingTables": "Majedwali yanayokosekana kwenye DB",
@@ -230,7 +230,7 @@
       "USED": "Inatumika",
       "NO_STATS": "Hakuna takwimu",
       "CONSTRAINT": "Kizuizi cha upekee (weka)",
-      "NO_DATA": "Hakuna data au takwimu hazijakusanywa — haiwezi kuhukumiwa",
+      "NO_DATA": "Hakuna data au takwimu hazijakusanywa: haiwezi kubainisha",
       "OBSERVING": "Inachunguzwa (chini ya siku 7)",
       "UNUSED_CAND": "Inayoweza kutotumika"
     },
@@ -245,14 +245,14 @@
       "RATE": "Maombi mengi sana. Tafadhali jaribu tena baada ya dakika moja."
     },
     "schema": "Schema",
-    "schemaHint": "Ni majedwali ya kawaida na yaliyogawanywa tu katika schema hii ndiyo yanalinganishwa (maoni hayajajumuishwa). Chaguomsingi ya umma — schema za ndani za Supabase (auth, storage, …) zimeachwa.",
-    "truncated": "{names} zimefikia kikomo cha safu {max} na zimekatwa — baadhi ya matokeo ya \"hayapo kwenye DB\" / \"hayapo kwenye modeli\" yanaweza kuwa ya uongo. Punguza schema na uendeshe tena.",
+    "schemaHint": "Inalinganisha tu majedwali ya kawaida na yaliyogawanywa katika schema hii (ukiondoa maoni). Umma chaguomsingi: Schema za ndani za Supabase (auth, storage, n.k.) hazijumuishwi.",
+    "truncated": "Hoja ya {names} imepunguzwa kwa safu {max}. Baadhi ya utambuzi wa 'Haipo kwenye DB'/'Haipo kwenye Model' inaweza kuwa chanya za uwongo. Punguza schema na utambue tena.",
     "colUnchecked": "Kwa sababu swala la safu lilikatwa, matokeo {n} ya safu zinazokosekana/za ziada yanachukuliwa kuwa hayawezi kuthibitishwa na yametengwa kutoka kwa hesabu ya hitilafu za safu.",
-    "renamed": "Faharisi {n} za PK zilizotumika chini ya sheria ya zamani ya kutaja (_PKEY) zipo kwenye DB chini ya jina jipya (PK_) — kawaida",
-    "superseded": "Maombi {n} ya zamani hayakujumuishwa kwa sababu ombi la baadaye liliunda upya jedwali lile lile (DROP … CASCADE) — kawaida",
+    "renamed": "Fahirisi {n} za PK zilizotumika kwa mkataba wa zamani wa kutaja (_PKEY) ziko kwenye DB na jina jipya (PK_). Kawaida.",
+    "superseded": "Maombi {n} ya awali yalitengwa kwenye ulinganisho kwa sababu maombi ya baadaye yaliunda upya jedwali lile lile (DROP … CASCADE). Kawaida.",
     "supersededItem": "Ombi {id} → limebadilishwa na ombi {by}",
     "sysCols": "Safu {n} za mfumo zilizoongezwa kiotomatiki wakati wa uzalishaji wa DDL hazipo kwenye modeli kwa muundo na zimetengwa kutoka kwa hitilafu",
-    "groupOwn": "Kiambishi awali cha mradi {pfx} — zinazoweza kukosekana kwenye modeli",
+    "groupOwn": "Kiambishi awali cha mradi huu {pfx}: wagombea wanaokosekana kwenye modeli",
     "groupOther": "Mfumo mwingine {pfx}",
     "basis": "Makadirio ya safu {rows} · tangu {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Ikiwa vitu bado vinatoweka baada ya kutumia tena, shuku kufutwa kwa mikono au kurudisha nyuma na uangalie shughuli ya akaunti ya muunganisho na DBA wako."
       },
       "extraTables": {
-        "s1": "Kifurushi hiki cha kiambishi awali cha mradi = watahiniwa wa modeli waliokosekana — waingize kwenye modeli kupitia schema.pi → Mipangilio → Geuza, au amua kama utawafuta ikiwa ni jedwali zisizotumika.",
-        "s2": "Vikundi vingine vya kiambishi awali = mifumo mingine inayoshiriki DB hii — si vitu vya kuchukua hatua kwa mradi huu.",
+        "s1": "Kikundi hiki cha kiambishi awali cha mradi = wagombea wanaokosekana kwenye modeli: ingiza kwenye modeli kupitia schema.pi → Mipangilio → Rejea, au amua kama utafuta ikiwa jedwali halitumiki.",
+        "s2": "Vikundi vingine vya viambishi awali = mifumo mingine inayotumia DB sawa: haiko chini ya hatua za mradi huu.",
         "s3": "Ikiwa schema lengwa si ya umma, badilisha sehemu ya \"Schema\" hapo juu na uendeshe tena."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Aina/NULL inatofautiana = linganisha na modeli (chanzo cha ukweli); kabla ya kupunguza urefu au kubadili NOT NULL, thibitisha safu zilizopo zinakidhi."
       },
       "idxUsage": {
-        "s1": "Kabla ya kuondoa, angalia ① dirisha la takwimu linajumuisha angalau mzunguko mmoja wa biashara (k.m. kundi la mwisho wa mwezi) — angalia \"tangu\".",
+        "s1": "Kabla ya kufuta, angalia ① ikiwa kipindi cha ukusanyaji wa takwimu ni angalau mzunguko mmoja wa uendeshaji (k.m., kundi la mwisho wa mwezi): rejea tarehe ya marejeleo.",
         "s2": "② Sio faharisi ya kipekee/PK (hizo zinaonyeshwa kando kama \"kizuizi cha upekee\").",
         "s3": "③ EXPLAIN SQL ya uwakilishi wa jedwali katika SQL Tuning na uthibitishe faharisi hii haitumiki.",
         "s4": "Mara tu zote tatu zimethibitishwa, ondoa faharisi kutoka kwa modeli katika schema.pi na utumie kupitia DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Jinsi ya kutoa tokeni ya muunganisho",
     "how1": "Ingia kwenye schema.pi na ufungue eneo la somo la kuunganisha",
     "how2": "Nenda kwenye Eneo la somo → Mipangilio → Tokeni ya muunganisho na ubonyeze 'Toa tokeni' (msimamizi wa eneo au jukumu la DA)",
-    "how3": "Nakili tokeni inayoanza na slk_ — inaonyeshwa mara moja tu inapotolewa",
+    "how3": "Nakili tokeni inayoanza na slk_ iliyotolewa. Asili huonyeshwa mara moja tu wakati wa utoaji.",
     "how4": "Bandika hapa chini na usajili",
     "openSchema": "Fungua schema.pi",
     "registerTitle": "Sajili muunganisho",
@@ -384,7 +384,7 @@
     "retry": "Jaribu tena",
     "pickerLink": "Kiungo",
     "pickerConn": "Muunganisho",
-    "pickerEmpty": "Hakuna viunganisho —",
+    "pickerEmpty": "Hakuna miunganisho.",
     "pickerGo": "sajili kimoja kwenye /connect",
     "errors": {
       "LINK_AUTH": "Tokeni ya muunganisho imeisha muda wake au imefutwa. Toa tokeni mpya katika schema.pi na uisajili tena",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Uhamiaji wa Data (PiMig)",
-    "intro": "Inakokotoa mpangilio wa upakiaji wa jedwali kutoka kwenye mahusiano katika modeli yako ya usanifu ya schema.pi, inapanga ukubwa wa vipande, usawa na orodha ya ukaguzi wa kukatisha, na inazalisha SQL ya uthibitishaji unayoendesha mwenyewe kwenye chanzo na lengo. Skrini hii inapanga na kukagua tu — haihamishi data au kusoma safu wima za DB za mteja.",
+    "intro": "Inakokotoa mpangilio wa upakiaji wa jedwali kutoka kwenye mahusiano katika modeli yako ya usanifu ya schema.pi, inapanga ukubwa wa vipande, usawa na orodha ya ukaguzi wa kukatisha, na inazalisha SQL ya uthibitishaji unayoendesha mwenyewe kwenye chanzo na lengo. Skrini hii inapanga na kukagua tu : haihamishi data au kusoma safu wima za DB za mteja.",
     "needLink": "Chagua kiungo cha schema.pi hapo juu kwanza. Ikiwa huna, sajili tokeni chini ya 'Unganisha'.",
     "loading": "Inapakia…",
     "newPlan": "Mpango mpya wa uhamiaji",
@@ -432,8 +432,8 @@
     "optsHint": "Usawa ni idadi ya majedwali yaliyopakiwa kwa wakati mmoja ndani ya kiwango. Ukubwa wa chunk ni kitengo cha commit (safu) ambacho injini ya utekelezaji itatumia.",
     "order": "Agizo la kupakia",
     "orderHint": "Yamepangwa kwa topolojia kwa mahusiano ya muundo (sio FKs halisi) ili majedwali ya mzazi yaje kwanza. Majedwali katika kiwango kimoja hayategemeani na yanaweza kupakia sambamba.",
-    "cycles": "Kundi/makundi {n} ya mzunguko — yamewekwa katika kiwango kimoja. Weka mpangilio wao mwenyewe na uahirishe ukaguzi wa marejeleo hadi baada ya kupakia.",
-    "selfRefs": "Majedwali yanayojirejelea (ya kihierarkia) — pakia safu za mzazi kwanza ndani ya jedwali",
+    "cycles": "Mizunguko {n}: imewekwa katika hatua sawa. Weka mwenyewe mpangilio wa upakiaji na uahirishe ukaguzi wa marejeleo hadi baada ya upakiaji.",
+    "selfRefs": "Majedwali yanayojirejelea (ya kihierarkia): safu za mzazi kwanza ndani ya jedwali moja.",
     "level": "Kiwango {n}",
     "checklist": "Orodha ya kukagua ya kukatisha",
     "toReady": "Weka kama tayari",
@@ -471,7 +471,7 @@
     },
     "verify": "SQL ya Uthibitishaji",
     "verifyHint": "Huzalisha hesabu, jumla ya safu ya nambari, funguo rudufu na maswali ya heshi ya funguo kwa kila jedwali kwa mpangilio wa upakiaji. Yaendeshe mwenyewe kwenye chanzo na lengo na ulinganishe (skrini hii haiyatekelezi).",
-    "noHashOracle": "Vitendaji vya heshi vya Oracle·Tibero na uwasilishaji wa maandishi hutofautiana na PostgreSQL, kwa hivyo maswali ya heshi yameachwa — linganisha hesabu, jumla na funguo rudufu.",
+    "noHashOracle": "Oracle na Tibero huacha utafutaji wa heshi kwa sababu kazi za heshi na uwakilishi wa herufi hutofautiana na PostgreSQL. Linganisha kwa hesabu, jumla, na urudufu wa funguo.",
     "copy": "Nakili",
     "copied": "Imenakiliwa",
     "copyFail": "Imeshindwa kunakili. Chagua maandishi na unakili mwenyewe.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Ombi si sahihi."
     },
     "board": {
-      "subtitle": "Nini cha kufanya kwenye DB hii sasa hivi — ishara 14 za OK, onyo au hatari, pamoja na masuluhisho, kwa mtazamo mmoja.",
+      "subtitle": "Nini cha kufanya sasa katika DB hii: Angalia hali ya kawaida, onyo, na hatari ya ishara 14 na suluhisho zao kwa mtazamo.",
       "refresh": {
         "updated": "Kuanzia {time} · huburudisha kila dakika",
         "now": "Burudisha sasa",
@@ -564,11 +564,11 @@
         "NA": "Haitumiki"
       },
       "overall": {
-        "RISK": "Hatari — hatua inahitajika sasa",
-        "WARN": "Onyo — baadhi ya vitu vinahitaji kuangaliwa",
-        "UNKNOWN": "Haijulikani — angalia muunganisho",
-        "OK": "SAWA — kila ishara iko ndani ya mipaka",
-        "CONN_DOWN": "Haiwezi kufikia DB — angalia muunganisho kwanza",
+        "RISK": "Hatari: Hatua ya haraka inahitajika",
+        "WARN": "Onyo: Vipengee vya kukagua",
+        "UNKNOWN": "Haiwezi kuthibitisha: Angalia hali ya muunganisho",
+        "OK": "Kawaida: Ishara zote ziko ndani ya vigezo",
+        "CONN_DOWN": "Haiwezi kuunganisha kwenye DB. Angalia muunganisho kwanza.",
         "NA": "Haitumiki"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Onyesha kidogo",
         "setup": "Weka hizi ili kuona zaidi",
         "none": "Hakuna hatari au vitu vya onyo vinavyohitaji hatua sasa hivi.",
-        "unknown": "Imeshindwa kuangalia ishara {n} — angalia kadi kwa sababu.",
+        "unknown": "Haiwezi kuthibitisha vipengee {n}: Angalia sababu kwenye kadi.",
         "myRule": "Sheria yangu imekiukwa: {rule}",
         "copySql": "Nakili SQL",
         "copied": "Imenakiliwa"
@@ -622,34 +622,34 @@
         "REPL": "Ucheleweshaji wa urudufishaji"
       },
       "fix": {
-        "AVAIL": "Majibu polepole au kuanzisha upya hivi karibuni — angalia mipangilio ya muunganisho na hali ya seva ya DB.",
-        "AVAIL_DOWN": "Imeshindwa kuunganisha kwenye DB — angalia mipangilio ya muunganisho na kwamba seva ya DB iko juu.",
-        "CONN_USE": "{sess}/{max} vikao kwenye DB hii (sio klasta nzima — hifadhidata zingine hazijumuishwi) — funga miunganisho isiyotumika au ongeza kikusanya muunganisho (pgbouncer).",
-        "URL": "URL {n} zilizochunguzwa zikishindwa · majibu max {ms}ms — angalia schema.pi monitor kwa sababu.",
-        "LONG_QRY": "Hoja imeendeshwa kwa {sec}s — kagua mpango wake na urekebishe, au DBA aighairi.",
-        "IDLE_TX": "Muamala umekuwa haufanyi kazi kwa {sec}s — pata ahadi inayokosekana kwenye programu na uweke muda wa kuisha.",
-        "LOCK_WAIT": "Vikao {n} vinasubiri kufungwa — pata kikao kinachozuia na umalize muamala wake.",
-        "CACHE_HIT": "Kiwango cha hit cha akiba {pct}% — tafuta skani kamili za jedwali kubwa au kagua shared_buffers.",
-        "XACT_ERR": "Kiwango cha kurejesha {pct}%, {dlck} kufungwa — angalia miamala inayoshindwa na kumbukumbu za makosa ya programu.",
-        "SLOW_SQL": "Kuna hoja inayochukua hadi {ms}ms kwa kila utekelezaji — angalia mpango wa utekelezaji na urekebishe, kuanzia na muda mrefu zaidi wa utekelezaji mmoja.",
-        "STORAGE": "DB ({gb} GB) iko karibu na kikomo chake (siku zilizobaki {days}) — safisha jedwali kubwa au ongeza uwezo.",
-        "VACUUM": "{tbl} ina safu nyingi zilizokufa au takwimu zilizopitwa na wakati — kagua mipangilio ya VACUUM (ANALYZE) na autovacuum.",
-        "INDEX": "Matokeo ya faharisi {n} (batili, isiyotumika, skani kamili) — angalia kichupo cha afya ya jedwali & faharisi kwa malengo.",
-        "BACKUP": "Uhifadhi wa WAL umezimwa au umekwama — angalia archive_mode, archive_command na hali ya chelezo.",
-        "REPL": "Ucheleweshaji wa urudufishaji {sec}s — angalia hali ya kusubiri na mtandao.",
-        "PGSS": "pg_stat_statements haijasakinishwa, kwa hivyo SQL polepole haipatikani — iwashe kwa SQL iliyo hapa chini (kuanzisha upya seva kunahitajika)."
+        "AVAIL": "Majibu ni polepole au yameanza upya. Angalia maelezo ya muunganisho na hali ya seva ya DB.",
+        "AVAIL_DOWN": "Imeshindwa kuunganisha kwenye DB. Angalia maelezo ya muunganisho na kama seva ya DB iko hai.",
+        "CONN_USE": "Kikao hiki cha DB {sess}/{max} (sio kote kwenye nguzo, miunganisho mingine ya DB haijajumuishwa): Safisha miunganisho isiyotumika au weka kikusanya miunganisho (pgbouncer).",
+        "URL": "Ukaguzi wa URL {n} umeshindwa · Majibu ya juu {ms}ms: Angalia sababu katika schema.pi monitor.",
+        "LONG_QRY": "Hoja imekuwa ikiendeshwa kwa sekunde {sec}. Kagua mpango wa utekelezaji na urekebishe, au umfanye DBA aisimamishe.",
+        "IDLE_TX": "Muamala umekuwa wazi na haufanyi kazi kwa sekunde {sec}. Tafuta ahadi zinazokosekana kwenye programu na uweke muda wa mwisho.",
+        "LOCK_WAIT": "Vikao {n} vinasubiri kufuli: Tafuta kikao kinachozuia na umalize muamala wake.",
+        "CACHE_HIT": "Kiwango cha kugonga akiba {pct}%: Tafuta skani kamili za jedwali kubwa au kagua shared_buffers.",
+        "XACT_ERR": "Kiwango cha kurudisha nyuma {pct}%, deadlocks {dlck}: Angalia miamala inayoshindwa na kumbukumbu za makosa ya programu.",
+        "SLOW_SQL": "Kuna hoja yenye muda wa juu wa {ms}ms. Kagua mpango wa utekelezaji na urekebishe kutoka kwa muda wa juu wa juu.",
+        "STORAGE": "DB {gb}GB iko karibu na kikomo chake (siku {days} zilizobaki). Safisha majedwali makubwa au ongeza uwezo.",
+        "VACUUM": "{tbl} ina safu nyingi zilizokufa au takwimu zilizopitwa na wakati. Kagua mipangilio ya VACUUM (ANALYZE) na autovacuum.",
+        "INDEX": "Ukaguzi wa fahirisi {n} (batili, isiyotumika, skani kamili): Angalia malengo katika kichupo cha afya ya jedwali/fahirisi.",
+        "BACKUP": "Hifadhi ya WAL imezimwa au imesimamishwa. Angalia archive_mode, archive_command, na hali ya chelezo.",
+        "REPL": "Kuchelewa kwa urudufishaji sekunde {sec}: Angalia hali ya seva ya kusubiri na mtandao.",
+        "PGSS": "Kiendelezi cha pg_stat_statements kinakosekana, kwa hivyo SQL polepole haiwezi kutazamwa. Kiwashe kwa SQL iliyo hapa chini (kuwasha upya seva kunahitajika)."
       },
       "reason": {
         "CONN_DOWN": "Haijahukumiwa kwa sababu muunganisho wa DB umeshuka.",
         "PGSS": "pg_stat_statements haijasakinishwa.",
         "VER": "Inapatikana kwenye PostgreSQL 13 au baadaye.",
         "SAMPLE": "Sampuli hazitoshi bado.",
-        "NO_LIMIT": "Hakuna kikomo cha ukubwa, kwa hivyo matumizi hayajahukumiwa — ongeza sheria ya ukubwa wa DB (MB) (>) ili kuitumia kama kikomo.",
+        "NO_LIMIT": "Matumizi hayabainishwi kwani hakuna kikomo cha uwezo. Kuongeza sheria ya ukubwa wa DB (MB) (>) kuitumia kama kikomo.",
         "RESET": "Takwimu zimewekwa upya chini ya siku 7 zilizopita, kwa hivyo faharisi zisizotumika hazijahukumiwa.",
         "STALE": "Hakuna rekodi za ukaguzi za hivi karibuni.",
         "STANDBY": "Haitumiki kwenye seva ya kusubiri.",
         "NONE": "Hakuna cha kuangalia.",
-        "GRANT": "Mapendeleo yanayokosekana — toa jukumu la pg_monitor kwa akaunti ya muunganisho.",
+        "GRANT": "Haiwezi kutazama kutokana na ukosefu wa ruhusa. Mpe jukumu la pg_monitor kwa akaunti ya muunganisho.",
         "LINK": "schema.pi hoja imeshindwa ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Ikiwa haitiririshi, angalia kumbukumbu za kusubiri."
         }
       },
-      "sqlNote": "SQL iliyo hapa chini ni ya kusoma tu, kwa kuangalia — marekebisho (VACUUM, DROP INDEX, pg_terminate_backend) yanaendeshwa na DBA.",
+      "sqlNote": "SQL iliyo hapa chini ni kwa ajili ya uthibitishaji wa kusoma tu. Vitendo (VACUUM, DROP INDEX, pg_terminate_backend) hutekelezwa moja kwa moja na DBA.",
       "go": {
         "activity": "Shughuli & kufungwa",
         "top": "Hoja polepole",
@@ -766,8 +766,8 @@
           "tree": "Ni nini kinachotumia nafasi, na nini kinahitaji kusafishwa?"
         },
         "asTable": "Tazama kama jedwali",
-        "needHistory": "Hakuna mwenendo bado — weka skrini hii wazi kwa dakika chache.",
-        "needPerf": "Hakuna historia ya ukubwa — kusanya katika kichupo cha utendaji au weka skrini hii wazi.",
+        "needHistory": "Hakuna mwelekeo bado. Itachorwa ukiiacha skrini hii wazi kwa dakika chache.",
+        "needPerf": "Hakuna historia ya uwezo. Ikusanye kutoka kichupo cha Utendaji au uache skrini hii wazi.",
         "noSess": "Hakuna vikao.",
         "noWait": "Hakuna kusubiri",
         "noData": "Hakuna data ya kuonyesha.",
@@ -840,17 +840,17 @@
         "noStat": "Hakuna takwimu"
       },
       "empty": {
-        "noConn": "Uainishaji huu hauna muunganisho wa seva ya PostgreSQL wa kufuatilia — unaonyesha URL na hali ya huduma pekee.",
+        "noConn": "Hakuna miunganisho ya seva ya PostgreSQL ya kufuatilia katika taksonomia hii. Hali ya URL na uhusiano pekee ndiyo inayoonyeshwa.",
         "unsupported": "Muunganisho huu hautumii ufuatiliaji (miunganisho ya seva ya PostgreSQL pekee).",
-        "connFail": "Imeshindwa kuunganisha kwenye hifadhidata — angalia mipangilio ya muunganisho na hali ya DB.",
-        "linkDown": "Imeshindwa kufikia schema.pi — inajaribu tena kiotomatiki.",
-        "linkAuth": "Tokeni ya muunganisho imeisha muda wake — toa tokeni mpya katika schema.pi na uisajili.",
-        "timeout": "Majibu ni polepole — inajaribu tena kiotomatiki.",
+        "connFail": "Imeshindwa kuunganisha kwenye DB. Angalia maelezo ya muunganisho na hali ya DB.",
+        "linkDown": "Imeshindwa kuunganisha kwenye schema.pi. Itajaribu tena kiotomatiki hivi karibuni.",
+        "linkAuth": "Tokeni ya muunganisho imeisha muda. Toa tena na usajili tokeni kutoka schema.pi.",
+        "timeout": "Majibu ni polepole. Itajaribu tena kiotomatiki hivi karibuni.",
         "rate": "Maombi mengi sana, kwa hivyo muda wa kuburudisha uliongezeka."
       },
       "aux": {
         "rules": "Sheria zangu za arifa ({n} zinazotumika)",
-        "schemaSvc": "Hali ya huduma — majibu ya schema.pi",
+        "schemaSvc": "Hali ya uhusiano: majibu ya huduma ya schema.pi",
         "schemaSvcNote": "Metriki za programu kwa dakika 60 zilizopita zilizohifadhiwa na schema.pi.",
         "source": "Chanzo cha data: DB lengwa inasomwa tu kupitia hoja zenye jina za schema.pi (kusoma tu); mwenendo huhifadhi takwimu tu katika dbms.pi (hakuna data ya safu)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Hakuna utambuzi bado. Bonyeza \"Endesha utambuzi\"",
     "lastRun": "Utambuzi wa mwisho {dtm}",
     "readOnly": "Utambuzi husoma tu (SELECT). Ushauri ni mwongozo na unategemea kumbukumbu ya seva, mzigo na mzigo wa kazi",
-    "truncated": "Vitu vingi sana — 500 vya kwanza tu vilikaguliwa",
+    "truncated": "Vitu vingi sana : 500 vya kwanza tu vilikaguliwa",
     "paramsNote": "Jumla ya kumbukumbu ya seva haijulikani, kwa hivyo inakadiriwa kutoka shared_buffers ≈ 25% ya RAM. random_page_cost inachukulia SSD",
     "auditNote": "Majedwali yenye RLS imezimwa na akaunti zisizotumika zitakaguliwa mara tu swali la kiungo litakapozisaidia",
-    "replNote": "Msingi ni Active-Standby (A-S) — primary moja + standby. Ucheleweshaji wa kucheza tena ≥ 5s = onyo, ≥ 60s = hatari (rejeleo la RPO lililopimwa)",
+    "replNote": "Kigezo kikuu ni Active-Standby (A-S): Primary 1 + Standby. Onyo kwa kuchelewa kwa uchezaji >= sekunde 5, hatari kwa >= sekunde 60 (rejea kipimo halisi cha RPO).",
     "lagIdle": "Hakuna mabadiliko",
     "pager": "Ukurasa",
     "prev": "Iliyotangulia",
@@ -938,11 +938,11 @@
       "st_ok": "Muda wa kuisha wa taarifa umewekwa",
       "iit_off": "Hakuna muda wa kuisha wa kutofanya kazi katika muamala (0). Inaweza kusababisha kushikilia kufuli na uvimbe",
       "iit_ok": "Muda wa kuisha wa kutofanya kazi katika muamala umewekwa",
-      "ckpt_short": "Muda wa kituo cha ukaguzi ni dakika 5 au chini. Fikiria dakika 10–15 kwa mizigo mizito ya kuandika",
+      "ckpt_short": "Muda wa kituo cha ukaguzi ni dakika 5 au chini. Fikiria dakika 10~15 kwa mizigo mizito ya kuandika",
       "ckpt_ok": "Ndani ya safu inayofaa",
       "wal_minimal": "wal_level=minimal inafanya PITR na urudufishaji usiwezekane. Tumia replica au zaidi",
       "wal_ok": "Kiwango cha WAL kinaunga mkono PITR na urudufishaji",
-      "rpc_hdd": "Chaguo-msingi cha HDD (4). Kwa SSD, 1.1–2 inapendekezwa",
+      "rpc_hdd": "Chaguo-msingi cha HDD (4). Kwa SSD, 1.1~2 inapendekezwa",
       "rpc_ok": "Inafaa kwa SSD",
       "super_many": "Superuser mbili au zaidi. Weka moja kwa usimamizi na upe marupurupu yanayohitajika tu kwa wengine",
       "super_ok": "Superuser mmoja au chini",
@@ -1020,7 +1020,7 @@
       "intro": "Kusanya sasa inasoma takwimu za juu za swali, majedwali, faharisi na ukubwa mara moja na kuzihifadhi kama picha. Kusanya angalau mara mbili ili kuona mabadiliko na mienendo ya ukubwa",
       "run": "Kusanya sasa",
       "running": "Inakusanya…",
-      "done": "Imekusanywa saa {dtm} — maswali {qry} · majedwali {tbl} · faharisi {idx}",
+      "done": "Mkusanyiko umekamilika {dtm}: Hoja {qry} · Majedwali {tbl} · Fahirisi {idx}",
       "auto": {
         "title": "Mkusanyiko otomatiki",
         "desc": "Ukiwashwa, muunganisho huu hukusanywa kiotomatiki kila siku saa 3 AM (saa za Korea). Baada ya siku 7 au zaidi unaweza kutegemea viwango vya hoja polepole na orodha ya faharisi zisizotumika",
@@ -1042,13 +1042,13 @@
       "sortCalls": "Simu",
       "empty": "Hakuna picha bado. Bonyeza Kusanya sasa kwenye kichupo cha Kusanya",
       "range": "Badilisha kati ya {from} → {to}",
-      "first": "Picha ya kwanza saa {dtm} — thamani za jumla (mabadiliko kutoka picha inayofuata)",
+      "first": "Mkusanyiko wa kwanza {dtm}: Jumla (ongezeko/kupungua kutoka mkusanyiko unaofuata)",
       "query": "Swali (literals zimefichwa)",
       "calls": "Simu",
       "totalMs": "Jumla ya ms",
       "meanMs": "Wastani wa ms",
       "rows": "Safu",
-      "reset": "Kuweka upya takwimu kumegunduliwa — imeonyeshwa kama jumla",
+      "reset": "Utambuzi wa kuweka upya takwimu: Huonyeshwa kama jumla",
       "src": "Chanzo",
       "srcToggle": "Onyesha au ficha maelezo ya chanzo",
       "openSqlLab": "Fungua katika SQL Tuning",
@@ -1056,7 +1056,7 @@
       "sortMax": "Muda wa juu zaidi wa utekelezaji mmoja",
       "maxMs": "Juu zaidi moja ms",
       "diagToggle": "Chunguza Sababu",
-      "noMax": "Hakuna thamani ya juu — vitu {n} vinatoka kwenye makusanyo ya zamani bila thamani ya juu, kwa hivyo vimepangwa kwa muda kwa wastani (sio kwa jumla ya muda). Kukusanya sasa kutajaza thamani ya juu."
+      "noMax": "Hakuna thamani ya juu: Vipengee {n} ni mikusanyiko ya zamani bila thamani moja ya juu, kwa hivyo vimepangwa kwa muda kwa wastani mmoja (sio kwa jumla ya muda). Thamani za juu zitajazwa na mkusanyiko wa sasa."
     },
     "health": {
       "empty": "Hakuna picha bado. Bonyeza Kusanya sasa kwenye kichupo cha Kusanya",
@@ -1064,9 +1064,9 @@
       "unusedIdx": "Faharisi zisizotumika",
       "unusedIdxHint": "Faharisi ambazo hazijawahi kutumika tangu kuweka upya takwimu za mwisho (kwa ukubwa). Usidondoshe PK au faharisi za kizuizi cha kipekee",
       "fullScan": "Uchanganuzi kamili kupita kiasi",
-      "fullScanHint": "Majedwali yenye safu 1,000+ hai ambapo uchanganuzi kamili ni angalau nusu — kagua faharisi kwenye safu za vichungi",
+      "fullScanHint": "Majedwali yenye safu 1,000+ zenye ufanisi na zaidi ya nusu ya skani kamili: Kagua fahirisi kwenye safu za masharti.",
       "dead": "Tuple nyingi zilizokufa",
-      "deadHint": "Uwiano wa tuple zilizokufa 20% au zaidi — angalia mipangilio ya VACUUM na autovacuum",
+      "deadHint": "Uwiano wa tuple zilizokufa zaidi ya 20%: Kagua mipangilio ya VACUUM na autovacuum.",
       "none": "Hakuna",
       "scans": "uchanganuzi"
     },
@@ -1083,7 +1083,7 @@
     },
     "activity": {
       "refresh": "Onyesha upya",
-      "live": "Hoja ya moja kwa moja — haijahifadhiwa",
+      "live": "Hoja ya wakati halisi: Haijahifadhiwa",
       "sessions": "Shughuli ya kipindi",
       "locks": "Vifunguo",
       "none": "Hakuna"
@@ -1110,7 +1110,7 @@
         "BATCH": "Inaonekana kama kundi au kazi iliyopangwa. Sambaza nyakati za kukimbia mbali na vilele vya biashara na punguza kazi kwa kila ahadi. Angalia faharisi na takwimu (ANALYZE) kwenye majedwali lengwa, na ugawanye miamala mirefu. Kuweka jina la kazi katika application_name hufanya uainishaji unaofuata kuwa sahihi zaidi",
         "PROGRAM": "Hii inaonekana kuwa hoja iliyotekelezwa na programu. Angalia mpango wa utekelezaji katika urekebishaji wa SQL. Ikiwa muda wa juu zaidi wa utekelezaji mmoja ni mrefu, kwanza angalia faharisi na mpangilio wa kuunganisha. Ikiwa utekelezaji mmoja ni mfupi lakini idadi ya simu ni kubwa, angalia simu zinazorudiwa (N+1) na kache. Weka jina la huduma katika application_name ya kundi la muunganisho.",
         "PLATFORM": "Inaonekana kama kazi ya ndani ya DB au jukwaa kama vile autovacuum au urudufishaji. Kawaida hakuna hatua inayohitajika. Ikiwa inakaa juu, kagua vizingiti vya autovacuum na maintenance_work_mem",
-        "MONITOR": "Huu ni hoja ya kujikusanya ya dbms.pi — muunganisho wa schema.pi ni taarifa isiyobadilika ambayo husoma tu maoni/katalogi za takwimu (pg_stat_*·pg_catalog), kwa hivyo si hoja ya biashara na hakuna hatua ya mteja inayohitajika. Ikiwa mzigo wa hifadhidata lengwa ni suala, punguza idadi ya mara unazofungua kitufe cha kukusanya/skrini ya ufuatiliaji. Taarifa kutoka kwa zana zingine za ufuatiliaji zinazosoma maoni sawa ya takwimu pia huwekwa hapa.",
+        "MONITOR": "Hoja ya ukusanyaji ya dbms.pi. Muunganisho wa schema.pi husoma tu maoni ya takwimu na katalogi (pg_stat_*, pg_catalog) na taarifa zisizobadilika, kwa hivyo sio hoja ya biashara na hakuna hatua ya mteja inayohitajika. Ikiwa mzigo wa hifadhidata lengwa ni suala, punguza mzunguko wa kufungua kitufe cha ukusanyaji au skrini ya ufuatiliaji. Taarifa kutoka kwa zana zingine za ufuatiliaji zinazosoma maoni sawa ya takwimu pia huwekwa hapa.",
         "UNKNOWN": "Hakuna dalili ya chanzo. Weka application_name kwenye kila muunganisho na ugawanye akaunti kwa madhumuni; itaainishwa kutoka kwa sampuli zinazofuata"
       },
       "detail": {
@@ -1121,7 +1121,7 @@
         "period": "Imechunguzwa",
         "none": "(tupu)"
       },
-      "noSample": "Hakuna sampuli bado — vikao vinavyoendesha vinachukuliwa sampuli unapotazama bodi ya ufuatiliaji au kichupo cha Shughuli na kufuli. Kwa sasa imeainishwa kutoka kwa jina la akaunti tu",
+      "noSample": "Hakuna sampuli bado. Vikao vinavyoendeshwa hujilimbikiza kama sampuli wakati wa kutazama Bodi ya Ufuatiliaji au vichupo vya Shughuli/Kufuli. Kwa sasa, vimeainishwa tu kwa jina la akaunti kwa marejeleo.",
       "verOff": "DB hii ni ya zamani kuliko PostgreSQL 14, kwa hivyo vikao vinavyoendesha havina kitambulisho cha swala. Akaunti tu (hakika) ndiyo inayoonyeshwa",
       "privOff": "Akaunti ya kiungo haiwezi kuona maelezo ya kikao cha akaunti zingine, kwa hivyo hakuna sampuli zinazokusanywa. Muulize msimamizi wa DB kuendesha GRANT pg_read_all_stats TO {user};",
       "linkUsr": "akaunti ya kiungo",
@@ -1132,11 +1132,11 @@
     "diag": {
       "title": "Chunguza Sababu",
       "fix": "Hatua:",
-      "none": "Hakuna sababu iliyofichuliwa na takwimu — angalia mpango wa utekelezaji katika SQL Tuning.",
-      "cum": "Hakuna simu katika kipindi hiki — jumla (tangu takwimu zilipowekwa upya)",
-      "basis": "Msingi — Kiwango cha juu cha mara 1 {max}ms · Wastani {mean}ms · Simu {calls} · Safu kwa kila simu {rpc} · Uwiano wa kusoma diski {read} · Vitalu vya muda {tmp}",
+      "none": "Hakuna sababu iliyofichuliwa na takwimu. Fungua mpango wa utekelezaji katika SQL Tuning ili kuangalia.",
+      "cum": "Hakuna simu katika muda huu: Jumla (tangu kuweka upya takwimu)",
+      "basis": "Msingi: Max moja {max}ms · Wastani {mean}ms · Simu {calls} · Safu kwa simu {rpc} · Uwiano wa kusoma diski {read} · Vitalu vya muda {tmp}",
       "SELF_MON": {
-        "cause": "Hoja ya kujikusanya ya dbms.pi — taarifa ya ufuatiliaji inayosoma tu maoni/katalogi za takwimu.",
+        "cause": "Hoja ya ukusanyaji ya dbms.pi: Taarifa ya ufuatiliaji inayosoma tu maoni ya takwimu na katalogi.",
         "fix": "Hakuna hatua ya mteja inayohitajika. Ikiwa mzigo wa hifadhidata lengwa ni suala, punguza idadi ya mara unazofungua skrini ya kukusanya/kufuatilia."
       },
       "NO_MAX": {
@@ -1144,31 +1144,31 @@
         "fix": "Bofya 'Kusanya' mara moja sasa ili kujaza thamani za juu kwa uchunguzi sahihi."
       },
       "SLOW_EACH": {
-        "cause": "Polepole Kila Wakati — Huchukua muda mrefu kila inapoendeshwa, na kiwango cha juu {max}ms na wastani {mean}ms.",
+        "cause": "Polepole kila wakati: Inachukua muda mrefu kila utekelezaji na max {max}ms na wastani {mean}ms.",
         "fix": "① Fungua mpango wa utekelezaji katika 'Fungua katika SQL Tuning'. ② Ikiwa kuna skani kamili (Seq Scan) au upangaji mkubwa, kagua faharisi kwenye safu za masharti ya WHERE/JOIN. ③ Punguza masharti ili kusoma safu/safu zinazohitajika tu."
       },
       "SPIKE": {
-        "cause": "Kuchelewa kwa Vipindi — Wastani {mean}ms, lakini mara kwa mara huchukua muda mrefu kwa kiwango cha juu {max}ms ({x} mara wastani).",
+        "cause": "Kuchelewa kwa vipindi: Wastani {mean}ms, lakini mara kwa mara huchukua muda mrefu na max {max}ms (mara {x} ya wastani).",
         "fix": "① Inapokuwa polepole, angalia kusubiri kwa kufuli (wait_event) kwenye kichupo cha Shughuli/Kufuli. ② Ikiwa utekelezaji wa kwanza tu ni polepole, akiba ilikuwa tupu na diski ilisomwa. ③ Linganisha hoja sawa na maadili tofauti katika SQL Tuning ili kuona kama mpango wa utekelezaji unabadilika kulingana na maadili."
       },
       "DISK_READ": {
-        "cause": "Cache Miss — {pct}% ({read} vitalu) vya vitalu vilivyosomwa vilisomwa kutoka diski, sio kumbukumbu.",
+        "cause": "Kukosa akiba: {pct}% ({read} vitalu) vya vitalu vilivyosomwa vilisomwa kutoka diski, sio kumbukumbu.",
         "fix": "① Punguza safu ya kusoma na faharisi. ② Punguza kipindi/masharti ya hoja. ③ Ikiwa data inayosomeka mara kwa mara inabaki juu, kagua shared_buffers (kumbukumbu)."
       },
       "TEMP_SPILL": {
-        "cause": "Kumbukumbu Imejaa — Upangaji/heshi ilizidi work_mem na kuandika vitalu {blk} (takriban {mb}MB, vitalu {perCall} kwa kila simu) kwenye faili za muda.",
+        "cause": "Kumbukumbu imejaa: Panga/heshi ilizidi work_mem na kuandika vitalu {blk} (takriban {mb}MB, vitalu {perCall} kwa kila simu) kwenye faili za muda.",
         "fix": "① Kuweka faharisi kwenye safu za ORDER BY/GROUP BY huruka upangaji. ② Kwanza, punguza idadi ya safu za kupanga (LIMIT ndani). ③ Ikiwa ni lazima kabisa, ongeza SET LOCAL work_mem tu kwa muamala huu wa hoja."
       },
       "MANY_ROWS": {
-        "cause": "Upatikanaji Mkubwa — Huchota safu {perCall} kwa kila simu.",
+        "cause": "Hoja nyingi: Inaleta safu {perCall} kwa kila simu.",
         "fix": "① Orodha za skrini hupatikana ukurasa kwa ukurasa. ② SELECT huchagua tu safu zinazotumika. ③ Ujumuishaji hufanywa kwenye hifadhidata, na matokeo pekee hupokelewa."
       },
       "PGRST_EMBED": {
-        "cause": "Taarifa ya kichujio kilichopachikwa cha PostgREST (!inner) — kuchuja wazazi kwa masharti ya watoto kunaweza kuchanganua seti nzima kabla ya masharti ya uainishaji.",
+        "cause": "Taarifa ya kichujio kilichopachikwa cha PostgREST (!inner): Kuchuja wazazi kwa masharti ya watoto kunaweza kuchanganua jedwali zima kabla ya sharti la uainishaji.",
         "fix": "① Angalia ikiwa kuna faharisi kwenye funguo za kuunganisha na safu za vichujio. ② Hamisha vichujio kwenye masharti ya jedwali la mzazi. ③ Piga watoto kwenye hoja ya mzazi iliyopo tayari au uwaunganishe kwenye kazi moja ya hifadhidata."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET Paging — Inazidi kuwa polepole inaposoma na kutupa safu zilizotangulia kwa kurasa za baadaye.",
+        "cause": "OFFSET paging: Kurasa za baadaye husoma na kutupa safu za awali, na kuwa polepole zaidi.",
         "fix": "Badilisha hadi keyset paging (WHERE id > last_id ORDER BY id LIMIT n) ambayo husoma kutoka kwa ufunguo baada ya ufunguo wa mwisho uliopokelewa."
       }
     }
@@ -1201,8 +1201,8 @@
       "toDraft": "Unda rasimu ya bomba kutoka kwa {n} zilizochaguliwa"
     },
     "ready": {
-      "ok": "Urudufishaji wa kimantiki wa WAL uko tayari — majedwali yenye PK yanaweza kutumia LOGICAL",
-      "no": "Urudufishaji wa kimantiki wa WAL hauko tayari — nasa kupitia upigaji kura au ulinganisho wa funguo",
+      "ok": "Urudufishaji wa kimantiki wa WAL uko tayari: Majedwali yenye PK yanaweza kutumia njia ya LOGICAL.",
+      "no": "Urudufishaji wa kimantiki wa WAL hauko tayari: Kusanya kwa kutumia njia ya kupiga kura/kulinganisha funguo.",
       "senders": "Viunganisho {n} vya urudufishaji"
     },
     "adapter": {
@@ -1217,20 +1217,20 @@
       "HAS_SOFT_DEL": "Ina safu ya kufuta laini",
       "NO_SOFT_DEL": "Haina safu ya kufuta laini",
       "HAS_PK": "Ina ufunguo mkuu",
-      "NO_PK": "Haina ufunguo mkuu — safu zilizobadilishwa haziwezi kutambuliwa",
+      "NO_PK": "Hakuna PK: Haiwezi kutambua safu zilizobadilishwa.",
       "DELETE_UNSEEN": "Upigaji kura hauwezi kunasa ufutaji halisi (safu ya kufuta laini inapendekezwa)",
       "LOGICAL_NOT_READY": "Inaweza kubadilisha hadi LOGICAL mara tu urudufishaji wa kimantiki wa WAL utakapokuwa tayari",
-      "FULL_RELOAD_ONLY": "Hakuna PK au safu ya muda wa mabadiliko, kwa hivyo hakuna unasi wa nyongeza — ongeza PK",
+      "FULL_RELOAD_ONLY": "Hakuna PK/muhuri wa muda wa mabadiliko, kwa hivyo ukusanyaji wa nyongeza hauwezekani: Ongeza PK inapendekezwa.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level si logical (kuibadilisha inahitaji kuanzisha upya DB)",
       "NO_SLOTS": "max_replication_slots ni 0",
       "NO_SENDERS": "max_wal_senders ni 0",
-      "IS_STANDBY": "Seva ya kusubiri — chukua urudufishaji wa kimantiki kutoka kwa msingi",
+      "IS_STANDBY": "Seva ya kusubiri: Pokea urudufishaji wa kimantiki kutoka kwa seva kuu.",
       "SETTINGS_UNKNOWN": "Haikuweza kusoma mipangilio, utayari haujulikani"
     },
     "ed": {
       "title": "Ufafanuzi wa bomba",
-      "draftOnly": "Ubunifu tu — umehifadhiwa kama rasimu (DRAFT)",
+      "draftOnly": "Muundo pekee: Hifadhi kama DRAFT pekee.",
       "new": "Bomba jipya",
       "empty": "Hakuna mabomba yaliyohifadhiwa",
       "manual": "Mwongozo",
@@ -1299,8 +1299,8 @@
     },
     "warn": {
       "none": "Hakuna maonyo mashuhuri.",
-      "SEQ_SCAN_LARGE": "Uchanganuzi kamili kwenye {relation} (takriban safu {rows}) — zingatia faharisi kwenye safu za vichungi.",
-      "NESTED_LOOP_HIGH": "Kitanzi kilichowekwa hutoa takriban safu {rows} — zingatia kuunganisha kwa heshi au kuunganisha, au faharisi kwenye sharti la kuunganisha.",
+      "SEQ_SCAN_LARGE": "Jedwali {relation} linafanya skani kamili (safu {rows} zinazokadiriwa): Kagua fahirisi kwenye safu za masharti.",
+      "NESTED_LOOP_HIGH": "Matokeo ya kitanzi kilichowekwa ndani ni safu {rows} zinazokadiriwa. Kagua viunganishi vya heshi/kuunganisha au fahirisi kwenye masharti ya kuunganisha.",
       "SORT_SPILL": "Ukubwa wa upangaji ni takriban {kb}KB, juu ya work_mem chaguo-msingi (4MB); inaweza kumwagika kwenye diski."
     },
     "lint": {
@@ -1314,14 +1314,14 @@
         "char": "herufi"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — chagua tu safu unazohitaji (I/O ya ziada, hakuna faharisi inayofunika).",
-        "FUNC_ON_COLUMN": "Safu ya kichungi {column} imefungwa katika kazi au usemi, kwa hivyo faharisi yake haiwezi kutumika — badilisha mara kwa mara badala yake.",
-        "LEADING_WILDCARD": "LIKE yenye % inayoongoza haiwezi kutumia faharisi ya B-tree — zingatia faharisi ya pg_trgm GIN.",
-        "OR_DIFF_COLUMNS": "Masharti ya OR kwenye safu tofauti — zingatia kugawanya na UNION (ongeza sharti la kutengwa kwa nakala ikiwa UNION ALL) au kukagua faharisi za kila safu.",
-        "IMPLICIT_CAST": "{column} inalinganishwa na nambari iliyonukuliwa — linganisha safu na aina za mara kwa mara (utupaji usio wazi).",
-        "NOT_IN_SUBQUERY": "NOT IN (subquery) hairudishi chochote wakati NULL zipo na ni polepole — tumia NOT EXISTS.",
-        "NO_WHERE": "Hakuna kifungu cha WHERE — kwenye jedwali kubwa huu ni uchanganuzi kamili (ongeza sharti au LIMIT).",
-        "DOMAIN_MISMATCH": "{column} ni aina ya {expected} kwa kikoa cha kawaida lakini inalinganishwa na mara kwa mara ya aina nyingine — utupaji usio wazi unaweza kuzuia matumizi ya faharisi."
+        "SELECT_STAR": "SELECT *: Chagua safu zinazohitajika tu (I/O isiyo ya lazima, fahirisi ya kufunika haiwezekani).",
+        "FUNC_ON_COLUMN": "Safu ya sharti {column} inachakatwa na kazi/operesheni, kwa hivyo fahirisi haziwezi kutumika. Chakata upande wa mara kwa mara.",
+        "LEADING_WILDCARD": "LIKE yenye % inayoongoza haiwezi kutumia fahirisi ya B-tree. Kagua fahirisi za pg_trgm GIN.",
+        "OR_DIFF_COLUMNS": "Masharti tofauti ya safu yameunganishwa na OR. Kagua utenganishaji wa UNION (ongeza sharti la kutengwa kwa marudio ikiwa UNION ALL) au fahirisi za safu kwa kila safu.",
+        "IMPLICIT_CAST": "{column} inalinganishwa na nambari iliyonukuliwa. Linganisha aina ya safu na aina ya mara kwa mara (utupaji wa aina usio wazi).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) inaweza kuwa tupu na polepole ikiwa NULL zimechanganywa. Badilisha iwe NOT EXISTS.",
+        "NO_WHERE": "Hakuna sharti la WHERE. Ikiwa ni jedwali kubwa, ni skani kamili (ongeza LIMIT au masharti).",
+        "DOMAIN_MISMATCH": "{column} ni aina {expected} kulingana na kikoa cha kawaida, lakini inalinganishwa na mara kwa mara ya aina tofauti. Utupaji wa aina usio wazi unaweza kuzuia matumizi ya fahirisi."
       }
     },
     "saved": {
@@ -1347,12 +1347,12 @@
     },
     "ai": {
       "title": "Ushauri wa kurekebisha AI",
-      "intro": "Chagua mpango mmoja uliookolewa ili kutoa ushauri. SQL na mipango pekee iliyo na vigezo vilivyofichwa kama ? hutumwa (ushauri unaotegemea sheria ikiwa hakuna ufunguo au ikishindwa). Baada ya mmiliki wa kiungo kuidhinisha, endesha tena maelezo kwa SQL hiyo hiyo, ihifadhi, na pima athari na mpango huo wa baadaye — ndipo tu inaporekodiwa kama imetumika.",
+      "intro": "Chagua mpango mmoja uliookolewa ili kutoa ushauri. SQL na mipango pekee iliyo na vigezo vilivyofichwa kama ? hutumwa (ushauri unaotegemea sheria ikiwa hakuna ufunguo au ikishindwa). Baada ya mmiliki wa kiungo kuidhinisha, endesha tena maelezo kwa SQL hiyo hiyo, ihifadhi, na pima athari na mpango huo wa baadaye : ndipo tu inaporekodiwa kama imetumika.",
       "pickPlan": "Chagua mpango uliookolewa kwa ushauri",
       "create": "Tengeneza ushauri",
       "creating": "Inatengeneza… (hadi sekunde 30)",
       "noPlans": "Hakuna mipango iliyookolewa. Tazama mpango wa maelezo hapo juu na uuhifadhi.",
-      "note": "Ushauri mmoja kwa kila mpango. Futa ushauri uliopo ili kutengeneza upya. DDL inapendekezwa tu — itumie katika schema.pi.",
+      "note": "Ushauri mmoja kwa kila mpango. Futa ushauri uliopo ili kutengeneza upya. DDL inapendekezwa tu : itumie katika schema.pi.",
       "empty": "Bado hakuna ushauri.",
       "noItems": "Hakuna maboresho yaliyopatikana kwa mpango huu.",
       "cost": "Gharama ya awali",
@@ -1394,10 +1394,10 @@
       "copy": "Nakili",
       "copied": "Imenakiliwa",
       "rule": {
-        "SEQ_SCAN_INDEX": "Uchanganuzi kamili wa {relation} — unda faharisi kwenye safu wima ya kichujio {column} (badilisha NN katika jina la faharisi na nambari ya mfuatano).",
-        "SEQ_SCAN_STATS": "Uchanganuzi kamili wa {relation} — angalia safu wima za kichujio na uhakikishe takwimu (ANALYZE) ni za sasa.",
-        "NESTED_LOOP": "Kitanzi kilichowekwa ndani kinatarajia safu {rows} — onyesha upya takwimu na uzingatie faharisi za ufunguo wa kuunganisha au kuunganisha kwa heshi.",
-        "SORT_SPILL": "Upangaji wa takriban {kb} KB unaweza kumwagika kwenye diski — zingatia kuongeza work_mem ya kikao au kuweka faharisi kwenye safu wima za upangaji.",
+        "SEQ_SCAN_INDEX": "{relation} skani kamili: Unda fahirisi kwenye safu ya sharti {column} (jina la fahirisi NN litabadilishwa na nambari ya mfuatano).",
+        "SEQ_SCAN_STATS": "{relation} skani kamili: Angalia safu za masharti na uhakikishe takwimu (ANALYZE) ni za kisasa.",
+        "NESTED_LOOP": "Matokeo ya kitanzi kilichowekwa ndani ni safu {rows} zinazokadiriwa: Sasisha takwimu na ukague fahirisi za sharti la kuunganisha au viunganishi vya heshi.",
+        "SORT_SPILL": "Panga inaweza kumwagika kwenye diski kwa takriban {kb}KB. Kagua kuongeza work_mem ya kikao au fahirisi kwenye safu za kupanga.",
         "SELECT_STAR": "Chagua safu wima unazohitaji tu badala ya SELECT * (I/O kidogo, faharisi za kufunika zinawezekana).",
         "FUNC_ON_COLUMN": "Sogeza kitendakazi/kielelezo kwenye safu wima ya kichujio {column} hadi upande wa kudumu (huwezesha matumizi ya faharisi).",
         "IMPLICIT_CAST": "Linganisha aina za {column} na kigezo (ondoa ubadilishaji usio wazi).",
@@ -1457,9 +1457,9 @@
     },
     "desc": {
       "FREE": "Gundua & Jifunze",
-      "D1": "Opereta — Huangalia kama hifadhidata iko sawa sasa",
-      "D2": "Msanidi & Mrekebishaji — Hurekebisha SQL polepole",
-      "D3": "DBA & DA — Kutoka usalama wa uendeshaji hadi utekelezaji na ziwa"
+      "D1": "Mwendeshaji: Huangalia kama hifadhidata iko sawa sasa.",
+      "D2": "Msanidi/Mrekebishaji: Hurekebisha SQL polepole.",
+      "D3": "DBA/DA: Usalama wa uendeshaji, uhamiaji, na hata data lake."
     },
     "feat": {
       "FREE": "Bodi ya ufuatiliaji, mwonekano wa mpango wa utekelezaji, mafunzo ya msingi",
@@ -1502,7 +1502,7 @@
       "required": "Kipengele hiki kinapatikana kuanzia mpango wa {plan}.",
       "limit": "Umetumia majaribio yote yanayopatikana kwa kipindi hiki. Unaweza kutumia zaidi kwa kuboresha hadi mpango wa {plan}.",
       "limitTop": "Umetumia majaribio yote yanayopatikana kwa kipindi hiki. Unaweza kuitumia tena kipindi kijacho.",
-      "expired": "Mpango wako wa schema.pi umeisha muda wake — tafadhali fanya malipo kwenye skrini ya mpango wa schema.pi.",
+      "expired": "Mpango wako wa schema.pi umeisha muda. Tafadhali lipa kwenye skrini ya mpango wa schema.pi.",
       "go": "Tazama Mpango",
       "close": "Funga"
     }

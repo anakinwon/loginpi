@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analyse og Lake",
     "intro": "dbms-aktivitets-KPI'er, tre-lags lake-design og datasæt-katalog på ét sted.",
-    "storageNotice": "Lake-lagring (kundeside eller sky) er endnu ikke besluttet (PRD afsnit 10 #7). Kun designs og navnemapping gemmes indtil videre – ingen rækkedata.",
+    "storageNotice": "Lake-lagring (kundeside eller sky) er endnu ikke besluttet (PRD afsnit 10 #7). Kun designs og navnemapping gemmes indtil videre : ingen rækkedata.",
     "noLink": "Vælg eller registrer et schema.pi-link først.",
     "goConnect": "Registrer et link",
     "loading": "Indlæser…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP-analyse — Model↔DB",
+    "title": "GAP-analyse: Model↔DB",
     "intro": "Sammenlign schema.pi-designmodellen og DDL-anvendelseshistorikken med det live DB-katalog for at finde drift, og mål, om designede indekser faktisk bruges. Kundens rækkedata læses eller gemmes aldrig.",
     "needLink": "Vælg et schema.pi-link ovenfor først. Hvis du ikke har et, skal du registrere et token i menuen 'Link'.",
     "needConn": "Vælg den DB-forbindelse, der skal sammenlignes ovenfor.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Anmodning {id}",
     "notSaved": "Kunne ikke gemme denne kørsel i historikken (resultaterne vises normalt).",
-    "capped": "For mange elementer – viser de første {cap} pr. sektion (antal er komplet).",
+    "capped": "For mange elementer : viser de første {cap} pr. sektion (antal er komplet).",
     "statsMissing": "Indeksbrugsstatistikker var utilgængelige, så brugen kunne ikke vurderes.",
     "sum": {
       "missingTables": "Tabeller mangler i DB",
@@ -230,7 +230,7 @@
       "USED": "I brug",
       "NO_STATS": "Ingen statistik",
       "CONSTRAINT": "Unikhedsbegrænsning (behold)",
-      "NO_DATA": "Ingen data eller statistik ikke indsamlet — kan ikke bedømmes",
+      "NO_DATA": "Ingen data eller statistik er ikke indsamlet: kan ikke bestemmes",
       "OBSERVING": "Observerer (under 7 dage)",
       "UNUSED_CAND": "Ubrugt kandidat"
     },
@@ -245,14 +245,14 @@
       "RATE": "For mange anmodninger. Prøv igen om et minut."
     },
     "schema": "Skema",
-    "schemaHint": "Kun almindelige og partitionerede tabeller i dette skema sammenlignes (visninger udelukket). Standard public — Supabase interne skemaer (auth, storage, …) udelades.",
-    "truncated": "{names} ramte {max}-række grænsen og blev afkortet — nogle \"ikke i DB\" / \"ikke i model\" resultater kan være falske. Indsnævr skemaet og kør igen.",
+    "schemaHint": "Sammenligner kun almindelige og partitionerede tabeller i dette skema (ekskl. visninger). Standard public: Supabase interne skemaer (auth, storage osv.) er udelukket.",
+    "truncated": "{names}-forespørgslen blev afkortet ved {max} rækker. Nogle 'Ikke i DB'/'Ikke i Model'-detektioner kan være falske positiver. Indsnævr skemaet og detekter igen.",
     "colUnchecked": "Fordi kolonneforespørgslen blev afkortet, behandles {n} manglende/ekstra kolonneresultater som ubekræftelige og udelukkes fra antallet af kolonnemismatch.",
-    "renamed": "{n} PK-indeks(er) anvendt under den gamle navngivningsregel (_PKEY) findes i DB under det nye navn (PK_) — normalt",
-    "superseded": "{n} ældre anmodning(er) blev udelukket, fordi en senere anmodning genskabte den samme tabel (DROP … CASCADE) — normalt",
+    "renamed": "{n} PK-indekser anvendt med den gamle navnekonvention (_PKEY) er i DB med det nye navn (PK_). Normal.",
+    "superseded": "{n} tidligere anmodninger blev udelukket fra sammenligning, fordi senere anmodninger genskabte den samme tabel (DROP … CASCADE). Normal.",
     "supersededItem": "Anmodning {id} → erstattet af anmodning {by}",
     "sysCols": "{n} systemkolonne(r) automatisk tilføjet ved DDL-generering er ikke i modellen per design og er udelukket fra mismatches",
-    "groupOwn": "Projektpræfiks {pfx} — kandidater, der mangler fra modellen",
+    "groupOwn": "Dette projektpræfiks {pfx}: model mangler kandidater",
     "groupOther": "Andet system {pfx}",
     "basis": "Est. rækker {rows} · siden {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Hvis objekter stadig forsvinder efter genanvendelse, mistænk et manuelt drop eller rollback og kontroller forbindelseskontoens aktivitet med din DBA."
       },
       "extraTables": {
-        "s1": "Dette projektpræfiks-bundt = manglende modelkandidater — importer dem til modellen via schema.pi → Indstillinger → Reverse, eller beslut om de skal slettes, hvis de er ubrugte tabeller.",
-        "s2": "Andre præfiksgrupper = andre systemer, der deler denne DB — ikke handlingselementer for dette projekt.",
+        "s1": "Denne projektpræfiksgruppe = model mangler kandidater: importer til model via schema.pi → Indstillinger → Reverse, eller beslut om den skal slettes, hvis tabellen ikke bruges.",
+        "s2": "Andre præfiksgrupper = andre systemer, der bruger den samme DB: ikke genstand for handling fra dette projekt.",
         "s3": "Hvis målskemaet ikke er public, ændr feltet \"Skema\" ovenfor og kør igen."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Type/NULL afviger = juster til modellen (sandhedskilde); før du reducerer længden eller skifter til NOT NULL, bekræft, at eksisterende rækker opfylder det."
       },
       "idxUsage": {
-        "s1": "Før fjernelse, kontroller ① at statistikvinduet dækker mindst én forretningscyklus (f.eks. månedsslutbatch) — se \"siden\".",
+        "s1": "Før sletning, kontroller ① om statistikindsamlingsperioden er mindst én driftsperiode (f.eks. månedsafslutningsbatch): se referencedatoen.",
         "s2": "② Det er ikke et unikt/PK-indeks (disse vises separat som \"unikhedsbegrænsning\").",
         "s3": "③ EXPLAIN tabellens repræsentative SQL i SQL Tuning og bekræft, at dette indeks ikke bruges.",
         "s4": "Når alle tre er bekræftet, fjern indekset fra modellen i schema.pi og anvend via DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Sådan udstedes et forbindelsestoken",
     "how1": "Log ind på schema.pi, og åbn det emneområde, der skal forbindes",
     "how2": "Gå til Emneområde → Indstillinger → Forbindelsestoken, og tryk på 'Udsted token' (områdeadministrator eller DA-rolle)",
-    "how3": "Kopier tokenet, der starter med slk_ — det vises kun én gang, når det udstedes",
+    "how3": "Kopier tokenet, der starter med slk_, som blev udstedt. Originalen vises kun én gang ved udstedelsen.",
     "how4": "Indsæt det nedenfor, og registrer",
     "openSchema": "Åbn schema.pi",
     "registerTitle": "Registrer forbindelse",
@@ -384,7 +384,7 @@
     "retry": "Prøv igen",
     "pickerLink": "Link",
     "pickerConn": "Forbindelse",
-    "pickerEmpty": "Ingen forbindelser —",
+    "pickerEmpty": "Ingen forbindelser.",
     "pickerGo": "registrer en på /connect",
     "errors": {
       "LINK_AUTH": "Forbindelsestokenet er udløbet eller tilbagekaldt. Udsted et nyt token i schema.pi, og registrer igen",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Datamigration (PiMig)",
-    "intro": "Beregner tabelindlæsningsrækkefølgen ud fra relationerne i din schema.pi-designmodel, organiserer chunk-størrelse, parallelitet og cutover-tjeklisten og genererer verifikations-SQL, som du selv kører på kilde og mål. Denne skærm planlægger og kontrollerer kun – den flytter ikke data eller læser kundens DB-rækker.",
+    "intro": "Beregner tabelindlæsningsrækkefølgen ud fra relationerne i din schema.pi-designmodel, organiserer chunk-størrelse, parallelitet og cutover-tjeklisten og genererer verifikations-SQL, som du selv kører på kilde og mål. Denne skærm planlægger og kontrollerer kun : den flytter ikke data eller læser kundens DB-rækker.",
     "needLink": "Vælg et schema.pi-link ovenfor først. Hvis du ikke har et, skal du registrere et token under 'Forbind'.",
     "loading": "Indlæser…",
     "newPlan": "Ny migrationsplan",
@@ -432,8 +432,8 @@
     "optsHint": "Parallelitet er antallet af tabeller, der indlæses samtidigt inden for et niveau. Blokstørrelse er den commit-enhed (rækker), som eksekveringsmotoren vil bruge.",
     "order": "Indlæsningsrækkefølge",
     "orderHint": "Topologisk sorteret efter designrelationer (ikke fysiske FK'er), så overordnede tabeller kommer først. Tabeller på samme niveau afhænger ikke af hinanden og kan indlæses parallelt.",
-    "cycles": "{n} cirkulære grupper — placeret på samme niveau. Indstil deres rækkefølge manuelt, og udskyd referencekontrol til efter indlæsning.",
-    "selfRefs": "Selvrefererende (hierarkiske) tabeller — indlæs overordnede rækker først inden for tabellen",
+    "cycles": "{n} cyklusser: placeret på samme trin. Indstil manuelt indlæsningsrækkefølgen og udskyd referencekontroller til efter indlæsning.",
+    "selfRefs": "Selvrefererende (hierarkiske) tabeller: overordnede rækker først inden for den samme tabel.",
     "level": "Niveau {n}",
     "checklist": "Cutover-tjekliste",
     "toReady": "Marker som klar",
@@ -471,7 +471,7 @@
     },
     "verify": "Verifikations-SQL",
     "verifyHint": "Genererer tælle-, numerisk kolonne-sum-, duplikatnøgle- og nøgle-hash-forespørgsler pr. tabel i indlæsningsrækkefølge. Kør dem selv på kilde og mål og sammenlign (denne skærm udfører dem ikke).",
-    "noHashOracle": "Oracle·Tibero hashfunktioner og tekstgengivelse adskiller sig fra PostgreSQL, så hashforespørgsler udelades — sammenlign tællinger, summer og duplikatnøgler.",
+    "noHashOracle": "Oracle og Tibero udelader hash-opslag, fordi hash-funktioner og tegngengivelser adskiller sig fra PostgreSQL. Sammenlign efter antal, sum og nøgledublikering.",
     "copy": "Kopier",
     "copied": "Kopieret",
     "copyFail": "Kunne ikke kopiere. Vælg teksten og kopier den manuelt.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Anmodningen er ugyldig."
     },
     "board": {
-      "subtitle": "Hvad skal der gøres på denne DB lige nu – 14 signaler om OK, advarsel eller risiko og løsninger, på et øjeblik.",
+      "subtitle": "Hvad skal der gøres nu i denne DB: Se normal, advarsel og risikostatus for 14 signaler og deres løsninger med et øjeblik.",
       "refresh": {
         "updated": "Pr. {time} · opdateres hvert minut",
         "now": "Opdater nu",
@@ -564,11 +564,11 @@
         "NA": "N/A"
       },
       "overall": {
-        "RISK": "Risiko — handling påkrævet nu",
-        "WARN": "Advarsel — nogle elementer skal tjekkes",
-        "UNKNOWN": "Ukendt — kontroller forbindelsen",
-        "OK": "OK — alle signaler er inden for grænserne",
-        "CONN_DOWN": "Kan ikke oprette forbindelse til DB — tjek forbindelsen først",
+        "RISK": "Risiko: Øjeblikkelig handling påkrævet",
+        "WARN": "Advarsel: Elementer der skal gennemgås",
+        "UNKNOWN": "Kan ikke bekræfte: Kontroller forbindelsesstatus",
+        "OK": "Normal: Alle signaler er inden for kriterierne",
+        "CONN_DOWN": "Kan ikke oprette forbindelse til DB. Kontroller forbindelsen først.",
         "NA": "N/A"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Vis mindre",
         "setup": "Opsæt disse for at se mere",
         "none": "Ingen risiko- eller advarselselementer kræver handling lige nu.",
-        "unknown": "Kunne ikke kontrollere {n} signal(er) — se kortene for årsagen.",
+        "unknown": "Kan ikke bekræfte {n} elementer: Kontroller årsagen på kortet.",
         "myRule": "Min regel overtrådt: {rule}",
         "copySql": "Kopiér SQL",
         "copied": "Kopieret"
@@ -622,34 +622,34 @@
         "REPL": "Replikationsforsinkelse"
       },
       "fix": {
-        "AVAIL": "Langsom respons eller en nylig genstart — kontroller forbindelsesindstillingerne og DB-serverstatus.",
-        "AVAIL_DOWN": "Kunne ikke oprette forbindelse til DB — kontroller forbindelsesindstillingerne, og at DB-serveren er oppe.",
-        "CONN_USE": "{sess}/{max} sessioner på denne DB (ikke klyngedækkende — andre databaser er ekskluderet) — luk inaktive forbindelser eller tilføj en forbindelsespuller (pgbouncer).",
-        "URL": "{n} kontrollerede URL'er fejler · maks. respons {ms}ms — se schema.pi-monitoren for årsagen.",
-        "LONG_QRY": "En forespørgsel har kørt i {sec}s — gennemgå dens plan og juster den, eller lad en DBA annullere den.",
-        "IDLE_TX": "En transaktion har været inaktiv i {sec}s — find den manglende commit i appen og indstil en timeout.",
-        "LOCK_WAIT": "{n} sessioner venter på låse — find den blokerende session og afslut dens transaktion.",
-        "CACHE_HIT": "Cache-hitrate {pct}% — se efter fulde scanninger af store tabeller eller gennemgå shared_buffers.",
-        "XACT_ERR": "Rollback-rate {pct}%, {dlck} deadlocks — kontroller de fejlede transaktioner og app-fejllogger.",
-        "SLOW_SQL": "Der er en forespørgsel, der tager op til {ms}ms pr. udførelse — se udførelsesplanen og juster den, startende fra den højeste enkelte udførelsestid.",
-        "STORAGE": "DB ({gb} GB) er tæt på sin grænse (dage tilbage {days}) — ryd op i store tabeller eller tilføj kapacitet.",
-        "VACUUM": "{tbl} har mange døde rækker eller forældet statistik — gennemgå VACUUM (ANALYZE) og autovacuum-indstillinger.",
-        "INDEX": "{n} indeksfund (ugyldige, ubrugte, fulde scanninger) — se fanen for tabel- og indekstilstand for målene.",
-        "BACKUP": "WAL-arkivering er slået fra eller stoppet — kontroller archive_mode, archive_command og backupstatus.",
-        "REPL": "Replikationsforsinkelse {sec}s — kontroller standby-status og netværket.",
-        "PGSS": "pg_stat_statements er ikke installeret, så langsom SQL er utilgængelig — aktiver det med SQL'en nedenfor (servergenstart påkrævet)."
+        "AVAIL": "Langsom respons eller lige genstartet. Kontroller forbindelsesoplysninger og DB-serverstatus.",
+        "AVAIL_DOWN": "Kunne ikke oprette forbindelse til DB. Kontroller forbindelsesoplysninger, og om DB-serveren er aktiv.",
+        "CONN_USE": "Denne DB-session {sess}/{max} (ikke klynge-dækkende, andre DB-forbindelser udelukket): Ryd op i inaktive forbindelser eller opsæt en forbindelsespuler (pgbouncer).",
+        "URL": "{n} URL-kontroller mislykkedes · Maks. respons {ms}ms: Kontroller årsagen i schema.pi-monitoren.",
+        "LONG_QRY": "En forespørgsel har kørt i {sec} sekunder. Gennemgå udførelsesplanen og juster den, eller få en DBA til at stoppe den.",
+        "IDLE_TX": "En transaktion har været åben og inaktiv i {sec} sekunder. Find manglende commits i appen og indstil en timeout.",
+        "LOCK_WAIT": "{n} sessioner venter på låse: Find den blokerende session og afslut dens transaktion.",
+        "CACHE_HIT": "Cache hit rate {pct}%: Se efter fulde tabelscanninger af store tabeller eller gennemgå shared_buffers.",
+        "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlocks: Kontroller mislykkede transaktioner og app-fejllogger.",
+        "SLOW_SQL": "Der er en forespørgsel med en enkelt maks. tid på {ms}ms. Gennemgå udførelsesplanen og juster fra den øverste enkelt maks. tid.",
+        "STORAGE": "DB {gb}GB er tæt på sin grænse (resterende {days} dage). Ryd op i store tabeller eller øg kapaciteten.",
+        "VACUUM": "{tbl} har mange døde rækker eller forældet statistik. Gennemgå VACUUM (ANALYZE) og autovacuum-indstillinger.",
+        "INDEX": "{n} indekskontroller (ugyldige, ubrugte, fuld scanning): Kontroller mål under fanen for tabel-/indekshelbred.",
+        "BACKUP": "WAL-arkivering er slået fra eller stoppet. Kontroller archive_mode, archive_command og backupstatus.",
+        "REPL": "Replikationsforsinkelse {sec} sekunder: Kontroller standby-serverstatus og netværk.",
+        "PGSS": "pg_stat_statements-udvidelsen mangler, så langsom SQL kan ikke ses. Aktiver den med SQL'en nedenfor (servergenstart påkrævet)."
       },
       "reason": {
         "CONN_DOWN": "Ikke bedømt, fordi DB-forbindelsen er nede.",
         "PGSS": "pg_stat_statements er ikke installeret.",
         "VER": "Tilgængelig på PostgreSQL 13 eller nyere.",
         "SAMPLE": "Ikke nok prøver endnu.",
-        "NO_LIMIT": "Ingen størrelsesgrænse, så brugen er ikke bedømt — tilføj en DB-størrelse (MB) regel (>) for at bruge den som grænse.",
+        "NO_LIMIT": "Anvendelse bestemmes ikke, da der ikke er nogen kapacitetsgrænse. Tilføjelse af en DB-størrelse (MB) regel (>) vil bruge den som en grænse.",
         "RESET": "Statistikker blev nulstillet for mindre end 7 dage siden, så ubrugte indekser bedømmes ikke.",
         "STALE": "Ingen nylige kontrolposter.",
         "STANDBY": "Ikke relevant på en standby-server.",
         "NONE": "Intet at kontrollere.",
-        "GRANT": "Manglende privilegier — tildel pg_monitor-rollen til forbindelseskontoen.",
+        "GRANT": "Kan ikke se på grund af manglende tilladelser. Giv pg_monitor-rollen til forbindelseskontoen.",
         "LINK": "schema.pi-forespørgsel mislykkedes ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Hvis den ikke streamer, kontroller standby-loggene."
         }
       },
-      "sqlNote": "SQL'en nedenfor er kun til læsning, til kontrol — rettelser (VACUUM, DROP INDEX, pg_terminate_backend) udføres af en DBA.",
+      "sqlNote": "SQL'en nedenfor er til skrivebeskyttet verifikation. Handlinger (VACUUM, DROP INDEX, pg_terminate_backend) udføres direkte af en DBA.",
       "go": {
         "activity": "Aktivitet & låse",
         "top": "Langsomme forespørgsler",
@@ -766,8 +766,8 @@
           "tree": "Hvad optager plads, og hvad skal ryddes op?"
         },
         "asTable": "Vis som tabel",
-        "needHistory": "Ingen trend endnu — hold denne skærm åben i et par minutter.",
-        "needPerf": "Ingen størrelseshistorik — indsaml i fanen ydeevne eller hold denne skærm åben.",
+        "needHistory": "Ingen tendens endnu. Den vil blive tegnet, hvis du lader denne skærm være åben i et par minutter.",
+        "needPerf": "Ingen kapacitetshistorik. Indsaml den fra fanen Ydeevne, eller lad denne skærm være åben.",
         "noSess": "Ingen sessioner.",
         "noWait": "Ingen ventetider",
         "noData": "Intet at vise.",
@@ -840,17 +840,17 @@
         "noStat": "Ingen statistik"
       },
       "empty": {
-        "noConn": "Denne taksonomi har ingen PostgreSQL-serverforbindelse at overvåge — viser kun URL'er og servicestatus.",
+        "noConn": "Der er ingen PostgreSQL-serverforbindelser at overvåge i denne taksonomi. Kun URL og forbindelsesstatus vises.",
         "unsupported": "Denne forbindelse understøtter ikke overvågning (kun PostgreSQL-serverforbindelser).",
-        "connFail": "Kunne ikke oprette forbindelse til databasen — kontroller forbindelsesindstillingerne og DB-status.",
-        "linkDown": "Kunne ikke nå schema.pi — forsøger automatisk igen.",
-        "linkAuth": "Forbindelsestokenet er udløbet — udsted et nyt token i schema.pi og registrer det.",
-        "timeout": "Svar er langsomme — forsøger automatisk igen.",
+        "connFail": "Kunne ikke oprette forbindelse til DB. Kontroller forbindelsesoplysninger og DB-status.",
+        "linkDown": "Kunne ikke oprette forbindelse til schema.pi. Vil automatisk prøve igen om kort tid.",
+        "linkAuth": "Forbindelsestoken er udløbet. Genudsted og registrer tokenet fra schema.pi.",
+        "timeout": "Responsen er langsom. Vil automatisk prøve igen om kort tid.",
         "rate": "For mange anmodninger, så opdateringsintervallet blev øget."
       },
       "aux": {
         "rules": "Mine advarselsregler ({n} aktive)",
-        "schemaSvc": "Servicestatus — schema.pi-svar",
+        "schemaSvc": "Forbindelsesstatus: schema.pi-tjenesterespons",
         "schemaSvcNote": "App-metrikker for de sidste 60 minutter gemt af schema.pi.",
         "source": "Datakilde: Mål-DB'en er kun læsbar via schema.pi navngivne forespørgsler (skrivebeskyttet); tendenser gemmer kun statistik i dbms.pi (ingen rækkedata)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Ingen diagnose endnu. Tryk på \"Kør diagnose\"",
     "lastRun": "Sidste diagnose {dtm}",
     "readOnly": "Diagnose læser kun (SELECT). Råd er en vejledning og afhænger af serverhukommelse, belastning og arbejdsbyrde",
-    "truncated": "For mange objekter — kun de første 500 blev kontrolleret",
+    "truncated": "For mange objekter : kun de første 500 blev kontrolleret",
     "paramsNote": "Total serverhukommelse er ukendt, så den estimeres ud fra shared_buffers ≈ 25% af RAM. random_page_cost antager SSD",
     "auditNote": "Tabeller med RLS slået fra og ubrugte konti vil blive kontrolleret, når linkforespørgslen understøtter dem",
-    "replNote": "Baseline er Active-Standby (A-S) — én primær + standby. Replay-forsinkelse ≥ 5s = advarsel, ≥ 60s = risiko (målt RPO-reference)",
+    "replNote": "Primært kriterium er Active-Standby (A-S): 1 Primary + Standby. Advarsel for replay-forsinkelse >= 5 sekunder, risiko for >= 60 sekunder (se faktisk RPO-måling).",
     "lagIdle": "Ingen ændringer",
     "pager": "Sideinddeling",
     "prev": "Forrige",
@@ -942,7 +942,7 @@
       "ckpt_ok": "Inden for et rimeligt område",
       "wal_minimal": "wal_level=minimal gør PITR og replikering umulig. Brug replica eller højere",
       "wal_ok": "WAL-niveau understøtter PITR og replikering",
-      "rpc_hdd": "HDD-standard (4). For SSD anbefales 1.1–2",
+      "rpc_hdd": "HDD-standard (4). For SSD anbefales 1.1~2",
       "rpc_ok": "Velegnet til SSD",
       "super_many": "To eller flere superusers. Behold én til administration og tildel kun nødvendige privilegier til andre",
       "super_ok": "Højst én superuser",
@@ -1018,7 +1018,7 @@
       "intro": "Indsaml nu læser top forespørgselsstatistikker, tabeller, indekser og størrelser én gang og gemmer dem som et snapshot. Indsaml mindst to gange for at se ændringer og størrelsestrends",
       "run": "Indsaml nu",
       "running": "Indsamler…",
-      "done": "Indsamlet {dtm} — {qry} forespørgsler · {tbl} tabeller · {idx} indekser",
+      "done": "Indsamling afsluttet {dtm}: {qry} forespørgsler · {tbl} tabeller · {idx} indekser",
       "auto": {
         "title": "Automatisk indsamling",
         "desc": "Når denne er slået til, indsamles denne forbindelses statistik automatisk hver dag kl. 3 (koreansk tid). Efter 7 eller flere dage kan du stole på rangeringen af langsomme forespørgsler og listen over ubrugte indekser",
@@ -1040,13 +1040,13 @@
       "sortCalls": "Kald",
       "empty": "Ingen snapshots endnu. Tryk på Indsaml nu under fanen Indsaml",
       "range": "Ændring mellem {from} → {to}",
-      "first": "Første snapshot {dtm} — kumulative værdier (ændringer fra næste snapshot)",
+      "first": "Første indsamling {dtm}: Kumulativ (stigning/fald fra næste indsamling)",
       "query": "Forespørgsel (literaler maskeret)",
       "calls": "Kald",
       "totalMs": "Total ms",
       "meanMs": "Gennemsnitlig ms",
       "rows": "Rækker",
-      "reset": "Registrering af nulstillede statistikker – vist som kumulativ",
+      "reset": "Statistiknulstilling registreret: Vises som kumulativ",
       "src": "Kilde",
       "srcToggle": "Vis eller skjul kildedetaljer",
       "openSqlLab": "Åbn i SQL Tuning",
@@ -1054,7 +1054,7 @@
       "sortMax": "Maks. enkelt udførelsestid",
       "maxMs": "Maks. enkelt ms",
       "diagToggle": "Diagnosticer årsag",
-      "noMax": "Ingen maksimumværdi — {n} elementer er fra ældre samlinger uden en maksimumværdi, så de er midlertidigt sorteret efter gennemsnit (ikke efter samlet tid). Indsamling nu vil udfylde maksimumværdien."
+      "noMax": "Ingen maks. værdi: {n} elementer er gamle indsamlinger uden en enkelt maks. værdi, så de er midlertidigt sorteret efter enkelt gennemsnit (ikke efter total tid). Maks. værdier vil blive udfyldt med nuværende indsamling."
     },
     "health": {
       "empty": "Ingen snapshots endnu. Tryk på 'Saml nu' under fanen 'Saml'",
@@ -1062,9 +1062,9 @@
       "unusedIdx": "Ubrugte indekser",
       "unusedIdxHint": "Indekser, der aldrig er brugt siden sidste nulstilling af statistikker (efter størrelse). Slet ikke PK- eller unikke-begrænsningsindekser",
       "fullScan": "Overdreven fuld scanning",
-      "fullScanHint": "Tabeller med 1.000+ aktive rækker, hvor fulde scanninger udgør mindst halvdelen – gennemgå indekser på filterkolonner",
+      "fullScanHint": "Tabeller med 1.000+ effektive rækker og over halvdelen fulde scanninger: Gennemgå indekser på betingelseskolonner.",
       "dead": "Overdrevne døde tupler",
-      "deadHint": "Forholdet mellem døde tupler er 20 % eller mere – tjek VACUUM- og autovacuum-indstillingerne",
+      "deadHint": "Død tuple-forhold over 20%: Gennemgå VACUUM og autovacuum-indstillinger.",
       "none": "Ingen",
       "scans": "scanninger"
     },
@@ -1081,7 +1081,7 @@
     },
     "activity": {
       "refresh": "Opdater",
-      "live": "Live forespørgsel – ikke gemt",
+      "live": "Realtidsforespørgsel: Ikke gemt",
       "sessions": "Sessionsaktivitet",
       "locks": "Låse",
       "none": "Ingen"
@@ -1108,7 +1108,7 @@
         "BATCH": "Ser ud til at være en batch- eller planlagt job. Spred køretider væk fra forretningsspidser og reducer arbejdet pr. commit. Kontroller indekser og statistikker (ANALYZE) på måltabellerne, og opdel lange transaktioner. At sætte jobnavnet i application_name gør den næste klassificering mere præcis.",
         "PROGRAM": "Dette ser ud til at være en forespørgsel udført af applikationen. Kontroller udførelsesplanen i SQL-justering. Hvis den maksimale enkelte udførelsestid er lang, skal du først se på indekser og join-rækkefølge. Hvis en enkelt udførelse er kort, men antallet af kald er højt, skal du se på gentagne kald (N+1) og caching. Indsæt servicenavnet i connection poolens application_name.",
         "PLATFORM": "Ser ud til at være DB- eller platforminternt arbejde som autovacuum eller replikering. Normalt er der ikke behov for handling. Hvis det forbliver øverst, gennemgå autovacuum-tærskler og maintenance_work_mem.",
-        "MONITOR": "Dette er en dbms.pi selvindsamlingsforespørgsel — schema.pi-forbindelsen er en fast erklæring, der kun læser statistiske visninger/kataloger (pg_stat_*·pg_catalog), så det er ikke en forretningsforespørgsel, og der kræves ingen kundehandling. Hvis belastningen på måldatabasen er et problem, skal du reducere antallet af gange, du åbner indsamlingsknappen/overvågningsskærmen. Erklæringer fra andre overvågningsværktøjer, der læser de samme statistiske visninger, grupperes også her.",
+        "MONITOR": "dbms.pi's egen indsamlingsforespørgsel. schema.pi-forbindelsen læser kun statistiske visninger og kataloger (pg_stat_*, pg_catalog) med faste udsagn, så det er ikke en forretningsforespørgsel, og der kræves ingen kundehandling. Hvis måldatabasebelastningen er et problem, reducer frekvensen af åbning af indsamlingsknappen eller overvågningsskærmen. Udsagn fra andre overvågningsværktøjer, der læser de samme statistiske visninger, er også grupperet her.",
         "UNKNOWN": "Der er ingen spor til kilden. Indstil application_name på hver forbindelse og opdel konti efter formål; det vil blive klassificeret fra de næste prøver."
       },
       "detail": {
@@ -1119,7 +1119,7 @@
         "period": "Observeret",
         "none": "(tom)"
       },
-      "noSample": "Ingen prøver endnu — kørende sessioner samples, når du ser overvågningsboardet eller fanen Aktivitet og låse. For nu er det kun klassificeret ud fra kontonavnet.",
+      "noSample": "Ingen prøver endnu. Kørende sessioner akkumuleres som prøver, når du ser overvågningskortet eller fanerne Aktivitet/Låse. I øjeblikket klassificeres de kun efter kontonavn til reference.",
       "verOff": "Denne DB er ældre end PostgreSQL 14, så kørende sessioner har ingen forespørgsels-ID. Kun kontoen (sikker) vises.",
       "privOff": "Linkkontoen kan ikke se andre kontosessionsdetaljer, så ingen prøver indsamles. Bed en DB-administrator om at køre GRANT pg_read_all_stats TO {user};",
       "linkUsr": "linkkonto",
@@ -1130,11 +1130,11 @@
     "diag": {
       "title": "Diagnosticer årsag",
       "fix": "Handling:",
-      "none": "Ingen årsag afsløret af statistikker — kontroller udførelsesplanen i SQL Tuning.",
-      "cum": "Ingen kald i dette interval – kumulativ (siden nulstilling af statistik)",
-      "basis": "Grundlag — Maks. 1-gangs {max}ms · Gennemsnit {mean}ms · Kald {calls} · Rækker pr. kald {rpc} · Disk læseforhold {read} · Midlertidige blokke {tmp}",
+      "none": "Ingen årsag afsløret af statistik. Åbn udførelsesplanen i SQL Tuning for at kontrollere.",
+      "cum": "Ingen opkald i dette interval: Kumulativ (siden statistiknulstilling)",
+      "basis": "Basis: Maks. enkelt {max}ms · Gennemsnit {mean}ms · Opkald {calls} · Rækker pr. opkald {rpc} · Disk læseforhold {read} · Midlertidige blokke {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi selvindsamlingsforespørgsel — overvågningsudsagn, der kun læser statistiske visninger/kataloger.",
+        "cause": "dbms.pi's egen indsamlingsforespørgsel: Overvågningsudsagn, der kun læser statistiske visninger og kataloger.",
         "fix": "Ingen kundehandling er påkrævet. Hvis belastningen på måldatabasen er et problem, skal du reducere antallet af gange, du åbner indsamlings-/overvågningsskærmen."
       },
       "NO_MAX": {
@@ -1142,31 +1142,31 @@
         "fix": "Klik på 'Indsaml' én gang nu for at udfylde maksimumværdier for nøjagtig diagnose."
       },
       "SLOW_EACH": {
-        "cause": "Altid langsom — Tager lang tid hver gang den kører, med maks. {max}ms og gennemsnit {mean}ms.",
+        "cause": "Langsom hver gang: Tager lang tid hver udførelse med maks. {max}ms og gennemsnit {mean}ms.",
         "fix": "① Åbn udførelsesplanen i 'Åbn i SQL Tuning'. ② Hvis der er fulde scanninger (Seq Scan) eller store sorteringer, gennemgå indekser på WHERE/JOIN-betingelseskolonner. ③ Indsnævr betingelser for kun at læse nødvendige kolonner/rækker."
       },
       "SPIKE": {
-        "cause": "Intermitterende forsinkelse — Gennemsnit {mean}ms, men tager lejlighedsvis lang tid ved maks. {max}ms ({x} gange gennemsnittet).",
+        "cause": "Intermitterende forsinkelse: Gennemsnit {mean}ms, men tager lejlighedsvis lang tid med maks. {max}ms ({x} gange gennemsnittet).",
         "fix": "① Når langsom, kontroller for låseventer (wait_event) under fanen Aktivitet/Låse. ② Hvis kun den første udførelse er langsom, var cachen tom, og disken blev læst. ③ Sammenlign den samme forespørgsel med forskellige værdier i SQL Tuning for at se, om udførelsesplanen ændres baseret på værdier."
       },
       "DISK_READ": {
-        "cause": "Cache-miss — {pct}% ({read} blokke) af læste blokke blev læst fra disk, ikke hukommelse.",
+        "cause": "Cache-miss: {pct}% ({read} blokke) af læste blokke blev læst fra disk, ikke hukommelse.",
         "fix": "① Reducer læseområdet med indekser. ② Indsnævr forespørgselsperioden/betingelserne. ③ Hvis hyppigt læste data forbliver høje, gennemgå shared_buffers (hukommelse)."
       },
       "TEMP_SPILL": {
-        "cause": "Hukommelsesoverløb — Sortering/hash overskred work_mem og skrev {blk} blokke (ca. {mb}MB, {perCall} blokke pr. kald) til midlertidige filer.",
+        "cause": "Hukommelsesoverløb: Sortering/hash overskred work_mem og skrev {blk} blokke (ca. {mb}MB, {perCall} blokke pr. opkald) til midlertidige filer.",
         "fix": "① Placering af indekser på ORDER BY/GROUP BY-kolonner springer sortering over. ② Først, reducer antallet af rækker, der skal sorteres (LIMIT indeni). ③ Hvis absolut nødvendigt, øg SET LOCAL work_mem kun for denne forespørgselstransaktion."
       },
       "MANY_ROWS": {
-        "cause": "Overdreven hentning — Henter {perCall} rækker pr. kald.",
+        "cause": "Overdreven forespørgsel: Henter {perCall} rækker pr. opkald.",
         "fix": "① Skærmlister hentes side for side. ② SELECT vælger kun de kolonner, der bruges. ③ Aggregeringer udføres i databasen, og kun resultaterne modtages."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST indlejret filter (!inner) udsagn — filtrering af forældre efter børnebetingelser kan scanne hele sættet før klassificeringsbetingelser.",
+        "cause": "PostgREST indlejret filter (!inner) udsagn: Filtrering af forældre efter børnebetingelser kan scanne hele tabellen før klassificeringsbetingelsen.",
         "fix": "① Kontroller, om der er indekser på join-nøgler og filterkolonner. ② Flyt filtre til den overordnede tabels betingelser. ③ Integrer børn i en allerede eksisterende overordnet forespørgsel eller kombiner dem til en enkelt databasefunktion."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET-paginering — Bliver gradvist langsommere, da den læser og kasserer forudgående rækker for senere sider.",
+        "cause": "OFFSET-paginering: Senere sider læser og kasserer tidligere rækker, hvilket bliver gradvist langsommere.",
         "fix": "Skift til keyset-paginering (WHERE id > last_id ORDER BY id LIMIT n), som læser fra nøglen efter den sidst modtagne nøgle."
       }
     }
@@ -1199,8 +1199,8 @@
       "toDraft": "Opret pipeline-udkast fra {n} valgte"
     },
     "ready": {
-      "ok": "WAL logisk replikering klar – tabeller med en PK kan bruge LOGICAL",
-      "no": "WAL logisk replikering ikke klar – fangst via polling eller nøglesammenligning",
+      "ok": "WAL logisk replikation klar: Tabeller med PK kan bruge LOGICAL-metoden.",
+      "no": "WAL logisk replikation ikke klar: Indsaml ved hjælp af polling/nøgle-sammenligningsmetoden.",
       "senders": "{n} replikeringsforbindelser"
     },
     "adapter": {
@@ -1215,20 +1215,20 @@
       "HAS_SOFT_DEL": "Har soft-delete-kolonne",
       "NO_SOFT_DEL": "Ingen soft-delete-kolonne",
       "HAS_PK": "Har primærnøgle",
-      "NO_PK": "Ingen primærnøgle – ændrede rækker kan ikke identificeres",
+      "NO_PK": "Ingen PK: Kan ikke identificere ændrede rækker.",
       "DELETE_UNSEEN": "Polling kan ikke fange fysiske DELETEs (soft-delete-kolonne anbefales)",
       "LOGICAL_NOT_READY": "Kan skifte til LOGICAL, når WAL logisk replikering er klar",
-      "FULL_RELOAD_ONLY": "Ingen PK eller ændringstidskolonne, så ingen inkrementel fangst – tilføj en PK",
+      "FULL_RELOAD_ONLY": "Ingen PK/ændringstidspunkt, så inkrementel indsamling er ikke mulig: PK-tilføjelse anbefales.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level er ikke logical (ændring kræver en DB-genstart)",
       "NO_SLOTS": "max_replication_slots er 0",
       "NO_SENDERS": "max_wal_senders er 0",
-      "IS_STANDBY": "Standby-server – tag logisk replikering fra primær",
+      "IS_STANDBY": "Standby-server: Modtag logisk replikation fra primærserveren.",
       "SETTINGS_UNKNOWN": "Kunne ikke læse indstillinger, beredskab ukendt"
     },
     "ed": {
       "title": "Pipeline-definitioner",
-      "draftOnly": "Kun design – gemt som udkast (DRAFT)",
+      "draftOnly": "Kun design: Gem kun som UDKAST.",
       "new": "Ny pipeline",
       "empty": "Ingen gemte pipelines",
       "manual": "Manuel",
@@ -1297,8 +1297,8 @@
     },
     "warn": {
       "none": "Ingen bemærkelsesværdige advarsler.",
-      "SEQ_SCAN_LARGE": "Fuld scanning på {relation} (ca. {rows} rækker) – overvej et indeks på filterkolonnerne.",
-      "NESTED_LOOP_HIGH": "Indlejret loop producerer ca. {rows} rækker – overvej et hash- eller merge-join, eller et indeks på join-betingelsen.",
+      "SEQ_SCAN_LARGE": "Tabel {relation} udfører en fuld scanning (estimeret {rows} rækker): Gennemgå indekser på betingelseskolonner.",
+      "NESTED_LOOP_HIGH": "Indlejret loop-resultat er estimeret {rows} rækker. Gennemgå hash/merge joins eller indekser på join-betingelser.",
       "SORT_SPILL": "Sorteringsstørrelsen er ca. {kb}KB, over standard work_mem (4MB); den kan spilde til disk."
     },
     "lint": {
@@ -1312,14 +1312,14 @@
         "char": "tegn"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * – vælg kun de kolonner, du har brug for (ekstra I/O, intet dækkende indeks).",
-        "FUNC_ON_COLUMN": "Filterkolonnen {column} er pakket ind i en funktion eller et udtryk, så dens indeks kan ikke bruges – transformer konstanten i stedet.",
-        "LEADING_WILDCARD": "LIKE med et indledende % kan ikke bruge et B-træ-indeks – overvej et pg_trgm GIN-indeks.",
-        "OR_DIFF_COLUMNS": "OR-betingelser på forskellige kolonner — overvej at opdele med UNION (tilføj en duplikatudelukkelsesbetingelse, hvis UNION ALL) eller gennemgå indeks pr. kolonne.",
-        "IMPLICIT_CAST": "{column} sammenlignes med et citeret tal – match kolonne- og konstanttyper (implicit cast).",
-        "NOT_IN_SUBQUERY": "NOT IN (subquery) returnerer intet, når NULL'er er til stede og er langsom – brug NOT EXISTS.",
-        "NO_WHERE": "Ingen WHERE-klausul – på en stor tabel er dette en fuld scanning (tilføj en betingelse eller LIMIT).",
-        "DOMAIN_MISMATCH": "{column} er en {expected} type ifølge standarddomænet, men sammenlignes med en konstant af en anden type – den implicitte cast kan forhindre indeksbrug."
+        "SELECT_STAR": "SELECT *: Vælg kun nødvendige kolonner (unødvendig I/O, dækkende indeks ikke muligt).",
+        "FUNC_ON_COLUMN": "Betingelseskolonne {column} behandles af en funktion/operation, så indekser kan ikke bruges. Behandl den konstante side.",
+        "LEADING_WILDCARD": "LIKE med et indledende % kan ikke bruge et B-træ-indeks. Gennemgå pg_trgm GIN-indekser.",
+        "OR_DIFF_COLUMNS": "Forskellige kolonnebetingelser er grupperet med OR. Gennemgå UNION-separation (tilføj betingelse for udelukkelse af dubletter, hvis UNION ALL) eller indekser pr. kolonne.",
+        "IMPLICIT_CAST": "{column} sammenlignes med et citeret tal. Match kolonnetype og konstanttype (implicit typekonvertering).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) kan være tom og langsom, hvis NULL'er er blandet. Skift til NOT EXISTS.",
+        "NO_WHERE": "Ingen WHERE-betingelse. Hvis det er en stor tabel, er det en fuld scanning (tilføj LIMIT eller betingelser).",
+        "DOMAIN_MISMATCH": "{column} er af typen {expected} ifølge standarddomænet, men sammenlignes med en konstant af en anden type. Implicit typekonvertering kan forhindre indeksbrug."
       }
     },
     "saved": {
@@ -1345,12 +1345,12 @@
     },
     "ai": {
       "title": "AI-tuningråd",
-      "intro": "Vælg én gemt plan for at generere rådgivning. Kun SQL og planer med konstanter maskeret som ? sendes (regelbaseret rådgivning, hvis ingen nøgle eller ved fejl). Efter at linkejeren har godkendt, skal du genkøre forklaringen for den samme SQL, gemme den og måle effekten med den senere plan — først da registreres den som anvendt.",
+      "intro": "Vælg én gemt plan for at generere rådgivning. Kun SQL og planer med konstanter maskeret som ? sendes (regelbaseret rådgivning, hvis ingen nøgle eller ved fejl). Efter at linkejeren har godkendt, skal du genkøre forklaringen for den samme SQL, gemme den og måle effekten med den senere plan : først da registreres den som anvendt.",
       "pickPlan": "Vælg en gemt plan for rådgivning",
       "create": "Generer rådgivning",
       "creating": "Genererer… (op til 30 sek.)",
       "noPlans": "Ingen gemte planer. Se en forklaring ovenfor og gem den.",
-      "note": "Én rådgivning pr. plan. Slet den eksisterende rådgivning for at generere igen. DDL foreslås kun — anvend den i schema.pi.",
+      "note": "Én rådgivning pr. plan. Slet den eksisterende rådgivning for at generere igen. DDL foreslås kun : anvend den i schema.pi.",
       "empty": "Ingen rådgivning endnu.",
       "noItems": "Ingen forbedringer fundet for denne plan.",
       "cost": "Før omkostning",
@@ -1392,10 +1392,10 @@
       "copy": "Kopier",
       "copied": "Kopieret",
       "rule": {
-        "SEQ_SCAN_INDEX": "Fuld scanning af {relation} — opret et indeks på filterkolonnen {column} (erstat NN i indeksnavnet med et sekvensnummer).",
-        "SEQ_SCAN_STATS": "Fuld scanning af {relation} — kontroller filterkolonnerne og sørg for, at statistikker (ANALYZE) er aktuelle.",
-        "NESTED_LOOP": "Indlejret loop forventer {rows} rækker — opdater statistikker og overvej join-nøgleindekser eller et hash join.",
-        "SORT_SPILL": "Sortering af omkring {kb} KB kan spildes til disk — overvej at hæve session work_mem eller indeksere sorteringskolonnerne.",
+        "SEQ_SCAN_INDEX": "{relation} fuld scanning: Opret et indeks på betingelseskolonne {column} (indeksnavn NN vil blive erstattet af et sekvensnummer).",
+        "SEQ_SCAN_STATS": "{relation} fuld scanning: Kontroller betingelseskolonner og sørg for, at statistikken (ANALYZE) er opdateret.",
+        "NESTED_LOOP": "Indlejret loop-resultat er estimeret {rows} rækker: Opdater statistik og gennemgå join-betingelsesindekser eller hash-joins.",
+        "SORT_SPILL": "Sortering kan spildes til disk med ca. {kb}KB. Gennemgå øget session work_mem eller indekser på sorteringskolonner.",
         "SELECT_STAR": "Vælg kun de kolonner, du har brug for, i stedet for SELECT * (mindre I/O, dækkende indekser mulige).",
         "FUNC_ON_COLUMN": "Flyt funktionen/udtrykket på filterkolonnen {column} til den konstante side (muliggør indeksbrug).",
         "IMPLICIT_CAST": "Match typerne af {column} og konstanten (fjern den implicitte cast).",
@@ -1455,9 +1455,9 @@
     },
     "desc": {
       "FREE": "Udforsk & Lær",
-      "D1": "Operatør — Kontrollerer, om databasen er i orden nu",
-      "D2": "Udvikler & Tuner — Retter langsom SQL",
-      "D3": "DBA & DA — Fra driftssikkerhed til implementering og lake"
+      "D1": "Operatør: Kontrollerer, om databasen er sund nu.",
+      "D2": "Udvikler/Tuner: Retter langsom SQL.",
+      "D3": "DBA/DA: Operationel sikkerhed, migration og endda datalake."
     },
     "feat": {
       "FREE": "Overvågningspanel, visning af udførelsesplan, grundlæggende læring",
@@ -1500,7 +1500,7 @@
       "required": "Denne funktion er tilgængelig fra {plan}-planen.",
       "limit": "Du har brugt alle tilgængelige forsøg for denne periode. Du kan bruge mere ved at opgradere til {plan}-planen.",
       "limitTop": "Du har brugt alle tilgængelige forsøg for denne periode. Du kan bruge den igen næste periode.",
-      "expired": "Din schema.pi-plan er udløbet — foretag venligst en betaling på schema.pi-planskærmen.",
+      "expired": "Din schema.pi-plan er udløbet. Betal venligst på schema.pi-plan-skærmen.",
       "go": "Se plan",
       "close": "Luk"
     }

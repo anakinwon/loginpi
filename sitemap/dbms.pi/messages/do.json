@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Análisis de GAP — Modelo↔DB",
+    "title": "Análisis GAP: Modelo↔DB",
     "intro": "Compare el modelo de diseño de schema.pi y el historial de aplicación de DDL con el catálogo de DB en vivo para encontrar la deriva y medir si los índices diseñados se utilizan realmente. Los datos de filas del cliente nunca se leen ni se almacenan.",
     "needLink": "Primero elija un enlace de schema.pi arriba. Si no tiene ninguno, registre un token en el menú 'Enlace'.",
     "needConn": "Elija la conexión DB a comparar arriba.",
@@ -230,7 +230,7 @@
       "USED": "En uso",
       "NO_STATS": "Sin estadísticas",
       "CONSTRAINT": "Restricción de unicidad (mantener)",
-      "NO_DATA": "Sin datos o estadísticas no recopiladas — no se puede juzgar",
+      "NO_DATA": "No hay datos o las estadísticas no se han recopilado: no se puede determinar",
       "OBSERVING": "En observación (menos de 7 días)",
       "UNUSED_CAND": "Candidato no utilizado"
     },
@@ -245,14 +245,14 @@
       "RATE": "Demasiadas solicitudes. Inténtelo de nuevo en un minuto."
     },
     "schema": "Esquema",
-    "schemaHint": "Solo las tablas regulares y particionadas en este esquema se comparan (vistas excluidas). Por defecto public — los esquemas internos de Supabase (auth, storage, …) se omiten.",
-    "truncated": "{names} alcanzó el límite de {max} filas y se truncó — algunos resultados de \"no en DB\" / \"no en modelo\" pueden ser falsos. Reduzca el esquema y ejecute de nuevo.",
+    "schemaHint": "Solo compara tablas regulares y particionadas en este esquema (excluyendo vistas). Por defecto, public: los esquemas internos de Supabase (auth, storage, etc.) están excluidos.",
+    "truncated": "La consulta de {names} se truncó en {max} filas. Algunas detecciones de 'No en DB'/'No en Modelo' pueden ser falsos positivos. Reduzca el esquema y vuelva a detectar.",
     "colUnchecked": "Debido a que la consulta de columnas fue truncada, {n} resultados de columnas faltantes/extra se tratan como no verificables y se excluyen del recuento de discrepancias de columnas.",
-    "renamed": "{n} índice(s) PK aplicado(s) bajo la antigua regla de nombres (_PKEY) existen en la DB con el nuevo nombre (PK_) — normal",
-    "superseded": "{n} solicitud(es) anterior(es) fueron excluidas porque una solicitud posterior recreó la misma tabla (DROP … CASCADE) — normal",
+    "renamed": "{n} índices PK aplicados con la antigua convención de nombres (_PKEY) están en la DB con el nuevo nombre (PK_). Normal.",
+    "superseded": "{n} solicitudes anteriores fueron excluidas de la comparación porque solicitudes posteriores recrearon la misma tabla (DROP … CASCADE). Normal.",
     "supersededItem": "Solicitud {id} → reemplazada por la solicitud {by}",
     "sysCols": "{n} columna(s) del sistema agregada(s) automáticamente en la generación de DDL no están en el modelo por diseño y se excluyen de las discrepancias.",
-    "groupOwn": "Prefijo del proyecto {pfx} — candidatos faltantes en el modelo",
+    "groupOwn": "Este prefijo de proyecto {pfx}: candidatos a falta de modelo",
     "groupOther": "Otro sistema {pfx}",
     "basis": "Filas estimadas {rows} · desde {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Si los objetos aún desaparecen después de volver a aplicar, sospeche de una eliminación manual o un rollback y verifique la actividad de la cuenta de conexión con su DBA."
       },
       "extraTables": {
-        "s1": "Este paquete de prefijos de proyecto = candidatos a modelos faltantes — impórtelos al modelo a través de schema.pi → Configuración → Revertir, o decida si eliminarlos si son tablas no utilizadas.",
-        "s2": "Otros grupos de prefijos = otros sistemas que comparten esta DB — no son elementos de acción para este proyecto.",
+        "s1": "Este grupo de prefijos de proyecto = candidatos a falta de modelo: impórtelos al modelo a través de schema.pi → Configuración → Inverso, o decida si eliminarlos si la tabla no se utiliza.",
+        "s2": "Otros grupos de prefijos = otros sistemas que usan la misma DB: no son objeto de acción por parte de este proyecto.",
         "s3": "Si el esquema de destino no es public, cambie el campo \"Esquema\" arriba y ejecute de nuevo."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Tipo/NULL difiere = alinee con el modelo (fuente de verdad); antes de reducir la longitud o cambiar a NOT NULL, confirme que las filas existentes lo satisfacen."
       },
       "idxUsage": {
-        "s1": "Antes de eliminar, verifique ① que la ventana de estadísticas cubra al menos un ciclo de negocio (ej. lote de fin de mes) — vea \"desde\".",
+        "s1": "Antes de eliminar, verifique ① si el período de recopilación de estadísticas es al menos un ciclo operativo (por ejemplo, lote de fin de mes): consulte la fecha de referencia.",
         "s2": "② No es un índice único/PK (esos se muestran por separado como \"restricción de unicidad\").",
         "s3": "③ EXPLAIN el SQL representativo de la tabla en SQL Tuning y confirme que este índice no se usa.",
         "s4": "Una vez confirmados los tres, elimine el índice del modelo en schema.pi y aplique a través de DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Cómo emitir un token de conexión",
     "how1": "Inicie sesión en schema.pi y abra el área temática a conectar",
     "how2": "Vaya a Área temática → Configuración → Token de conexión y presione 'Emitir token' (administrador de área o rol DA)",
-    "how3": "Copie el token que comienza con slk_ — se muestra solo una vez cuando se emite",
+    "how3": "Copie el token que comienza con slk_ que fue emitido. El original se muestra solo una vez en el momento de la emisión.",
     "how4": "Péguelo a continuación y regístrelo",
     "openSchema": "Abrir schema.pi",
     "registerTitle": "Registrar conexión",
@@ -384,7 +384,7 @@
     "retry": "Reintentar",
     "pickerLink": "Enlace",
     "pickerConn": "Conexión",
-    "pickerEmpty": "No hay conexiones —",
+    "pickerEmpty": "No hay conexiones.",
     "pickerGo": "registre una en /connect",
     "errors": {
       "LINK_AUTH": "El token de conexión ha caducado o ha sido revocado. Emita un nuevo token en schema.pi y regístrelo de nuevo",
@@ -432,8 +432,8 @@
     "optsHint": "El paralelismo es el número de tablas que se cargan al mismo tiempo dentro de un nivel. El tamaño del fragmento es la unidad de commit (filas) que utilizará el motor de ejecución.",
     "order": "Orden de carga",
     "orderHint": "Ordenado topológicamente por relaciones de diseño (no FK físicas) para que las tablas padre aparezcan primero. Las tablas del mismo nivel no dependen entre sí y pueden cargarse en paralelo.",
-    "cycles": "{n} grupo(s) circular(es) — colocados en el mismo nivel. Establezca su orden manualmente y posponga las comprobaciones de referencia hasta después de la carga.",
-    "selfRefs": "Tablas autorreferenciadas (jerárquicas) — cargar primero las filas padre dentro de la tabla",
+    "cycles": "{n} ciclos: colocados en la misma etapa. Establezca manualmente el orden de carga y posponga las comprobaciones de referencia hasta después de la carga.",
+    "selfRefs": "Tablas autorreferenciadas (jerárquicas): filas padre primero dentro de la misma tabla.",
     "level": "Nivel {n}",
     "checklist": "Lista de verificación de transición",
     "toReady": "Marcar como listo",
@@ -471,7 +471,7 @@
     },
     "verify": "SQL de verificación",
     "verifyHint": "Genera consultas de recuento, suma de columnas numéricas, clave duplicada y hash de clave por tabla en orden de carga. Ejecútelas usted mismo en el origen y el destino y compare (esta pantalla no las ejecuta).",
-    "noHashOracle": "Las funciones hash y la representación de texto de Oracle·Tibero difieren de PostgreSQL, por lo que se omiten las consultas hash; compare recuentos, sumas y claves duplicadas.",
+    "noHashOracle": "Oracle y Tibero omiten la búsqueda hash porque las funciones hash y las representaciones de caracteres difieren de PostgreSQL. Compare por recuento, suma y duplicación de claves.",
     "copy": "Copiar",
     "copied": "Copiado",
     "copyFail": "No se pudo copiar. Seleccione el texto y cópielo manualmente.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "La solicitud no es válida."
     },
     "board": {
-      "subtitle": "Qué hacer en esta DB ahora mismo: 14 señales de estado (normal, advertencia o riesgo) y soluciones, de un vistazo.",
+      "subtitle": "Qué hacer ahora en esta DB: Vea el estado normal, de advertencia y de riesgo de 14 señales y sus soluciones de un vistazo.",
       "refresh": {
         "updated": "A partir de las {time} · se actualiza cada minuto",
         "now": "Actualizar ahora",
@@ -564,11 +564,11 @@
         "NA": "N/A"
       },
       "overall": {
-        "RISK": "Riesgo: se necesita acción ahora",
-        "WARN": "Advertencia: algunos elementos necesitan revisión",
-        "UNKNOWN": "Desconocido: compruebe la conexión",
-        "OK": "OK: todas las señales están dentro de los límites",
-        "CONN_DOWN": "No se puede acceder a la DB; compruebe primero la conexión",
+        "RISK": "Riesgo: Se requiere acción inmediata",
+        "WARN": "Advertencia: Elementos a revisar",
+        "UNKNOWN": "No se puede confirmar: Verifique el estado de la conexión",
+        "OK": "Normal: Todas las señales están dentro de los criterios",
+        "CONN_DOWN": "No se puede conectar a la DB. Verifique la conexión primero.",
         "NA": "N/A"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Mostrar menos",
         "setup": "Configure esto para ver más",
         "none": "No hay elementos de riesgo o advertencia que requieran acción ahora mismo.",
-        "unknown": "No se pudieron comprobar {n} señal(es); consulte las tarjetas para ver el motivo.",
+        "unknown": "No se pueden confirmar {n} elementos: Verifique el motivo en la tarjeta.",
         "myRule": "Mi regla incumplida: {rule}",
         "copySql": "Copiar SQL",
         "copied": "Copiado"
@@ -622,34 +622,34 @@
         "REPL": "Retraso de replicación"
       },
       "fix": {
-        "AVAIL": "Respuesta lenta o un reinicio reciente: compruebe la configuración de la conexión y el estado del servidor de la DB.",
-        "AVAIL_DOWN": "No se pudo conectar a la DB: compruebe la configuración de la conexión y que el servidor de la DB esté activo.",
-        "CONN_USE": "{sess}/{max} sesiones en esta DB (no en todo el clúster; otras bases de datos están excluidas): cierre las conexiones inactivas o añada un agrupador de conexiones (pgbouncer).",
-        "URL": "{n} URL comprobadas fallando · respuesta máxima {ms}ms: consulte el monitor de schema.pi para ver la causa.",
-        "LONG_QRY": "Una consulta lleva {sec}s ejecutándose: revise su plan y ajústela, o pida a un DBA que la cancele.",
-        "IDLE_TX": "Una transacción ha estado inactiva durante {sec}s: encuentre el commit que falta en la aplicación y establezca un tiempo de espera.",
-        "LOCK_WAIT": "{n} sesiones están esperando bloqueos: encuentre la sesión que bloquea y finalice su transacción.",
-        "CACHE_HIT": "Tasa de aciertos de caché {pct}%: busque escaneos completos de tablas grandes o revise shared_buffers.",
-        "XACT_ERR": "Tasa de rollback {pct}%, {dlck} deadlocks: compruebe las transacciones fallidas y los registros de errores de la aplicación.",
-        "SLOW_SQL": "Hay una consulta que tarda hasta {ms}ms por ejecución; vea el plan de ejecución y ajústela, empezando por el tiempo de ejecución individual más alto.",
-        "STORAGE": "La DB ({gb} GB) está cerca de su límite (días restantes {days}): limpie tablas grandes o añada capacidad.",
-        "VACUUM": "{tbl} tiene muchas filas muertas o estadísticas obsoletas: revise la configuración de VACUUM (ANALYZE) y autovacuum.",
-        "INDEX": "{n} hallazgos de índices (inválidos, no utilizados, escaneos completos): consulte la pestaña de estado de tablas e índices para ver los objetivos.",
-        "BACKUP": "El archivado de WAL está desactivado o atascado: compruebe archive_mode, archive_command y el estado de la copia de seguridad.",
-        "REPL": "Retraso de replicación {sec}s: compruebe el estado del standby y la red.",
-        "PGSS": "pg_stat_statements no está instalado, por lo que el SQL lento no está disponible; habilítelo con el SQL siguiente (se requiere reiniciar el servidor)."
+        "AVAIL": "Respuesta lenta o recién reiniciado. Verifique la información de conexión y el estado del servidor de la DB.",
+        "AVAIL_DOWN": "Fallo al conectar a la DB. Verifique la información de conexión y si el servidor de la DB está activo.",
+        "CONN_USE": "Esta sesión de DB {sess}/{max} (no en todo el clúster, otras conexiones de DB excluidas): Limpie las conexiones inactivas o configure un agrupador de conexiones (pgbouncer).",
+        "URL": "{n} comprobaciones de URL fallaron · Respuesta máxima {ms}ms: Verifique la causa en el monitor de schema.pi.",
+        "LONG_QRY": "Una consulta ha estado ejecutándose durante {sec} segundos. Revise el plan de ejecución y ajústelo, o pida a un DBA que la detenga.",
+        "IDLE_TX": "Una transacción ha estado abierta e inactiva durante {sec} segundos. Busque commits faltantes en la aplicación y establezca un tiempo de espera.",
+        "LOCK_WAIT": "{n} sesiones están esperando bloqueos: Encuentre la sesión que bloquea y finalice su transacción.",
+        "CACHE_HIT": "Tasa de aciertos de caché {pct}%: Busque escaneos completos de tablas grandes o revise shared_buffers.",
+        "XACT_ERR": "Tasa de reversión {pct}%, {dlck} interbloqueos: Verifique las transacciones fallidas y los registros de errores de la aplicación.",
+        "SLOW_SQL": "Hay una consulta con un tiempo máximo único de {ms}ms. Revise el plan de ejecución y ajuste desde el tiempo máximo único superior.",
+        "STORAGE": "La DB {gb}GB está cerca de su límite (restan {days} días). Limpie tablas grandes o aumente la capacidad.",
+        "VACUUM": "{tbl} tiene muchas filas muertas o estadísticas desactualizadas. Revise la configuración de VACUUM (ANALYZE) y autovacuum.",
+        "INDEX": "{n} comprobaciones de índices (inválidos, no utilizados, escaneo completo): Verifique los objetivos en la pestaña de salud de tablas/índices.",
+        "BACKUP": "El archivado WAL está desactivado o detenido. Verifique archive_mode, archive_command y el estado de la copia de seguridad.",
+        "REPL": "Retraso de replicación {sec} segundos: Verifique el estado del servidor en espera y la red.",
+        "PGSS": "Falta la extensión pg_stat_statements, por lo que no se pueden ver las SQL lentas. Habilítela con la SQL siguiente (se requiere reiniciar el servidor)."
       },
       "reason": {
         "CONN_DOWN": "No juzgado porque la conexión a la DB está caída.",
         "PGSS": "pg_stat_statements no está instalado.",
         "VER": "Disponible en PostgreSQL 13 o posterior.",
         "SAMPLE": "Todavía no hay suficientes muestras.",
-        "NO_LIMIT": "No hay límite de tamaño, por lo que el uso no se juzga; añada una regla de tamaño de DB (MB) (>) para usarla como límite.",
+        "NO_LIMIT": "El uso no se determina ya que no hay límite de capacidad. Agregar una regla de tamaño de DB (MB) (>) la usará como límite.",
         "RESET": "Las estadísticas se restablecieron hace menos de 7 días, por lo que los índices no utilizados no se juzgan.",
         "STALE": "No hay registros de verificación recientes.",
         "STANDBY": "No aplicable en un servidor en espera.",
         "NONE": "Nada que comprobar.",
-        "GRANT": "Faltan privilegios: conceda el rol pg_monitor a la cuenta de conexión.",
+        "GRANT": "No se puede ver debido a la falta de permisos. Otorgue el rol pg_monitor a la cuenta de conexión.",
         "LINK": "La consulta de schema.pi falló ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Si no está transmitiendo, compruebe los registros del standby."
         }
       },
-      "sqlNote": "El SQL siguiente es de solo lectura, para comprobación; las correcciones (VACUUM, DROP INDEX, pg_terminate_backend) las ejecuta un DBA.",
+      "sqlNote": "La SQL siguiente es solo para verificación de solo lectura. Las acciones (VACUUM, DROP INDEX, pg_terminate_backend) son ejecutadas directamente por un DBA.",
       "go": {
         "activity": "Actividad y bloqueos",
         "top": "Consultas lentas",
@@ -766,8 +766,8 @@
           "tree": "¿Qué ocupa espacio y qué necesita limpieza?"
         },
         "asTable": "Ver como tabla",
-        "needHistory": "Todavía no hay tendencia; mantenga esta pantalla abierta durante unos minutos.",
-        "needPerf": "No hay historial de tamaño; recopile en la pestaña de rendimiento o mantenga esta pantalla abierta.",
+        "needHistory": "Aún no hay tendencia. Se dibujará si deja esta pantalla abierta durante unos minutos.",
+        "needPerf": "No hay historial de capacidad. Recopílelo desde la pestaña Rendimiento o deje esta pantalla abierta.",
         "noSess": "No hay sesiones.",
         "noWait": "Sin esperas",
         "noData": "No hay datos para mostrar.",
@@ -840,17 +840,17 @@
         "noStat": "Sin estadísticas"
       },
       "empty": {
-        "noConn": "Esta taxonomía no tiene una conexión de servidor PostgreSQL para monitorizar; solo se muestran las URL y el estado del servicio.",
+        "noConn": "No hay conexiones de servidor PostgreSQL para monitorear en esta taxonomía. Solo se muestran el estado de URL y de enlace.",
         "unsupported": "Esta conexión no admite la monitorización (solo conexiones de servidor PostgreSQL).",
-        "connFail": "No se pudo conectar a la base de datos; compruebe la configuración de la conexión y el estado de la DB.",
-        "linkDown": "No se pudo acceder a schema.pi; reintentando automáticamente.",
-        "linkAuth": "El token de conexión ha caducado; emita un nuevo token en schema.pi y regístrelo.",
-        "timeout": "Las respuestas son lentas; reintentando automáticamente.",
+        "connFail": "Fallo al conectar a la DB. Verifique la información de conexión y el estado de la DB.",
+        "linkDown": "Fallo al conectar a schema.pi. Se reintentará automáticamente en breve.",
+        "linkAuth": "El token de conexión ha caducado. Vuelva a emitir y registre el token desde schema.pi.",
+        "timeout": "La respuesta es lenta. Se reintentará automáticamente en breve.",
         "rate": "Demasiadas solicitudes, por lo que se aumentó el intervalo de actualización."
       },
       "aux": {
         "rules": "Mis reglas de alerta ({n} activas)",
-        "schemaSvc": "Estado del servicio: respuestas de schema.pi",
+        "schemaSvc": "Estado de enlace: respuesta del servicio schema.pi",
         "schemaSvcNote": "Métricas de la aplicación de los últimos 60 minutos almacenadas por schema.pi.",
         "source": "Fuente de datos: la DB de destino es de solo lectura a través de consultas con nombre de schema.pi (solo lectura); las tendencias almacenan estadísticas solo en dbms.pi (sin datos de fila)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Aún no hay diagnóstico. Pulse \"Ejecutar diagnóstico\"",
     "lastRun": "Último diagnóstico {dtm}",
     "readOnly": "El diagnóstico solo lee (SELECT). El consejo es una guía y depende de la memoria del servidor, la carga y la carga de trabajo",
-    "truncated": "Demasiados objetos — solo se verificaron los primeros 500",
+    "truncated": "Demasiados objetos : solo se verificaron los primeros 500",
     "paramsNote": "La memoria total del servidor es desconocida, por lo que se estima a partir de shared_buffers ≈ 25% de RAM. random_page_cost asume SSD",
     "auditNote": "Las tablas con RLS desactivado y las cuentas no utilizadas se verificarán una vez que la consulta de enlace las admita",
-    "replNote": "La línea base es Active-Standby (A-S) — un primario + en espera. Retraso de reproducción ≥ 5s = advertencia, ≥ 60s = riesgo (referencia RPO medida)",
+    "replNote": "El criterio principal es Active-Standby (A-S): 1 Primario + Standby. Advertencia para retraso de reproducción >= 5 segundos, riesgo para >= 60 segundos (consulte la medición RPO real).",
     "lagIdle": "Sin cambios",
     "pager": "Paginación",
     "prev": "Anterior",
@@ -1020,7 +1020,7 @@
       "intro": "Recopilar ahora lee las principales estadísticas de consultas, tablas, índices y tamaños una vez y las almacena como una instantánea. Recopile al menos dos veces para ver los cambios y las tendencias de tamaño",
       "run": "Recopilar ahora",
       "running": "Recopilando…",
-      "done": "Recopilado el {dtm} — {qry} consultas · {tbl} tablas · {idx} índices",
+      "done": "Recopilación completada {dtm}: {qry} consultas · {tbl} tablas · {idx} índices",
       "auto": {
         "title": "Recopilación automática",
         "desc": "Cuando está activada, esta conexión se recopila automáticamente todos los días a las 3 AM (hora de Corea). Después de 7 o más días, puede confiar en la clasificación de consultas lentas y la lista de índices no utilizados.",
@@ -1042,13 +1042,13 @@
       "sortCalls": "Llamadas",
       "empty": "Aún no hay instantáneas. Pulse Recopilar ahora en la pestaña Recopilar",
       "range": "Cambio entre {from} → {to}",
-      "first": "Primera instantánea el {dtm} — valores acumulativos (cambios desde la siguiente instantánea)",
+      "first": "Primera recopilación {dtm}: Acumulativo (aumento/disminución desde la siguiente recopilación)",
       "query": "Consulta (literales enmascarados)",
       "calls": "Llamadas",
       "totalMs": "Total ms",
       "meanMs": "Media ms",
       "rows": "Filas",
-      "reset": "Reinicio de estadísticas detectado — se muestra como acumulativo",
+      "reset": "Detección de reinicio de estadísticas: Se muestra como acumulativo",
       "src": "Origen",
       "srcToggle": "Mostrar u ocultar detalles del origen",
       "openSqlLab": "Abrir en SQL Tuning",
@@ -1056,7 +1056,7 @@
       "sortMax": "Tiempo máximo de ejecución individual",
       "maxMs": "Máx. individual ms",
       "diagToggle": "Diagnosticar causa",
-      "noMax": "Sin valor máximo: {n} elementos provienen de colecciones anteriores sin un valor máximo, por lo que se ordenan temporalmente por promedio (no por tiempo total). La recopilación ahora rellenará el valor máximo."
+      "noMax": "Sin valor máximo: {n} elementos son recopilaciones antiguas sin un valor máximo único, por lo que se ordenan temporalmente por promedio único (no por tiempo total). Los valores máximos se poblarán con la recopilación actual."
     },
     "health": {
       "empty": "Aún no hay instantáneas. Presione Recopilar ahora en la pestaña Recopilar",
@@ -1064,9 +1064,9 @@
       "unusedIdx": "Índices no utilizados",
       "unusedIdxHint": "Índices nunca utilizados desde el último reinicio de estadísticas (por tamaño). No elimine los índices PK o de restricción única",
       "fullScan": "Escaneos completos excesivos",
-      "fullScanHint": "Tablas con más de 1000 filas activas donde los escaneos completos son al menos la mitad — revise los índices en las columnas de filtro",
+      "fullScanHint": "Tablas con más de 1,000 filas efectivas y más de la mitad de escaneos completos: Revise los índices en las columnas de condición.",
       "dead": "Tuplas muertas excesivas",
-      "deadHint": "Relación de tuplas muertas del 20% o más — verifique la configuración de VACUUM y autovacuum",
+      "deadHint": "Relación de tuplas muertas superior al 20%: Revise la configuración de VACUUM y autovacuum.",
       "none": "Ninguno",
       "scans": "escaneos"
     },
@@ -1083,7 +1083,7 @@
     },
     "activity": {
       "refresh": "Actualizar",
-      "live": "Consulta en vivo — no almacenada",
+      "live": "Consulta en tiempo real: No guardada",
       "sessions": "Actividad de la sesión",
       "locks": "Bloqueos",
       "none": "Ninguno"
@@ -1110,7 +1110,7 @@
         "BATCH": "Parece un lote o un trabajo programado. Distribuya los tiempos de ejecución fuera de los picos de negocio y reduzca el trabajo por commit. Verifique los índices y las estadísticas (ANALYZE) en las tablas de destino, y divida las transacciones largas. Poner el nombre del trabajo en application_name hará que la próxima clasificación sea más precisa.",
         "PROGRAM": "Parece ser una consulta ejecutada por la aplicación. Verifique el plan de ejecución en la optimización de SQL. Si el tiempo máximo de ejecución individual es largo, primero examine los índices y el orden de unión. Si una sola ejecución es corta pero el número de llamadas es alto, examine las llamadas repetidas (N+1) y el almacenamiento en caché. Inserte el nombre del servicio en el application_name del grupo de conexiones.",
         "PLATFORM": "Parece un trabajo interno de DB o plataforma, como autovacuum o replicación. Generalmente no se necesita ninguna acción. Si permanece en la parte superior, revise los umbrales de autovacuum y maintenance_work_mem.",
-        "MONITOR": "Esta es una consulta de auto-recopilación de dbms.pi — la conexión schema.pi es una declaración fija que solo lee vistas/catálogos estadísticos (pg_stat_*·pg_catalog), por lo que no es una consulta de negocio y no se requiere ninguna acción del cliente. Si la carga de la base de datos de destino es un problema, reduzca el número de veces que abre el botón de recopilación/pantalla de monitoreo. Las declaraciones de otras herramientas de monitoreo que leen las mismas vistas estadísticas también se agrupan aquí.",
+        "MONITOR": "Consulta de recopilación propia de dbms.pi. La conexión schema.pi solo lee vistas estadísticas y catálogos (pg_stat_*, pg_catalog) con sentencias fijas, por lo que no es una consulta de negocio y no se requiere ninguna acción del cliente. Si la carga de la base de datos de destino es un problema, reduzca la frecuencia de apertura del botón de recopilación o de la pantalla de monitoreo. Las sentencias de otras herramientas de monitoreo que leen las mismas vistas estadísticas también se agrupan aquí.",
         "UNKNOWN": "No hay ninguna pista sobre el origen. Configure application_name en cada conexión y divida las cuentas por propósito; se clasificará a partir de las próximas muestras."
       },
       "detail": {
@@ -1121,7 +1121,7 @@
         "period": "Observado",
         "none": "(vacío)"
       },
-      "noSample": "Aún no hay muestras — las sesiones en ejecución se muestrean cuando ve el panel de monitoreo o la pestaña Actividad y bloqueos. Por ahora se clasifica solo por el nombre de la cuenta.",
+      "noSample": "Aún no hay muestras. Las sesiones en ejecución se acumulan como muestras al ver el Panel de monitoreo o las pestañas Actividad/Bloqueos. Actualmente, solo se clasifican por nombre de cuenta para referencia.",
       "verOff": "Esta DB es anterior a PostgreSQL 14, por lo que las sesiones en ejecución no tienen ID de consulta. Solo se muestra la cuenta (cierta).",
       "privOff": "La cuenta de enlace no puede ver los detalles de la sesión de otras cuentas, por lo que no se recopilan muestras. Pida a un administrador de DB que ejecute GRANT pg_read_all_stats TO {user};",
       "linkUsr": "cuenta de enlace",
@@ -1132,11 +1132,11 @@
     "diag": {
       "title": "Diagnosticar causa",
       "fix": "Acción:",
-      "none": "No se reveló ninguna causa por las estadísticas — verifique el plan de ejecución en SQL Tuning.",
-      "cum": "Sin llamadas en este intervalo — acumulado (desde el restablecimiento de las estadísticas)",
-      "basis": "Base — Máximo 1 vez {max}ms · Promedio {mean}ms · Llamadas {calls} · Filas por llamada {rpc} · Tasa de lectura de disco {read} · Bloques temporales {tmp}",
+      "none": "Ninguna causa revelada por las estadísticas. Abra el plan de ejecución en SQL Tuning para verificar.",
+      "cum": "No hay llamadas en este intervalo: Acumulativo (desde el reinicio de estadísticas)",
+      "basis": "Base: Máximo único {max}ms · Promedio {mean}ms · Llamadas {calls} · Filas por llamada {rpc} · Tasa de lectura de disco {read} · Bloques temporales {tmp}",
       "SELF_MON": {
-        "cause": "Consulta de auto-recopilación de dbms.pi — declaración de monitoreo que lee solo vistas/catálogos estadísticos.",
+        "cause": "Consulta de recopilación propia de dbms.pi: Sentencia de monitoreo que solo lee vistas estadísticas y catálogos.",
         "fix": "No se requiere ninguna acción del cliente. Si la carga de la base de datos de destino es un problema, reduzca el número de veces que abre la pantalla de recopilación/monitoreo."
       },
       "NO_MAX": {
@@ -1144,31 +1144,31 @@
         "fix": "Haga clic en 'Recopilar' una vez ahora para llenar los valores máximos para un diagnóstico preciso."
       },
       "SLOW_EACH": {
-        "cause": "Siempre lento — Tarda mucho tiempo cada vez que se ejecuta, con un máximo de {max}ms y un promedio de {mean}ms.",
+        "cause": "Lento cada vez: Tarda mucho en cada ejecución con un máximo de {max}ms y un promedio de {mean}ms.",
         "fix": "① Abra el plan de ejecución en 'Abrir en SQL Tuning'. ② Si hay escaneos completos (Seq Scan) o grandes ordenamientos, revise los índices en las columnas de la condición WHERE/JOIN. ③ Reduzca las condiciones para leer solo las columnas/filas necesarias."
       },
       "SPIKE": {
-        "cause": "Retraso intermitente — Promedio {mean}ms, pero ocasionalmente tarda mucho tiempo con un máximo de {max}ms ({x} veces el promedio).",
+        "cause": "Retraso intermitente: Promedio {mean}ms, pero ocasionalmente tarda mucho con un máximo de {max}ms ({x} veces el promedio).",
         "fix": "① Cuando sea lento, verifique las esperas de bloqueo (wait_event) en la pestaña Actividad/Bloqueos. ② Si solo la primera ejecución es lenta, la caché estaba vacía y se leyó el disco. ③ Compare la misma consulta con diferentes valores en SQL Tuning para ver si el plan de ejecución cambia según los valores."
       },
       "DISK_READ": {
-        "cause": "Fallo de caché — El {pct}% ({read} bloques) de los bloques leídos se leyeron del disco, no de la memoria.",
+        "cause": "Fallo de caché: El {pct}% ({read} bloques) de los bloques leídos se leyeron del disco, no de la memoria.",
         "fix": "① Reduzca el rango de lectura con índices. ② Reduzca el período/condiciones de la consulta. ③ Si los datos leídos con frecuencia siguen siendo altos, revise shared_buffers (memoria)."
       },
       "TEMP_SPILL": {
-        "cause": "Desbordamiento de memoria — La ordenación/hash excedió work_mem y escribió {blk} bloques (aprox. {mb}MB, {perCall} bloques por llamada) en archivos temporales.",
+        "cause": "Desbordamiento de memoria: La ordenación/hash excedió work_mem y escribió {blk} bloques (aprox. {mb}MB, {perCall} bloques por llamada) en archivos temporales.",
         "fix": "① Colocar índices en las columnas ORDER BY/GROUP BY omite la ordenación. ② Primero, reduzca el número de filas a ordenar (LIMIT interno). ③ Si es absolutamente necesario, aumente SET LOCAL work_mem solo para esta transacción de consulta."
       },
       "MANY_ROWS": {
-        "cause": "Recuperación excesiva — Recupera {perCall} filas por llamada.",
+        "cause": "Consulta excesiva: Recupera {perCall} filas por llamada.",
         "fix": "① Las listas de la pantalla se recuperan página por página. ② SELECT solo selecciona las columnas que se utilizan. ③ Las agregaciones se realizan en la base de datos y solo se reciben los resultados."
       },
       "PGRST_EMBED": {
-        "cause": "Declaración de filtro incrustado de PostgREST (!inner) — filtrar padres por condiciones de hijos puede escanear todo el conjunto antes de las condiciones de clasificación.",
+        "cause": "Sentencia de filtro incrustado de PostgREST (!inner): Filtrar padres por condiciones de hijos puede escanear toda la tabla antes de la condición de clasificación.",
         "fix": "① Verifique si hay índices en las claves de unión y las columnas de filtro. ② Mueva los filtros a las condiciones de la tabla padre. ③ Inserte los hijos en una consulta padre ya existente o combínelos en una única función de base de datos."
       },
       "OFFSET_PAGING": {
-        "cause": "Paginación OFFSET — Se vuelve progresivamente más lenta a medida que lee y descarta las filas precedentes para las páginas posteriores.",
+        "cause": "Paginación OFFSET: Las páginas posteriores leen y descartan filas anteriores, volviéndose progresivamente más lentas.",
         "fix": "Cambie a paginación por conjunto de claves (WHERE id > last_id ORDER BY id LIMIT n) que lee desde la clave después de la última clave recibida."
       }
     }
@@ -1201,8 +1201,8 @@
       "toDraft": "Crear borrador de pipeline a partir de {n} seleccionados"
     },
     "ready": {
-      "ok": "Replicación lógica WAL lista — las tablas con PK pueden usar LOGICAL",
-      "no": "Replicación lógica WAL no lista — captura mediante sondeo o comparación de claves",
+      "ok": "Replicación lógica WAL lista: Las tablas con PK pueden usar el método LOGICAL.",
+      "no": "Replicación lógica WAL no lista: Recopile usando el método de sondeo/comparación de claves.",
       "senders": "{n} conexiones de replicación"
     },
     "adapter": {
@@ -1217,20 +1217,20 @@
       "HAS_SOFT_DEL": "Tiene columna de eliminación suave",
       "NO_SOFT_DEL": "No tiene columna de eliminación suave",
       "HAS_PK": "Tiene clave principal",
-      "NO_PK": "No tiene clave principal — no se pueden identificar las filas cambiadas",
+      "NO_PK": "Sin PK: No se pueden identificar las filas cambiadas.",
       "DELETE_UNSEEN": "El sondeo no puede capturar eliminaciones físicas (se recomienda la columna de eliminación suave)",
       "LOGICAL_NOT_READY": "Puede cambiar a LOGICAL una vez que la replicación lógica WAL esté lista",
-      "FULL_RELOAD_ONLY": "No hay PK o columna de tiempo de cambio, por lo que no hay captura incremental — agregue una PK",
+      "FULL_RELOAD_ONLY": "Sin PK/marca de tiempo de cambio, por lo que la recopilación incremental no es posible: se recomienda agregar PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level no es lógico (cambiarlo requiere un reinicio de la DB)",
       "NO_SLOTS": "max_replication_slots es 0",
       "NO_SENDERS": "max_wal_senders es 0",
-      "IS_STANDBY": "Servidor en espera — tome la replicación lógica del primario",
+      "IS_STANDBY": "Servidor en espera: Reciba la replicación lógica del servidor primario.",
       "SETTINGS_UNKNOWN": "No se pudieron leer las configuraciones, estado de preparación desconocido"
     },
     "ed": {
       "title": "Definiciones de pipeline",
-      "draftOnly": "Solo diseño — guardado como borradores (DRAFT)",
+      "draftOnly": "Solo diseño: Guardar solo como BORRADOR.",
       "new": "Nuevo pipeline",
       "empty": "No hay pipelines guardados",
       "manual": "Manual",
@@ -1299,8 +1299,8 @@
     },
     "warn": {
       "none": "No hay advertencias notables.",
-      "SEQ_SCAN_LARGE": "Escaneo completo en {relation} (aproximadamente {rows} filas) — considere un índice en las columnas de filtro.",
-      "NESTED_LOOP_HIGH": "El bucle anidado produce aproximadamente {rows} filas — considere un hash o merge join, o un índice en la condición de unión.",
+      "SEQ_SCAN_LARGE": "La tabla {relation} está realizando un escaneo completo (estimado {rows} filas): Revise los índices en las columnas de condición.",
+      "NESTED_LOOP_HIGH": "El resultado del bucle anidado es un estimado de {rows} filas. Revise las uniones hash/merge o los índices en las condiciones de unión.",
       "SORT_SPILL": "El tamaño de la ordenación es de aproximadamente {kb}KB, por encima del work_mem predeterminado (4MB); puede desbordarse al disco."
     },
     "lint": {
@@ -1314,14 +1314,14 @@
         "char": "carácter"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — seleccione solo las columnas que necesita (E/S extra, sin índice de cobertura).",
-        "FUNC_ON_COLUMN": "La columna de filtro {column} está envuelta en una función o expresión, por lo que su índice no se puede usar — transforme la constante en su lugar.",
-        "LEADING_WILDCARD": "LIKE con un % inicial no puede usar un índice B-tree — considere un índice GIN de pg_trgm.",
-        "OR_DIFF_COLUMNS": "Condiciones OR en columnas diferentes: considere dividirlas con UNION (agregue una condición de exclusión de duplicados si es UNION ALL) o revise los índices por columna.",
-        "IMPLICIT_CAST": "{column} se compara con un número entre comillas — haga coincidir los tipos de columna y constante (conversión implícita).",
-        "NOT_IN_SUBQUERY": "NOT IN (subconsulta) no devuelve nada cuando hay NULL y es lento — use NOT EXISTS.",
-        "NO_WHERE": "Sin cláusula WHERE — en una tabla grande esto es un escaneo completo (agregue una condición o LIMIT).",
-        "DOMAIN_MISMATCH": "{column} es de tipo {expected} según el dominio estándar, pero se compara con una constante de otro tipo — la conversión implícita puede impedir el uso del índice."
+        "SELECT_STAR": "SELECT *: Seleccione solo las columnas necesarias (E/S innecesaria, índice de cobertura no posible).",
+        "FUNC_ON_COLUMN": "La columna de condición {column} es procesada por una función/operación, por lo que no se pueden usar índices. Procese el lado constante.",
+        "LEADING_WILDCARD": "LIKE con un % inicial no puede usar un índice B-tree. Revise los índices GIN de pg_trgm.",
+        "OR_DIFF_COLUMNS": "Las condiciones de columnas diferentes se agrupan con OR. Revise la separación UNION (agregue la condición de exclusión de duplicados si es UNION ALL) o los índices por columna.",
+        "IMPLICIT_CAST": "{column} se compara con un número entre comillas. Haga coincidir el tipo de columna y el tipo de constante (conversión de tipo implícita).",
+        "NOT_IN_SUBQUERY": "NOT IN (subconsulta) puede estar vacío y ser lento si se mezclan NULLs. Cambie a NOT EXISTS.",
+        "NO_WHERE": "Sin condición WHERE. Si es una tabla grande, es un escaneo completo (agregue LIMIT o condiciones).",
+        "DOMAIN_MISMATCH": "{column} es de tipo {expected} según el dominio estándar, pero se compara con una constante de un tipo diferente. La conversión de tipo implícita puede impedir el uso del índice."
       }
     },
     "saved": {
@@ -1394,10 +1394,10 @@
       "copy": "Copiar",
       "copied": "Copiado",
       "rule": {
-        "SEQ_SCAN_INDEX": "Escaneo completo de {relation} — cree un índice en la columna de filtro {column} (reemplace NN en el nombre del índice con un número de secuencia).",
-        "SEQ_SCAN_STATS": "Escaneo completo de {relation} — verifique las columnas de filtro y asegúrese de que las estadísticas (ANALYZE) estén actualizadas.",
-        "NESTED_LOOP": "El bucle anidado espera {rows} filas — actualice las estadísticas y considere índices de clave de unión o una unión hash.",
-        "SORT_SPILL": "La ordenación de aproximadamente {kb} KB puede desbordarse al disco — considere aumentar work_mem de la sesión o indexar las columnas de ordenación.",
+        "SEQ_SCAN_INDEX": "Escaneo completo de {relation}: Cree un índice en la columna de condición {column} (el nombre del índice NN será reemplazado por un número de secuencia).",
+        "SEQ_SCAN_STATS": "Escaneo completo de {relation}: Verifique las columnas de condición y asegúrese de que las estadísticas (ANALYZE) estén actualizadas.",
+        "NESTED_LOOP": "El resultado del bucle anidado es un estimado de {rows} filas: Actualice las estadísticas y revise los índices de la condición de unión o las uniones hash.",
+        "SORT_SPILL": "La ordenación puede desbordarse al disco en aproximadamente {kb}KB. Revise el aumento de work_mem de la sesión o los índices en las columnas de ordenación.",
         "SELECT_STAR": "Seleccione solo las columnas que necesita en lugar de SELECT * (menos E/S, índices de cobertura posibles).",
         "FUNC_ON_COLUMN": "Mueva la función/expresión en la columna de filtro {column} al lado constante (permite el uso de índices).",
         "IMPLICIT_CAST": "Haga coincidir los tipos de {column} y la constante (elimine la conversión implícita).",
@@ -1457,9 +1457,9 @@
     },
     "desc": {
       "FREE": "Explorar y aprender",
-      "D1": "Operador: comprueba si la base de datos está bien ahora.",
-      "D2": "Desarrollador y ajustador — Corrige SQL lento",
-      "D3": "DBA y DA — Desde la seguridad operativa hasta la implementación y el lago"
+      "D1": "Operador: Comprueba si la base de datos está sana ahora.",
+      "D2": "Desarrollador/Afinador: Corrige SQL lento.",
+      "D3": "DBA/DA: Seguridad operativa, migración e incluso lago de datos."
     },
     "feat": {
       "FREE": "Panel de monitoreo, vista de plan de ejecución, aprendizaje básico",
@@ -1502,7 +1502,7 @@
       "required": "Esta función está disponible a partir del plan {plan}.",
       "limit": "Ha utilizado todos los intentos disponibles para este período. Puede usar más actualizando al plan {plan}.",
       "limitTop": "Ha utilizado todos los intentos disponibles para este período. Puede volver a usarlo en el próximo período.",
-      "expired": "Su plan schema.pi ha caducado; realice un pago en la pantalla del plan schema.pi.",
+      "expired": "Su plan schema.pi ha caducado. Por favor, pague en la pantalla del plan schema.pi.",
       "go": "Ver plan",
       "close": "Cerrar"
     }

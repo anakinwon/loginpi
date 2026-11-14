@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analytics at Lake",
     "intro": "Mga KPI ng aktibidad ng dbms, three-layer lake design at dataset catalog sa isang lugar.",
-    "storageNotice": "Hindi pa napagdesisyunan ang storage ng Lake (customer-side o cloud) (PRD section 10 #7). Mga disenyo at name mapping lang ang nakaimbak sa ngayon — walang row data.",
+    "storageNotice": "Hindi pa napagdesisyunan ang storage ng Lake (customer-side o cloud) (PRD section 10 #7). Mga disenyo at name mapping lang ang nakaimbak sa ngayon : walang row data.",
     "noLink": "Pumili o magrehistro muna ng schema.pi link.",
     "goConnect": "Magrehistro ng link",
     "loading": "Naglo-load…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP Analysis — Model↔DB",
+    "title": "GAP Analysis: Model↔DB",
     "intro": "Paghambingin ang schema.pi design model at DDL apply history sa live DB catalog upang makahanap ng drift, at sukatin kung talagang ginagamit ang mga dinisenyong index. Hindi kailanman binabasa o iniimbak ang row data ng customer.",
     "needLink": "Pumili muna ng schema.pi link sa itaas. Kung wala kang anuman, magrehistro ng token sa menu ng 'Link'.",
     "needConn": "Pumili ng koneksyon sa DB na ihahambing sa itaas.",
@@ -188,7 +188,7 @@
     "model": "Modelo",
     "reqNo": "Kahilingan {id}",
     "notSaved": "Hindi na-save ang pagpapatakbong ito sa history (normal na ipinapakita ang mga resulta).",
-    "capped": "Masyadong maraming item — ipinapakita ang unang {cap} bawat seksyon (kumpleto ang mga bilang).",
+    "capped": "Masyadong maraming item : ipinapakita ang unang {cap} bawat seksyon (kumpleto ang mga bilang).",
     "statsMissing": "Hindi available ang istatistika ng paggamit ng index, kaya hindi masusuri ang paggamit.",
     "sum": {
       "missingTables": "Mga table na nawawala sa DB",
@@ -230,7 +230,7 @@
       "USED": "Ginagamit",
       "NO_STATS": "Walang istatistika",
       "CONSTRAINT": "Uniqueness constraint (panatilihin)",
-      "NO_DATA": "Walang data o hindi nakolekta ang stats — hindi mahuhusgahan",
+      "NO_DATA": "Walang data o hindi nakolekta ang mga istatistika: hindi matukoy",
       "OBSERVING": "Nag-oobserba (wala pang 7 araw)",
       "UNUSED_CAND": "Kandidato para sa hindi nagagamit"
     },
@@ -245,14 +245,14 @@
       "RATE": "Masyadong maraming kahilingan. Pakisubukang muli sa isang minuto."
     },
     "schema": "Schema",
-    "schemaHint": "Ang mga regular at partitioned table lang sa schema na ito ang inihahambing (hindi kasama ang mga view). Default public — ang mga internal schema ng Supabase (auth, storage, …) ay hindi kasama.",
-    "truncated": "Naabot ng {names} ang limitasyon ng {max}-row at na-truncate — maaaring mali ang ilang resulta ng \"wala sa DB\" / \"wala sa model\". Paliitin ang schema at patakbuhin muli.",
+    "schemaHint": "Ikumpara lang ang mga regular at partitioned table sa schema na ito (hindi kasama ang mga view). Default na public: Hindi kasama ang mga internal na schema ng Supabase (auth, storage, atbp.).",
+    "truncated": "Ang query ng {names} ay naputol sa {max} na row. Ang ilang 'Wala sa DB'/'Wala sa Model' na deteksiyon ay maaaring false positives. Paliitin ang schema at muling tukuyin.",
     "colUnchecked": "Dahil na-truncate ang query ng column, ang {n} nawawala/dagdag na resulta ng column ay itinuturing na hindi mapapatunayan at hindi kasama sa bilang ng hindi pagkakatugma ng column.",
-    "renamed": "Ang {n} PK index(es) na inilapat sa ilalim ng lumang panuntunan sa pagpapangalan (_PKEY) ay umiiral sa DB sa ilalim ng bagong pangalan (PK_) — normal",
-    "superseded": "Ang {n} mas lumang kahilingan ay hindi kasama dahil muling ginawa ng isang mas huling kahilingan ang parehong table (DROP … CASCADE) — normal",
+    "renamed": "Ang {n} PK index na inilapat gamit ang lumang convention sa pagpapangalan (_PKEY) ay nasa DB na may bagong pangalan (PK_). Normal.",
+    "superseded": "Ang {n} na nakaraang kahilingan ay hindi kasama sa paghahambing dahil ang mga huling kahilingan ay muling gumawa ng parehong table (DROP … CASCADE). Normal.",
     "supersededItem": "Kahilingan {id} → pinalitan ng kahilingan {by}",
     "sysCols": "Ang {n} system column(s) na awtomatikong idinagdag sa pagbuo ng DDL ay wala sa modelo ayon sa disenyo at hindi kasama sa mga hindi pagkakatugma",
-    "groupOwn": "Prefix ng proyekto {pfx} — mga kandidato na nawawala sa modelo",
+    "groupOwn": "Ang prefix ng proyektong ito {pfx}: nawawalang kandidato sa modelo",
     "groupOther": "Ibang system {pfx}",
     "basis": "Tinantyang rows {rows} · mula {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Kung nawawala pa rin ang mga object pagkatapos muling ilapat, maghinala ng manual na pagtanggal o rollback at suriin ang aktibidad ng account ng koneksyon sa iyong DBA."
       },
       "extraTables": {
-        "s1": "Ang bundle ng prefix ng proyektong ito = nawawalang mga kandidato ng modelo — i-import ang mga ito sa modelo sa pamamagitan ng schema.pi → Mga Setting → Reverse, o magpasya kung tatanggalin ang mga ito kung hindi nagagamit na mga talahanayan.",
-        "s2": "Ibang grupo ng prefix = ibang system na nagbabahagi ng DB na ito — hindi ito mga item ng aksyon para sa proyektong ito.",
+        "s1": "Ang grupong ito ng prefix ng proyekto = nawawalang kandidato sa modelo: i-import sa modelo sa pamamagitan ng schema.pi → Settings → Reverse, o magpasya kung tatanggalin kung hindi ginagamit ang table.",
+        "s2": "Iba pang grupo ng prefix = iba pang system na gumagamit ng parehong DB: hindi sakop ng aksyon ng proyektong ito.",
         "s3": "Kung ang target na schema ay hindi public, baguhin ang field na \"Schema\" sa itaas at patakbuhin muli."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Magkaiba ang Uri/NULL = ihanay sa modelo (source of truth); bago paliitin ang haba o lumipat sa NOT NULL, kumpirmahing natutugunan ito ng mga umiiral na row."
       },
       "idxUsage": {
-        "s1": "Bago tanggalin, suriin ① kung ang window ng istatistika ay sumasaklaw ng hindi bababa sa isang business cycle (hal. batch sa katapusan ng buwan) — tingnan ang \"mula\".",
+        "s1": "Bago tanggalin, suriin ① kung ang panahon ng pagkolekta ng istatistika ay hindi bababa sa isang operating cycle (hal., batch sa katapusan ng buwan): sumangguni sa petsa ng sanggunian.",
         "s2": "② Hindi ito unique/PK index (ang mga iyon ay hiwalay na ipinapakita bilang \"uniqueness constraint\").",
         "s3": "③ I-EXPLAIN ang kinatawan ng SQL ng table sa SQL Tuning at kumpirmahing hindi ginagamit ang index na ito.",
         "s4": "Kapag nakumpirma na ang lahat ng tatlo, tanggalin ang index mula sa modelo sa schema.pi at ilapat sa pamamagitan ng DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Paano mag-isyu ng connection token",
     "how1": "Mag-sign in sa schema.pi at buksan ang subject area na ikokonekta",
     "how2": "Pumunta sa Subject area → Settings → Connection token at pindutin ang 'Issue token' (area admin o DA role)",
-    "how3": "Kopyahin ang token na nagsisimula sa slk_ — isang beses lang ito ipinapakita kapag inisyu",
+    "how3": "Kopyahin ang token na nagsisimula sa slk_ na inisyu. Ang orihinal ay ipinapakita nang isang beses lang sa oras ng pag-isyu.",
     "how4": "Idikit ito sa ibaba at irehistro",
     "openSchema": "Buksan ang schema.pi",
     "registerTitle": "Magrehistro ng koneksyon",
@@ -384,7 +384,7 @@
     "retry": "Subukang muli",
     "pickerLink": "Link",
     "pickerConn": "Koneksyon",
-    "pickerEmpty": "Walang koneksyon —",
+    "pickerEmpty": "Walang koneksyon.",
     "pickerGo": "magrehistro ng isa sa /connect",
     "errors": {
       "LINK_AUTH": "Nag-expire o binawi ang connection token. Mag-isyu ng bagong token sa schema.pi at irehistro muli",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Data Migration (PiMig)",
-    "intro": "Kinakalkula ang load order ng table mula sa mga relasyon sa iyong schema.pi design model, inaayos ang laki ng chunk, parallelism at ang cutover checklist, at bumubuo ng verification SQL na pinapatakbo mo mismo sa source at target. Ang screen na ito ay nagpaplano at nagsusuri lang — hindi ito naglilipat ng data o nagbabasa ng mga row ng customer DB.",
+    "intro": "Kinakalkula ang load order ng table mula sa mga relasyon sa iyong schema.pi design model, inaayos ang laki ng chunk, parallelism at ang cutover checklist, at bumubuo ng verification SQL na pinapatakbo mo mismo sa source at target. Ang screen na ito ay nagpaplano at nagsusuri lang : hindi ito naglilipat ng data o nagbabasa ng mga row ng customer DB.",
     "needLink": "Pumili muna ng schema.pi link sa itaas. Kung wala kang anuman, magrehistro ng token sa ilalim ng 'Connect'.",
     "loading": "Naglo-load…",
     "newPlan": "Bagong plano sa migration",
@@ -432,8 +432,8 @@
     "optsHint": "Ang parallelism ay ang bilang ng mga talahanayan na sabay-sabay na nilo-load sa loob ng isang antas. Ang laki ng tipak ay ang yunit ng commit (mga row) na gagamitin ng execution engine.",
     "order": "Order ng pag-load",
     "orderHint": "Topologically na inayos ayon sa mga relasyon ng disenyo (hindi pisikal na FKs) upang mauna ang mga parent table. Ang mga talahanayan sa parehong antas ay hindi nakadepende sa isa't isa at maaaring mag-load nang parallel.",
-    "cycles": "{n} pabilog na grupo — inilagay sa parehong antas. Manu-manong itakda ang kanilang order at ipagpaliban ang mga pagsusuri sa reference hanggang matapos ang pag-load.",
-    "selfRefs": "Mga talahanayan na nagre-refer sa sarili (hierarchical) — i-load muna ang mga parent row sa loob ng talahanayan",
+    "cycles": "{n} cycle: inilagay sa parehong yugto. Manu-manong itakda ang loading order at ipagpaliban ang mga reference check hanggang matapos ang loading.",
+    "selfRefs": "Mga self-referencing (hierarchical) table: parent rows muna sa loob ng parehong table.",
     "level": "Antas {n}",
     "checklist": "Checklist ng cutover",
     "toReady": "Markahan bilang handa",
@@ -471,7 +471,7 @@
     },
     "verify": "Verification SQL",
     "verifyHint": "Bumubuo ng count, numeric column sum, duplicate key at key hash queries bawat talahanayan sa order ng pag-load. Patakbuhin ang mga ito sa source at target at ihambing (hindi ito isinasagawa ng screen na ito).",
-    "noHashOracle": "Ang mga hash function at text rendering ng Oracle·Tibero ay naiiba sa PostgreSQL, kaya ang mga hash query ay tinanggal — ihambing ang mga count, sum at duplicate key.",
+    "noHashOracle": "Inaalis ng Oracle at Tibero ang hash lookup dahil magkaiba ang hash functions at character representations sa PostgreSQL. Ikumpara sa bilang, kabuuan, at pagdoble ng key.",
     "copy": "Kopyahin",
     "copied": "Nakopya",
     "copyFail": "Hindi makakopya. Piliin ang text at kopyahin nang manu-mano.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Hindi valid ang kahilingan."
     },
     "board": {
-      "subtitle": "Ano ang gagawin sa DB na ito ngayon — 14 na signal ng OK, babala, at panganib na may mga solusyon, sa isang sulyap.",
+      "subtitle": "Ano ang gagawin ngayon sa DB na ito: Tingnan ang normal, babala, at status ng panganib ng 14 na signal at ang kanilang mga solusyon sa isang sulyap.",
       "refresh": {
         "updated": "Hanggang {time} · nagre-refresh bawat minuto",
         "now": "I-refresh ngayon",
@@ -564,11 +564,11 @@
         "NA": "Hindi Naaangkop"
       },
       "overall": {
-        "RISK": "Panganib — kailangan ng agarang aksyon",
-        "WARN": "Babala — kailangan tingnan ang ilang item",
-        "UNKNOWN": "Hindi alam — suriin ang koneksyon",
-        "OK": "OK — ang bawat signal ay nasa loob ng mga limitasyon",
-        "CONN_DOWN": "Hindi maabot ang DB — suriin muna ang koneksyon",
+        "RISK": "Panganib: Kailangan ng agarang aksyon",
+        "WARN": "Babala: Mga item na dapat suriin",
+        "UNKNOWN": "Hindi makumpirma: Suriin ang status ng koneksyon",
+        "OK": "Normal: Lahat ng signal ay nasa loob ng pamantayan",
+        "CONN_DOWN": "Hindi makakonekta sa DB. Suriin muna ang koneksyon.",
         "NA": "Hindi Naaangkop"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Ipakita nang mas kaunti",
         "setup": "I-set up ang mga ito para makakita pa",
         "none": "Walang panganib o babala na item na nangangailangan ng aksyon ngayon.",
-        "unknown": "Hindi masuri ang {n} signal(s) — tingnan ang mga card para sa dahilan.",
+        "unknown": "Hindi makumpirma ang {n} item: Suriin ang dahilan sa card.",
         "myRule": "Nilabag ang aking panuntunan: {rule}",
         "copySql": "Kopyahin ang SQL",
         "copied": "Nakopya"
@@ -622,34 +622,34 @@
         "REPL": "Pagkaantala ng replication"
       },
       "fix": {
-        "AVAIL": "Mabagal na tugon o kamakailang pag-restart — suriin ang mga setting ng koneksyon at status ng DB server.",
-        "AVAIL_DOWN": "Hindi makakonekta sa DB — suriin ang mga setting ng koneksyon at kung naka-up ang DB server.",
-        "CONN_USE": "{sess}/{max} na session sa DB na ito (hindi cluster-wide — hindi kasama ang ibang database) — isara ang mga idle na koneksyon o magdagdag ng connection pooler (pgbouncer).",
-        "URL": "{n} na sinuring URL ang nabigo · max response {ms}ms — tingnan ang schema.pi monitor para sa dahilan.",
-        "LONG_QRY": "May query na tumatakbo nang {sec}s — suriin ang plano nito at i-tune ito, o ipa-cancel ito sa isang DBA.",
-        "IDLE_TX": "May transaksyon na idle nang {sec}s — hanapin ang nawawalang commit sa app at magtakda ng timeout.",
-        "LOCK_WAIT": "{n} na session ang naghihintay sa mga lock — hanapin ang blocking session at tapusin ang transaksyon nito.",
-        "CACHE_HIT": "Rate ng pagtama ng cache {pct}% — hanapin ang buong pag-scan ng malalaking talahanayan o suriin ang shared_buffers.",
-        "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlock — suriin ang mga nabigong transaksyon at mga log ng error ng app.",
-        "SLOW_SQL": "Mayroong query na may pinakamataas na {ms}ms sa isang pagkakataon — tingnan ang execution plan mula sa pinakamataas na single-execution time at i-tune.",
-        "STORAGE": "Ang DB ({gb} GB) ay malapit na sa limitasyon nito (natitirang araw {days}) — linisin ang malalaking talahanayan o magdagdag ng kapasidad.",
-        "VACUUM": "Ang {tbl} ay may maraming patay na row o luma na istatistika — suriin ang mga setting ng VACUUM (ANALYZE) at autovacuum.",
-        "INDEX": "{n} na natuklasan sa index (invalid, hindi ginagamit, buong pag-scan) — tingnan ang tab ng kalusugan ng talahanayan at index para sa mga target.",
-        "BACKUP": "Naka-off o stalled ang WAL archiving — suriin ang archive_mode, archive_command at status ng backup.",
-        "REPL": "Pagkaantala ng replication {sec}s — suriin ang standby status at ang network.",
-        "PGSS": "Hindi naka-install ang pg_stat_statements, kaya hindi available ang mabagal na SQL — paganahin ito gamit ang SQL sa ibaba (kinakailangan ang pag-restart ng server)."
+        "AVAIL": "Mabagal ang tugon o kakasimula lang. Suriin ang impormasyon ng koneksyon at status ng DB server.",
+        "AVAIL_DOWN": "Nabigo ang koneksyon sa DB. Suriin ang impormasyon ng koneksyon at kung buhay ang DB server.",
+        "CONN_USE": "Ang DB session na ito {sess}/{max} (hindi cluster-wide, hindi kasama ang iba pang koneksyon sa DB): Linisin ang mga idle na koneksyon o mag-set up ng connection pooler (pgbouncer).",
+        "URL": "{n} nabigong URL check · Max response {ms}ms: Suriin ang sanhi sa schema.pi monitor.",
+        "LONG_QRY": "May query na tumatakbo nang {sec} segundo. Suriin ang execution plan at i-tune ito, o ipatigil sa isang DBA.",
+        "IDLE_TX": "May transaction na bukas at idle nang {sec} segundo. Hanapin ang mga nawawalang commit sa app at magtakda ng timeout.",
+        "LOCK_WAIT": "{n} session ang naghihintay ng lock: Hanapin ang blocking session at tapusin ang transaction nito.",
+        "CACHE_HIT": "Cache hit rate {pct}%: Hanapin ang full table scans ng malalaking table o suriin ang shared_buffers.",
+        "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlocks: Suriin ang mga nabibigong transaction at app error logs.",
+        "SLOW_SQL": "May query na may single max time na {ms}ms. Suriin ang execution plan at i-tune mula sa pinakamataas na single max time.",
+        "STORAGE": "Ang DB {gb}GB ay malapit na sa limitasyon nito (natitirang {days} araw). Linisin ang malalaking table o dagdagan ang kapasidad.",
+        "VACUUM": "Ang {tbl} ay may maraming dead rows o outdated na istatistika. Suriin ang VACUUM (ANALYZE) at autovacuum settings.",
+        "INDEX": "{n} index check (invalid, unused, full scan): Suriin ang mga target sa tab ng table/index health.",
+        "BACKUP": "Naka-off o huminto ang WAL archiving. Suriin ang archive_mode, archive_command, at status ng backup.",
+        "REPL": "Replication delay {sec} segundo: Suriin ang status ng standby server at network.",
+        "PGSS": "Nawawala ang pg_stat_statements extension, kaya hindi makita ang mabagal na SQL. I-enable ito gamit ang SQL sa ibaba (kailangan ng server restart)."
       },
       "reason": {
         "CONN_DOWN": "Hindi hinusgahan dahil down ang koneksyon ng DB.",
         "PGSS": "Hindi naka-install ang pg_stat_statements.",
         "VER": "Available sa PostgreSQL 13 o mas bago.",
         "SAMPLE": "Hindi pa sapat ang mga sample.",
-        "NO_LIMIT": "Walang limitasyon sa laki, kaya hindi hinuhusgahan ang paggamit — magdagdag ng panuntunan sa laki ng DB (MB) (>) para gamitin ito bilang limitasyon.",
+        "NO_LIMIT": "Hindi natutukoy ang paggamit dahil walang limitasyon sa kapasidad. Ang pagdaragdag ng panuntunan sa laki ng DB (MB) (>) ay gagamitin ito bilang limitasyon.",
         "RESET": "Ang mga istatistika ay na-reset nang mas mababa sa 7 araw na nakalipas, kaya hindi hinuhusgahan ang mga hindi nagamit na index.",
         "STALE": "Walang kamakailang tala ng pagsusuri.",
         "STANDBY": "Hindi naaangkop sa isang standby server.",
         "NONE": "Walang dapat suriin.",
-        "GRANT": "Nawawalang mga pribilehiyo — ibigay ang pg_monitor role sa connection account.",
+        "GRANT": "Hindi makita dahil sa kakulangan ng pahintulot. Ibigay ang pg_monitor role sa connection account.",
         "LINK": "Nabigo ang query ng schema.pi ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Kung hindi ito nag-stream, suriin ang mga log ng standby."
         }
       },
-      "sqlNote": "Ang SQL sa ibaba ay read-only, para sa pagsusuri — ang mga pag-aayos (VACUUM, DROP INDEX, pg_terminate_backend) ay pinapatakbo ng isang DBA.",
+      "sqlNote": "Ang SQL sa ibaba ay para sa read-only verification. Ang mga aksyon (VACUUM, DROP INDEX, pg_terminate_backend) ay direktang isinasagawa ng isang DBA.",
       "go": {
         "activity": "Aktibidad at mga lock",
         "top": "Mabagal na mga query",
@@ -766,8 +766,8 @@
           "tree": "Ano ang kumakain ng espasyo, at ano ang kailangang linisin?"
         },
         "asTable": "Tingnan bilang talahanayan",
-        "needHistory": "Wala pang trend — panatilihing bukas ang screen na ito sa loob ng ilang minuto.",
-        "needPerf": "Walang history ng laki — kolektahin sa tab ng performance o panatilihing bukas ang screen na ito.",
+        "needHistory": "Wala pang trend. Iguguhit ito kung iiwan mong bukas ang screen na ito nang ilang minuto.",
+        "needPerf": "Walang history ng kapasidad. Kolektahin ito mula sa tab ng Performance o iwanang bukas ang screen na ito.",
         "noSess": "Walang session.",
         "noWait": "Walang paghihintay",
         "noData": "Walang maipakita.",
@@ -840,17 +840,17 @@
         "noStat": "Walang istatistika"
       },
       "empty": {
-        "noConn": "Walang koneksyon sa PostgreSQL server ang taxonomy na ito para subaybayan — ipinapakita lang ang mga URL at status ng serbisyo.",
+        "noConn": "Walang koneksyon sa PostgreSQL server na imo-monitor sa taxonomy na ito. Ang status lang ng URL at linkage ang ipinapakita.",
         "unsupported": "Hindi sinusuportahan ng koneksyon na ito ang pagsubaybay (mga koneksyon sa PostgreSQL server lang).",
-        "connFail": "Hindi makakonekta sa database — suriin ang mga setting ng koneksyon at status ng DB.",
-        "linkDown": "Hindi maabot ang schema.pi — awtomatikong sinusubukang muli.",
-        "linkAuth": "Nag-expire na ang token ng koneksyon — mag-isyu ng bagong token sa schema.pi at irehistro ito.",
-        "timeout": "Mabagal ang mga tugon — awtomatikong sinusubukang muli.",
+        "connFail": "Nabigo ang koneksyon sa DB. Suriin ang impormasyon ng koneksyon at status ng DB.",
+        "linkDown": "Nabigo ang koneksyon sa schema.pi. Awtomatikong susubukan muli sa ilang sandali.",
+        "linkAuth": "Nag-expire ang token ng koneksyon. Muling i-isyu at irehistro ang token mula sa schema.pi.",
+        "timeout": "Mabagal ang tugon. Awtomatikong susubukan muli sa ilang sandali.",
         "rate": "Masyadong maraming kahilingan, kaya tumaas ang interval ng pag-refresh."
       },
       "aux": {
         "rules": "Aking mga panuntunan sa alerto ({n} aktibo)",
-        "schemaSvc": "Status ng serbisyo — mga tugon ng schema.pi",
+        "schemaSvc": "Status ng linkage: tugon ng serbisyo ng schema.pi",
         "schemaSvcNote": "Mga metric ng app para sa huling 60 minuto na naka-store sa schema.pi.",
         "source": "Pinagmulan ng data: ang target na DB ay read-only sa pamamagitan ng mga pinangalanang query ng schema.pi (read-only); ang mga trend ay nag-iimbak lang ng mga istatistika sa dbms.pi (walang data ng row)."
       }
@@ -866,10 +866,10 @@
     "noRun": "Wala pang diagnosis. Pindutin ang \"Patakbuhin ang diagnosis\"",
     "lastRun": "Huling diagnosis {dtm}",
     "readOnly": "Ang diagnosis ay nagbabasa lamang (SELECT). Ang payo ay isang gabay at nakasalalay sa memorya ng server, load at workload",
-    "truncated": "Masyadong maraming object — tanging ang unang 500 ang sinuri",
+    "truncated": "Masyadong maraming object : tanging ang unang 500 ang sinuri",
     "paramsNote": "Hindi alam ang kabuuang memorya ng server, kaya tinatantya ito mula sa shared_buffers ≈ 25% ng RAM. Ipinapalagay ng random_page_cost ang SSD",
     "auditNote": "Ang mga talahanayan na may RLS off at hindi nagamit na mga account ay susuriin kapag sinusuportahan na sila ng link query",
-    "replNote": "Ang baseline ay Active-Standby (A-S) — isang primary + standby. Replay lag ≥ 5s = babala, ≥ 60s = panganib (sinusukat na reference ng RPO)",
+    "replNote": "Pangunahing pamantayan ay Active-Standby (A-S): 1 Primary + Standby. Babala para sa replay delay >= 5 segundo, panganib para sa >= 60 segundo (sumangguni sa aktwal na pagsukat ng RPO).",
     "lagIdle": "Walang pagbabago",
     "pager": "Pag-paginate",
     "prev": "Nakaraan",
@@ -939,11 +939,11 @@
       "st_ok": "Nakatakda ang isang statement timeout",
       "iit_off": "Walang idle-in-transaction timeout (0). Maaaring magdulot ng lock holding at bloat",
       "iit_ok": "Nakatakda ang isang idle-in-transaction timeout",
-      "ckpt_short": "Ang interval ng checkpoint ay 5 minuto o mas mababa. Isaalang-alang ang 10–15 minuto para sa mga write-heavy load",
+      "ckpt_short": "Ang interval ng checkpoint ay 5 minuto o mas mababa. Isaalang-alang ang 10~15 minuto para sa mga write-heavy load",
       "ckpt_ok": "Sa loob ng makatwirang saklaw",
       "wal_minimal": "Ang wal_level=minimal ay nagpapahirap sa PITR at replication. Gumamit ng replica o mas mataas",
       "wal_ok": "Sinusuportahan ng WAL level ang PITR at replication",
-      "rpc_hdd": "Default ng HDD (4). Para sa SSD, inirerekomenda ang 1.1–2",
+      "rpc_hdd": "Default ng HDD (4). Para sa SSD, inirerekomenda ang 1.1~2",
       "rpc_ok": "Angkop para sa SSD",
       "super_many": "Dalawa o higit pang superuser. Panatilihin ang isa para sa administrasyon at magbigay lamang ng kinakailangang pribilehiyo sa iba",
       "super_ok": "Isa lamang o mas kaunti ang superuser",
@@ -1022,7 +1022,7 @@
       "intro": "Kinokolekta ngayon ang mga nangungunang istatistika ng query, mga talahanayan, mga index at mga laki nang isang beses at iniimbak ang mga ito bilang isang snapshot. Kolektahin nang hindi bababa sa dalawang beses upang makita ang mga pagbabago at mga trend ng laki",
       "run": "Kolektahin ngayon",
       "running": "Kinokolekta…",
-      "done": "Nakolekta noong {dtm} — {qry} na query · {tbl} na talahanayan · {idx} na index",
+      "done": "Nakumpleto ang koleksyon {dtm}: {qry} query · {tbl} table · {idx} index",
       "auto": {
         "title": "Awtomatikong koleksyon",
         "desc": "Kapag naka-on, ang koneksyon na ito ay awtomatikong kinokolekta araw-araw sa 3 AM (oras ng Korea). Pagkatapos ng 7 o higit pang araw, maaari kang umasa sa ranggo ng mabagal na query at listahan ng hindi nagamit na index",
@@ -1044,13 +1044,13 @@
       "sortCalls": "Mga tawag",
       "empty": "Wala pang snapshot. Pindutin ang Kolektahin ngayon sa tab na Kolektahin",
       "range": "Pagbabago sa pagitan ng {from} → {to}",
-      "first": "Unang snapshot noong {dtm} — mga pinagsama-samang halaga (mga pagbabago mula sa susunod na snapshot)",
+      "first": "Unang koleksyon {dtm}: Cumulative (pagtaas/pagbaba mula sa susunod na koleksyon)",
       "query": "Query (nakamaskara ang mga literal)",
       "calls": "Mga tawag",
       "totalMs": "Kabuuang ms",
       "meanMs": "Mean ms",
       "rows": "Mga Row",
-      "reset": "Nakita ang pag-reset ng stats — ipinapakita bilang cumulative",
+      "reset": "Nakita ang pag-reset ng istatistika: Ipinapakita bilang cumulative",
       "src": "Pinagmulan",
       "srcToggle": "Ipakita o itago ang mga detalye ng pinagmulan",
       "openSqlLab": "Buksan sa SQL Tuning",
@@ -1058,7 +1058,7 @@
       "sortMax": "Pinakamataas na single-execution time",
       "maxMs": "Pinakamataas na 1 beses ms",
       "diagToggle": "Pagsusuri ng Sanhi",
-      "noMax": "Walang maximum na halaga — Ang {n} na kaso ay mga lumang koleksyon na walang maximum na halaga nang isang beses, kaya pansamantalang inayos ang mga ito ayon sa average na isang beses (hindi ayon sa kabuuang oras). Kung kokolektahin ngayon, mapupuno ang maximum na halaga."
+      "noMax": "Walang max na halaga: Ang {n} item ay mga lumang koleksyon na walang single max na halaga, kaya pansamantalang inayos ang mga ito ayon sa single average (hindi ayon sa kabuuang oras). Ang mga max na halaga ay pupunan sa kasalukuyang koleksyon."
     },
     "health": {
       "empty": "Wala pang snapshot. Pindutin ang Kolektahin ngayon sa tab na Kolektahin",
@@ -1066,9 +1066,9 @@
       "unusedIdx": "Mga hindi nagamit na index",
       "unusedIdxHint": "Mga index na hindi nagamit mula noong huling pag-reset ng stats (ayon sa laki). Huwag i-drop ang PK o unique-constraint indexes",
       "fullScan": "Labis na full scan",
-      "fullScanHint": "Mga table na may 1,000+ live row kung saan ang full scan ay hindi bababa sa kalahati — suriin ang mga index sa mga filter column",
+      "fullScanHint": "Mga table na may 1,000+ epektibong row at mahigit kalahati ng full scans: Suriin ang mga index sa mga condition column.",
       "dead": "Labis na dead tuple",
-      "deadHint": "Dead tuple ratio na 20% o higit pa — suriin ang mga setting ng VACUUM at autovacuum",
+      "deadHint": "Dead tuple ratio na mahigit 20%: Suriin ang VACUUM at autovacuum settings.",
       "none": "Wala",
       "scans": "scan"
     },
@@ -1085,7 +1085,7 @@
     },
     "activity": {
       "refresh": "I-refresh",
-      "live": "Live query — hindi nakaimbak",
+      "live": "Real-time na query: Hindi naka-save",
       "sessions": "Aktibidad ng session",
       "locks": "Mga Lock",
       "none": "Wala"
@@ -1112,7 +1112,7 @@
         "BATCH": "Mukhang isang batch o naka-iskedyul na trabaho. Ikalat ang run times palayo sa mga business peak at paliitin ang trabaho bawat commit. Suriin ang mga index at istatistika (ANALYZE) sa mga target na table, at hatiin ang mahabang transaksyon. Ang paglalagay ng pangalan ng trabaho sa application_name ay nagiging mas tumpak ang susunod na klasipikasyon",
         "PROGRAM": "Mukhang ito ay isang query na isinagawa ng application. Tingnan ang execution plan sa SQL tuning. Kung mahaba ang pinakamataas na single-execution time, tingnan muna ang index/join order, at kung maikli ang single-execution time ngunit mataas ang bilang ng tawag, tingnan ang paulit-ulit na tawag (N+1)/cache. Ilagay ang pangalan ng serbisyo sa application_name ng connection pool.",
         "PLATFORM": "Mukhang DB o internal na trabaho ng platform tulad ng autovacuum o replication. Karaniwan ay walang aksyon na kailangan. Kung nananatili ito sa itaas, suriin ang mga threshold ng autovacuum at maintenance_work_mem",
-        "MONITOR": "Ito ay isang query na kinokolekta ng dbms.pi mismo — ang koneksyon ng schema.pi ay isang nakapirming pahayag na nagbabasa lamang ng mga statistical view/catalog (pg_stat_*·pg_catalog) kaya hindi ito isang business query at hindi nangangailangan ng pagkilos ng customer. Kung ang load ng target na database ay isang problema, bawasan ang bilang ng beses na binubuksan mo ang pindutan ng koleksyon/screen ng pagsubaybay. Ang mga pahayag mula sa iba pang mga tool sa pagsubaybay na nagbabasa ng parehong statistical view ay pinagsama-sama rin dito.",
+        "MONITOR": "Sariling collection query ng dbms.pi. Ang koneksyon ng schema.pi ay nagbabasa lang ng statistical views at catalogs (pg_stat_*, pg_catalog) na may fixed statements, kaya hindi ito business query at walang kinakailangang aksyon ng customer. Kung problema ang load ng target database, bawasan ang dalas ng pagbubukas ng collection button o monitoring screen. Ang mga statement mula sa iba pang monitoring tools na nagbabasa ng parehong statistical views ay pinagsasama-sama rin dito.",
         "UNKNOWN": "Walang pahiwatig sa pinagmulan. Itakda ang application_name sa bawat koneksyon at hatiin ang mga account ayon sa layunin; ito ay ikaklasipika mula sa mga susunod na sample"
       },
       "detail": {
@@ -1123,7 +1123,7 @@
         "period": "Naobserbahan",
         "none": "(walang laman)"
       },
-      "noSample": "Wala pang sample — ang mga tumatakbong session ay sinasample kapag tiningnan mo ang monitoring board o ang tab na Activity & locks. Sa ngayon, ito ay ikinaklasipika mula sa pangalan ng account lang",
+      "noSample": "Wala pang sample. Ang mga tumatakbong session ay nag-iipon bilang sample kapag tinitingnan ang Monitoring Board o Activity/Locks tabs. Sa kasalukuyan, inuri lang ang mga ito ayon sa pangalan ng account para sa sanggunian.",
       "verOff": "Ang DB na ito ay mas luma kaysa sa PostgreSQL 14, kaya ang mga tumatakbong session ay walang query ID. Ang account lang (tiyak) ang ipinapakita",
       "privOff": "Ang link account ay hindi makakita ng mga detalye ng session ng ibang account, kaya walang sample na nakolekta. Hilingin sa isang DB admin na patakbuhin ang GRANT pg_read_all_stats TO {user};",
       "linkUsr": "link account",
@@ -1134,11 +1134,11 @@
     "diag": {
       "title": "Pagsusuri ng Sanhi",
       "fix": "Aksyon:",
-      "none": "Walang sanhi na lumitaw sa mga istatistika — Buksan ang execution plan sa SQL tuning upang suriin.",
-      "cum": "Walang tawag sa segment na ito — batay sa pinagsama-samang (mula nang i-reset ang istatistika)",
-      "basis": "Batayan — Pinakamataas na 1 beses {max}ms · Average {mean}ms · {calls} na tawag · {rpc} na row bawat tawag · {read} na rate ng pagbasa ng disk · {tmp} na pansamantalang block",
+      "none": "Walang sanhi na inihayag ng istatistika. Buksan ang execution plan sa SQL Tuning para suriin.",
+      "cum": "Walang tawag sa interval na ito: Cumulative (mula nang i-reset ang istatistika)",
+      "basis": "Batayan: Max single {max}ms · Avg {mean}ms · Calls {calls} · Rows per call {rpc} · Disk read ratio {read} · Temp blocks {tmp}",
       "SELF_MON": {
-        "cause": "Query sa koleksyon ng dbms.pi mismo — Ito ay isang pahayag sa pagsubaybay na nagbabasa lamang ng mga view ng istatistika at katalogo.",
+        "cause": "Sariling collection query ng dbms.pi: Monitoring statement na nagbabasa lang ng statistical views at catalogs.",
         "fix": "Hindi kailangan ng pagkilos ng customer. Kung ang load ng target na database ay isang problema, bawasan ang bilang ng beses na tinitingnan mo ang screen ng koleksyon/pagsubaybay."
       },
       "NO_MAX": {
@@ -1146,31 +1146,31 @@
         "fix": "Kung pipindutin mo ang koleksyon ngayon, mapupuno ang pinakamataas na halaga at magiging tumpak ang diagnosis."
       },
       "SLOW_EACH": {
-        "cause": "Palaging mabagal — Tumatagal ng mahabang panahon sa bawat pagpapatupad na may pinakamataas na {max}ms at average na {mean}ms.",
+        "cause": "Mabagal sa bawat pagkakataon: Matagal ang bawat execution na may max {max}ms at average {mean}ms.",
         "fix": "① Tingnan ang execution plan sa 'Buksan sa SQL tuning' ② Kung may full scan (Seq Scan) o malaking pag-aayos, suriin ang mga index ng WHERE·JOIN condition column ③ Paliitin ang mga kondisyon upang basahin lamang ang mga kinakailangang column·row."
       },
       "SPIKE": {
-        "cause": "Paminsan-minsang pagkaantala — Ang average ay {mean}ms, ngunit paminsan-minsan ay tumatagal ng mahabang panahon sa pinakamataas na {max}ms ({x} beses ng average).",
+        "cause": "Intermittent delay: Average {mean}ms, ngunit paminsan-minsan ay matagal na may max {max}ms ({x} beses ng average).",
         "fix": "① Kapag mabagal, suriin ang lock wait (wait_event) sa tab ng aktibidad·lock ② Kung mabagal lamang ang unang pagpapatupad, nangangahulugan ito na walang laman ang cache at nabasa ang disk ③ Ihambing ang parehong query na may iba't ibang halaga sa SQL tuning upang makita kung nagbabago ang execution plan ayon sa halaga."
       },
       "DISK_READ": {
-        "cause": "Cache miss — {pct}% ({read} na block) ng mga nabasang block ay nabasa mula sa disk, hindi sa memorya.",
+        "cause": "Cache miss: {pct}% ({read} blocks) ng mga read block ay binasa mula sa disk, hindi memory.",
         "fix": "① Bawasan ang saklaw ng pagbasa gamit ang index ② Paliitin ang panahon·kondisyon ng pagtingin ③ Kung madalas basahin ang data at patuloy na mataas, suriin ang shared_buffers (memorya)."
       },
       "TEMP_SPILL": {
-        "cause": "Sobrang memorya — Ang pag-aayos·hash ay lumampas sa work_mem at nagsulat ng {blk} na block (humigit-kumulang {mb}MB, {perCall} na block bawat tawag) sa pansamantalang file.",
+        "cause": "Memory overflow: Ang sort/hash ay lumampas sa work_mem at nagsulat ng {blk} blocks (approx. {mb}MB, {perCall} blocks per call) sa mga temporary file.",
         "fix": "① Kung may index sa ORDER BY·GROUP BY column, lalaktawan ang pag-aayos ② Bawasan muna ang bilang ng mga row na aayusin (LIMIT sa loob) ③ Kung talagang kinakailangan, itaas ang SET LOCAL work_mem para lamang sa query transaction na ito."
       },
       "MANY_ROWS": {
-        "cause": "Sobrang pagtingin — Kumukuha ng {perCall} na row sa bawat tawag.",
+        "cause": "Sobrang query: Nag-fetch ng {perCall} rows per call.",
         "fix": "① Ang listahan ng screen ay tinitingnan sa bawat pahina ② Ang SELECT ay pumipili lamang ng mga column na ginagamit ③ Ang aggregation ay ginagawa sa database at ang resulta lamang ang natatanggap"
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST embedded filter (!inner) statement — Kung sasalain ang parent gamit ang kondisyon ng child, maaaring suriin ang buong data bago ang kondisyon ng pag-uuri.",
+        "cause": "PostgREST embedded filter (!inner) statement: Ang pag-filter ng mga parent ayon sa child conditions ay maaaring mag-scan ng buong table bago ang classification condition.",
         "fix": "① Suriin kung may index sa join key/filter column ② Ilipat ang filter sa kondisyon ng parent table ③ I-embed ang child sa kasalukuyang ginagawang parent query o pagsamahin ito sa isang function ng database"
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET paging — Habang papalayo ang pahina, binabasa at itinatapon ang mga naunang row, kaya unti-unting bumabagal.",
+        "cause": "OFFSET paging: Ang mga huling pahina ay nagbabasa at nagtatapon ng mga naunang row, na nagiging mas mabagal.",
         "fix": "Palitan ng keyset paging (WHERE id > huling id ORDER BY id LIMIT n) na nagbabasa mula sa susunod na key pagkatapos ng huling natanggap na key."
       }
     }
@@ -1203,8 +1203,8 @@
       "toDraft": "Gumawa ng pipeline draft mula sa {n} na napili"
     },
     "ready": {
-      "ok": "Handa na ang WAL logical replication — ang mga table na may PK ay maaaring gumamit ng LOGICAL",
-      "no": "Hindi handa ang WAL logical replication — kumuha sa pamamagitan ng polling o key comparison",
+      "ok": "Handa na ang WAL logical replication: Ang mga table na may PK ay maaaring gumamit ng LOGICAL method.",
+      "no": "Hindi handa ang WAL logical replication: Kolektahin gamit ang polling/key comparison method.",
       "senders": "{n} na koneksyon sa replication"
     },
     "adapter": {
@@ -1219,20 +1219,20 @@
       "HAS_SOFT_DEL": "May soft-delete column",
       "NO_SOFT_DEL": "Walang soft-delete column",
       "HAS_PK": "May primary key",
-      "NO_PK": "Walang primary key — hindi matukoy ang mga nabagong row",
+      "NO_PK": "Walang PK: Hindi matukoy ang mga nabagong row.",
       "DELETE_UNSEEN": "Hindi makakuha ng physical DELETEs ang polling (inirerekomenda ang soft-delete column)",
       "LOGICAL_NOT_READY": "Maaaring lumipat sa LOGICAL kapag handa na ang WAL logical replication",
-      "FULL_RELOAD_ONLY": "Walang PK o change-time column, kaya walang incremental capture — magdagdag ng PK",
+      "FULL_RELOAD_ONLY": "Walang PK/change timestamp, kaya hindi posible ang incremental collection: Inirerekomenda ang pagdaragdag ng PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "Ang wal_level ay hindi logical (ang pagbabago nito ay nangangailangan ng pag-restart ng DB)",
       "NO_SLOTS": "Ang max_replication_slots ay 0",
       "NO_SENDERS": "Ang max_wal_senders ay 0",
-      "IS_STANDBY": "Standby server — kumuha ng logical replication mula sa primary",
+      "IS_STANDBY": "Standby server: Tumanggap ng logical replication mula sa primary server.",
       "SETTINGS_UNKNOWN": "Hindi mabasa ang mga setting, hindi alam ang kahandaan"
     },
     "ed": {
       "title": "Mga Kahulugan ng Pipeline",
-      "draftOnly": "Disenyo lang — naka-save bilang mga draft (DRAFT)",
+      "draftOnly": "Disenyo lang: I-save bilang DRAFT lang.",
       "new": "Bagong pipeline",
       "empty": "Walang naka-save na pipeline",
       "manual": "Manual",
@@ -1301,8 +1301,8 @@
     },
     "warn": {
       "none": "Walang kapansin-pansing babala.",
-      "SEQ_SCAN_LARGE": "Full scan sa {relation} (humigit-kumulang {rows} na row) — isaalang-alang ang isang index sa mga filter column.",
-      "NESTED_LOOP_HIGH": "Ang nested loop ay gumagawa ng humigit-kumulang {rows} na row — isaalang-alang ang isang hash o merge join, o isang index sa join condition.",
+      "SEQ_SCAN_LARGE": "Ang table na {relation} ay nagsasagawa ng full scan (tinatayang {rows} row): Suriin ang mga index sa mga condition column.",
+      "NESTED_LOOP_HIGH": "Ang resulta ng nested loop ay tinatayang {rows} row. Suriin ang hash/merge joins o mga index sa join conditions.",
       "SORT_SPILL": "Ang laki ng sort ay humigit-kumulang {kb}KB, higit sa default na work_mem (4MB); maaaring mag-spill ito sa disk."
     },
     "lint": {
@@ -1316,14 +1316,14 @@
         "char": "character"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — piliin lang ang mga column na kailangan mo (dagdag na I/O, walang covering index).",
-        "FUNC_ON_COLUMN": "Ang filter column na {column} ay nakabalot sa isang function o expression, kaya hindi magagamit ang index nito — i-transform ang constant sa halip.",
-        "LEADING_WILDCARD": "Ang LIKE na may leading % ay hindi makagamit ng B-tree index — isaalang-alang ang isang pg_trgm GIN index.",
-        "OR_DIFF_COLUMNS": "Pinagsama ang magkaibang kundisyon ng column gamit ang OR — isaalang-alang ang paghihiwalay ng UNION (magdagdag ng kundisyon para sa pag-alis ng duplicate kung UNION ALL) o mga index sa bawat column.",
-        "IMPLICIT_CAST": "Ang {column} ay inihambing sa isang quoted number — itugma ang mga uri ng column at constant (implicit cast).",
-        "NOT_IN_SUBQUERY": "Ang NOT IN (subquery) ay walang ibinabalik kapag may mga NULL at mabagal — gamitin ang NOT EXISTS.",
-        "NO_WHERE": "Walang WHERE clause — sa isang malaking table ito ay isang full scan (magdagdag ng kondisyon o LIMIT).",
-        "DOMAIN_MISMATCH": "Ang {column} ay isang {expected} na uri ayon sa standard domain ngunit inihambing sa isang constant ng ibang uri — ang implicit cast ay maaaring pumigil sa paggamit ng index."
+        "SELECT_STAR": "SELECT *: Piliin lang ang mga kinakailangang column (hindi kinakailangang I/O, hindi posible ang covering index).",
+        "FUNC_ON_COLUMN": "Ang condition column na {column} ay pinoproseso ng isang function/operation, kaya hindi magagamit ang mga index. Iproseso ang constant side.",
+        "LEADING_WILDCARD": "Ang LIKE na may leading % ay hindi makakagamit ng B-tree index. Suriin ang pg_trgm GIN indexes.",
+        "OR_DIFF_COLUMNS": "Ang magkaibang column conditions ay pinagsama-sama sa OR. Suriin ang paghihiwalay ng UNION (magdagdag ng duplicate exclusion condition kung UNION ALL) o mga per-column index.",
+        "IMPLICIT_CAST": "Ang {column} ay inihahambing sa isang quoted number. Itugma ang column type at constant type (implicit type casting).",
+        "NOT_IN_SUBQUERY": "Ang NOT IN (subquery) ay maaaring walang laman at mabagal kung may halong NULL. Palitan ng NOT EXISTS.",
+        "NO_WHERE": "Walang WHERE condition. Kung malaking table ito, full scan ito (magdagdag ng LIMIT o conditions).",
+        "DOMAIN_MISMATCH": "Ang {column} ay type {expected} ayon sa standard domain, ngunit inihahambing sa isang constant ng ibang type. Ang implicit type casting ay maaaring pumigil sa paggamit ng index."
       }
     },
     "saved": {
@@ -1349,12 +1349,12 @@
     },
     "ai": {
       "title": "Payo sa AI tuning",
-      "intro": "Pumili ng isang naka-save na plano upang makabuo ng payo. Tanging SQL at mga plano na may mga constant na nakamaskara bilang ? ang ipinapadala (payo na batay sa panuntunan kung walang key o sa pagkabigo). Pagkatapos aprubahan ng may-ari ng link, muling patakbuhin ang explain para sa parehong SQL, i-save ito, at sukatin ang epekto sa kalaunang planong iyon — pagkatapos lamang nito ay maitatala ito bilang inilapat.",
+      "intro": "Pumili ng isang naka-save na plano upang makabuo ng payo. Tanging SQL at mga plano na may mga constant na nakamaskara bilang ? ang ipinapadala (payo na batay sa panuntunan kung walang key o sa pagkabigo). Pagkatapos aprubahan ng may-ari ng link, muling patakbuhin ang explain para sa parehong SQL, i-save ito, at sukatin ang epekto sa kalaunang planong iyon : pagkatapos lamang nito ay maitatala ito bilang inilapat.",
       "pickPlan": "Pumili ng naka-save na plano para sa payo",
       "create": "Bumuo ng payo",
       "creating": "Bumubuo… (hanggang 30 s)",
       "noPlans": "Walang naka-save na plano. Tingnan ang isang explain plan sa itaas at i-save ito.",
-      "note": "Isang payo bawat plano. Tanggalin ang kasalukuyang payo upang muling buuin. Ang DDL ay iminungkahi lamang — ilapat ito sa schema.pi.",
+      "note": "Isang payo bawat plano. Tanggalin ang kasalukuyang payo upang muling buuin. Ang DDL ay iminungkahi lamang : ilapat ito sa schema.pi.",
       "empty": "Wala pang payo.",
       "noItems": "Walang nakitang pagpapabuti para sa planong ito.",
       "cost": "Bago ang gastos",
@@ -1396,10 +1396,10 @@
       "copy": "Kopyahin",
       "copied": "Nakopya",
       "rule": {
-        "SEQ_SCAN_INDEX": "Buong scan ng {relation} — gumawa ng index sa filter column {column} (palitan ang NN sa pangalan ng index ng isang sequence number).",
-        "SEQ_SCAN_STATS": "Buong scan ng {relation} — suriin ang mga filter column at tiyakin na ang statistics (ANALYZE) ay kasalukuyan.",
-        "NESTED_LOOP": "Ang nested loop ay umaasa ng {rows} na row — i-refresh ang statistics at isaalang-alang ang join-key indexes o isang hash join.",
-        "SORT_SPILL": "Ang pag-sort ng humigit-kumulang {kb} KB ay maaaring kumalat sa disk — isaalang-alang ang pagtaas ng session work_mem o pag-index ng mga sort column.",
+        "SEQ_SCAN_INDEX": "{relation} full scan: Gumawa ng index sa condition column na {column} (ang pangalan ng index na NN ay papalitan ng sequence number).",
+        "SEQ_SCAN_STATS": "{relation} full scan: Suriin ang mga condition column at tiyakin na ang mga istatistika (ANALYZE) ay napapanahon.",
+        "NESTED_LOOP": "Ang resulta ng nested loop ay tinatayang {rows} row: I-update ang mga istatistika at suriin ang mga join condition index o hash joins.",
+        "SORT_SPILL": "Ang sort ay maaaring umapaw sa disk ng humigit-kumulang {kb}KB. Suriin ang pagtaas ng session work_mem o mga index sa mga sort column.",
         "SELECT_STAR": "Piliin lamang ang mga column na kailangan mo sa halip na SELECT * (mas kaunting I/O, posibleng covering indexes).",
         "FUNC_ON_COLUMN": "Ilipat ang function/expression sa filter column {column} sa constant side (nagbibigay-daan sa paggamit ng index).",
         "IMPLICIT_CAST": "Itugma ang mga uri ng {column} at ang constant (tanggalin ang implicit cast).",
@@ -1459,9 +1459,9 @@
     },
     "desc": {
       "FREE": "Paggalugad·Pag-aaral",
-      "D1": "Operator — Sinusuri kung maayos ang database ngayon",
-      "D2": "Developer·Tuner — Inaayos ang mabagal na SQL",
-      "D3": "DBA·DA — Mula sa kaligtasan ng operasyon·pagpapatupad·lake"
+      "D1": "Operator: Sinusuri kung malusog ang database ngayon.",
+      "D2": "Developer/Tuner: Inaayos ang mabagal na SQL.",
+      "D3": "DBA/DA: Kaligtasan sa operasyon, migration, at maging data lake."
     },
     "feat": {
       "FREE": "Monitoring board·Tingnan ang execution plan·Pangunahing pag-aaral",
@@ -1504,7 +1504,7 @@
       "required": "Ang feature na ito ay magagamit mula sa {plan} plan.",
       "limit": "Naubos mo na ang lahat ng paggamit para sa panahong ito. Maaari kang gumamit ng higit pa kung mag-a-upgrade ka sa {plan} plan.",
       "limitTop": "Naubos mo na ang lahat ng paggamit para sa panahong ito. Maaari mo itong gamitin muli sa susunod na panahon.",
-      "expired": "Nag-expire ang iyong schema.pi plan — mangyaring magbayad sa screen ng schema.pi plan.",
+      "expired": "Nag-expire ang iyong schema.pi plan. Mangyaring magbayad sa schema.pi plan screen.",
       "go": "Tingnan ang Plan",
       "close": "Isara"
     }

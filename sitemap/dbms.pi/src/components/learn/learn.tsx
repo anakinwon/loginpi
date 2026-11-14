@@ -222,7 +222,7 @@ function Dict() {
   const liveData = live?.linkId === linkId ? live.data : null
   const lgcTypes = liveData ? [...new Set(liveData.typeMap.map((m) => m.lgcTpCd))].sort() : []
   const phyOf = (dbmsCd: string, lgc: string) =>
-    liveData?.typeMap.filter((m) => m.dbmsCd === dbmsCd && m.lgcTpCd === lgc).map((m) => m.phyTpNm).join(', ') || '—'
+    liveData?.typeMap.filter((m) => m.dbmsCd === dbmsCd && m.lgcTpCd === lgc).map((m) => m.phyTpNm).join(', ') || '-'
 
   return (
     <div className="flex flex-col gap-3">

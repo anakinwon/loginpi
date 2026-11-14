@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analise en Meer",
     "intro": "dbms-aktiwiteit KPI's, drielaag-meerontwerp en datastel-katalogus op een plek.",
-    "storageNotice": "Meerberging (kliënt-kant of wolk) is nog nie besluit nie (PRD afdeling 10 #7). Slegs ontwerpe en naamkarterings word tans gestoor — geen rydata nie.",
+    "storageNotice": "Meerberging (kliënt-kant of wolk) is nog nie besluit nie (PRD afdeling 10 #7). Slegs ontwerpe en naamkarterings word tans gestoor : geen rydata nie.",
     "noLink": "Kies of registreer eers 'n schema.pi-skakel.",
     "goConnect": "Registreer 'n skakel",
     "loading": "Laai tans…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP-analise — Model↔DB",
+    "title": "GAP-analise: Model↔DB",
     "intro": "Vergelyk die schema.pi-ontwerpmodel en DDL-toepassingsgeskiedenis met die lewendige DB-katalogus om afwykings te vind, en meet of ontwerpte indekse werklik gebruik word. Kliëntrydata word nooit gelees of gestoor nie.",
     "needLink": "Kies eers 'n schema.pi-skakel hierbo. As jy geen het nie, registreer 'n token in die 'Skakel'-kieslys.",
     "needConn": "Kies die DB-verbinding om hierbo te vergelyk.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Versoek {id}",
     "notSaved": "Kon nie hierdie lopie na geskiedenis stoor nie (resultate word normaalweg gewys).",
-    "capped": "Te veel items — wys die eerste {cap} per afdeling (tellings is volledig).",
+    "capped": "Te veel items : wys die eerste {cap} per afdeling (tellings is volledig).",
     "statsMissing": "Indeksgebruikstatistieke was onbeskikbaar, dus kon gebruik nie beoordeel word nie.",
     "sum": {
       "missingTables": "Tabelle ontbreek in DB",
@@ -230,7 +230,7 @@
       "USED": "In gebruik",
       "NO_STATS": "Geen statistieke",
       "CONSTRAINT": "Uniekheidsbeperking (behou)",
-      "NO_DATA": "Geen data of statistieke nie versamel nie — kan nie oordeel nie",
+      "NO_DATA": "Geen data of statistieke nie versamel nie: kan nie bepaal nie",
       "OBSERVING": "Waarneming (minder as 7 dae)",
       "UNUSED_CAND": "Ongebruikte kandidaat"
     },
@@ -245,14 +245,14 @@
       "RATE": "Te veel versoeke. Probeer asseblief oor 'n minuut weer."
     },
     "schema": "Skema",
-    "schemaHint": "Slegs gewone en gepartisioneerde tabelle in hierdie skema word vergelyk (aansigte uitgesluit). Verstek publiek — Supabase interne skemas (auth, storage, …) word uitgelaat.",
-    "truncated": "{names} het die {max}-ry limiet bereik en is afgeknot — sommige \"nie in DB\" / \"nie in model\" resultate mag vals wees. Vernou die skema en voer weer uit.",
+    "schemaHint": "Vergelyk slegs gewone en gepartisioneerde tabelle in hierdie skema (uitsluitend aansigte). Verstek publiek: Supabase interne skemas (auth, storage, ens.) word uitgesluit.",
+    "truncated": "{names} navraag is afgesny by {max} rye. Sommige 'Nie in DB'/'Nie in Model' opsporings kan vals positiewe wees. Verklein die skema en her-opspoor.",
     "colUnchecked": "Omdat die kolomnavraag afgeknot is, word {n} ontbrekende/ekstra kolomresultate as onverifieerbaar behandel en uitgesluit van die kolomwanverhoudingtelling.",
-    "renamed": "{n} PK-indeks(e) toegepas onder die ou naamreël (_PKEY) bestaan in die DB onder die nuwe naam (PK_) — normaal",
-    "superseded": "{n} ouer versoek(e) is uitgesluit omdat 'n latere versoek dieselfde tabel herskep het (DROP … CASCADE) — normaal",
+    "renamed": "{n} PK-indekse wat met die ou naamkonvensie (_PKEY) toegepas is, is in die DB met die nuwe naam (PK_). Normaal.",
+    "superseded": "{n} vorige versoeke is uit vergelyking uitgesluit omdat latere versoeke dieselfde tabel herskep het (DROP … CASCADE). Normaal.",
     "supersededItem": "Versoek {id} → vervang deur versoek {by}",
     "sysCols": "{n} stelselkolom(me) wat outomaties by DDL-generering bygevoeg is, is nie volgens ontwerp in die model nie en is uitgesluit van wanverhoudings",
-    "groupOwn": "Projekvoorvoegsel {pfx} — kandidate wat in die model ontbreek",
+    "groupOwn": "Hierdie projekvoorvoegsel {pfx}: model ontbrekende kandidate",
     "groupOther": "Ander stelsel {pfx}",
     "basis": "Geskatte rye {rows} · sedert {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "As objekte steeds verdwyn na her-toepassing, vermoed 'n handmatige verwydering of terugrol en kontroleer die verbindingsrekening se aktiwiteit met jou DBA."
       },
       "extraTables": {
-        "s1": "Hierdie projekvoorvoegselbundel = ontbrekende modelkandidate — voer dit in die model in via schema.pi → Instellings → Omgekeerd, of besluit of u dit moet uitvee as dit ongebruikte tabelle is.",
-        "s2": "Ander voorvoegselgroepe = ander stelsels wat hierdie DB deel — nie aksie-items vir hierdie projek nie.",
+        "s1": "Hierdie projekvoorvoegselgroep = model ontbrekende kandidate: voer in na model via schema.pi → Instellings → Omgekeerd, of besluit of dit uitgevee moet word as die tabel nie gebruik word nie.",
+        "s2": "Ander voorvoegselgroepe = ander stelsels wat dieselfde DB gebruik: nie onderhewig aan aksie deur hierdie projek nie.",
         "s3": "As die teikenskema nie publiek is nie, verander die \"Skema\"-veld hierbo en voer weer uit."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Tipe/NULL verskil = pas aan by die model (bron van waarheid); voordat lengte verkort word of na NOT NULL oorgeskakel word, bevestig bestaande rye voldoen daaraan."
       },
       "idxUsage": {
-        "s1": "Voordat dit verwyder word, kontroleer ① die statistiekvenster dek ten minste een besigheidssiklus (bv. maandeinde-batch) — sien \"sedert\".",
+        "s1": "Voordat u uitvee, kontroleer ① of die statistiekversamelingstydperk ten minste een bedryfsiklus is (bv. maandeinde-batch): verwys na die verwysingsdatum.",
         "s2": "② Dit is nie 'n unieke/PK-indeks nie (daardie wys afsonderlik as \"uniekheidsbeperking\").",
         "s3": "③ EXPLAIN die tabel se verteenwoordigende SQL in SQL Tuning en bevestig hierdie indeks word nie gebruik nie.",
         "s4": "Sodra al drie bevestig is, verwyder die indeks uit die model in schema.pi en pas toe via DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Hoe om 'n verbindingstoken uit te reik",
     "how1": "Meld aan by schema.pi en maak die onderwerparea oop om te verbind",
     "how2": "Gaan na Onderwerparea → Instellings → Verbindingstoken en druk 'Reik token uit' (area-administrateur of DA-rol)",
-    "how3": "Kopieer die token wat met slk_ begin — dit word slegs een keer gewys wanneer dit uitgereik word",
+    "how3": "Kopieer die token wat met slk_ begin en wat uitgereik is. Die oorspronklike word slegs een keer tydens uitreiking vertoon.",
     "how4": "Plak dit hieronder en registreer",
     "openSchema": "Maak schema.pi oop",
     "registerTitle": "Registreer verbinding",
@@ -384,7 +384,7 @@
     "retry": "Probeer weer",
     "pickerLink": "Skakel",
     "pickerConn": "Verbinding",
-    "pickerEmpty": "Geen verbindings —",
+    "pickerEmpty": "Geen verbindings nie.",
     "pickerGo": "registreer een by /connect",
     "errors": {
       "LINK_AUTH": "Die verbindingstoken het verval of is herroep. Reik 'n nuwe token in schema.pi uit en registreer weer",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Datamigrasie (PiMig)",
-    "intro": "Bereken die tabel-laaivolgorde uit die verhoudings in jou schema.pi-ontwerpmodel, organiseer brokgrootte, parallelisme en die oorskakel-kontrolelys, en genereer verifikasie-SQL wat jy self op bron en teiken uitvoer. Hierdie skerm beplan en kontroleer slegs — dit skuif nie data of lees kliënt-DB-rye nie.",
+    "intro": "Bereken die tabel-laaivolgorde uit die verhoudings in jou schema.pi-ontwerpmodel, organiseer brokgrootte, parallelisme en die oorskakel-kontrolelys, en genereer verifikasie-SQL wat jy self op bron en teiken uitvoer. Hierdie skerm beplan en kontroleer slegs : dit skuif nie data of lees kliënt-DB-rye nie.",
     "needLink": "Kies eers 'n schema.pi-skakel hierbo. As jy geen het nie, registreer 'n token onder 'Koppel'.",
     "loading": "Laai tans…",
     "newPlan": "Nuwe migrasieplan",
@@ -432,8 +432,8 @@
     "optsHint": "Parallelisme is die aantal tabelle wat gelyktydig binne 'n vlak gelaai word. Brokkiegrootte is die toewysingseenheid (rye) wat die uitvoerenjin sal gebruik.",
     "order": "Laaivolgorde",
     "orderHint": "Topologies gesorteer volgens ontwerprelasies (nie fisiese FK's nie) sodat ouertabelle eerste kom. Tabelle in dieselfde vlak is nie van mekaar afhanklik nie en kan parallel laai.",
-    "cycles": "{n} sirkelgroep(e) — in dieselfde vlak geplaas. Stel hul volgorde handmatig en stel verwysingskontroles uit tot na laai.",
-    "selfRefs": "Selfverwysende (hiërargiese) tabelle — laai ouerrye eers binne die tabel",
+    "cycles": "{n} siklusse: op dieselfde stadium geplaas. Stel die laaivolgorde handmatig in en stel verwysingskontroles uit tot na die laai.",
+    "selfRefs": "Selfverwysende (hiërargiese) tabelle: ouerrye eers binne dieselfde tabel.",
     "level": "Vlak {n}",
     "checklist": "Oorskakeling kontrolelys",
     "toReady": "Merk as gereed",
@@ -471,7 +471,7 @@
     },
     "verify": "Verifikasie SQL",
     "verifyHint": "Genereer telling, numeriese kolom som, duplikaat sleutel en sleutel hash navrae per tabel in laaivolgorde. Voer dit self op bron en teiken uit en vergelyk (hierdie skerm voer dit nie uit nie).",
-    "noHashOracle": "Oracle·Tibero hash-funksies en teksweergawe verskil van PostgreSQL, so hash-navrae word weggelaat — vergelyk tellings, somme en duplikaat sleutels.",
+    "noHashOracle": "Oracle en Tibero laat hash-opsoek weg omdat hash-funksies en karaktervoorstellings verskil van PostgreSQL. Vergelyk volgens telling, som en sleutelduplisering.",
     "copy": "Kopieer",
     "copied": "Gekopieer",
     "copyFail": "Kon nie kopieer nie. Kies die teks en kopieer dit handmatig.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Die versoek is ongeldig."
     },
     "board": {
-      "subtitle": "Wat om nou op hierdie DB te doen — 14 seine van OK, waarskuwing of risiko, met oplossings, in 'n oogopslag.",
+      "subtitle": "Wat om nou in hierdie DB te doen: Sien die normale, waarskuwings- en risikostatus van 14 seine en hul oplossings in 'n oogopslag.",
       "refresh": {
         "updated": "Vanaf {time} · verfris elke minuut",
         "now": "Verfris nou",
@@ -564,11 +564,11 @@
         "NA": "N.v.t."
       },
       "overall": {
-        "RISK": "Risiko — aksie is nou nodig",
-        "WARN": "Waarskuwing — sommige items moet nagegaan word",
-        "UNKNOWN": "Onbekend — kontroleer die verbinding",
-        "OK": "OK — elke sein is binne perke",
-        "CONN_DOWN": "Kan nie die DB bereik nie — kontroleer eers die verbinding",
+        "RISK": "Risiko: Onmiddellike aksie benodig",
+        "WARN": "Waarskuwing: Items om te hersien",
+        "UNKNOWN": "Kan nie bevestig nie: Kontroleer verbindingstatus",
+        "OK": "Normaal: Alle seine is binne die kriteria",
+        "CONN_DOWN": "Kan nie aan DB koppel nie. Kontroleer eers verbinding.",
         "NA": "N.v.t."
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Wys minder",
         "setup": "Stel dit op om meer te sien",
         "none": "Geen risiko- of waarskuwingsitems benodig nou aksie nie.",
-        "unknown": "Kon nie {n} sein(e) kontroleer nie — sien die kaarte vir die rede.",
+        "unknown": "Kan nie {n} items bevestig nie: Kontroleer die rede op die kaart.",
         "myRule": "My reël oortree: {rule}",
         "copySql": "Kopieer SQL",
         "copied": "Gekopieer"
@@ -622,34 +622,34 @@
         "REPL": "Replikasie-agterstand"
       },
       "fix": {
-        "AVAIL": "Stadige reaksie of 'n onlangse herbegin — kontroleer die verbindinginstellings en DB-bedienerstatus.",
-        "AVAIL_DOWN": "Kon nie aan die DB koppel nie — kontroleer die verbindinginstellings en dat die DB-bediener aan is.",
-        "CONN_USE": "{sess}/{max} sessies op hierdie DB (nie klusterwyd nie — ander databasisse is uitgesluit) — sluit ledige verbindings of voeg 'n verbindingpoeler (pgbouncer) by.",
-        "URL": "{n} gekontroleerde URL's misluk · maksimum reaksie {ms}ms — sien die schema.pi-monitor vir die oorsaak.",
-        "LONG_QRY": "'n Navraag loop al {sec}s — hersien die plan en stem dit af, of laat 'n DBA dit kanselleer.",
-        "IDLE_TX": "'n Transaksie is al {sec}s ledig — vind die ontbrekende commit in die toepassing en stel 'n tydsbeperking in.",
-        "LOCK_WAIT": "{n} sessies wag op slotte — vind die blokkerende sessie en beëindig die transaksie.",
-        "CACHE_HIT": "Kas-treffersyfer {pct}% — soek vir volle skanderings van groot tabelle of hersien shared_buffers.",
-        "XACT_ERR": "Terugrolkoers {pct}%, {dlck} dooiepunte — kontroleer die mislukte transaksies en toepassingsfoutlogboeke.",
-        "SLOW_SQL": "Daar is 'n navraag wat tot {ms}ms per uitvoering neem — bekyk die uitvoeringsplan en pas dit aan, beginnende by die hoogste enkele uitvoeringstyd.",
-        "STORAGE": "Die DB ({gb} GB) is naby sy limiet (dae oor {days}) — maak groot tabelle skoon of voeg kapasiteit by.",
-        "VACUUM": "{tbl} het baie dooie rye of verouderde statistieke — hersien VACUUM (ANALYZE) en autovacuum-instellings.",
-        "INDEX": "{n} indeksbevindinge (ongeldig, ongebruik, volle skanderings) — sien die tabel- en indeksgesondheid-oortjie vir die teikens.",
-        "BACKUP": "WAL-argivering is af of vasgeloop — kontroleer archive_mode, archive_command en rugsteunstatus.",
-        "REPL": "Replikasie-agterstand {sec}s — kontroleer die bystandstatus en die netwerk.",
-        "PGSS": "pg_stat_statements is nie geïnstalleer nie, so stadige SQL is nie beskikbaar nie — aktiveer dit met die SQL hieronder (bedienerherbegin benodig)."
+        "AVAIL": "Stadige reaksie of pas herbegin. Kontroleer verbindinginligting en DB-bedienerstatus.",
+        "AVAIL_DOWN": "Kon nie aan DB koppel nie. Kontroleer verbindinginligting en of die DB-bediener lewendig is.",
+        "CONN_USE": "Hierdie DB-sessie {sess}/{max} (nie klusterwyd nie, ander DB-verbindings uitgesluit): Maak ledige verbindings skoon of stel 'n verbindingpoeler (pgbouncer) op.",
+        "URL": "{n} URL-kontroles het misluk · Maksimum reaksie {ms}ms: Kontroleer die oorsaak in schema.pi monitor.",
+        "LONG_QRY": "'n Navraag loop al {sec} sekondes. Hersien die uitvoeringsplan en pas dit aan, of laat 'n DBA dit stop.",
+        "IDLE_TX": "'n Transaksie is al {sec} sekondes oop en ledig. Vind ontbrekende commits in die toepassing en stel 'n tydsbeperking in.",
+        "LOCK_WAIT": "{n} sessies wag vir slotte: Vind die blokkerende sessie en beëindig sy transaksie.",
+        "CACHE_HIT": "Kas-treffersyfer {pct}%: Soek vir volle tabel skanderings van groot tabelle of hersien shared_buffers.",
+        "XACT_ERR": "Terugrolkoers {pct}%, {dlck} dooiepunte: Kontroleer mislukte transaksies en toepassingsfoutlogboeke.",
+        "SLOW_SQL": "Daar is 'n navraag met 'n enkele maksimum tyd van {ms}ms. Hersien die uitvoeringsplan en pas dit aan vanaf die top enkele maksimum tyd.",
+        "STORAGE": "DB {gb}GB is naby sy limiet (oor {days} dae). Maak groot tabelle skoon of verhoog kapasiteit.",
+        "VACUUM": "{tbl} het baie dooie rye of verouderde statistieke. Hersien VACUUM (ANALYZE) en outovacuum-instellings.",
+        "INDEX": "{n} indekskontroles (ongeldig, ongebruik, volle skandering): Kontroleer teikens in die tabel/indeksgesondheid-oortjie.",
+        "BACKUP": "WAL-argivering is af of gestop. Kontroleer archive_mode, archive_command en rugsteunstatus.",
+        "REPL": "Replikasiestelsel {sec} sekondes: Kontroleer bystandbedienerstatus en netwerk.",
+        "PGSS": "pg_stat_statements-uitbreiding ontbreek, so stadige SQL kan nie gesien word nie. Aktiveer dit met die SQL hieronder (bedienerherbegin benodig)."
       },
       "reason": {
         "CONN_DOWN": "Nie beoordeel nie omdat die DB-verbinding af is.",
         "PGSS": "pg_stat_statements is nie geïnstalleer nie.",
         "VER": "Beskikbaar op PostgreSQL 13 of later.",
         "SAMPLE": "Nog nie genoeg monsters nie.",
-        "NO_LIMIT": "Geen groottelimiet nie, so gebruik word nie beoordeel nie — voeg 'n DB-grootte (MB) reël (>) by om dit as die limiet te gebruik.",
+        "NO_LIMIT": "Gebruik word nie bepaal nie aangesien daar geen kapasiteitslimiet is nie. Die byvoeging van 'n DB-grootte (MB) reël (>) sal dit as 'n limiet gebruik.",
         "RESET": "Statistieke is minder as 7 dae gelede teruggestel, so ongebruikte indekse word nie beoordeel nie.",
         "STALE": "Geen onlangse kontrole rekords nie.",
         "STANDBY": "Nie van toepassing op 'n bystandbediener nie.",
         "NONE": "Niks om te kontroleer nie.",
-        "GRANT": "Ontbrekende voorregte — gee die pg_monitor-rol aan die verbindingrekening.",
+        "GRANT": "Kan nie sien nie weens gebrek aan toestemmings. Verleen die pg_monitor-rol aan die verbindingrekening.",
         "LINK": "schema.pi navraag het misluk ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "As dit nie stroom nie, kontroleer die bystandlogboeke."
         }
       },
-      "sqlNote": "Die SQL hieronder is slegs-lees, vir kontrole — regstellings (VACUUM, DROP INDEX, pg_terminate_backend) word deur 'n DBA uitgevoer.",
+      "sqlNote": "Die SQL hieronder is vir leesalleen-verifikasie. Aksies (VACUUM, DROP INDEX, pg_terminate_backend) word direk deur 'n DBA uitgevoer.",
       "go": {
         "activity": "Aktiwiteit & slotte",
         "top": "Stadige navrae",
@@ -766,8 +766,8 @@
           "tree": "Wat eet spasie, en wat moet skoongemaak word?"
         },
         "asTable": "Bekyk as tabel",
-        "needHistory": "Nog geen tendens nie — hou hierdie skerm vir 'n paar minute oop.",
-        "needPerf": "Geen groottegeskiedenis nie — versamel in die prestasie-oortjie of hou hierdie skerm oop.",
+        "needHistory": "Nog geen tendens nie. Dit sal geteken word as u hierdie skerm vir 'n paar minute oop laat.",
+        "needPerf": "Geen kapasiteitsgeskiedenis nie. Versamel dit vanaf die Prestasie-oortjie of laat hierdie skerm oop.",
         "noSess": "Geen sessies nie.",
         "noWait": "Geen wagte nie",
         "noData": "Niks om te wys nie.",
@@ -840,17 +840,17 @@
         "noStat": "Geen statistieke"
       },
       "empty": {
-        "noConn": "Hierdie taksonomie het geen PostgreSQL-bedienerverbinding om te monitor nie — wys slegs URL's en diensstatus.",
+        "noConn": "Daar is geen PostgreSQL-bedienerverbindings om in hierdie taksonomie te monitor nie. Slegs URL- en skakelstatus word getoon.",
         "unsupported": "Hierdie verbinding ondersteun nie monitering nie (slegs PostgreSQL-bedienerverbindings).",
-        "connFail": "Kon nie aan die databasis koppel nie — kontroleer die verbindinginstellings en DB-status.",
-        "linkDown": "Kon nie schema.pi bereik nie — probeer outomaties weer.",
-        "linkAuth": "Die verbindingstoken het verval — reik 'n nuwe token uit in schema.pi en registreer dit.",
-        "timeout": "Antwoorde is stadig — probeer outomaties weer.",
+        "connFail": "Kon nie aan DB koppel nie. Kontroleer verbindinginligting en DB-status.",
+        "linkDown": "Kon nie aan schema.pi koppel nie. Sal outomaties binnekort weer probeer.",
+        "linkAuth": "Verbindingstoken het verval. Heruitreik en registreer die token vanaf schema.pi.",
+        "timeout": "Reaksie is stadig. Sal outomaties binnekort weer probeer.",
         "rate": "Te veel versoeke, so die verfrisinterval is verhoog."
       },
       "aux": {
         "rules": "My waarskuwingsreëls ({n} aktief)",
-        "schemaSvc": "Diensstatus — schema.pi-antwoorde",
+        "schemaSvc": "Skakelstatus: schema.pi diensreaksie",
         "schemaSvcNote": "Toepassingsmetrieke vir die laaste 60 minute gestoor deur schema.pi.",
         "source": "Databron: die teiken-DB is slegs-lees deur schema.pi-benoemde navrae (slegs-lees); tendense stoor slegs statistieke in dbms.pi (geen rydata nie)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Nog geen diagnose nie. Druk \"Voer diagnose uit\"",
     "lastRun": "Laaste diagnose {dtm}",
     "readOnly": "Diagnose lees slegs (SELECT). Advies is 'n gids en hang af van bedienergeheue, laai en werklading",
-    "truncated": "Te veel objekte — slegs die eerste 500 is nagegaan",
+    "truncated": "Te veel objekte : slegs die eerste 500 is nagegaan",
     "paramsNote": "Totale bedienergeheue is onbekend, dus word dit geskat uit shared_buffers ≈ 25% van RAM. random_page_cost aanvaar SSD",
     "auditNote": "Tabelle met RLS af en ongebruikte rekeninge sal nagegaan word sodra die skakelnavraag dit ondersteun",
-    "replNote": "Basislyn is Aktief-Standby (A-S) — een primêre + standby. Herlaagvertraging ≥ 5s = waarskuwing, ≥ 60s = risiko (gemeet RPO-verwysing)",
+    "replNote": "Primêre kriterium is Aktief-Bystand (A-S): 1 Primêr + Bystand. Waarskuwing vir herhalingsvertraging >= 5 sekondes, risiko vir >= 60 sekondes (verwys na werklike RPO-meting).",
     "lagIdle": "Geen veranderinge",
     "pager": "Paginering",
     "prev": "Vorige",
@@ -938,11 +938,11 @@
       "st_ok": "'n Stellingtydperk is ingestel",
       "iit_off": "Geen ledig-in-transaksie tydperk (0). Kan slotvasthouding en opblaas veroorsaak",
       "iit_ok": "'n Ledig-in-transaksie tydperk is ingestel",
-      "ckpt_short": "Kontrolepuntinterval is 5 minute of minder. Oorweeg 10–15 minute vir skryf-swaar ladings",
+      "ckpt_short": "Kontrolepuntinterval is 5 minute of minder. Oorweeg 10~15 minute vir skryf-swaar ladings",
       "ckpt_ok": "Binne 'n redelike reeks",
       "wal_minimal": "wal_level=minimal maak PITR en replikasie onmoontlik. Gebruik replika of hoër",
       "wal_ok": "WAL-vlak ondersteun PITR en replikasie",
-      "rpc_hdd": "HDD-verstek (4). Vir SSD word 1.1–2 aanbeveel",
+      "rpc_hdd": "HDD-verstek (4). Vir SSD word 1.1~2 aanbeveel",
       "rpc_ok": "Geskik vir SSD",
       "super_many": "Twee of meer supergebruikers. Hou een vir administrasie en ken slegs nodige voorregte aan ander toe",
       "super_ok": "Hoogstens een supergebruiker",
@@ -1020,7 +1020,7 @@
       "intro": "Versamel lees nou top-navraagstatistieke, tabelle, indekse en groottes een keer en stoor dit as 'n momentopname. Versamel ten minste twee keer om veranderinge en groottetendense te sien",
       "run": "Versamel nou",
       "running": "Versamel tans…",
-      "done": "Versamel op {dtm} — {qry} navrae · {tbl} tabelle · {idx} indekse",
+      "done": "Versameling voltooi {dtm}: {qry} navrae · {tbl} tabelle · {idx} indekse",
       "auto": {
         "title": "Outo-versameling",
         "desc": "Wanneer aan, word hierdie verbinding outomaties elke dag om 03:00 (Koreaanse tyd) versamel. Na 7 of meer dae kan jy staatmaak op die stadige navraagranglys en ongebruikte indekslys.",
@@ -1042,13 +1042,13 @@
       "sortCalls": "Oproepe",
       "empty": "Nog geen momentopnames nie. Druk Versamel nou op die Versamel-oortjie",
       "range": "Verandering tussen {from} → {to}",
-      "first": "Eerste momentopname op {dtm} — kumulatiewe waardes (veranderinge vanaf die volgende momentopname)",
+      "first": "Eerste versameling {dtm}: Kumulatief (toename/afname vanaf volgende versameling)",
       "query": "Navraag (literale gemasker)",
       "calls": "Oproepe",
       "totalMs": "Totale ms",
       "meanMs": "Gemiddelde ms",
       "rows": "Rye",
-      "reset": " Statistiekterugstelling bespeur — getoon as kumulatief",
+      "reset": "Statistieke herstel bespeur: Vertoon as kumulatief",
       "src": "Bron",
       "srcToggle": "Wys of versteek bronbesonderhede",
       "openSqlLab": "Maak oop in SQL Tuning",
@@ -1056,7 +1056,7 @@
       "sortMax": "Maksimum enkele uitvoeringstyd",
       "maxMs": "Maksimum enkel ms",
       "diagToggle": "Diagnoseer Oorsaak",
-      "noMax": "Geen maksimum waarde nie — {n} gevalle is ouer versamelings sonder 'n maksimum waarde vir 'n enkele keer, en is tydelik gesorteer volgens die gemiddelde vir 'n enkele keer (nie volgens totale tyd nie). Maksimum waardes sal ingevul word met huidige versamelings."
+      "noMax": "Geen maksimum waarde nie: {n} items is ou versamelings sonder 'n enkele maksimum waarde, so hulle word tydelik gesorteer volgens enkele gemiddelde (nie volgens totale tyd nie). Maksimum waardes sal met huidige versameling gevul word."
     },
     "health": {
       "empty": "Nog geen momentopnames nie. Druk Versamel nou op die Versamel-oortjie",
@@ -1064,9 +1064,9 @@
       "unusedIdx": "Ongebruikte indekse",
       "unusedIdxHint": "Indekse wat nooit gebruik is sedert die laaste statistiekterugstelling nie (volgens grootte). Moenie PK- of unieke-beperking-indekse laat val nie",
       "fullScan": "Oormatige volle skanderings",
-      "fullScanHint": "Tabelle met 1 000+ lewendige rye waar volle skanderings ten minste die helfte is — hersien indekse op filterkolomme",
+      "fullScanHint": "Tabelle met 1 000+ effektiewe rye en meer as die helfte volle skanderings: Hersien indekse op voorwaardekolomme.",
       "dead": "Oormatige dooie tuples",
-      "deadHint": "Dooie tuple-verhouding 20% of meer — kontroleer VACUUM- en outovacuum-instellings",
+      "deadHint": "Dooie tuple-verhouding oor 20%: Hersien VACUUM- en outovacuum-instellings.",
       "none": "Geen",
       "scans": "skanderings"
     },
@@ -1083,7 +1083,7 @@
     },
     "activity": {
       "refresh": "Verfris",
-      "live": "Regstreekse navraag — nie gestoor nie",
+      "live": "Intydse navraag: Nie gestoor nie",
       "sessions": "Sessie-aktiwiteit",
       "locks": "Slotte",
       "none": "Geen"
@@ -1110,7 +1110,7 @@
         "BATCH": "Dit lyk soos 'n batch of geskeduleerde taak. Versprei looptye weg van besigheidspieke en verminder die werk per commit. Kontroleer indekse en statistieke (ANALYZE) op die teikentabelle, en verdeel lang transaksies. Deur die taaknaam in application_name te plaas, maak die volgende klassifikasie meer presies",
         "PROGRAM": "Dit blyk 'n navraag te wees wat deur die toepassing uitgevoer is. Kontroleer die uitvoeringsplan in SQL-aanpassing. As die maksimum enkele uitvoeringstyd lank is, kyk eers na indekse en aansluitingsvolgorde. As 'n enkele uitvoering kort is, maar die oproeptelling hoog is, kyk na herhaalde oproepe (N+1) en kas. Plaas die diensnaam in die application_name van die verbindingpoel.",
         "PLATFORM": "Dit lyk soos DB of platform interne werk soos autovacuum of replikasie. Gewoonlik is geen aksie nodig nie. As dit boaan bly, hersien autovacuum-drempels en maintenance_work_mem",
-        "MONITOR": "Dit is 'n dbms.pi selfversamelingsnavraag — die schema.pi-verbinding is 'n vaste stelling wat slegs statistiese aansigte/katalogusse (pg_stat_*·pg_catalog) lees, so dit is nie 'n besigheidsnavraag nie en geen kliëntaksie word vereis nie. As die teikendatabasislas 'n probleem is, verminder die aantal kere wat jy die versamelknoppie/monitorskerm oopmaak. Stellings van ander moniteringhulpmiddels wat dieselfde statistiese aansigte lees, word ook hier gegroepeer.",
+        "MONITOR": "dbms.pi se eie versamelingsnavraag. Die schema.pi-verbinding lees slegs statistiese aansigte en katalogusse (pg_stat_*, pg_catalog) met vaste stellings, so dit is nie 'n besigheidsnavraag nie en geen kliëntaksie is nodig nie. As die teikendatabasislas 'n probleem is, verminder die frekwensie van die oopmaak van die versamelingsknoppie of monitering-skerm. Stellings van ander moniteringhulpmiddels wat dieselfde statistiese aansigte lees, word ook hier gegroepeer.",
         "UNKNOWN": "Daar is geen leidraad tot die bron nie. Stel application_name op elke verbinding en verdeel rekeninge volgens doel; dit sal vanaf die volgende monsters geklassifiseer word"
       },
       "detail": {
@@ -1121,7 +1121,7 @@
         "period": "Waargeneem",
         "none": "(leeg)"
       },
-      "noSample": "Nog geen monsters nie — lopende sessies word gemonster wanneer jy die moniteringbord of die Aktiwiteit- en slotte-oortjie bekyk. Vir nou word dit slegs uit die rekeningnaam geklassifiseer",
+      "noSample": "Nog geen monsters nie. Lopende sessies akkumuleer as monsters wanneer die Moniteringbord of Aktiwiteit/Slotte-oortjies bekyk word. Tans word hulle slegs volgens rekeningnaam vir verwysing geklassifiseer.",
       "verOff": "Hierdie DB is ouer as PostgreSQL 14, so lopende sessies het geen navraag-ID nie. Slegs die rekening (seker) word getoon",
       "privOff": "Die skakelrekening kan nie ander rekeninge se sessiebesonderhede sien nie, so geen monsters word versamel nie. Vra 'n DB-administrateur om GRANT pg_read_all_stats TO {user}; uit te voer",
       "linkUsr": "skakelrekening",
@@ -1132,11 +1132,11 @@
     "diag": {
       "title": "Diagnoseer Oorsaak",
       "fix": "Aksie:",
-      "none": "Geen oorsaak deur statistieke geopenbaar nie — kontroleer die uitvoeringsplan in SQL Tuning.",
-      "cum": "Geen oproepe in hierdie interval nie – kumulatief (sedert statistieke teruggestel is)",
-      "basis": "Basis — Maksimum 1-keer {max}ms · Gemiddeld {mean}ms · Oproepe {calls} · Rye per oproep {rpc} · Skyflesingsverhouding {read} · Tydelike blokke {tmp}",
+      "none": "Geen oorsaak deur statistieke geopenbaar nie. Maak die uitvoeringsplan in SQL Tuning oop om te kontroleer.",
+      "cum": "Geen oproepe in hierdie interval nie: Kumulatief (sedert statistieke herstel)",
+      "basis": "Basis: Maksimum enkele {max}ms · Gemiddeld {mean}ms · Oproepe {calls} · Rye per oproep {rpc} · Skyflesingsverhouding {read} · Tydelike blokke {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi selfversamelingnavraag — moniteringstelling wat slegs statistiese aansigte/katalogusse lees.",
+        "cause": "dbms.pi se eie versamelingsnavraag: Moniteringstelling wat slegs statistiese aansigte en katalogusse lees.",
         "fix": "Geen kliëntaksie is nodig nie. As die teikendatabasislas 'n probleem is, verminder die aantal kere wat u die versameling-/monitorskerm oopmaak."
       },
       "NO_MAX": {
@@ -1144,31 +1144,31 @@
         "fix": "Klik 'Versamel' een keer nou om maksimum waardes vir akkurate diagnose in te vul."
       },
       "SLOW_EACH": {
-        "cause": "Altyd Stadig — Neem elke keer lank om te loop, met maksimum {max}ms en gemiddeld {mean}ms.",
+        "cause": "Stadig elke keer: Neem lank elke uitvoering met maksimum {max}ms en gemiddeld {mean}ms.",
         "fix": "① Maak die uitvoeringsplan oop in 'Maak oop in SQL Tuning'. ② As daar volle skanderings (Seq Scan) of groot sorteer is, hersien indekse op WHERE/JOIN-kondisiekolomme. ③ Vernou kondisies om slegs nodige kolomme/rye te lees."
       },
       "SPIKE": {
-        "cause": "Intermitterende Vertraging — Gemiddeld {mean}ms, maar neem soms lank teen maksimum {max}ms ({x} keer die gemiddelde).",
+        "cause": "Intermitterende vertraging: Gemiddeld {mean}ms, maar neem soms lank met maksimum {max}ms ({x} keer die gemiddelde).",
         "fix": "① Wanneer stadig, kontroleer vir slotwagte (wait_event) in die Aktiwiteit/Slotte-oortjie. ② As slegs die eerste uitvoering stadig is, was die kas leeg en is die skyf gelees. ③ Vergelyk dieselfde navraag met verskillende waardes in SQL Tuning om te sien of die uitvoeringsplan verander op grond van waardes."
       },
       "DISK_READ": {
-        "cause": "Kasgemis — {pct}% ({read} blokke) van geleesde blokke is van skyf gelees, nie geheue nie.",
+        "cause": "Kas-mis: {pct}% ({read} blokke) van geleesde blokke is vanaf skyf gelees, nie geheue nie.",
         "fix": "① Verminder die leesbereik met indekse. ② Vernou die navraagperiode/kondisies. ③ As gereeld geleesde data hoog bly, hersien shared_buffers (geheue)."
       },
       "TEMP_SPILL": {
-        "cause": "Geheue-oorloop — Sorteer/hash het work_mem oorskry en {blk} blokke (ongeveer {mb}MB, {perCall} blokke per oproep) na tydelike lêers geskryf.",
+        "cause": "Geheue-oorloop: Sorteer/hash het work_mem oorskry en {blk} blokke (ongeveer {mb}MB, {perCall} blokke per oproep) na tydelike lêers geskryf.",
         "fix": "① Die plasing van indekse op ORDER BY/GROUP BY-kolomme slaan sortering oor. ② Verminder eers die aantal rye om te sorteer (LIMIT binne). ③ Indien absoluut nodig, verhoog SET LOCAL work_mem slegs vir hierdie navraagtransaksie."
       },
       "MANY_ROWS": {
-        "cause": "Oormatige Herwinning — Haal {perCall} rye per oproep op.",
+        "cause": "Oormatige navraag: Haal {perCall} rye per oproep op.",
         "fix": "① Skermlyste word bladsy vir bladsy opgeroep. ② SELECT kies slegs die kolomme wat gebruik word. ③ Aggregasies word in die databasis uitgevoer, en slegs die resultate word ontvang."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST ingebedde filter (!inner) stelling — die filter van ouers volgens kinderkondisies kan die hele stel skandeer voor klassifikasiekondisies.",
+        "cause": "PostgREST ingebedde filter (!inner) stelling: Filtering van ouers volgens kindervoorwaardes kan die hele tabel skandeer voor die klassifikasievoorwaarde.",
         "fix": "① Kontroleer of daar indekse op aansluitsleutels en filterkolomme is. ② Skuif filters na die ouertabel se voorwaardes. ③ Sluit kinders in 'n reeds bestaande ouernavraag in of kombineer dit in 'n enkele databasis-funksie."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET-bladsyverdeling — Word progressief stadiger namate dit voorafgaande rye vir latere bladsye lees en weggooi.",
+        "cause": "OFFSET-bladsy: Later bladsye lees en verwerp vroeër rye, wat progressief stadiger word.",
         "fix": "Verander na sleutelstel-bladsyverdeling (WHERE id > laaste_id ORDER BY id LIMIT n) wat vanaf die sleutel na die laaste ontvangde sleutel lees."
       }
     }
@@ -1201,8 +1201,8 @@
       "toDraft": "Skep pyplynkonsep uit {n} geselekteerde"
     },
     "ready": {
-      "ok": "WAL logiese replikasie gereed — tabelle met 'n PK kan LOGICAL gebruik",
-      "no": "WAL logiese replikasie nie gereed nie — vaslegging via polling of sleutelvergelyking",
+      "ok": "WAL logiese replikasie gereed: Tabelle met PK kan LOGICAL-metode gebruik.",
+      "no": "WAL logiese replikasie nie gereed nie: Versamel met behulp van polling/sleutelvergelykingsmetode.",
       "senders": "{n} replikasieverbinding(s)"
     },
     "adapter": {
@@ -1217,20 +1217,20 @@
       "HAS_SOFT_DEL": "Het sagte-verwyder-kolom",
       "NO_SOFT_DEL": "Geen sagte-verwyder-kolom",
       "HAS_PK": "Het primêre sleutel",
-      "NO_PK": "Geen primêre sleutel nie — veranderde rye kan nie geïdentifiseer word nie",
+      "NO_PK": "Geen PK: Kan nie veranderde rye identifiseer nie.",
       "DELETE_UNSEEN": "Polling kan nie fisiese DELETEs vaslê nie (sagte-verwyder-kolom aanbeveel)",
       "LOGICAL_NOT_READY": "Kan na LOGICAL oorskakel sodra WAL logiese replikasie gereed is",
-      "FULL_RELOAD_ONLY": "Geen PK of veranderingstydkolom nie, dus geen inkrementele vaslegging nie — voeg 'n PK by",
+      "FULL_RELOAD_ONLY": "Geen PK/veranderingstydstempel nie, dus inkrementele versameling nie moontlik nie: PK-byvoeging aanbeveel.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level is nie logical nie (verandering vereis 'n DB-herbegin)",
       "NO_SLOTS": "max_replication_slots is 0",
       "NO_SENDERS": "max_wal_senders is 0",
-      "IS_STANDBY": "Standby-bediener — neem logiese replikasie van die primêre",
+      "IS_STANDBY": "Bystandbediener: Ontvang logiese replikasie vanaf die primêre bediener.",
       "SETTINGS_UNKNOWN": "Kon nie instellings lees nie, gereedheid onbekend"
     },
     "ed": {
       "title": "Pyplyn definisies",
-      "draftOnly": "Slegs ontwerp — gestoor as konsepte (DRAFT)",
+      "draftOnly": "Slegs ontwerp: Stoor slegs as DRAFT.",
       "new": "Nuwe pyplyn",
       "empty": "Geen gestoorde pyplyne nie",
       "manual": "Handmatig",
@@ -1299,8 +1299,8 @@
     },
     "warn": {
       "none": "Geen noemenswaardige waarskuwings nie.",
-      "SEQ_SCAN_LARGE": "Volle skandering op {relation} (ongeveer {rows} rye) — oorweeg 'n indeks op die filterkolomme.",
-      "NESTED_LOOP_HIGH": "Geneste lus produseer ongeveer {rows} rye — oorweeg 'n hash- of merge-join, of 'n indeks op die join-voorwaarde.",
+      "SEQ_SCAN_LARGE": "Tabel {relation} voer 'n volle skandering uit (geskatte {rows} rye): Hersien indekse op voorwaardekolomme.",
+      "NESTED_LOOP_HIGH": "Geneste lusresultaat is 'n geskatte {rows} rye. Hersien hash-/merge-joins of indekse op join-voorwaardes.",
       "SORT_SPILL": "Sorteergrootte is ongeveer {kb}KB, bo die verstek work_mem (4MB); dit kan na skyf mors."
     },
     "lint": {
@@ -1314,14 +1314,14 @@
         "char": "karakter"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — kies slegs die kolomme wat jy benodig (ekstra I/O, geen bedekkende indeks).",
-        "FUNC_ON_COLUMN": "Die filterkolom {column} is in 'n funksie of uitdrukking toegedraai, so sy indeks kan nie gebruik word nie — transformeer eerder die konstante.",
-        "LEADING_WILDCARD": "LIKE met 'n leidende % kan nie 'n B-boomindeks gebruik nie — oorweeg 'n pg_trgm GIN-indeks.",
-        "OR_DIFF_COLUMNS": "OR-voorwaardes op verskillende kolomme — oorweeg om met UNION te skei (voeg 'n duplikaat-uitsluitingsvoorwaarde by indien UNION ALL) of hersien kolom-spesifieke indekse.",
-        "IMPLICIT_CAST": "{column} word vergelyk met 'n aangehaalde nommer — pas die kolom- en konstante tipes aan (implisiete omskakeling).",
-        "NOT_IN_SUBQUERY": "NOT IN (subnavraag) gee niks terug wanneer NULLs teenwoordig is en is stadig — gebruik NOT EXISTS.",
-        "NO_WHERE": "Geen WHERE-klousule nie — op 'n groot tabel is dit 'n volle skandering (voeg 'n voorwaarde of LIMIT by).",
-        "DOMAIN_MISMATCH": "{column} is 'n {expected} tipe volgens standaarddomein, maar word vergelyk met 'n konstante van 'n ander tipe — die implisiete omskakeling kan indeksgebruik voorkom."
+        "SELECT_STAR": "SELECT *: Kies slegs nodige kolomme (onnodige I/O, dekkingindeks nie moontlik nie).",
+        "FUNC_ON_COLUMN": "Voorwaardekolom {column} word deur 'n funksie/operasie verwerk, so indekse kan nie gebruik word nie. Verwerk die konstante kant.",
+        "LEADING_WILDCARD": "LIKE met 'n leidende % kan nie 'n B-boomindeks gebruik nie. Hersien pg_trgm GIN-indekse.",
+        "OR_DIFF_COLUMNS": "Verskillende kolomvoorwaardes word met OR gegroepeer. Hersien UNION-skeiding (voeg duplikaat-uitsluitingsvoorwaarde by indien UNION ALL) of per-kolom-indekse.",
+        "IMPLICIT_CAST": "{column} word vergelyk met 'n aangehaalde nommer. Pas kolomtipe en konstante tipe aan (implisiete tipe-omskakeling).",
+        "NOT_IN_SUBQUERY": "NOT IN (subnavraag) kan leeg en stadig wees as NULLs gemeng is. Verander na NOT EXISTS.",
+        "NO_WHERE": "Geen WHERE-voorwaarde nie. As dit 'n groot tabel is, is dit 'n volle skandering (voeg LIMIT of voorwaardes by).",
+        "DOMAIN_MISMATCH": "{column} is tipe {expected} volgens standaarddomein, maar word vergelyk met 'n konstante van 'n ander tipe. Implisiete tipe-omskakeling kan indeksgebruik voorkom."
       }
     },
     "saved": {
@@ -1347,12 +1347,12 @@
     },
     "ai": {
       "title": "AI-instellingadvies",
-      "intro": "Kies een gestoorde plan om advies te genereer. Slegs SQL en planne met konstantes gemasker as ? word gestuur (reëlgebaseerde advies indien geen sleutel of by mislukking). Nadat die skakel-eienaar goedkeur, herhaal die verduideliking vir dieselfde SQL, stoor dit, en meet die impak met daardie latere plan — slegs dan word dit as toegepas aangeteken.",
+      "intro": "Kies een gestoorde plan om advies te genereer. Slegs SQL en planne met konstantes gemasker as ? word gestuur (reëlgebaseerde advies indien geen sleutel of by mislukking). Nadat die skakel-eienaar goedkeur, herhaal die verduideliking vir dieselfde SQL, stoor dit, en meet die impak met daardie latere plan : slegs dan word dit as toegepas aangeteken.",
       "pickPlan": "Kies 'n gestoorde plan vir advies",
       "create": "Genereer advies",
       "creating": "Genereer tans... (tot 30 s)",
       "noPlans": "Geen gestoorde planne nie. Bekyk 'n verduidelikingsplan hierbo en stoor dit.",
-      "note": "Een advies per plan. Vee die bestaande advies uit om te hergenereer. DDL word slegs voorgestel — pas dit toe in schema.pi.",
+      "note": "Een advies per plan. Vee die bestaande advies uit om te hergenereer. DDL word slegs voorgestel : pas dit toe in schema.pi.",
       "empty": "Nog geen advies nie.",
       "noItems": "Geen verbeteringe vir hierdie plan gevind nie.",
       "cost": "Voor koste",
@@ -1394,10 +1394,10 @@
       "copy": "Kopieer",
       "copied": "Gekopieer",
       "rule": {
-        "SEQ_SCAN_INDEX": "Volle skandering van {relation} — skep 'n indeks op filterkolom {column} (vervang NN in die indeksnaam met 'n volgordenummer).",
-        "SEQ_SCAN_STATS": "Volle skandering van {relation} — kontroleer die filterkolomme en maak seker statistieke (ANALYZE) is op datum.",
-        "NESTED_LOOP": "Geneste lus verwag {rows} rye — verfris statistieke en oorweeg aansluitingsleutelindekse of 'n hash-aansluiting.",
-        "SORT_SPILL": "Sorteer van ongeveer {kb} KB kan na skyf mors — oorweeg om sessie work_mem te verhoog of die sorteerkolomme te indekseer.",
+        "SEQ_SCAN_INDEX": "{relation} volle skandering: Skep 'n indeks op voorwaardekolom {column} (indeksnaam NN sal deur 'n volgordenummer vervang word).",
+        "SEQ_SCAN_STATS": "{relation} volle skandering: Kontroleer voorwaardekolomme en verseker dat statistieke (ANALYZE) op datum is.",
+        "NESTED_LOOP": "Geneste lusresultaat is 'n geskatte {rows} rye: Dateer statistieke op en hersien join-voorwaardesindekse of hash-joins.",
+        "SORT_SPILL": "Sorteer kan na skyf mors met ongeveer {kb}KB. Hersien die verhoging van sessie work_mem of indekse op sorteerkolomme.",
         "SELECT_STAR": "Kies slegs die kolomme wat jy benodig in plaas van SELECT * (minder I/O, bedekkende indekse moontlik).",
         "FUNC_ON_COLUMN": "Skuif die funksie/uitdrukking op filterkolom {column} na die konstante kant (maak indeksgebruik moontlik).",
         "IMPLICIT_CAST": "Pas die tipes van {column} en die konstante aan (verwyder die implisiete omskakeling).",
@@ -1457,9 +1457,9 @@
     },
     "desc": {
       "FREE": "Verken & Leer",
-      "D1": "Operateur — Kontroleer of die databasis nou in orde is",
-      "D2": "Ontwikkelaar & Insteller — Herstel stadige SQL",
-      "D3": "DBA & DA — Van operasionele veiligheid tot implementering en meer"
+      "D1": "Operateur: Kontroleer of die databasis nou gesond is.",
+      "D2": "Ontwikkelaar/Tuner: Herstel stadige SQL.",
+      "D3": "DBA/DA: Operasionele veiligheid, migrasie, en selfs data lake."
     },
     "feat": {
       "FREE": "Moniteringsbord, uitvoeringsplan-aansig, basiese leer",
@@ -1502,7 +1502,7 @@
       "required": "Hierdie funksie is beskikbaar vanaf die {plan}-plan.",
       "limit": "Jy het al die beskikbare pogings vir hierdie tydperk gebruik. Jy kan meer gebruik deur op te gradeer na die {plan}-plan.",
       "limitTop": "Jy het al die beskikbare pogings vir hierdie tydperk gebruik. Jy kan dit volgende tydperk weer gebruik.",
-      "expired": "Jou schema.pi-plan het verval — doen asseblief 'n betaling op die schema.pi-plan-skerm.",
+      "expired": "Jou schema.pi-plan het verval. Betaal asseblief op die schema.pi-plan-skerm.",
       "go": "Bekyk Plan",
       "close": "Sluit"
     }

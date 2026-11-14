@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Phân tích·Hồ dữ liệu",
     "intro": "Xem KPI hoạt động dbms, thiết kế hồ dữ liệu 3 lớp và danh mục tập dữ liệu trên một màn hình.",
-    "storageNotice": "Kho lưu trữ hồ dữ liệu (phía khách hàng hoặc đám mây) vẫn chưa được quyết định (PRD mục 10 #7). Hiện tại chỉ lưu trữ thiết kế và ánh xạ tên — không có dữ liệu hàng.",
+    "storageNotice": "Kho lưu trữ hồ dữ liệu (phía khách hàng hoặc đám mây) vẫn chưa được quyết định (PRD mục 10 #7). Hiện tại chỉ lưu trữ thiết kế và ánh xạ tên : không có dữ liệu hàng.",
     "noLink": "Trước tiên, hãy chọn hoặc đăng ký liên kết schema.pi.",
     "goConnect": "Đăng ký liên kết",
     "loading": "Đang tải…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Phân tích GAP — Mô hình↔DB",
+    "title": "Phân tích GAP: Mô hình↔DB",
     "intro": "So sánh mô hình thiết kế schema.pi và lịch sử áp dụng DDL với danh mục DB trực tiếp để tìm độ lệch, và đo lường xem các chỉ mục đã thiết kế có thực sự được sử dụng hay không. Dữ liệu hàng của khách hàng không bao giờ được đọc hoặc lưu trữ.",
     "needLink": "Trước tiên, hãy chọn một liên kết schema.pi ở trên. Nếu bạn chưa có, hãy đăng ký một token trong menu 'Liên kết'.",
     "needConn": "Chọn kết nối DB để so sánh ở trên.",
@@ -188,7 +188,7 @@
     "model": "Mô hình",
     "reqNo": "Yêu cầu {id}",
     "notSaved": "Không thể lưu lần chạy này vào lịch sử (kết quả vẫn hiển thị bình thường).",
-    "capped": "Quá nhiều mục — hiển thị {cap} mục đầu tiên mỗi phần (số lượng đầy đủ).",
+    "capped": "Quá nhiều mục : hiển thị {cap} mục đầu tiên mỗi phần (số lượng đầy đủ).",
     "statsMissing": "Không có thống kê sử dụng chỉ mục, nên không thể đánh giá việc sử dụng.",
     "sum": {
       "missingTables": "Bảng thiếu trong DB",
@@ -230,7 +230,7 @@
       "USED": "Đang sử dụng",
       "NO_STATS": "Không có thống kê",
       "CONSTRAINT": "Để đảm bảo tính duy nhất (không phải đối tượng xóa)",
-      "NO_DATA": "Không có dữ liệu hoặc thống kê chưa được thu thập — không thể phán đoán",
+      "NO_DATA": "Không có dữ liệu hoặc chưa thu thập thống kê: Không thể xác định",
       "OBSERVING": "Đang quan sát (dưới 7 ngày)",
       "UNUSED_CAND": "Ứng cử viên không sử dụng"
     },
@@ -245,14 +245,14 @@
       "RATE": "Quá nhiều yêu cầu. Vui lòng thử lại sau một phút."
     },
     "schema": "Schema",
-    "schemaHint": "Chỉ các bảng thông thường và bảng phân vùng trong schema này được so sánh (không bao gồm các view). Mặc định là public — các schema nội bộ của Supabase (auth, storage, …) bị bỏ qua.",
-    "truncated": "Truy vấn {names} đã đạt giới hạn {max} hàng và bị cắt bớt — một số kết quả \"không có trong DB\" / \"không có trong mô hình\" có thể sai. Thu hẹp schema và chạy lại.",
+    "schemaHint": "Chỉ so sánh các bảng thông thường/phân vùng của schema này (trừ các view). Mặc định public: Các schema nội bộ của Supabase (auth·storage, v.v.) sẽ bị loại trừ.",
+    "truncated": "Truy vấn {names} đã bị cắt do đạt giới hạn {max} hàng. Một số kết quả 'Không có trong DB'·'Không có trong mô hình' có thể là sai. Hãy thu hẹp schema và phát hiện lại.",
     "colUnchecked": "Vì truy vấn cột bị cắt bớt, {n} kết quả cột bị thiếu/thêm được coi là không thể xác minh và bị loại khỏi số lượng cột không khớp.",
-    "renamed": "{n} chỉ mục PK được áp dụng theo quy tắc đặt tên cũ (_PKEY) tồn tại trong DB dưới tên mới (PK_) — bình thường",
-    "superseded": "{n} yêu cầu cũ hơn đã bị loại trừ vì một yêu cầu sau đó đã tạo lại cùng một bảng (DROP … CASCADE) — bình thường",
+    "renamed": "{n} chỉ mục PK được áp dụng theo quy tắc đặt tên cũ (_PKEY) hiện có trong DB với tên mới (PK_). Bình thường",
+    "superseded": "{n} yêu cầu trước đó đã bị loại khỏi so sánh vì các yêu cầu sau đã tạo lại (DROP … CASCADE) cùng một bảng. Bình thường",
     "supersededItem": "Yêu cầu {id} → bị thay thế bởi yêu cầu {by}",
     "sysCols": "{n} cột hệ thống (được thêm tự động khi tạo DDL) không có trong mô hình theo thiết kế và bị loại khỏi các trường hợp không khớp",
-    "groupOwn": "Tiền tố dự án {pfx} — ứng cử viên bị thiếu trong mô hình",
+    "groupOwn": "Tiền tố dự án này {pfx}: Các ứng viên thiếu trong mô hình",
     "groupOther": "Hệ thống khác {pfx}",
     "basis": "Ước tính hàng {rows} · từ {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Nếu các đối tượng vẫn biến mất sau khi áp dụng lại, hãy nghi ngờ việc xóa thủ công hoặc khôi phục và kiểm tra hoạt động của tài khoản kết nối với DBA của bạn."
       },
       "extraTables": {
-        "s1": "Các bảng có tiền tố dự án này = Các ứng viên thiếu mô hình — hãy nhập chúng vào mô hình thông qua schema.pi → Cài đặt → Đảo ngược, hoặc quyết định xóa nếu chúng không được sử dụng.",
-        "s2": "Các nhóm tiền tố khác = các hệ thống khác chia sẻ DB này — không phải là mục hành động cho dự án này.",
+        "s1": "Nhóm tiền tố dự án này = Các ứng viên thiếu trong mô hình: Nhập vào mô hình bằng cách đảo ngược trong schema.pi → Cài đặt, hoặc quyết định có xóa bảng nếu không sử dụng.",
+        "s2": "Các nhóm tiền tố khác = Các hệ thống khác sử dụng cùng một DB: Không phải đối tượng cần xử lý của dự án này.",
         "s3": "Nếu schema đích không phải là public, hãy thay đổi trường \"Schema\" ở trên và chạy lại."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Kiểu/NULL khác nhau = căn chỉnh theo mô hình (nguồn đáng tin cậy); trước khi thu hẹp độ dài hoặc chuyển sang NOT NULL, hãy xác nhận các hàng hiện có đáp ứng điều đó."
       },
       "idxUsage": {
-        "s1": "Trước khi xóa, hãy kiểm tra ① cửa sổ thống kê bao gồm ít nhất một chu kỳ kinh doanh (ví dụ: lô cuối tháng) — xem \"từ\".",
+        "s1": "Trước khi xóa, hãy kiểm tra ① liệu thời gian thu thập thống kê có lớn hơn hoặc bằng một chu kỳ hoạt động (ví dụ: batch cuối tháng) không: Xem ngày cơ sở.",
         "s2": "② Nó không phải là chỉ mục duy nhất/PK (những chỉ mục đó hiển thị riêng là \"ràng buộc duy nhất\").",
         "s3": "③ EXPLAIN SQL đại diện của bảng trong SQL Tuning và xác nhận chỉ mục này không được sử dụng.",
         "s4": "Sau khi xác nhận cả ba, hãy xóa chỉ mục khỏi mô hình trong schema.pi và áp dụng thông qua DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Cách cấp token kết nối",
     "how1": "Đăng nhập vào schema.pi và mở lĩnh vực chủ đề để kết nối",
     "how2": "Đi tới Lĩnh vực chủ đề → Cài đặt → Token kết nối và nhấn 'Cấp token' (quản trị viên lĩnh vực hoặc vai trò DA)",
-    "how3": "Sao chép token bắt đầu bằng slk_ — nó chỉ hiển thị một lần khi được cấp",
+    "how3": "Sao chép token bắt đầu bằng slk_ đã được cấp. Văn bản gốc chỉ hiển thị một lần khi cấp.",
     "how4": "Dán vào bên dưới và đăng ký",
     "openSchema": "Mở schema.pi",
     "registerTitle": "Đăng ký kết nối",
@@ -384,7 +384,7 @@
     "retry": "Thử lại",
     "pickerLink": "Liên kết",
     "pickerConn": "Kết nối",
-    "pickerEmpty": "Không có kết nối —",
+    "pickerEmpty": "Không có kết nối.",
     "pickerGo": "đăng ký một cái tại /connect",
     "errors": {
       "LINK_AUTH": "Token kết nối đã hết hạn hoặc bị thu hồi. Vui lòng cấp một token mới trong schema.pi và đăng ký lại",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Di chuyển dữ liệu (PiMig)",
-    "intro": "Tính toán thứ tự tải bảng từ các mối quan hệ trong mô hình thiết kế schema.pi của bạn, tổ chức kích thước khối, song song và danh sách kiểm tra chuyển đổi, đồng thời tạo SQL xác minh mà bạn tự chạy trên nguồn và đích. Màn hình này chỉ lập kế hoạch và kiểm tra — nó không di chuyển dữ liệu hoặc đọc các hàng DB của khách hàng.",
+    "intro": "Tính toán thứ tự tải bảng từ các mối quan hệ trong mô hình thiết kế schema.pi của bạn, tổ chức kích thước khối, song song và danh sách kiểm tra chuyển đổi, đồng thời tạo SQL xác minh mà bạn tự chạy trên nguồn và đích. Màn hình này chỉ lập kế hoạch và kiểm tra : nó không di chuyển dữ liệu hoặc đọc các hàng DB của khách hàng.",
     "needLink": "Trước tiên, hãy chọn một liên kết schema.pi ở trên. Nếu bạn chưa có, hãy đăng ký một token trong menu 'Kết nối'.",
     "loading": "Đang tải…",
     "newPlan": "Kế hoạch di chuyển mới",
@@ -432,8 +432,8 @@
     "optsHint": "Song song là số lượng bảng được tải cùng lúc trong một cấp độ. Kích thước khối là đơn vị commit (số hàng) mà công cụ thực thi sẽ sử dụng.",
     "order": "Thứ tự tải",
     "orderHint": "Được sắp xếp theo cấu trúc liên kết bởi các mối quan hệ thiết kế (không phải FK vật lý) để các bảng cha đến trước. Các bảng trong cùng một cấp độ không phụ thuộc vào nhau và có thể tải song song.",
-    "cycles": "{n} nhóm tuần hoàn — được đặt ở cùng cấp độ. Đặt thứ tự thủ công và hoãn kiểm tra tham chiếu cho đến sau khi tải.",
-    "selfRefs": "Bảng tự tham chiếu (phân cấp) — tải các hàng cha trước trong bảng",
+    "cycles": "{n} nhóm quan hệ vòng: Đã đặt ở cùng một giai đoạn. Hãy tự xác định thứ tự tải và hoãn kiểm tra tham chiếu sau khi tải.",
+    "selfRefs": "Bảng tự tham chiếu (phân cấp): Hàng cha trong cùng một bảng trước.",
     "level": "Cấp độ {n}",
     "checklist": "Danh sách kiểm tra chuyển đổi",
     "toReady": "Đánh dấu là sẵn sàng",
@@ -471,7 +471,7 @@
     },
     "verify": "SQL xác minh",
     "verifyHint": "Tạo các truy vấn đếm, tổng cột số, khóa trùng lặp và băm khóa cho mỗi bảng theo thứ tự tải. Tự chạy chúng trên nguồn và đích và so sánh (màn hình này không thực thi chúng).",
-    "noHashOracle": "Các hàm băm và hiển thị văn bản của Oracle·Tibero khác với PostgreSQL, vì vậy các truy vấn băm bị bỏ qua — so sánh số lượng, tổng và khóa trùng lặp.",
+    "noHashOracle": "Oracle·Tibero bỏ qua truy vấn hash vì hàm hash và biểu diễn ký tự khác với PostgreSQL. Hãy so sánh bằng số lượng, tổng và trùng lặp khóa.",
     "copy": "Sao chép",
     "copied": "Đã sao chép",
     "copyFail": "Không thể sao chép. Chọn văn bản và sao chép thủ công.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Giá trị yêu cầu không hợp lệ."
     },
     "board": {
-      "subtitle": "Những việc cần làm trên DB này ngay bây giờ — 14 tín hiệu OK, cảnh báo hoặc rủi ro, cùng với các bản sửa lỗi, trong nháy mắt.",
+      "subtitle": "Những gì cần làm ngay bây giờ trong DB này: Xem nhanh 14 tín hiệu về trạng thái bình thường, cảnh báo, rủi ro và giải pháp.",
       "refresh": {
         "updated": "Tính đến {time} · làm mới mỗi phút",
         "now": "Làm mới ngay",
@@ -564,11 +564,11 @@
         "NA": "Không áp dụng"
       },
       "overall": {
-        "RISK": "Rủi ro — cần hành động ngay",
-        "WARN": "Cảnh báo — một số mục cần xem xét",
-        "UNKNOWN": "Không xác định — kiểm tra kết nối",
-        "OK": "OK — mọi tín hiệu đều nằm trong giới hạn",
-        "CONN_DOWN": "Không thể kết nối với DB — kiểm tra kết nối trước",
+        "RISK": "Rủi ro: Cần hành động ngay",
+        "WARN": "Cảnh báo: Có các mục cần xem xét",
+        "UNKNOWN": "Không thể xác định: Kiểm tra trạng thái kết nối",
+        "OK": "Bình thường: Tất cả các tín hiệu đều nằm trong ngưỡng",
+        "CONN_DOWN": "Không thể kết nối với DB. Hãy kiểm tra kết nối trước.",
         "NA": "Không áp dụng"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Thu gọn",
         "setup": "Thiết lập các mục này để xem thêm",
         "none": "Không có mục rủi ro hoặc cảnh báo nào cần hành động ngay bây giờ.",
-        "unknown": "Không thể kiểm tra {n} tín hiệu — xem thẻ để biết lý do.",
+        "unknown": "Không thể xác định {n} mục: Kiểm tra lý do trong thẻ.",
         "myRule": "Quy tắc của tôi bị vi phạm: {rule}",
         "copySql": "Sao chép SQL",
         "copied": "Đã sao chép"
@@ -622,34 +622,34 @@
         "REPL": "Độ trễ sao chép"
       },
       "fix": {
-        "AVAIL": "Phản hồi chậm hoặc vừa khởi động lại — kiểm tra cài đặt kết nối và trạng thái máy chủ DB.",
-        "AVAIL_DOWN": "Không thể kết nối với DB — kiểm tra cài đặt kết nối và đảm bảo máy chủ DB đang hoạt động.",
-        "CONN_USE": "{sess}/{max} phiên trên DB này (không phải toàn bộ cụm — các cơ sở dữ liệu khác bị loại trừ) — đóng các kết nối nhàn rỗi hoặc thêm bộ quản lý kết nối (pgbouncer).",
-        "URL": "{n} URL được kiểm tra bị lỗi · phản hồi tối đa {ms}ms — xem màn hình schema.pi để biết nguyên nhân.",
-        "LONG_QRY": "Một truy vấn đã chạy được {sec} giây — xem lại kế hoạch của nó và điều chỉnh, hoặc nhờ DBA hủy bỏ.",
-        "IDLE_TX": "Một giao dịch đã nhàn rỗi {sec} giây — tìm cam kết bị thiếu trong ứng dụng và đặt thời gian chờ.",
-        "LOCK_WAIT": "{n} phiên đang chờ khóa — tìm phiên chặn và kết thúc giao dịch của nó.",
-        "CACHE_HIT": "Tỷ lệ truy cập bộ nhớ cache {pct}% — tìm các lần quét toàn bộ bảng lớn hoặc xem lại shared_buffers.",
-        "XACT_ERR": "Tỷ lệ rollback {pct}%, {dlck} deadlock — kiểm tra các giao dịch lỗi và nhật ký lỗi ứng dụng.",
-        "SLOW_SQL": "Có các truy vấn mất tối đa {ms}ms mỗi lần — hãy xem kế hoạch thực thi và điều chỉnh, bắt đầu từ các truy vấn có thời gian thực thi tối đa cao nhất.",
-        "STORAGE": "DB ({gb} GB) gần hết giới hạn (còn lại {days} ngày) — dọn dẹp các bảng lớn hoặc thêm dung lượng.",
-        "VACUUM": "{tbl} có nhiều hàng chết hoặc thống kê cũ — xem lại cài đặt VACUUM (ANALYZE) và autovacuum.",
-        "INDEX": "{n} phát hiện chỉ mục (không hợp lệ, không sử dụng, quét toàn bộ) — xem tab tình trạng bảng & chỉ mục để biết các mục tiêu.",
-        "BACKUP": "Lưu trữ WAL bị tắt hoặc bị kẹt — kiểm tra archive_mode, archive_command và trạng thái sao lưu.",
-        "REPL": "Độ trễ sao chép {sec} giây — kiểm tra trạng thái dự phòng và mạng.",
-        "PGSS": "pg_stat_statements không được cài đặt, vì vậy SQL chậm không khả dụng — bật nó bằng SQL bên dưới (yêu cầu khởi động lại máy chủ)."
+        "AVAIL": "Phản hồi chậm hoặc vừa khởi động lại. Kiểm tra thông tin kết nối và trạng thái máy chủ DB.",
+        "AVAIL_DOWN": "Không thể kết nối với DB. Kiểm tra thông tin kết nối và đảm bảo máy chủ DB đang hoạt động.",
+        "CONN_USE": "{sess}/{max} phiên DB này (không phải toàn bộ cluster, không bao gồm các kết nối DB khác): Dọn dẹp các kết nối không hoạt động hoặc sử dụng bộ kết nối (pgbouncer).",
+        "URL": "{n} URL kiểm tra thất bại · Phản hồi tối đa {ms}ms: Kiểm tra nguyên nhân trong màn hình giám sát schema.pi.",
+        "LONG_QRY": "Có truy vấn đang chạy {sec} giây. Xem kế hoạch thực thi và điều chỉnh hoặc DBA hủy bỏ.",
+        "IDLE_TX": "Giao dịch đã mở và dừng {sec} giây. Tìm lỗi thiếu commit trong ứng dụng và đặt thời gian chờ.",
+        "LOCK_WAIT": "{n} phiên đang chờ khóa: Tìm phiên đang chặn và kết thúc giao dịch đó.",
+        "CACHE_HIT": "Tỷ lệ truy cập cache {pct}%: Tìm các lần đọc toàn bộ bảng lớn hoặc xem xét shared_buffers.",
+        "XACT_ERR": "Tỷ lệ rollback {pct}%, deadlock {dlck} lần: Kiểm tra các giao dịch thất bại và nhật ký lỗi ứng dụng.",
+        "SLOW_SQL": "Có truy vấn có thời gian tối đa một lần {ms}ms. Xem kế hoạch thực thi và điều chỉnh từ các truy vấn có thời gian tối đa một lần cao nhất.",
+        "STORAGE": "DB {gb}GB gần đạt giới hạn (còn {days} ngày). Dọn dẹp các bảng lớn hoặc tăng dung lượng.",
+        "VACUUM": "{tbl} có nhiều hàng chết hoặc thống kê đã cũ. Xem xét cài đặt VACUUM(ANALYZE)·autovacuum.",
+        "INDEX": "Kiểm tra chỉ mục {n} mục (không hợp lệ·không sử dụng·đọc toàn bộ): Kiểm tra các đối tượng trong tab sức khỏe bảng·chỉ mục.",
+        "BACKUP": "Lưu trữ WAL đã tắt hoặc dừng. Kiểm tra archive_mode·archive_command và trạng thái sao lưu.",
+        "REPL": "Độ trễ sao chép {sec} giây: Kiểm tra trạng thái máy chủ chờ và mạng.",
+        "PGSS": "Không thể xem SQL chậm vì không có tiện ích pg_stat_statements. Bật bằng SQL dưới đây (cần khởi động lại máy chủ)."
       },
       "reason": {
         "CONN_DOWN": "Không được đánh giá vì kết nối DB bị ngắt.",
         "PGSS": "pg_stat_statements không được cài đặt.",
         "VER": "Chỉ khả dụng trên PostgreSQL 13 trở lên.",
         "SAMPLE": "Chưa đủ mẫu.",
-        "NO_LIMIT": "Không có giới hạn kích thước, vì vậy việc sử dụng không được đánh giá — thêm quy tắc kích thước DB (MB) (>) để sử dụng nó làm giới hạn.",
+        "NO_LIMIT": "Không có giới hạn dung lượng nên không đánh giá mức sử dụng. Nếu thêm quy tắc kích thước DB (MB) (>), nó sẽ được sử dụng làm giới hạn.",
         "RESET": "Thống kê được đặt lại chưa đầy 7 ngày trước, vì vậy các chỉ mục không sử dụng không được đánh giá.",
         "STALE": "Không có bản ghi kiểm tra gần đây.",
         "STANDBY": "Không áp dụng trên máy chủ dự phòng.",
         "NONE": "Không có gì để kiểm tra.",
-        "GRANT": "Thiếu đặc quyền — cấp vai trò pg_monitor cho tài khoản kết nối.",
+        "GRANT": "Không có quyền xem. Cấp vai trò pg_monitor cho tài khoản kết nối.",
         "LINK": "Truy vấn schema.pi thất bại ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Nếu nó không phát trực tuyến, hãy kiểm tra nhật ký máy chủ dự phòng."
         }
       },
-      "sqlNote": "SQL bên dưới chỉ đọc, để kiểm tra — các bản sửa lỗi (VACUUM, DROP INDEX, pg_terminate_backend) được DBA chạy.",
+      "sqlNote": "SQL dưới đây chỉ dùng để kiểm tra chỉ đọc. Các hành động (VACUUM·DROP INDEX·pg_terminate_backend) sẽ được DBA thực hiện trực tiếp.",
       "go": {
         "activity": "Hoạt động & khóa",
         "top": "Truy vấn chậm",
@@ -766,8 +766,8 @@
           "tree": "Cái gì chiếm không gian và cái gì cần dọn dẹp?"
         },
         "asTable": "Xem dưới dạng bảng",
-        "needHistory": "Chưa có xu hướng — giữ màn hình này mở trong vài phút.",
-        "needPerf": "Không có lịch sử kích thước — thu thập trong tab hiệu suất hoặc giữ màn hình này mở.",
+        "needHistory": "Chưa có xu hướng. Màn hình này sẽ được vẽ sau vài phút mở.",
+        "needPerf": "Không có lịch sử dung lượng. Thu thập trong tab hiệu suất hoặc để màn hình này mở.",
         "noSess": "Không có phiên.",
         "noWait": "Không chờ",
         "noData": "Không có gì để hiển thị.",
@@ -840,17 +840,17 @@
         "noStat": "Không có thống kê"
       },
       "empty": {
-        "noConn": "Phân loại này không có kết nối máy chủ PostgreSQL để giám sát — chỉ hiển thị URL và trạng thái dịch vụ.",
+        "noConn": "Không có kết nối máy chủ PostgreSQL để giám sát trong phân loại này. Chỉ xem trạng thái URL·liên kết.",
         "unsupported": "Kết nối này không hỗ trợ giám sát (chỉ kết nối máy chủ PostgreSQL).",
-        "connFail": "Không thể kết nối với cơ sở dữ liệu — kiểm tra cài đặt kết nối và trạng thái DB.",
-        "linkDown": "Không thể kết nối với schema.pi — đang tự động thử lại.",
-        "linkAuth": "Mã thông báo kết nối đã hết hạn — phát hành mã thông báo mới trong schema.pi và đăng ký nó.",
-        "timeout": "Phản hồi chậm — đang tự động thử lại.",
+        "connFail": "Không thể kết nối với DB. Kiểm tra thông tin kết nối và trạng thái DB.",
+        "linkDown": "Không thể kết nối với schema.pi. Sẽ tự động thử lại sau một lát.",
+        "linkAuth": "Token kết nối đã hết hạn. Phát hành lại token trong schema.pi và đăng ký.",
+        "timeout": "Phản hồi chậm. Sẽ tự động thử lại sau một lát.",
         "rate": "Quá nhiều yêu cầu, vì vậy khoảng thời gian làm mới đã được tăng lên."
       },
       "aux": {
         "rules": "Quy tắc cảnh báo của tôi ({n} đang hoạt động)",
-        "schemaSvc": "Trạng thái dịch vụ — phản hồi schema.pi",
+        "schemaSvc": "Trạng thái liên kết: Phản hồi dịch vụ schema.pi",
         "schemaSvcNote": "Các chỉ số ứng dụng trong 60 phút gần nhất được schema.pi lưu trữ.",
         "source": "Nguồn dữ liệu: DB đích chỉ đọc thông qua các truy vấn được đặt tên của schema.pi (chỉ đọc); xu hướng chỉ lưu trữ thống kê trong dbms.pi (không có dữ liệu hàng)."
       }
@@ -866,10 +866,10 @@
     "noRun": "Chưa có chẩn đoán nào. Nhấn \"Chạy chẩn đoán\"",
     "lastRun": "Chẩn đoán cuối cùng {dtm}",
     "readOnly": "Chẩn đoán chỉ đọc (SELECT). Lời khuyên là một hướng dẫn và phụ thuộc vào bộ nhớ máy chủ, tải và khối lượng công việc",
-    "truncated": "Quá nhiều đối tượng — chỉ 500 đối tượng đầu tiên được kiểm tra",
+    "truncated": "Quá nhiều đối tượng : chỉ 500 đối tượng đầu tiên được kiểm tra",
     "paramsNote": "Tổng bộ nhớ máy chủ không xác định, vì vậy nó được ước tính từ shared_buffers ≈ 25% RAM. random_page_cost giả định SSD",
     "auditNote": "Các bảng có RLS tắt và tài khoản không sử dụng sẽ được kiểm tra khi truy vấn liên kết hỗ trợ chúng",
-    "replNote": "Cơ sở là Active-Standby (A-S) — một primary + standby. Độ trễ phát lại ≥ 5 giây = cảnh báo, ≥ 60 giây = rủi ro (tham chiếu RPO đo được)",
+    "replNote": "Tiêu chuẩn chính là Active-Standby (A-S): 1 Primary + Standby. Cảnh báo độ trễ replay trên 5 giây, rủi ro trên 60 giây (giá trị tham khảo RPO thực tế).",
     "lagIdle": "Không có thay đổi",
     "pager": "Phân trang",
     "prev": "Trước",
@@ -939,11 +939,11 @@
       "st_ok": "Đã đặt thời gian chờ câu lệnh",
       "iit_off": "Không có thời gian chờ không hoạt động trong giao dịch (0). Có thể gây giữ khóa và phình to",
       "iit_ok": "Đã đặt thời gian chờ không hoạt động trong giao dịch",
-      "ckpt_short": "Khoảng thời gian kiểm tra là 5 phút hoặc ít hơn. Xem xét 10–15 phút cho các tải ghi nặng",
+      "ckpt_short": "Khoảng thời gian kiểm tra là 5 phút hoặc ít hơn. Xem xét 10~15 phút cho các tải ghi nặng",
       "ckpt_ok": "Trong một phạm vi hợp lý",
       "wal_minimal": "wal_level=minimal làm cho PITR và sao chép không thể thực hiện được. Sử dụng replica hoặc cao hơn",
       "wal_ok": "Mức WAL hỗ trợ PITR và sao chép",
-      "rpc_hdd": "Mặc định HDD (4). Đối với SSD, 1.1–2 được khuyến nghị",
+      "rpc_hdd": "Mặc định HDD (4). Đối với SSD, 1.1~2 được khuyến nghị",
       "rpc_ok": "Phù hợp với SSD",
       "super_many": "Hai hoặc nhiều superuser. Giữ một cho quản trị và chỉ cấp các đặc quyền cần thiết cho những người khác",
       "super_ok": "Tối đa một superuser",
@@ -991,7 +991,7 @@
   },
   "perf": {
     "title": "Hiệu suất",
-    "intro": "Thu thập số liệu thống kê truy vấn, bảng và chỉ mục từ kết nối PostgreSQL đã liên kết để hiển thị các truy vấn chậm, tình trạng bảng/chỉ mục và xu hướng kích thước. Chỉ lưu trữ số liệu thống kê — không bao giờ lưu trữ dữ liệu hàng DB của khách hàng",
+    "intro": "Thu thập số liệu thống kê truy vấn, bảng và chỉ mục từ kết nối PostgreSQL đã liên kết để hiển thị các truy vấn chậm, tình trạng bảng/chỉ mục và xu hướng kích thước. Chỉ lưu trữ số liệu thống kê : không bao giờ lưu trữ dữ liệu hàng DB của khách hàng",
     "loading": "Đang tải…",
     "pickFirst": "Vui lòng chọn một liên kết và kết nối ở trên trước",
     "pager": "Phân trang",
@@ -1022,7 +1022,7 @@
       "intro": "Thu thập ngay bây giờ đọc số liệu thống kê truy vấn hàng đầu, bảng, chỉ mục và kích thước một lần và lưu chúng dưới dạng ảnh chụp nhanh. Thu thập ít nhất hai lần để xem các thay đổi và xu hướng kích thước",
       "run": "Thu thập ngay",
       "running": "Đang thu thập…",
-      "done": "Đã thu thập lúc {dtm} — {qry} truy vấn · {tbl} bảng · {idx} chỉ mục",
+      "done": "Thu thập hoàn tất {dtm}: {qry} truy vấn · {tbl} bảng · {idx} chỉ mục",
       "auto": {
         "title": "Thu thập tự động",
         "desc": "Khi bật, kết nối này sẽ tự động thu thập thống kê vào 3 giờ sáng (giờ Hàn Quốc) mỗi ngày. Sau 7 ngày trở lên, bạn có thể tin tưởng vào bảng xếp hạng truy vấn chậm và danh sách chỉ mục không sử dụng",
@@ -1044,13 +1044,13 @@
       "sortCalls": "Số lần gọi",
       "empty": "Chưa có ảnh chụp nhanh nào. Nhấn Thu thập ngay trên tab Thu thập",
       "range": "Thay đổi giữa {from} → {to}",
-      "first": "Ảnh chụp nhanh đầu tiên lúc {dtm} — giá trị tích lũy (thay đổi từ ảnh chụp nhanh tiếp theo)",
+      "first": "Thu thập lần đầu {dtm}: Là giá trị tích lũy (tăng/giảm từ lần thu thập tiếp theo)",
       "query": "Truy vấn (ký tự được che)",
       "calls": "Số lần gọi",
       "totalMs": "Tổng ms",
       "meanMs": "Trung bình ms",
       "rows": "Hàng",
-      "reset": "Đã phát hiện đặt lại số liệu thống kê — hiển thị dưới dạng tích lũy",
+      "reset": "Phát hiện khởi tạo lại thống kê: Hiển thị dưới dạng giá trị tích lũy",
       "src": "Nguồn",
       "srcToggle": "Hiển thị hoặc ẩn chi tiết nguồn",
       "openSqlLab": "Mở trong SQL Tuning",
@@ -1058,7 +1058,7 @@
       "sortMax": "Thời gian thực thi tối đa 1 lần",
       "maxMs": "Tối đa 1 lần ms",
       "diagToggle": "Chẩn đoán nguyên nhân",
-      "noMax": "Không có giá trị cao nhất — {n} mục được sắp xếp tạm thời theo giá trị trung bình một lần vì chúng là các bộ sưu tập cũ không có giá trị cao nhất một lần (không theo tổng thời gian). Giá trị cao nhất sẽ được điền nếu được thu thập ngay bây giờ."
+      "noMax": "Không có giá trị cao nhất: {n} mục là các lần thu thập cũ không có giá trị tối đa một lần, nên đã tạm thời sắp xếp theo trung bình một lần (không theo tổng thời gian). Nếu thu thập bây giờ, giá trị tối đa sẽ được điền."
     },
     "health": {
       "empty": "Chưa có ảnh chụp nhanh nào. Nhấn Thu thập ngay trên tab Thu thập",
@@ -1066,9 +1066,9 @@
       "unusedIdx": "Chỉ mục không sử dụng",
       "unusedIdxHint": "Các chỉ mục chưa bao giờ được sử dụng kể từ lần đặt lại số liệu thống kê gần nhất (theo kích thước). Không xóa PK hoặc chỉ mục ràng buộc duy nhất",
       "fullScan": "Quét toàn bộ quá mức",
-      "fullScanHint": "Các bảng có hơn 1.000 hàng đang hoạt động mà việc quét toàn bộ chiếm ít nhất một nửa — xem lại các chỉ mục trên các cột bộ lọc",
+      "fullScanHint": "Bảng có hơn 1.000 hàng hợp lệ và hơn một nửa là quét toàn bộ: Xem xét chỉ mục cột điều kiện.",
       "dead": "Các tuple chết quá mức",
-      "deadHint": "Tỷ lệ tuple chết từ 20% trở lên — kiểm tra cài đặt VACUUM và autovacuum",
+      "deadHint": "Tỷ lệ tuple chết trên 20%: Kiểm tra cài đặt VACUUM·autovacuum.",
       "none": "Không có",
       "scans": "lần quét"
     },
@@ -1085,7 +1085,7 @@
     },
     "activity": {
       "refresh": "Làm mới",
-      "live": "Truy vấn trực tiếp — không được lưu trữ",
+      "live": "Truy vấn thời gian thực: Không lưu trữ",
       "sessions": "Hoạt động phiên",
       "locks": "Khóa",
       "none": "Không có"
@@ -1112,7 +1112,7 @@
         "BATCH": "Có vẻ như một lô hoặc công việc đã lên lịch. Phân tán thời gian chạy ra khỏi các đỉnh kinh doanh và thu nhỏ công việc trên mỗi commit. Kiểm tra các chỉ mục và thống kê (ANALYZE) trên các bảng đích, và chia nhỏ các giao dịch dài. Đặt tên công việc vào application_name sẽ làm cho phân loại tiếp theo chính xác hơn",
         "PROGRAM": "Đây có vẻ là các truy vấn được thực thi bởi ứng dụng. Hãy kiểm tra kế hoạch thực thi trong điều chỉnh SQL. Nếu thời gian thực thi tối đa mỗi lần dài, hãy xem xét thứ tự chỉ mục/kết nối trước; nếu thời gian thực thi mỗi lần ngắn nhưng số lần gọi nhiều, hãy xem xét các cuộc gọi lặp lại (N+1)/bộ nhớ đệm. Đặt tên dịch vụ vào application_name của nhóm kết nối.",
         "PLATFORM": "Có vẻ như công việc nội bộ của DB hoặc nền tảng như autovacuum hoặc sao chép. Thường không cần hành động. Nếu nó vẫn ở trên cùng, hãy xem xét ngưỡng autovacuum và maintenance_work_mem",
-        "MONITOR": "Đây là truy vấn tự thu thập của dbms.pi — kết nối schema.pi là một câu lệnh cố định chỉ đọc các chế độ xem thống kê/danh mục (pg_stat_*/pg_catalog), không phải truy vấn nghiệp vụ và không yêu cầu khách hàng thực hiện hành động. Nếu tải cơ sở dữ liệu mục tiêu là vấn đề, hãy giảm số lần mở nút thu thập/màn hình giám sát. Các câu lệnh từ các công cụ giám sát khác cũng chỉ đọc cùng một chế độ xem thống kê cũng được nhóm ở đây.",
+        "MONITOR": "Đây là truy vấn thu thập nội bộ của dbms.pi. Kết nối schema.pi chỉ đọc các view thống kê·catalog (pg_stat_*·pg_catalog) bằng các câu lệnh cố định, không phải truy vấn nghiệp vụ và không cần khách hàng thực hiện hành động. Nếu tải cơ sở dữ liệu mục tiêu là vấn đề, hãy giảm số lần mở nút thu thập·màn hình giám sát. Các câu lệnh chỉ đọc cùng một view thống kê từ các công cụ giám sát khác cũng được nhóm ở đây.",
         "UNKNOWN": "Không có manh mối nào về nguồn. Đặt application_name trên mỗi kết nối và chia tài khoản theo mục đích; nó sẽ được phân loại từ các mẫu tiếp theo"
       },
       "detail": {
@@ -1123,7 +1123,7 @@
         "period": "Đã quan sát",
         "none": "(trống)"
       },
-      "noSample": "Chưa có mẫu nào — các phiên đang chạy được lấy mẫu khi bạn xem bảng giám sát hoặc tab Hoạt động & khóa. Hiện tại nó chỉ được phân loại từ tên tài khoản",
+      "noSample": "Chưa có mẫu. Các phiên đang chạy sẽ được tích lũy làm mẫu khi xem bảng giám sát hoặc tab hoạt động·khóa. Hiện tại, chỉ phân loại tham khảo theo tên tài khoản.",
       "verOff": "DB này cũ hơn PostgreSQL 14, vì vậy các phiên đang chạy không có ID truy vấn. Chỉ tài khoản (chắc chắn) được hiển thị",
       "privOff": "Tài khoản liên kết không thể xem chi tiết phiên của các tài khoản khác, vì vậy không có mẫu nào được thu thập. Yêu cầu quản trị viên DB chạy GRANT pg_read_all_stats TO {user};",
       "linkUsr": "tài khoản liên kết",
@@ -1134,11 +1134,11 @@
     "diag": {
       "title": "Chẩn đoán nguyên nhân",
       "fix": "Hành động:",
-      "none": "Không có nguyên nhân nào được thống kê — hãy mở kế hoạch thực thi trong điều chỉnh SQL để kiểm tra",
-      "cum": "Không có lệnh gọi trong khoảng thời gian này — dựa trên tích lũy (kể từ khi đặt lại thống kê)",
-      "basis": "Căn cứ — Cao nhất 1 lần {max}ms · Trung bình {mean}ms · Số lần gọi {calls} · Số hàng mỗi lần {rpc} · Tỷ lệ đọc đĩa {read} · Khối tạm thời {tmp}",
+      "none": "Không có nguyên nhân nào được tiết lộ qua thống kê. Mở kế hoạch thực thi trong điều chỉnh SQL để kiểm tra.",
+      "cum": "Không có cuộc gọi trong khoảng thời gian này: Dựa trên tích lũy (sau khi đặt lại thống kê)",
+      "basis": "Cơ sở: Tối đa 1 lần {max}ms · Trung bình {mean}ms · Số lần gọi {calls} · Số hàng mỗi lần {rpc} · Tỷ lệ đọc đĩa {read} · Khối tạm thời {tmp}",
       "SELF_MON": {
-        "cause": "Truy vấn thu thập nội bộ của dbms.pi — đây là câu lệnh giám sát chỉ đọc các chế độ xem thống kê và danh mục",
+        "cause": "Truy vấn thu thập nội bộ của dbms.pi: Là câu lệnh giám sát chỉ đọc các view thống kê·catalog.",
         "fix": "Không yêu cầu hành động của khách hàng. Nếu tải cơ sở dữ liệu đích là vấn đề, hãy giảm số lần truy vấn màn hình thu thập/giám sát."
       },
       "NO_MAX": {
@@ -1146,31 +1146,31 @@
         "fix": "Nhấn thu thập một lần ngay bây giờ để điền giá trị cao nhất và chẩn đoán sẽ chính xác hơn"
       },
       "SLOW_EACH": {
-        "cause": "Chậm mỗi lần — mất nhiều thời gian mỗi khi thực thi với cao nhất {max}ms, trung bình {mean}ms",
+        "cause": "Chậm mỗi lần: Mất nhiều thời gian mỗi khi thực thi với tối đa {max}ms, trung bình {mean}ms.",
         "fix": "① Xem kế hoạch thực thi bằng cách 'Mở trong điều chỉnh SQL' ② Nếu có quét toàn bộ (Seq Scan) hoặc sắp xếp lớn, hãy xem xét chỉ mục cột điều kiện WHERE·JOIN ③ Thu hẹp điều kiện để chỉ đọc các cột và hàng cần thiết"
       },
       "SPIKE": {
-        "cause": "Trì hoãn không liên tục — trung bình {mean}ms nhưng đôi khi mất nhiều thời gian với cao nhất {max}ms (gấp {x} lần trung bình)",
+        "cause": "Trễ không liên tục: Trung bình {mean}ms nhưng đôi khi mất nhiều thời gian với tối đa {max}ms ({x} lần trung bình).",
         "fix": "① Khi chậm, kiểm tra chờ khóa (wait_event) trong tab hoạt động·khóa ② Nếu chỉ chậm ở lần thực thi đầu tiên, đó là do bộ nhớ cache trống và đã đọc từ đĩa ③ So sánh cùng một truy vấn với nhiều giá trị trong điều chỉnh SQL để xem kế hoạch thực thi có thay đổi theo giá trị không"
       },
       "DISK_READ": {
-        "cause": "Cache miss — {pct}% ({read} khối) các khối đã đọc được đọc từ đĩa chứ không phải bộ nhớ",
+        "cause": "Cache miss: {pct}% ({read} khối) các khối đã đọc được đọc từ đĩa chứ không phải bộ nhớ.",
         "fix": "① Giảm phạm vi đọc bằng chỉ mục ② Thu hẹp khoảng thời gian·điều kiện truy vấn ③ Nếu dữ liệu được đọc thường xuyên nhưng vẫn cao, hãy xem xét shared_buffers (bộ nhớ)"
       },
       "TEMP_SPILL": {
-        "cause": "Vượt quá bộ nhớ — sắp xếp·băm đã vượt quá work_mem và đã ghi {blk} khối (khoảng {mb}MB, {perCall} khối mỗi lần) vào tệp tạm thời",
+        "cause": "Vượt quá bộ nhớ: Sắp xếp·hash đã vượt quá work_mem và ghi {blk} khối (khoảng {mb}MB, {perCall} khối mỗi lần) vào tệp tạm thời.",
         "fix": "① Đặt chỉ mục trên các cột ORDER BY·GROUP BY để bỏ qua sắp xếp ② Giảm số hàng cần sắp xếp trước (LIMIT vào bên trong) ③ Nếu thực sự cần thiết, chỉ tăng SET LOCAL work_mem cho giao dịch truy vấn này"
       },
       "MANY_ROWS": {
-        "cause": "Truy vấn quá nhiều — lấy {perCall} hàng mỗi lần",
+        "cause": "Truy vấn quá nhiều: Lấy {perCall} hàng mỗi lần.",
         "fix": "① Danh sách màn hình được truy vấn theo từng trang ② SELECT chỉ chọn các cột được sử dụng ③ Tổng hợp được thực hiện trong cơ sở dữ liệu và chỉ nhận kết quả"
       },
       "PGRST_EMBED": {
-        "cause": "Câu lệnh bộ lọc nhúng PostgREST (!inner) — lọc cha bằng điều kiện con có thể quét toàn bộ trước điều kiện phân loại",
+        "cause": "Câu lệnh bộ lọc nhúng PostgREST (!inner): Nếu lọc cha bằng điều kiện con, có thể quét toàn bộ trước điều kiện phân loại.",
         "fix": "① Kiểm tra xem có chỉ mục trên khóa nối/cột lọc không ② Di chuyển bộ lọc đến điều kiện của bảng cha ③ Nhúng con vào truy vấn cha hiện có hoặc hợp nhất thành một hàm cơ sở dữ liệu"
       },
       "OFFSET_PAGING": {
-        "cause": "Phân trang OFFSET — các trang sau càng chậm vì đọc và loại bỏ các hàng trước đó",
+        "cause": "Phân trang OFFSET: Các trang sau sẽ đọc và loại bỏ các hàng trước đó, nên ngày càng chậm hơn.",
         "fix": "Thay đổi sang phân trang keyset (WHERE id > id cuối cùng ORDER BY id LIMIT n) đọc từ khóa cuối cùng đã nhận"
       }
     }
@@ -1203,8 +1203,8 @@
       "toDraft": "Tạo bản nháp pipeline từ {n} đã chọn"
     },
     "ready": {
-      "ok": "Sao chép logic WAL đã sẵn sàng — các bảng có PK có thể sử dụng LOGICAL",
-      "no": "Sao chép logic WAL chưa sẵn sàng — thu thập qua thăm dò hoặc so sánh khóa",
+      "ok": "Sao chép logic WAL đã sẵn sàng: Các bảng có PK có thể sử dụng phương thức LOGICAL.",
+      "no": "Sao chép logic WAL chưa sẵn sàng: Thu thập bằng phương thức polling·so sánh khóa.",
       "senders": "{n} kết nối sao chép"
     },
     "adapter": {
@@ -1219,20 +1219,20 @@
       "HAS_SOFT_DEL": "Có cột xóa mềm",
       "NO_SOFT_DEL": "Không có cột xóa mềm",
       "HAS_PK": "Có khóa chính",
-      "NO_PK": "Không có khóa chính — không thể xác định các hàng đã thay đổi",
+      "NO_PK": "Không có PK: Không thể xác định hàng thay đổi.",
       "DELETE_UNSEEN": "Thăm dò không thể thu thập các bản DELETE vật lý (khuyến nghị cột xóa mềm)",
       "LOGICAL_NOT_READY": "Có thể chuyển sang LOGICAL khi sao chép logic WAL đã sẵn sàng",
-      "FULL_RELOAD_ONLY": "Không có PK hoặc cột thời gian thay đổi, vì vậy không thể thu thập tăng dần — hãy thêm PK",
+      "FULL_RELOAD_ONLY": "Không có PK·thời gian thay đổi nên không thể thu thập tăng dần: Khuyến nghị thêm PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level không phải là logical (thay đổi nó cần khởi động lại DB)",
       "NO_SLOTS": "max_replication_slots là 0",
       "NO_SENDERS": "max_wal_senders là 0",
-      "IS_STANDBY": "Máy chủ dự phòng — lấy sao chép logic từ máy chủ chính",
+      "IS_STANDBY": "Máy chủ chờ (standby): Nhận sao chép logic từ máy chủ chính.",
       "SETTINGS_UNKNOWN": "Không thể đọc cài đặt, trạng thái sẵn sàng không xác định"
     },
     "ed": {
       "title": "Định nghĩa pipeline",
-      "draftOnly": "Chỉ thiết kế — lưu dưới dạng bản nháp (DRAFT)",
+      "draftOnly": "Chỉ thiết kế: Chỉ lưu dưới dạng bản nháp (DRAFT).",
       "new": "Pipeline mới",
       "empty": "Không có pipeline nào được lưu",
       "manual": "Thủ công",
@@ -1301,8 +1301,8 @@
     },
     "warn": {
       "none": "Không có cảnh báo đáng chú ý nào.",
-      "SEQ_SCAN_LARGE": "Quét toàn bộ trên {relation} (khoảng {rows} hàng) — hãy xem xét một chỉ mục trên các cột bộ lọc.",
-      "NESTED_LOOP_HIGH": "Vòng lặp lồng nhau tạo ra khoảng {rows} hàng — hãy xem xét một hash hoặc merge join, hoặc một chỉ mục trên điều kiện join.",
+      "SEQ_SCAN_LARGE": "Quét toàn bộ bảng {relation} (ước tính {rows} hàng): Xem xét chỉ mục cột điều kiện.",
+      "NESTED_LOOP_HIGH": "Kết quả vòng lặp lồng nhau ước tính {rows} hàng. Xem xét hash·merge join hoặc chỉ mục điều kiện join.",
       "SORT_SPILL": "Kích thước sắp xếp khoảng {kb}KB, vượt quá work_mem mặc định (4MB); nó có thể tràn ra đĩa."
     },
     "lint": {
@@ -1316,14 +1316,14 @@
         "char": "ký tự"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — chỉ chọn các cột bạn cần (I/O thừa, không có chỉ mục bao phủ).",
-        "FUNC_ON_COLUMN": "Cột bộ lọc {column} được bao bọc trong một hàm hoặc biểu thức, vì vậy chỉ mục của nó không thể được sử dụng — thay vào đó hãy chuyển đổi hằng số.",
-        "LEADING_WILDCARD": "LIKE với % đứng đầu không thể sử dụng chỉ mục B-tree — hãy xem xét chỉ mục GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Các điều kiện cột khác nhau được nhóm bằng OR — hãy xem xét tách UNION (thêm điều kiện loại trừ trùng lặp nếu là UNION ALL) hoặc các chỉ mục theo cột.",
-        "IMPLICIT_CAST": "{column} được so sánh với một số được trích dẫn — khớp các kiểu cột và hằng số (chuyển đổi kiểu ngầm định).",
-        "NOT_IN_SUBQUERY": "NOT IN (truy vấn con) không trả về gì khi có giá trị NULL và chậm — hãy sử dụng NOT EXISTS.",
-        "NO_WHERE": "Không có mệnh đề WHERE — trên một bảng lớn, đây là một quét toàn bộ (thêm một điều kiện hoặc LIMIT).",
-        "DOMAIN_MISMATCH": "{column} là kiểu {expected} theo miền tiêu chuẩn nhưng được so sánh với một hằng số có kiểu khác — việc chuyển đổi kiểu ngầm định có thể ngăn việc sử dụng chỉ mục."
+        "SELECT_STAR": "SELECT *: Chỉ chọn các cột cần thiết (I/O không cần thiết·không thể sử dụng chỉ mục bao phủ).",
+        "FUNC_ON_COLUMN": "Cột điều kiện {column} được xử lý bằng hàm·toán tử nên không thể sử dụng chỉ mục. Hãy xử lý phía hằng số.",
+        "LEADING_WILDCARD": "LIKE có % ở phía trước không thể sử dụng chỉ mục B-tree. Xem xét chỉ mục GIN của pg_trgm.",
+        "OR_DIFF_COLUMNS": "Các điều kiện cột khác nhau được nhóm bằng OR. Xem xét tách UNION (thêm điều kiện loại trừ trùng lặp nếu là UNION ALL) hoặc chỉ mục cho từng cột.",
+        "IMPLICIT_CAST": "So sánh {column} với số trong dấu ngoặc kép. Hãy khớp kiểu cột và kiểu hằng số (chuyển đổi kiểu ngầm định).",
+        "NOT_IN_SUBQUERY": "NOT IN (truy vấn con) sẽ trống và chậm nếu có NULL. Thay bằng NOT EXISTS.",
+        "NO_WHERE": "Không có điều kiện WHERE. Nếu là bảng lớn, sẽ là quét toàn bộ (thêm LIMIT hoặc điều kiện).",
+        "DOMAIN_MISMATCH": "{column} có kiểu {expected} theo miền chuẩn nhưng so sánh với hằng số kiểu khác. Có thể không sử dụng được chỉ mục do chuyển đổi kiểu ngầm định."
       }
     },
     "saved": {
@@ -1349,12 +1349,12 @@
     },
     "ai": {
       "title": "Lời khuyên điều chỉnh AI",
-      "intro": "Chọn một kế hoạch đã lưu để tạo đề xuất. Chỉ SQL và các kế hoạch có hằng số được che bằng dấu ? mới được gửi (đề xuất dựa trên quy tắc nếu không có khóa hoặc khi thất bại). Sau khi chủ sở hữu liên kết chấp thuận, hãy chạy lại giải thích cho cùng một SQL, lưu nó và đo lường tác động với kế hoạch sau đó — chỉ khi đó nó mới được ghi nhận là đã áp dụng.",
+      "intro": "Chọn một kế hoạch đã lưu để tạo đề xuất. Chỉ SQL và các kế hoạch có hằng số được che bằng dấu ? mới được gửi (đề xuất dựa trên quy tắc nếu không có khóa hoặc khi thất bại). Sau khi chủ sở hữu liên kết chấp thuận, hãy chạy lại giải thích cho cùng một SQL, lưu nó và đo lường tác động với kế hoạch sau đó : chỉ khi đó nó mới được ghi nhận là đã áp dụng.",
       "pickPlan": "Chọn một kế hoạch đã lưu để đề xuất",
       "create": "Tạo đề xuất",
       "creating": "Đang tạo… (tối đa 30 giây)",
       "noPlans": "Không có kế hoạch nào được lưu. Xem một kế hoạch giải thích ở trên và lưu nó.",
-      "note": "Mỗi kế hoạch chỉ có một đề xuất. Xóa đề xuất hiện có để tạo lại. DDL chỉ được đề xuất — áp dụng nó trong schema.pi.",
+      "note": "Mỗi kế hoạch chỉ có một đề xuất. Xóa đề xuất hiện có để tạo lại. DDL chỉ được đề xuất : áp dụng nó trong schema.pi.",
       "empty": "Chưa có đề xuất nào.",
       "noItems": "Không tìm thấy cải tiến nào cho kế hoạch này.",
       "cost": "Chi phí trước",
@@ -1396,10 +1396,10 @@
       "copy": "Sao chép",
       "copied": "Đã sao chép",
       "rule": {
-        "SEQ_SCAN_INDEX": "Quét toàn bộ {relation} — tạo chỉ mục trên cột bộ lọc {column} (thay thế NN trong tên chỉ mục bằng số thứ tự).",
-        "SEQ_SCAN_STATS": "Quét toàn bộ {relation} — kiểm tra các cột bộ lọc và đảm bảo thống kê (ANALYZE) là mới nhất.",
-        "NESTED_LOOP": "Vòng lặp lồng nhau dự kiến {rows} hàng — làm mới thống kê và xem xét các chỉ mục khóa nối hoặc nối băm.",
-        "SORT_SPILL": "Sắp xếp khoảng {kb} KB có thể tràn ra đĩa — xem xét tăng work_mem của phiên hoặc lập chỉ mục các cột sắp xếp.",
+        "SEQ_SCAN_INDEX": "Quét toàn bộ {relation}: Tạo chỉ mục trên cột điều kiện {column} (tên chỉ mục NN sẽ được thay bằng số thứ tự).",
+        "SEQ_SCAN_STATS": "Quét toàn bộ {relation}: Kiểm tra cột điều kiện và đảm bảo thống kê (ANALYZE) là mới nhất.",
+        "NESTED_LOOP": "Kết quả vòng lặp lồng nhau ước tính {rows} hàng: Cập nhật thống kê và xem xét chỉ mục điều kiện join hoặc hash join.",
+        "SORT_SPILL": "Sắp xếp khoảng {kb}KB có thể tràn ra đĩa. Xem xét tăng work_mem phiên hoặc chỉ mục cột sắp xếp.",
         "SELECT_STAR": "Chỉ chọn các cột bạn cần thay vì SELECT * (giảm I/O, có thể có chỉ mục bao phủ).",
         "FUNC_ON_COLUMN": "Di chuyển hàm/biểu thức trên cột bộ lọc {column} sang phía hằng số (cho phép sử dụng chỉ mục).",
         "IMPLICIT_CAST": "Khớp các kiểu của {column} và hằng số (loại bỏ ép kiểu ngầm định).",
@@ -1459,9 +1459,9 @@
     },
     "desc": {
       "FREE": "Khám phá·Học hỏi",
-      "D1": "Người vận hành — kiểm tra xem cơ sở dữ liệu có ổn không",
-      "D2": "Nhà phát triển·Người điều chỉnh — Sửa SQL chậm",
-      "D3": "DBA·DA — Từ an toàn vận hành·triển khai·đến hồ dữ liệu"
+      "D1": "Người vận hành: Kiểm tra xem cơ sở dữ liệu có ổn không.",
+      "D2": "Nhà phát triển·Điều chỉnh: Sửa các SQL chậm.",
+      "D3": "DBA·DA: Đảm bảo an toàn vận hành·di chuyển·đến lake."
     },
     "feat": {
       "FREE": "Bảng điều khiển giám sát·Xem kế hoạch thực thi·Học cơ bản",
@@ -1504,7 +1504,7 @@
       "required": "Tính năng này khả dụng từ gói {plan}.",
       "limit": "Bạn đã sử dụng hết số lần cho phép trong kỳ này. Bạn có thể sử dụng thêm nếu nâng cấp lên gói {plan}.",
       "limitTop": "Bạn đã sử dụng hết số lần cho phép trong kỳ này. Bạn có thể sử dụng lại vào kỳ tiếp theo.",
-      "expired": "Gói schema.pi đã hết hạn — vui lòng thanh toán trên màn hình gói schema.pi.",
+      "expired": "Gói schema.pi đã hết hạn. Vui lòng thanh toán trên màn hình gói schema.pi.",
       "go": "Xem gói",
       "close": "Đóng"
     }

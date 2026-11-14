@@ -386,14 +386,14 @@ function DriftResultView({
         title={t('sec.ddlMissing')}
         hint={t('hint.ddlMissing')}
         items={r.ddlMissing.map(
-          (d) => `${d.kind} ${d.name} — ${t('reqNo', { id: d.reqId })}`,
+          (d) => `${d.kind} ${d.name} : ${t('reqNo', { id: d.reqId })}`,
         )}
       >
         {r.renamed.length > 0 && (
           <Fold
             label={t('renamed', { n: r.renamed.length })}
             items={r.renamed.map(
-              (x) => `${x.name} → ${x.dbName} — ${t('reqNo', { id: x.reqId })}`,
+              (x) => `${x.name} → ${x.dbName} : ${t('reqNo', { id: x.reqId })}`,
             )}
           />
         )}
@@ -461,7 +461,7 @@ function DriftResultView({
         title={t('sec.colMismatches')}
         items={r.colMismatches.map(
           (c) =>
-            `${c.tbl}.${c.col} — ${t(`kind.${c.kind}`)}${c.model ? ` (${t('model')} ${c.model} / DB ${c.db})` : ''}`,
+            `${c.tbl}.${c.col} : ${t(`kind.${c.kind}`)}${c.model ? ` (${t('model')} ${c.model} / DB ${c.db})` : ''}`,
         )}
       >
         {r.sysCols.length > 0 && (

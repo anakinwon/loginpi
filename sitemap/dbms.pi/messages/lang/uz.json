@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analitika va koʻl",
     "intro": "dbms faoliyati KPI, uch qatlamli koʻl dizayni va maʼlumotlar toʻplami katalogi bir joyda.",
-    "storageNotice": "Koʻl saqlash joyi (mijoz tomonida yoki bulutda) hali hal qilinmagan (PRD 10-boʻlim #7). Hozircha faqat dizaynlar va nom xaritalari saqlanadi — qator maʼlumotlari yoʻq.",
+    "storageNotice": "Koʻl saqlash joyi (mijoz tomonida yoki bulutda) hali hal qilinmagan (PRD 10-boʻlim #7). Hozircha faqat dizaynlar va nom xaritalari saqlanadi : qator maʼlumotlari yoʻq.",
     "noLink": "Avval schema.pi havolasini tanlang yoki roʻyxatdan oʻtkazing.",
     "goConnect": "Havolani roʻyxatdan oʻtkazish",
     "loading": "Yuklanmoqda…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP tahlili — Model↔DB",
+    "title": "GAP tahlili: Model↔DB",
     "intro": "schema.pi dizayn modeli va DDL qoʻllash tarixini jonli DB katalogi bilan solishtirib, driftni toping va moʻljallangan indekslar haqiqatda ishlatilayotganligini oʻlchang. Mijoz qator maʼlumotlari hech qachon oʻqilmaydi yoki saqlanmaydi.",
     "needLink": "Avval yuqoridan schema.pi havolasini tanlang. Agar sizda yoʻq boʻlsa, 'Ulanish' menyusida token roʻyxatdan oʻtkazing.",
     "needConn": "Yuqoridan solishtirish uchun DB ulanishini tanlang.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Soʻrov {id}",
     "notSaved": "Bu ishga tushirishni tarixga saqlab boʻlmadi (natijalar odatdagidek koʻrsatiladi).",
-    "capped": "Juda koʻp elementlar — har bir boʻlim uchun birinchi {cap} koʻrsatilmoqda (hisoblar toʻliq).",
+    "capped": "Juda koʻp elementlar : har bir boʻlim uchun birinchi {cap} koʻrsatilmoqda (hisoblar toʻliq).",
     "statsMissing": "Indeksdan foydalanish statistikasi mavjud emasligi sababli, foydalanishni baholab boʻlmadi.",
     "sum": {
       "missingTables": "DB da yoʻq jadvallar",
@@ -230,7 +230,7 @@
       "USED": "Foydalanilmoqda",
       "NO_STATS": "Statistika yoʻq",
       "CONSTRAINT": "Noyoblik cheklovi (saqlash)",
-      "NO_DATA": "Maʼlumot yoʻq yoki statistika yigʻilmagan — hukm qilib boʻlmaydi",
+      "NO_DATA": "Maʼlumotlar yoʻq yoki statistikalar yigʻilmagan: aniqlash mumkin emas",
       "OBSERVING": "Kuzatuv ostida (7 kundan kam)",
       "UNUSED_CAND": "Ishlatilmagan nomzod"
     },
@@ -245,14 +245,14 @@
       "RATE": "Juda koʻp soʻrovlar. Iltimos, bir daqiqadan keyin qayta urinib koʻring."
     },
     "schema": "Sxema",
-    "schemaHint": "Faqat ushbu sxemadagi oddiy va boʻlingan jadvallar solishtiriladi (koʻrinishlar bundan mustasno). Standart public — Supabase ichki sxemalari (auth, storage, …) chiqarib tashlanadi.",
-    "truncated": "{names} {max} qator chegarasiga yetdi va qisqartirildi — baʼzi \"DBda yoʻq\" / \"modelda yoʻq\" natijalari notoʻgʻri boʻlishi mumkin. Sxemani toraytiring va qayta ishga tushiring.",
+    "schemaHint": "Faqat ushbu sxemadagi oddiy va boʻlingan jadvallarni solishtiradi (koʻrinishlar bundan mustasno). Standart public: Supabase ichki sxemalari (auth, storage va boshqalar) chiqarib tashlanadi.",
+    "truncated": "{names} soʻrovi {max} qator chegarasiga yetib, qisqartirildi. Baʼzi 'DB da yoʻq'/'Modelda yoʻq' aniqlashlar notoʻgʻri boʻlishi mumkin. Sxemani toraytirib, qayta aniqlang.",
     "colUnchecked": "Ustun soʻrovi qisqartirilganligi sababli, {n} ta yetishmayotgan/qoʻshimcha ustun natijalari tekshirib boʻlmaydigan deb hisoblanadi va ustun nomuvofiqligi sonidan chiqarib tashlanadi.",
-    "renamed": "Eski nomlash qoidasi (_PKEY) boʻyicha qoʻllanilgan {n} ta PK indeksi DBda yangi nom (PK_) ostida mavjud — normal",
-    "superseded": "{n} ta eski soʻrov keyingi soʻrov xuddi shu jadvalni qayta yaratganligi sababli (DROP … CASCADE) chiqarib tashlandi — normal",
+    "renamed": "Eski nomlash qoidasi (_PKEY) bilan qoʻllanilgan {n} ta PK indekslari DB da yangi nom (PK_) bilan mavjud. Normal.",
+    "superseded": "Avvalgi {n} ta soʻrov solishtirishdan chiqarib tashlandi, chunki keyingi soʻrovlar bir xil jadvalni qayta yaratdi (DROP … CASCADE). Normal.",
     "supersededItem": "Soʻrov {id} → {by} soʻrovi bilan almashtirildi",
     "sysCols": "DDL yaratishda avtomatik qoʻshilgan {n} ta tizim ustuni modelda boʻlmasligi normal holat va nomuvofiqliklardan chiqarib tashlanadi",
-    "groupOwn": "Loyiha prefiksi {pfx} — modeldan tashqarida qolgan nomzodlar",
+    "groupOwn": "Ushbu loyiha prefiksi {pfx}: modelda yoʻq nomzodlar",
     "groupOther": "Boshqa tizim {pfx}",
     "basis": "Taxminiy qatorlar {rows} · {since} dan beri",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Qayta qoʻllagandan keyin ham obyektlar yoʻqolsa, qoʻlda oʻchirish yoki qaytarishdan shubhalaning va ulanish hisobining faoliyatini DBA bilan tekshiring."
       },
       "extraTables": {
-        "s1": "Ushbu loyiha prefiksi toʻplami = modelda yoʻq nomzodlar — ularni schema.pi → Sozlamalar → Reverse orqali modelga import qiling yoki foydalanilmayotgan jadvallar boʻlsa, ularni oʻchirishni hal qiling.",
-        "s2": "Boshqa prefiks guruhlari = ushbu DBni baham koʻradigan boshqa tizimlar — ushbu loyiha uchun harakat elementlari emas.",
+        "s1": "Ushbu loyiha prefiksi guruhi = modelda yoʻq nomzodlar: schema.pi → Sozlamalar → Reverse orqali modelga import qiling yoki jadval ishlatilmasa, uni oʻchirishni hal qiling.",
+        "s2": "Boshqa prefiks guruhlari = bir xil DB dan foydalanadigan boshqa tizimlar: ushbu loyiha tomonidan amalga oshiriladigan harakatlarga taalluqli emas.",
         "s3": "Agar maqsadli sxema public boʻlmasa, yuqoridagi \"Sxema\" maydonini oʻzgartiring va qayta ishga tushiring."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Turi/NULL farq qiladi = modelga (haqiqat manbai) moslashtiring; uzunlikni qisqartirish yoki NOT NULLga oʻtishdan oldin, mavjud qatorlar unga mos kelishini tasdiqlang."
       },
       "idxUsage": {
-        "s1": "Oʻchirishdan oldin, ① statistika oynasi kamida bitta biznes siklini (masalan, oy oxiridagi partiya) qamrab olganligini tekshiring — \"dan beri\" ga qarang.",
+        "s1": "Oʻchirishdan oldin tekshiring ① statistika yigʻish davri kamida bitta operatsion sikl (masalan, oy oxiridagi paket) boʻladimi: maʼlumot sanasiga qarang.",
         "s2": "② Bu noyob/PK indeks emasligini (ular alohida \"noyoblik cheklovi\" sifatida koʻrsatiladi).",
         "s3": "③ SQL Tuningda jadvalning vakili SQLni EXPLAIN qiling va ushbu indeks ishlatilmaganligini tasdiqlang.",
         "s4": "Uchta holat ham tasdiqlangandan soʻng, indeksni schema.pi dagi modeldan olib tashlang va DDL orqali qoʻllang."
@@ -354,7 +354,7 @@
     "howTitle": "Ulanish tokenini qanday chiqarish kerak",
     "how1": "schema.pi ga kiring va ulanish uchun mavzu sohasini oching",
     "how2": "Mavzu sohasi → Sozlamalar → Ulanish tokeniga oʻting va 'Token chiqarish' tugmasini bosing (soha administratori yoki DA roli)",
-    "how3": "slk_ bilan boshlanadigan tokenni nusxalang — u faqat bir marta chiqarilganda koʻrsatiladi",
+    "how3": "Berilgan slk_ bilan boshlanadigan tokenni nusxalang. Asl nusxasi faqat berish vaqtida bir marta koʻrsatiladi.",
     "how4": "Uni quyida joylashtiring va roʻyxatdan oʻtkazing",
     "openSchema": "schema.pi ni ochish",
     "registerTitle": "Ulanishni roʻyxatdan oʻtkazish",
@@ -384,7 +384,7 @@
     "retry": "Qayta urinish",
     "pickerLink": "Havola",
     "pickerConn": "Ulanish",
-    "pickerEmpty": "Ulanishlar yoʻq —",
+    "pickerEmpty": "Ulanishlar yoʻq.",
     "pickerGo": "/connect da roʻyxatdan oʻtkazing",
     "errors": {
       "LINK_AUTH": "Ulanish tokenining muddati tugagan yoki bekor qilingan. schema.pi da yangi token chiqaring va qayta roʻyxatdan oʻtkazing",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Maʼlumotlarni migratsiya qilish (PiMig)",
-    "intro": "schema.pi dizayn modelingizdagi munosabatlardan jadval yuklash tartibini hisoblaydi, boʻlak hajmini, parallellikni va oʻtish nazorat roʻyxatini tashkil qiladi va manba va maqsadga oʻzingiz ishlatadigan tekshirish SQL ni yaratadi. Bu ekran faqat rejalashtiradi va tekshiradi — u maʼlumotlarni koʻchirmaydi yoki mijoz DB qatorlarini oʻqimaydi.",
+    "intro": "schema.pi dizayn modelingizdagi munosabatlardan jadval yuklash tartibini hisoblaydi, boʻlak hajmini, parallellikni va oʻtish nazorat roʻyxatini tashkil qiladi va manba va maqsadga oʻzingiz ishlatadigan tekshirish SQL ni yaratadi. Bu ekran faqat rejalashtiradi va tekshiradi : u maʼlumotlarni koʻchirmaydi yoki mijoz DB qatorlarini oʻqimaydi.",
     "needLink": "Avval yuqoridan schema.pi havolasini tanlang. Agar sizda yoʻq boʻlsa, 'Ulanish' menyusida token roʻyxatdan oʻtkazing.",
     "loading": "Yuklanmoqda…",
     "newPlan": "Yangi migratsiya rejasi",
@@ -429,11 +429,11 @@
     "chunkSize": "Boʻlak hajmi (qatorlar/kommit)",
     "parallel": "Parallellik (bir vaqtda jadvallar)",
     "saveOpts": "Parametrlarni saqlash",
-    "optsHint": "Parallellik — bir daraja ichida bir vaqtda yuklanadigan jadvallar soni. Boʻlak hajmi — ijro etish mexanizmi foydalanadigan kommit birligi (qatorlar).",
+    "optsHint": "Parallellik : bir daraja ichida bir vaqtda yuklanadigan jadvallar soni. Boʻlak hajmi : ijro etish mexanizmi foydalanadigan kommit birligi (qatorlar).",
     "order": "Yuklash tartibi",
     "orderHint": "Ota jadvallar birinchi kelishi uchun dizayn munosabatlari (jismoniy FKlar emas) boʻyicha topologik tartiblangan. Bir xil darajadagi jadvallar bir-biriga bogʻliq emas va parallel yuklanishi mumkin.",
-    "cycles": "{n} ta aylanma guruh — bir darajaga joylashtirilgan. Ularning tartibini qoʻlda belgilang va yuklashdan keyin maʼlumotlarni tekshirishni kechiktiring.",
-    "selfRefs": "Oʻz-oʻziga murojaat qiluvchi (ierarxik) jadvallar — jadval ichida avval ota qatorlarni yuklash",
+    "cycles": "{n} ta sikl: bir xil bosqichga joylashtirilgan. Yuklash tartibini qoʻlda oʻrnating va yuklashdan keyin maʼlumot tekshiruvlarini kechiktiring.",
+    "selfRefs": "Oʻz-oʻziga murojaat qiluvchi (ierarxik) jadvallar: bir xil jadval ichida avval ota qatorlar.",
     "level": "Daraja {n}",
     "checklist": "Oʻtish nazorat roʻyxati",
     "toReady": "Tayyor deb belgilash",
@@ -471,7 +471,7 @@
     },
     "verify": "Tekshirish SQL",
     "verifyHint": "Yuklash tartibida har bir jadval uchun hisoblash, raqamli ustun yigʻindisi, dublikat kalit va kalit xesh soʻrovlarini yaratadi. Ularni manba va maqsad boʻyicha oʻzingiz ishga tushiring va solishtiring (bu ekran ularni bajarmaydi).",
-    "noHashOracle": "Oracle·Tibero xesh funksiyalari va matnni koʻrsatish PostgreSQL dan farq qiladi, shuning uchun xesh soʻrovlari oʻtkazib yuboriladi — hisoblashlar, yigʻindilar va dublikat kalitlarni solishtiring.",
+    "noHashOracle": "Oracle va Tibero hash funksiyalari va belgilar tasvirlari PostgreSQL dan farq qilgani sababli hash qidiruvini oʻtkazib yuboradi. Son, yigʻindi va kalit takrorlanishi boʻyicha solishtiring.",
     "copy": "Nusxalash",
     "copied": "Nusxalandi",
     "copyFail": "Nusxalashning iloji boʻlmadi. Matnni tanlang va qoʻlda nusxalang.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Soʻrov notoʻgʻri."
     },
     "board": {
-      "subtitle": "Ushbu DB da hozir nima qilish kerak — 14 ta signal OK, ogohlantirish yoki xavf sifatida, tuzatishlar bilan, bir qarashda.",
+      "subtitle": "Ushbu DB da hozir nima qilish kerak: 14 ta signalning normal, ogohlantirish va xavf holatini va ularning yechimlarini bir qarashda koʻring.",
       "refresh": {
         "updated": "{time} holatiga koʻra · har daqiqada yangilanadi",
         "now": "Hozir yangilash",
@@ -564,11 +564,11 @@
         "NA": "Mavjud emas"
       },
       "overall": {
-        "RISK": "Xavf — hozir harakat qilish kerak",
-        "WARN": "Ogohlantirish — baʼzi elementlarni koʻrib chiqish kerak",
-        "UNKNOWN": "Nomaʼlum — ulanishni tekshiring",
-        "OK": "OK — har bir signal chegaralar ichida",
-        "CONN_DOWN": "DB ga ulanib boʻlmadi — avval ulanishni tekshiring",
+        "RISK": "Xavf: Zudlik bilan chora koʻrish kerak",
+        "WARN": "Ogohlantirish: Koʻrib chiqilishi kerak boʻlgan elementlar",
+        "UNKNOWN": "Tasdiqlab boʻlmaydi: Ulanish holatini tekshiring",
+        "OK": "Normal: Barcha signallar mezonlar ichida",
+        "CONN_DOWN": "DB ga ulanib boʻlmadi. Avval ulanishni tekshiring.",
         "NA": "Mavjud emas"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Kamroq koʻrsatish",
         "setup": "Koʻproq koʻrish uchun bularni sozlang",
         "none": "Hozirda hech qanday xavf yoki ogohlantirish elementlari harakatni talab qilmaydi.",
-        "unknown": "{n} ta signalni tekshirib boʻlmadi — sababini kartalarda koʻring.",
+        "unknown": "{n} ta elementni tasdiqlab boʻlmadi: Kartadagi sababni tekshiring.",
         "myRule": "Mening qoidam buzildi: {rule}",
         "copySql": "SQL nusxalash",
         "copied": "Nusxalandi"
@@ -622,34 +622,34 @@
         "REPL": "Replikatsiya kechikishi"
       },
       "fix": {
-        "AVAIL": "Sekin javob yoki yaqinda qayta ishga tushirish — ulanish sozlamalarini va DB server holatini tekshiring.",
-        "AVAIL_DOWN": "DB ga ulanib boʻlmadi — ulanish sozlamalarini va DB serveri ishlayotganligini tekshiring.",
-        "CONN_USE": "Ushbu DB da {sess}/{max} sessiya (klaster boʻyicha emas — boshqa maʼlumotlar bazalari chiqarib tashlangan) — boʻsh ulanishlarni yoping yoki ulanish poolerini (pgbouncer) qoʻshing.",
-        "URL": "{n} ta tekshirilgan URL ishlamayapti · maksimal javob {ms}ms — sababini schema.pi monitorida koʻring.",
-        "LONG_QRY": "Soʻrov {sec} soniyadan beri ishlamoqda — uning rejasini koʻrib chiqing va sozlang, yoki DBA ga uni bekor qildiring.",
-        "IDLE_TX": "Tranzaksiya {sec} soniyadan beri boʻsh turibdi — ilovada yoʻqolgan commitni toping va vaqt chegarasini oʻrnating.",
-        "LOCK_WAIT": "{n} ta sessiya bloklashlarni kutmoqda — bloklovchi sessiyani toping va uning tranzaksiyasini yakunlang.",
-        "CACHE_HIT": "Keshga kirish darajasi {pct}% — katta jadvallarni toʻliq skanerlashni qidiring yoki shared_buffers ni koʻrib chiqing.",
-        "XACT_ERR": "Qaytarish darajasi {pct}%, {dlck} ta oʻlik blokirovkalar — ishlamayotgan tranzaksiyalarni va ilova xato loglarini tekshiring.",
-        "SLOW_SQL": "Har bir ijroda {ms}ms gacha vaqt oladigan soʻrov mavjud — ijro rejasini koʻrib chiqing va eng yuqori bir martalik ijro vaqtidan boshlab sozlang.",
-        "STORAGE": "DB ({gb} GB) oʻz chegarasiga yaqin ({days} kun qoldi) — katta jadvallarni tozalang yoki sigʻimni oshiring.",
-        "VACUUM": "{tbl} da koʻplab oʻlik qatorlar yoki eskirgan statistikalar mavjud — VACUUM (ANALYZE) va autovacuum sozlamalarini koʻrib chiqing.",
-        "INDEX": "{n} ta indeks topilmalari (yaroqsiz, ishlatilmagan, toʻliq skanerlash) — jadvallar va indekslar holati yorligʻida maqsadlarni koʻring.",
-        "BACKUP": "WAL arxivlash oʻchirilgan yoki toʻxtatilgan — archive_mode, archive_command va zaxira holatini tekshiring.",
-        "REPL": "Replikatsiya kechikishi {sec} soniya — kutish holatini va tarmoqni tekshiring.",
-        "PGSS": "pg_stat_statements oʻrnatilmagan, shuning uchun sekin SQL mavjud emas — uni quyidagi SQL bilan yoqing (serverni qayta ishga tushirish talab qilinadi)."
+        "AVAIL": "Javob sekin yoki yangi qayta ishga tushirildi. Ulanish maʼlumotlarini va DB server holatini tekshiring.",
+        "AVAIL_DOWN": "DB ga ulanish muvaffaqiyatsiz tugadi. Ulanish maʼlumotlarini va DB serverining ishlashini tekshiring.",
+        "CONN_USE": "Ushbu DB sessiyasi {sess}/{max} (klaster boʻyicha emas, boshqa DB ulanishlari chiqarib tashlangan): Boʻsh ulanishlarni tozalang yoki ulanish poolerini (pgbouncer) oʻrnating.",
+        "URL": "{n} ta URL tekshiruvi muvaffaqiyatsiz tugadi · Maksimal javob {ms}ms: schema.pi monitorida sababni tekshiring.",
+        "LONG_QRY": "{sec} soniyadan beri ishlayotgan soʻrov bor. Ijro rejasini koʻrib chiqing va sozlang yoki DBA ga uni toʻxtatishni buyuring.",
+        "IDLE_TX": "Tranzaksiya {sec} soniyadan beri ochiq va boʻsh turibdi. Ilovadagi yoʻqolgan commitlarni toping va vaqt chegarasini oʻrnating.",
+        "LOCK_WAIT": "{n} ta sessiya qulflarni kutmoqda: Bloklovchi sessiyani toping va uning tranzaksiyasini tugating.",
+        "CACHE_HIT": "Keshga tushish darajasi {pct}%: Katta jadvallarning toʻliq skanirlashini qidiring yoki shared_buffers ni koʻrib chiqing.",
+        "XACT_ERR": "Rollback darajasi {pct}%, {dlck} ta oʻlik qulflar: Muvaffaqiyatsiz tranzaksiyalarni va ilova xato loglarini tekshiring.",
+        "SLOW_SQL": "Bir martalik maksimal vaqti {ms}ms boʻlgan soʻrov bor. Ijro rejasini koʻrib chiqing va eng yuqori bir martalik maksimal vaqtdan boshlab sozlang.",
+        "STORAGE": "DB {gb}GB chegarasiga yaqin (qolgan {days} kun). Katta jadvallarni tozalang yoki hajmini oshiring.",
+        "VACUUM": "{tbl} da koʻp oʻlik qatorlar yoki eskirgan statistikalar bor. VACUUM (ANALYZE) va autovacuum sozlamalarini koʻrib chiqing.",
+        "INDEX": "{n} ta indeks tekshiruvi (yaroqsiz, ishlatilmagan, toʻliq skanerlash): Jadval/indeks salomatligi yorligʻida maqsadlarni tekshiring.",
+        "BACKUP": "WAL arxivlash oʻchirilgan yoki toʻxtatilgan. archive_mode, archive_command va zaxira nusxa holatini tekshiring.",
+        "REPL": "Replikatsiya kechikishi {sec} soniya: Kutish serveri holatini va tarmoqni tekshiring.",
+        "PGSS": "pg_stat_statements kengaytmasi yoʻq, shuning uchun sekin SQL ni koʻrish mumkin emas. Quyidagi SQL bilan yoqing (serverni qayta ishga tushirish talab qilinadi)."
       },
       "reason": {
         "CONN_DOWN": "DB ulanishi uzilganligi sababli baholanmadi.",
         "PGSS": "pg_stat_statements oʻrnatilmagan.",
         "VER": "PostgreSQL 13 yoki undan keyingi versiyalarda mavjud.",
         "SAMPLE": "Hali yetarli namunalar yoʻq.",
-        "NO_LIMIT": "Hajm chegarasi yoʻq, shuning uchun foydalanish baholanmaydi — uni chegara sifatida ishlatish uchun DB hajmi (MB) qoidasini (>) qoʻshing.",
+        "NO_LIMIT": "Hajm chegarasi yoʻqligi sababli foydalanish aniqlanmaydi. DB hajmi (MB) qoidasini (>) qoʻshsangiz, u chegara sifatida ishlatiladi.",
         "RESET": "Statistikalar 7 kundan kamroq vaqt oldin tiklangan, shuning uchun ishlatilmagan indekslar baholanmaydi.",
         "STALE": "Yaqinda tekshirish yozuvlari yoʻq.",
         "STANDBY": "Kutish serverida qoʻllanilmaydi.",
         "NONE": "Tekshirish uchun hech narsa yoʻq.",
-        "GRANT": "Yetishmayotgan imtiyozlar — ulanish hisobiga pg_monitor rolini bering.",
+        "GRANT": "Ruxsat yoʻqligi sababli koʻrib boʻlmaydi. Ulanish hisobiga pg_monitor rolini bering.",
         "LINK": "schema.pi soʻrovi bajarilmadi ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Agar u oqimlamayotgan boʻlsa, kutish serveri loglarini tekshiring."
         }
       },
-      "sqlNote": "Quyidagi SQL faqat oʻqish uchun, tekshirish uchun — tuzatishlar (VACUUM, DROP INDEX, pg_terminate_backend) DBA tomonidan bajariladi.",
+      "sqlNote": "Quyidagi SQL faqat oʻqish uchun tekshirish uchundir. Harakatlar (VACUUM, DROP INDEX, pg_terminate_backend) DBA tomonidan bevosita bajariladi.",
       "go": {
         "activity": "Faoliyat va bloklashlar",
         "top": "Sekin soʻrovlar",
@@ -766,8 +766,8 @@
           "tree": "Nima joy egallaydi va nimani tozalash kerak?"
         },
         "asTable": "Jadval sifatida koʻrish",
-        "needHistory": "Hali tendensiya yoʻq — ushbu ekranni bir necha daqiqa ochiq qoldiring.",
-        "needPerf": "Hajm tarixi yoʻq — ishlash yorligʻida yigʻing yoki ushbu ekranni ochiq qoldiring.",
+        "needHistory": "Hali tendensiya yoʻq. Agar ushbu ekranni bir necha daqiqa ochiq qoldirsangiz, u chiziladi.",
+        "needPerf": "Hajm tarixi yoʻq. Uni Performance yorligʻidan yigʻing yoki ushbu ekranni ochiq qoldiring.",
         "noSess": "Sessiyalar yoʻq.",
         "noWait": "Kutishlar yoʻq",
         "noData": "Koʻrsatish uchun maʼlumot yoʻq.",
@@ -840,17 +840,17 @@
         "noStat": "Statistika yoʻq"
       },
       "empty": {
-        "noConn": "Ushbu taksonomiyada monitoring qilish uchun PostgreSQL server ulanishi yoʻq — faqat URL manzillar va xizmat holati koʻrsatiladi.",
+        "noConn": "Ushbu taksonomiyada monitoring qilish uchun PostgreSQL server ulanishlari yoʻq. Faqat URL va bogʻlanish holati koʻrsatiladi.",
         "unsupported": "Ushbu ulanish monitoringni qoʻllab-quvvatlamaydi (faqat PostgreSQL server ulanishlari).",
-        "connFail": "Maʼlumotlar bazasiga ulanib boʻlmadi — ulanish sozlamalarini va DB holatini tekshiring.",
-        "linkDown": "schema.pi ga ulanib boʻlmadi — avtomatik ravishda qayta urinilmoqda.",
-        "linkAuth": "Ulanish tokenining muddati tugadi — schema.pi da yangi token yarating va uni roʻyxatdan oʻtkazing.",
-        "timeout": "Javoblar sekin — avtomatik ravishda qayta urinilmoqda.",
+        "connFail": "DB ga ulanish muvaffaqiyatsiz tugadi. Ulanish maʼlumotlarini va DB holatini tekshiring.",
+        "linkDown": "schema.pi ga ulanish muvaffaqiyatsiz tugadi. Tez orada avtomatik ravishda qayta uriniladi.",
+        "linkAuth": "Ulanish tokenining muddati tugadi. schema.pi dan tokenni qayta chiqaring va roʻyxatdan oʻtkazing.",
+        "timeout": "Javob sekin. Tez orada avtomatik ravishda qayta uriniladi.",
         "rate": "Juda koʻp soʻrovlar, shuning uchun yangilash oraligʻi oshirildi."
       },
       "aux": {
         "rules": "Mening ogohlantirish qoidalarim ({n} faol)",
-        "schemaSvc": "Xizmat holati — schema.pi javoblari",
+        "schemaSvc": "Bogʻlanish holati: schema.pi xizmatining javobi",
         "schemaSvcNote": "schema.pi tomonidan saqlangan oxirgi 60 daqiqalik ilova metrikalari.",
         "source": "Maʼlumot manbai: maqsadli DB faqat schema.pi nomli soʻrovlar (faqat oʻqish uchun) orqali oʻqiladi; tendensiyalar faqat dbms.pi da statistikani saqlaydi (qator maʼlumotlari saqlanmaydi)."
       }
@@ -866,10 +866,10 @@
     "noRun": "Hali diagnostika yoʻq. \"Diagnostikani ishga tushirish\" tugmasini bosing",
     "lastRun": "Oxirgi diagnostika {dtm}",
     "readOnly": "Diagnostika faqat oʻqiydi (SELECT). Maslahat yoʻriqnoma boʻlib, server xotirasi, yuklanishi va ish yukiga bogʻliq",
-    "truncated": "Juda koʻp obʼektlar — faqat dastlabki 500 tasi tekshirildi",
+    "truncated": "Juda koʻp obʼektlar : faqat dastlabki 500 tasi tekshirildi",
     "paramsNote": "Serverning umumiy xotirasi nomaʼlum, shuning uchun u shared_buffers ≈ RAMning 25% dan taxmin qilinadi. random_page_cost SSDni nazarda tutadi.",
     "auditNote": "RLS oʻchirilgan jadvallar va foydalanilmagan hisoblar havola soʻrovi ularni qoʻllab-quvvatlagandan soʻng tekshiriladi.",
-    "replNote": "Boshlangʻich nuqta Active-Standby (A-S) — bitta asosiy + kutish. Qayta ijro etish kechikishi ≥ 5s = ogohlantirish, ≥ 60s = xavf (oʻlchangan RPO maʼlumotnomasi)",
+    "replNote": "Asosiy mezon Active-Standby (A-S): 1 ta Primary + Standby. Replay kechikishi >= 5 soniya boʻlsa ogohlantirish, >= 60 soniya boʻlsa xavf (RPO haqiqiy oʻlchoviga qarang).",
     "lagIdle": "Oʻzgarishlar yoʻq",
     "pager": "Sahifalash",
     "prev": "Oldingi",
@@ -939,11 +939,11 @@
       "st_ok": "Bayonot vaqti tugashi oʻrnatilgan.",
       "iit_off": "Tranzaksiyada boʻsh turgan vaqt tugashi yoʻq (0). Qulfni ushlab turish va shishishga olib kelishi mumkin.",
       "iit_ok": "Tranzaksiyada boʻsh turgan vaqt tugashi oʻrnatilgan.",
-      "ckpt_short": "Nazorat nuqtasi oraligʻi 5 daqiqa yoki undan kam. Yozish yuklamasi yuqori boʻlsa, 10–15 daqiqani koʻrib chiqing.",
+      "ckpt_short": "Nazorat nuqtasi oraligʻi 5 daqiqa yoki undan kam. Yozish yuklamasi yuqori boʻlsa, 10~15 daqiqani koʻrib chiqing.",
       "ckpt_ok": "Oqilona diapazonda",
       "wal_minimal": "wal_level=minimal PITR va replikatsiyani imkonsiz qiladi. replica yoki undan yuqori darajani ishlating.",
       "wal_ok": "WAL darajasi PITR va replikatsiyani qoʻllab-quvvatlaydi.",
-      "rpc_hdd": "HDD standart (4). SSD uchun 1.1–2 tavsiya etiladi.",
+      "rpc_hdd": "HDD standart (4). SSD uchun 1.1~2 tavsiya etiladi.",
       "rpc_ok": "SSD uchun mos.",
       "super_many": "Ikki yoki undan ortiq superuser. Bitta maʼmuriyat uchun qoldiring va boshqalarga faqat kerakli imtiyozlarni bering.",
       "super_ok": "Koʻpi bilan bitta superuser.",
@@ -991,7 +991,7 @@
   },
   "perf": {
     "title": "Ishlash",
-    "intro": "Ulanilgan PostgreSQL ulanishidan soʻrov, jadval va indeks statistikalarini toʻplaydi, sekin soʻrovlarni, jadval/indeks holatini va hajm tendensiyalarini koʻrsatadi. Faqat statistika saqlanadi — mijoz DB qator maʼlumotlari hech qachon saqlanmaydi",
+    "intro": "Ulanilgan PostgreSQL ulanishidan soʻrov, jadval va indeks statistikalarini toʻplaydi, sekin soʻrovlarni, jadval/indeks holatini va hajm tendensiyalarini koʻrsatadi. Faqat statistika saqlanadi : mijoz DB qator maʼlumotlari hech qachon saqlanmaydi",
     "loading": "Yuklanmoqda…",
     "pickFirst": "Avval yuqoridan havolani va ulanishni tanlang.",
     "pager": "Sahifalash",
@@ -1022,7 +1022,7 @@
       "intro": "Hozir yigʻish tugmasini bosish yuqori soʻrov statistikasi, jadvallar, indekslar va hajmlarni bir marta oʻqiydi va ularni surat sifatida saqlaydi. Oʻzgarishlar va hajmi tendensiyalarini koʻrish uchun kamida ikki marta yigʻish kerak.",
       "run": "Hozir yigʻish",
       "running": "Yigʻilmoqda…",
-      "done": "{dtm} da yigʻildi — {qry} ta soʻrov · {tbl} ta jadval · {idx} ta indeks",
+      "done": "{dtm} yigʻish yakunlandi: {qry} ta soʻrov · {tbl} ta jadval · {idx} ta indeks",
       "auto": {
         "title": "Avtomatik yigʻish",
         "desc": "Yoqilgan boʻlsa, ushbu ulanish statistikasi har kuni ertalab soat 3:00 da (Koreya vaqti bilan) avtomatik ravishda yigʻiladi. 7 yoki undan ortiq kun toʻplangandan soʻng, sekin soʻrovlar reytingi va ishlatilmagan indekslar roʻyxatiga ishonishingiz mumkin.",
@@ -1044,13 +1044,13 @@
       "sortCalls": "Chaqiruvlar",
       "empty": "Hali suratlar yoʻq. Yigʻish yorligʻida Hozir yigʻish tugmasini bosing.",
       "range": "{from} → {to} orasidagi oʻzgarish",
-      "first": "{dtm} da birinchi surat — kumulyativ qiymatlar (keyingi suratdan oʻzgarishlar)",
+      "first": "{dtm} birinchi yigʻish: Kumulyativ (keyingi yigʻishdan oʻsish/kamayish)",
       "query": "Soʻrov (literallar maskalangan)",
       "calls": "Chaqiruvlar",
       "totalMs": "Umumiy ms",
       "meanMs": "Oʻrtacha ms",
       "rows": "Qatorlar",
-      "reset": "Statistikalar qayta tiklangani aniqlandi — umumiy sifatida koʻrsatilgan",
+      "reset": "Statistikalar qayta tiklanganligi aniqlandi: Kumulyativ sifatida koʻrsatiladi",
       "src": "Manba",
       "srcToggle": "Manba tafsilotlarini koʻrsatish yoki yashirish",
       "openSqlLab": "SQL Tuningda ochish",
@@ -1058,7 +1058,7 @@
       "sortMax": "Maksimal bir martalik ijro vaqti",
       "maxMs": "Maksimal bir martalik ms",
       "diagToggle": "Sababini aniqlash",
-      "noMax": "Maksimal qiymat yoʻq — {n} ta element maksimal qiymatga ega boʻlmagan eski toʻplamlardan olingan, shuning uchun ular vaqtincha oʻrtacha qiymat boʻyicha saralangan (umumiy vaqt boʻyicha emas). Hozir yigʻish maksimal qiymatni toʻldiradi."
+      "noMax": "Maksimal qiymat yoʻq: {n} ta element eski yigʻishlar boʻlib, bir martalik maksimal qiymatga ega emas, shuning uchun ular vaqtincha bir martalik oʻrtacha qiymat boʻyicha saralangan (umumiy vaqt boʻyicha emas). Maksimal qiymatlar joriy yigʻish bilan toʻldiriladi."
     },
     "health": {
       "empty": "Hali suratlar yoʻq. Yigʻish yorligʻida hozir yigʻish tugmasini bosing",
@@ -1066,9 +1066,9 @@
       "unusedIdx": "Ishlatilmagan indekslar",
       "unusedIdxHint": "Oxirgi statistikalar qayta tiklangandan beri hech qachon ishlatilmagan indekslar (hajmi boʻyicha). PK yoki noyob cheklov indekslarini oʻchirmang",
       "fullScan": "Haddan tashqari toʻliq skanerlashlar",
-      "fullScanHint": "1000+ jonli qatorli jadvallar, bu yerda toʻliq skanerlashlar kamida yarmini tashkil qiladi — filtr ustunlaridagi indekslarni koʻrib chiqing",
+      "fullScanHint": "1000+ samarali qatorga ega va yarimdan koʻp toʻliq skanerlashga ega jadvallar: Shart ustunlaridagi indekslarni koʻrib chiqing.",
       "dead": "Haddan tashqari oʻlik tuplelar",
-      "deadHint": "Oʻlik tuple nisbati 20% yoki undan koʻp — VACUUM va autovacuum sozlamalarini tekshiring",
+      "deadHint": "Oʻlik tuple nisbati 20% dan yuqori: VACUUM va autovacuum sozlamalarini koʻrib chiqing.",
       "none": "Hech biri",
       "scans": "skanerlashlar"
     },
@@ -1085,7 +1085,7 @@
     },
     "activity": {
       "refresh": "Yangilash",
-      "live": "Jonli soʻrov — saqlanmaydi",
+      "live": "Haqiqiy vaqtda soʻrov: Saqlanmaydi",
       "sessions": "Sessiya faoliyati",
       "locks": "Qulflar",
       "none": "Hech biri"
@@ -1112,7 +1112,7 @@
         "BATCH": "Koʻrinishidan, partiya yoki rejalashtirilgan ish. Ish vaqtini biznes choʻqqilaridan uzoqlashtiring va har bir commit uchun ish hajmini kamaytiring. Maqsadli jadvallardagi indekslar va statistikalarni (ANALYZE) tekshiring va uzoq tranzaksiyalarni boʻling. Ish nomini application_name ga kiritish keyingi tasnifni aniqroq qiladi",
         "PROGRAM": "Bu ilova tomonidan bajarilgan soʻrovga oʻxshaydi. SQL sozlashda ijro rejasini tekshiring. Agar maksimal bir martalik ijro vaqti uzoq boʻlsa, avval indekslar va qoʻshilish tartibini koʻrib chiqing. Agar bir martalik ijro qisqa boʻlsa, lekin chaqiruvlar soni koʻp boʻlsa, takroriy chaqiruvlar (N+1) va keshni koʻrib chiqing. Ulanish pulining application_name ga xizmat nomini kiriting.",
         "PLATFORM": "Koʻrinishidan, DB yoki platformaning ichki ishi, masalan, autovacuum yoki replikatsiya. Odatda hech qanday harakat talab qilinmaydi. Agar u yuqorida qolsa, autovacuum chegaralari va maintenance_work_mem ni koʻrib chiqing",
-        "MONITOR": "Bu dbms.pi oʻz-oʻzidan yigʻish soʻrovi — schema.pi ulanishi faqat statistik koʻrinishlar/kataloglarni (pg_stat_*·pg_catalog) oʻqiydigan qatʼiy bayonot boʻlgani uchun, bu biznes soʻrovi emas va mijozning hech qanday harakati talab qilinmaydi. Agar maqsadli maʼlumotlar bazasi yuklamasi muammo boʻlsa, yigʻish tugmasi/monitoring ekranini ochish sonini kamaytiring. Xuddi shu statistik koʻrinishlarni oʻqiydigan boshqa monitoring vositalaridan olingan bayonotlar ham shu yerga guruhlanadi.",
+        "MONITOR": "dbms.pi ning oʻz yigʻish soʻrovi. schema.pi ulanishi faqat statistik koʻrinishlar va kataloglarni (pg_stat_*, pg_catalog) qatʼiy bayonotlar bilan oʻqiydi, shuning uchun bu biznes soʻrovi emas va mijozdan hech qanday harakat talab qilinmaydi. Agar maqsadli maʼlumotlar bazasi yuklamasi muammo boʻlsa, yigʻish tugmasini yoki monitoring ekranini ochish chastotasini kamaytiring. Xuddi shu statistik koʻrinishlarni oʻqiydigan boshqa monitoring vositalaridan kelgan bayonotlar ham shu yerda guruhlanadi.",
         "UNKNOWN": "Manbaga oid hech qanday maʼlumot yoʻq. Har bir ulanishda application_name ni oʻrnating va hisoblarni maqsad boʻyicha ajrating; u keyingi namunalardan tasniflanadi"
       },
       "detail": {
@@ -1123,7 +1123,7 @@
         "period": "Kuzatilgan",
         "none": "(boʻsh)"
       },
-      "noSample": "Hali namunalar yoʻq — monitoring paneli yoki Faoliyat va blokirovkalar yorligʻini koʻrganingizda ishlayotgan sessiyalar namuna olinadi. Hozircha u faqat hisob nomi boʻyicha tasniflanadi",
+      "noSample": "Hali namunalar yoʻq. Monitoring Board yoki Activity/Locks yorliqlarini koʻrishda ishlayotgan sessiyalar namunalar sifatida toʻplanadi. Hozirda ular faqat hisob nomi boʻyicha maʼlumot uchun tasniflanadi.",
       "verOff": "Ushbu DB PostgreSQL 14 dan eski, shuning uchun ishlayotgan sessiyalarda soʻrov IDsi yoʻq. Faqat hisob (aniq) koʻrsatiladi",
       "privOff": "Ulanish hisobi boshqa hisoblarning sessiya tafsilotlarini koʻra olmaydi, shuning uchun namunalar yigʻilmaydi. DB administratoridan GRANT pg_read_all_stats TO {user}; ni ishga tushirishni soʻrang",
       "linkUsr": "ulanuvchi hisob",
@@ -1134,11 +1134,11 @@
     "diag": {
       "title": "Sababini aniqlash",
       "fix": "Harakat:",
-      "none": "Statistika boʻyicha hech qanday sabab aniqlanmadi — SQL Tuningda bajarish rejasini tekshiring.",
-      "cum": "Bu oraliqda chaqiruvlar yoʻq — umumiy (statistik maʼlumotlar qayta tiklangandan beri)",
-      "basis": "Asos — Maksimal 1 martalik {max}ms · Oʻrtacha {mean}ms · Chaqiruvlar {calls} · Har bir chaqiruvga qatorlar {rpc} · Diskdan oʻqish nisbati {read} · Vaqtinchalik bloklar {tmp}",
+      "none": "Statistika tomonidan aniqlangan sabab yoʻq. Tekshirish uchun SQL Tuning da ijro rejasini oching.",
+      "cum": "Ushbu intervalda chaqiruvlar yoʻq: Kumulyativ (statistika qayta tiklanganidan beri)",
+      "basis": "Asos: Maksimal bir martalik {max}ms · Oʻrtacha {mean}ms · Chaqiruvlar {calls} · Har bir chaqiruvga qatorlar {rpc} · Diskdan oʻqish nisbati {read} · Vaqtinchalik bloklar {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi oʻz-oʻzini yigʻish soʻrovi — faqat statistik koʻrinishlar/kataloglarni oʻqiydigan monitoring iborasi.",
+        "cause": "dbms.pi ning oʻz yigʻish soʻrovi: Faqat statistik koʻrinishlar va kataloglarni oʻqiydigan monitoring bayonoti.",
         "fix": "Mijoz harakati talab qilinmaydi. Agar maqsadli maʼlumotlar bazasining yuklanishi muammo boʻlsa, yigʻish/monitoring ekranini ochish sonini kamaytiring."
       },
       "NO_MAX": {
@@ -1146,31 +1146,31 @@
         "fix": "Aniq tashxis qoʻyish uchun maksimal qiymatlarni toʻldirish uchun hozir bir marta 'Yigʻish' tugmasini bosing."
       },
       "SLOW_EACH": {
-        "cause": "Har doim sekin — Har safar ishga tushirilganda uzoq vaqt oladi, maksimal {max}ms va oʻrtacha {mean}ms.",
+        "cause": "Har safar sekin: Maksimal {max}ms va oʻrtacha {mean}ms bilan har bir ijroda uzoq vaqt oladi.",
         "fix": "① 'SQL Tuningda ochish' orqali bajarish rejasini oching. ② Agar toʻliq skanerlash (Seq Scan) yoki katta saralashlar boʻlsa, WHERE/JOIN shart ustunlaridagi indekslarni koʻrib chiqing. ③ Faqat kerakli ustunlar/qatorlarni oʻqish uchun shartlarni toraytiring."
       },
       "SPIKE": {
-        "cause": "Vaqti-vaqti bilan kechikish — Oʻrtacha {mean}ms, lekin vaqti-vaqti bilan maksimal {max}ms (oʻrtachadan {x} marta) uzoq vaqt oladi.",
+        "cause": "Vaqti-vaqti bilan kechikish: Oʻrtacha {mean}ms, lekin baʼzan maksimal {max}ms (oʻrtachadan {x} marta) bilan uzoq vaqt oladi.",
         "fix": "① Sekin boʻlganda, Faoliyat/Qulflar yorligʻida qulf kutishlarini (wait_event) tekshiring. ② Agar faqat birinchi bajarish sekin boʻlsa, kesh boʻsh boʻlgan va diskdan oʻqilgan. ③ Bajarish rejasi qiymatlarga qarab oʻzgaradimi yoki yoʻqligini bilish uchun SQL Tuningda bir xil soʻrovni turli qiymatlar bilan solishtiring."
       },
       "DISK_READ": {
-        "cause": "Kesh xatosi — Oʻqilgan bloklarning {pct}% ({read} blok) xotiradan emas, diskdan oʻqilgan.",
+        "cause": "Kesh xatosi: Oʻqilgan bloklarning {pct}% ({read} blok) xotiradan emas, diskdan oʻqildi.",
         "fix": "① Indekslar yordamida oʻqish diapazonini kamaytiring. ② Soʻrov davrini/shartlarini toraytiring. ③ Agar tez-tez oʻqiladigan maʼlumotlar yuqori boʻlib qolsa, shared_buffers (xotira)ni koʻrib chiqing."
       },
       "TEMP_SPILL": {
-        "cause": "Xotira toʻlib ketishi — Saralash/xesh work_memdan oshib ketdi va vaqtinchalik fayllarga {blk} blok (taxminan {mb}MB, har bir chaqiruvga {perCall} blok) yozdi.",
+        "cause": "Xotira toʻlib ketishi: Saralash/hash work_mem dan oshib ketdi va vaqtinchalik fayllarga {blk} blok (taxminan {mb}MB, har bir chaqiruvga {perCall} blok) yozdi.",
         "fix": "① ORDER BY/GROUP BY ustunlariga indekslar qoʻyish saralashni oʻtkazib yuboradi. ② Avval, saralash uchun qatorlar sonini kamaytiring (LIMIT ichida). ③ Agar mutlaqo zarur boʻlsa, faqat ushbu soʻrov tranzaksiyasi uchun SET LOCAL work_memni oshiring."
       },
       "MANY_ROWS": {
-        "cause": "Haddan tashqari koʻp maʼlumot olish — Har bir chaqiruvga {perCall} qatorni oladi.",
+        "cause": "Haddan tashqari soʻrov: Har bir chaqiruvga {perCall} qatorni oladi.",
         "fix": "① Ekran roʻyxatlari sahifa boʻyicha olinadi. ② SELECT faqat ishlatiladigan ustunlarni tanlaydi. ③ Agregatsiyalar maʼlumotlar bazasida amalga oshiriladi va faqat natijalar qabul qilinadi."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST oʻrnatilgan filtr (!inner) iborasi — bolalar shartlari boʻyicha ota-onalarni filtrlash tasniflash shartlaridan oldin butun toʻplamni skanerlashi mumkin.",
+        "cause": "PostgREST oʻrnatilgan filtr (!inner) bayonoti: Bolalar shartlari boʻyicha ota-onalarni filtrlash tasniflash shartidan oldin butun jadvalni skanerlashi mumkin.",
         "fix": "① Qoʻshilish kalitlari va filtr ustunlarida indekslar mavjudligini tekshiring. ② Filtrlarni asosiy jadval shartlariga oʻtkazing. ③ Bolalarni allaqachon mavjud asosiy soʻrovga joylashtiring yoki ularni bitta maʼlumotlar bazasi funksiyasiga birlashtiring."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET sahifalash — keyingi sahifalar uchun oldingi qatorlarni oʻqib tashlagani sababli asta-sekin sekinlashadi.",
+        "cause": "OFFSET sahifalash: Keyingi sahifalar avvalgi qatorlarni oʻqiydi va tashlab yuboradi, bu esa asta-sekin sekinlashadi.",
         "fix": "Oxirgi qabul qilingan kalitdan keyin oʻqiydigan keyset sahifalashga oʻzgartiring (WHERE id > last_id ORDER BY id LIMIT n)."
       }
     }
@@ -1203,8 +1203,8 @@
       "toDraft": "Tanlangan {n} dan quvur liniyasi qoralamasini yaratish"
     },
     "ready": {
-      "ok": "WAL mantiqiy replikatsiya tayyor — PKga ega jadvallar LOGICAL dan foydalanishi mumkin",
-      "no": "WAL mantiqiy replikatsiya tayyor emas — soʻrov yoki kalitni taqqoslash orqali olinadi",
+      "ok": "WAL mantiqiy replikatsiyasi tayyor: PK ga ega jadvallar LOGICAL usulidan foydalanishi mumkin.",
+      "no": "WAL mantiqiy replikatsiyasi tayyor emas: Polling/kalit solishtirish usuli yordamida yigʻing.",
       "senders": "{n} replikatsiya ulanishlari"
     },
     "adapter": {
@@ -1219,20 +1219,20 @@
       "HAS_SOFT_DEL": "Yumshoq oʻchirish ustuni mavjud",
       "NO_SOFT_DEL": "Yumshoq oʻchirish ustuni yoʻq",
       "HAS_PK": "Asosiy kalit mavjud",
-      "NO_PK": "Asosiy kalit yoʻq — oʻzgargan qatorlarni aniqlab boʻlmaydi",
+      "NO_PK": "PK yoʻq: Oʻzgargan qatorlarni aniqlab boʻlmaydi.",
       "DELETE_UNSEEN": "Soʻrov fizik DELETElarni qamrab ololmaydi (yumshoq oʻchirish ustuni tavsiya etiladi)",
       "LOGICAL_NOT_READY": "WAL mantiqiy replikatsiya tayyor boʻlgach, LOGICAL ga oʻtish mumkin",
-      "FULL_RELOAD_ONLY": "PK yoki oʻzgarish vaqti ustuni yoʻq, shuning uchun inkremental olish mumkin emas — PK qoʻshing",
+      "FULL_RELOAD_ONLY": "PK/oʻzgarish vaqt tamgʻasi yoʻq, shuning uchun inkremental yigʻish mumkin emas: PK qoʻshish tavsiya etiladi.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level logical emas (uni oʻzgartirish DBni qayta ishga tushirishni talab qiladi)",
       "NO_SLOTS": "max_replication_slots 0",
       "NO_SENDERS": "max_wal_senders 0",
-      "IS_STANDBY": "Kutish (standby) server — mantiqiy replikatsiyani asosiy serverdan oling",
+      "IS_STANDBY": "Standby server: Primary serverdan mantiqiy replikatsiyani qabul qiling.",
       "SETTINGS_UNKNOWN": "Sozlamalarni oʻqib boʻlmadi, tayyorlik nomaʼlum"
     },
     "ed": {
       "title": "Quvur liniyasi taʼriflari",
-      "draftOnly": "Faqat loyihalash — qoralamalar (DRAFT) sifatida saqlanadi",
+      "draftOnly": "Faqat dizayn: Faqat DRAFT sifatida saqlash.",
       "new": "Yangi quvur liniyasi",
       "empty": "Saqlangan quvur liniyalari yoʻq",
       "manual": "Qoʻlda",
@@ -1301,8 +1301,8 @@
     },
     "warn": {
       "none": "Eʼtiborga loyiq ogohlantirishlar yoʻq.",
-      "SEQ_SCAN_LARGE": "{relation} da toʻliq skanerlash (taxminan {rows} qator) — filtr ustunlariga indeks qoʻshishni koʻrib chiqing.",
-      "NESTED_LOOP_HIGH": "Ichki tsikl taxminan {rows} qator hosil qiladi — xesh yoki birlashma qoʻshilishini yoki qoʻshilish shartiga indeks qoʻshishni koʻrib chiqing.",
+      "SEQ_SCAN_LARGE": "{relation} jadvali toʻliq skanerlashni amalga oshirmoqda (taxminan {rows} qator): Shart ustunlaridagi indekslarni koʻrib chiqing.",
+      "NESTED_LOOP_HIGH": "Ichki tsikl natijasi taxminan {rows} qator. Hash/merge joinlarni yoki join shartlaridagi indekslarni koʻrib chiqing.",
       "SORT_SPILL": "Saralash hajmi taxminan {kb}KB, standart work_mem (4MB) dan yuqori; u diskka toʻkilishi mumkin."
     },
     "lint": {
@@ -1316,14 +1316,14 @@
         "char": "belgi"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — faqat kerakli ustunlarni tanlang (qoʻshimcha I/O, qoplovchi indeks yoʻq).",
-        "FUNC_ON_COLUMN": "Filtr ustuni {column} funksiya yoki ifodaga oʻralgan, shuning uchun uning indeksi ishlatilmaydi — buning oʻrniga konstantani oʻzgartiring.",
-        "LEADING_WILDCARD": "Oldida % boʻlgan LIKE B-tree indeksidan foydalana olmaydi — pg_trgm GIN indeksini koʻrib chiqing.",
-        "OR_DIFF_COLUMNS": "Turli ustun shartlari OR bilan bogʻlangan — UNION bilan ajratishni (agar UNION ALL boʻlsa, takrorlanishni istisno qilish shartini qoʻshish) yoki ustun boʻyicha indekslarni koʻrib chiqing.",
-        "IMPLICIT_CAST": "{column} tirnoqli raqam bilan taqqoslanadi — ustun va doimiy turlarni moslang (yashirin tur oʻzgartirish).",
-        "NOT_IN_SUBQUERY": "NOT IN (kichik soʻrov) NULLlar mavjud boʻlganda hech narsa qaytarmaydi va sekin ishlaydi — NOT EXISTS dan foydalaning.",
-        "NO_WHERE": "WHERE bandi yoʻq — katta jadvalda bu toʻliq skanerlash (shart yoki LIMIT qoʻshing).",
-        "DOMAIN_MISMATCH": "{column} standart domen boʻyicha {expected} turiga ega, ammo boshqa turdagi konstantaga taqqoslanadi — yashirin tur oʻzgartirish indeksdan foydalanishga toʻsqinlik qilishi mumkin."
+        "SELECT_STAR": "SELECT *: Faqat kerakli ustunlarni tanlang (keraksiz I/O, qoplovchi indeks mumkin emas).",
+        "FUNC_ON_COLUMN": "Shart ustuni {column} funksiya/operatsiya bilan ishlov berilgan, shuning uchun indekslardan foydalanib boʻlmaydi. Doimiy tomonni ishlov bering.",
+        "LEADING_WILDCARD": "Oldida % boʻlgan LIKE B-tree indeksidan foydalana olmaydi. pg_trgm GIN indekslarini koʻrib chiqing.",
+        "OR_DIFF_COLUMNS": "Turli ustun shartlari OR bilan guruhlangan. UNION ajratishni (agar UNION ALL boʻlsa, dublikatlarni istisno qilish shartini qoʻshing) yoki ustun boʻyicha indekslarni koʻrib chiqing.",
+        "IMPLICIT_CAST": "{column} tirnoqli raqam bilan solishtirilmoqda. Ustun turi va doimiy turini moslang (yashirin tur oʻzgartirish).",
+        "NOT_IN_SUBQUERY": "NOT IN (kichik soʻrov) NULL lar aralashgan boʻlsa, boʻsh va sekin boʻlishi mumkin. NOT EXISTS ga oʻzgartiring.",
+        "NO_WHERE": "WHERE sharti yoʻq. Agar bu katta jadval boʻlsa, bu toʻliq skanerlashdir (LIMIT yoki shartlarni qoʻshing).",
+        "DOMAIN_MISMATCH": "{column} standart domen boʻyicha {expected} turida, lekin boshqa turdagi doimiy bilan solishtirilmoqda. Yashirin tur oʻzgartirish indeksdan foydalanishga toʻsqinlik qilishi mumkin."
       }
     },
     "saved": {
@@ -1349,12 +1349,12 @@
     },
     "ai": {
       "title": "AI sozlash boʻyicha maslahat",
-      "intro": "Maslahat yaratish uchun saqlangan rejalardan birini tanlang. Faqat SQL va konstantalari ? bilan niqoblangan rejalar yuboriladi (agar kalit boʻlmasa yoki muvaffaqiyatsizlikka uchrasa, qoidaga asoslangan maslahat). Havola egasi tasdiqlaganidan soʻng, xuddi shu SQL uchun tushuntirishni qayta ishga tushiring, uni saqlang va keyingi reja bilan taʼsirini oʻlchang — shundan keyingina u qoʻllanilgan deb qayd etiladi.",
+      "intro": "Maslahat yaratish uchun saqlangan rejalardan birini tanlang. Faqat SQL va konstantalari ? bilan niqoblangan rejalar yuboriladi (agar kalit boʻlmasa yoki muvaffaqiyatsizlikka uchrasa, qoidaga asoslangan maslahat). Havola egasi tasdiqlaganidan soʻng, xuddi shu SQL uchun tushuntirishni qayta ishga tushiring, uni saqlang va keyingi reja bilan taʼsirini oʻlchang : shundan keyingina u qoʻllanilgan deb qayd etiladi.",
       "pickPlan": "Maslahat uchun saqlangan rejani tanlang",
       "create": "Maslahat yaratish",
       "creating": "Yaratilmoqda… (30 soniyagacha)",
       "noPlans": "Saqlangan rejalar yoʻq. Yuqoridagi tushuntirish rejasini koʻring va saqlang.",
-      "note": "Har bir reja uchun bitta maslahat. Qayta yaratish uchun mavjud maslahatni oʻchiring. DDL faqat taklif qilinadi — uni schema.pi da qoʻllang.",
+      "note": "Har bir reja uchun bitta maslahat. Qayta yaratish uchun mavjud maslahatni oʻchiring. DDL faqat taklif qilinadi : uni schema.pi da qoʻllang.",
       "empty": "Hali maslahat yoʻq.",
       "noItems": "Ushbu reja uchun hech qanday yaxshilanish topilmadi.",
       "cost": "Avvalgi xarajat",
@@ -1396,10 +1396,10 @@
       "copy": "Nusxalash",
       "copied": "Nusxalandi",
       "rule": {
-        "SEQ_SCAN_INDEX": "{relation} ning toʻliq skaneri — filtr ustuni {column} da indeks yarating (indeks nomidagi NN ni ketma-ketlik raqami bilan almashtiring).",
-        "SEQ_SCAN_STATS": "{relation} ning toʻliq skaneri — filtr ustunlarini tekshiring va statistika (ANALYZE) ning joriy ekanligiga ishonch hosil qiling.",
-        "NESTED_LOOP": "Ichki tsikl {rows} qatorni kutadi — statistikani yangilang va birlashma kalit indekslarini yoki xesh birlashmasini koʻrib chiqing.",
-        "SORT_SPILL": "Taxminan {kb} KB hajmdagi saralash diskka toʻkilishi mumkin — sessiya work_mem ni oshirishni yoki saralash ustunlarini indekslashni koʻrib chiqing.",
+        "SEQ_SCAN_INDEX": "{relation} toʻliq skanerlash: Shart ustuni {column} da indeks yarating (indeks nomi NN ketma-ketlik raqami bilan almashtiriladi).",
+        "SEQ_SCAN_STATS": "{relation} toʻliq skanerlash: Shart ustunlarini tekshiring va statistikalar (ANALYZE) yangilanganligiga ishonch hosil qiling.",
+        "NESTED_LOOP": "Ichki tsikl natijasi taxminan {rows} qator: Statistikani yangilang va join shartlari indekslarini yoki hash joinlarni koʻrib chiqing.",
+        "SORT_SPILL": "Saralash taxminan {kb}KB bilan diskka toʻlib ketishi mumkin. Sessiya work_mem ni oshirishni yoki saralash ustunlaridagi indekslarni koʻrib chiqing.",
         "SELECT_STAR": "SELECT * oʻrniga faqat kerakli ustunlarni tanlang (kamroq I/O, qoplovchi indekslar mumkin).",
         "FUNC_ON_COLUMN": "Filtr ustuni {column} dagi funksiya/ifodani konstanta tomoniga oʻtkazing (indeksdan foydalanishni yoqadi).",
         "IMPLICIT_CAST": "{column} va konstantaning turlarini moslang (yashirin tur oʻzgartirishni olib tashlang).",
@@ -1459,9 +1459,9 @@
     },
     "desc": {
       "FREE": "Oʻrganish va kashf qilish",
-      "D1": "Operator — Hozir maʼlumotlar bazasi yaxshi ishlayotganini tekshiradi",
-      "D2": "Dasturchi va sozlovchi — Sekin SQLni tuzatadi",
-      "D3": "DBA va DA — Operatsion xavfsizlikdan tortib amalga oshirish va koʻlga qadar"
+      "D1": "Operator: Hozirda maʼlumotlar bazasi sogʻlomligini tekshiradi.",
+      "D2": "Dasturchi/Tuner: Sekin SQL ni tuzatadi.",
+      "D3": "DBA/DA: Operatsion xavfsizlik, migratsiya va hatto data lake."
     },
     "feat": {
       "FREE": "Monitoring paneli, ijro rejasini koʻrish, asosiy oʻrganish",
@@ -1504,7 +1504,7 @@
       "required": "Bu funksiya {plan} tarif rejasidan boshlab mavjud.",
       "limit": "Bu davr uchun barcha mavjud urinishlardan foydalanib boʻldingiz. {plan} tarif rejasiga yangilash orqali koʻproq foydalanishingiz mumkin.",
       "limitTop": "Bu davr uchun barcha mavjud urinishlardan foydalanib boʻldingiz. Keyingi davrda yana foydalanishingiz mumkin.",
-      "expired": "schema.pi tarif rejangiz muddati tugadi — iltimos, schema.pi tarif rejalari ekranida toʻlovni amalga oshiring.",
+      "expired": "schema.pi rejangiz muddati tugadi. Iltimos, schema.pi reja ekranida toʻlovni amalga oshiring.",
       "go": "Tarif rejasini koʻrish",
       "close": "Yopish"
     }

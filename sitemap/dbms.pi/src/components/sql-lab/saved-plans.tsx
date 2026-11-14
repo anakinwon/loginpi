@@ -139,7 +139,7 @@ function Diff({ a, b }: { a: Detail; b: Detail }) {
         {[a, b].map((p, i) => (
           <div key={p.plan_id} className="min-w-0">
             <p className="mb-1 text-xs font-semibold">
-              {i === 0 ? t('before') : t('after')} — {p.plan_nm || p.sql_hash.slice(0, 8)}
+              {i === 0 ? t('before') : t('after')} : {p.plan_nm || p.sql_hash.slice(0, 8)}
             </p>
             <Warnings warnings={analyzePlan(p.plan_json)} />
             <PlanTree root={p.plan_json} warnings={analyzePlan(p.plan_json)} />

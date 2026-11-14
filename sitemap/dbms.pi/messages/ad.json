@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Anàlisi de GAP — Model↔DB",
+    "title": "Anàlisi GAP: Model↔DB",
     "intro": "Compara el model de disseny de schema.pi i l'historial d'aplicació de DDL amb el catàleg de DB en viu per trobar la deriva, i mesura si els índexs dissenyats s'utilitzen realment. Les dades de fila del client mai es llegeixen ni s'emmagatzemen.",
     "needLink": "Tria primer un enllaç de schema.pi a dalt. Si no en tens cap, registra un testimoni al menú 'Enllaç'.",
     "needConn": "Tria la connexió de DB per comparar a dalt.",
@@ -230,7 +230,7 @@
       "USED": "En ús",
       "NO_STATS": "Sense estadístiques",
       "CONSTRAINT": "Restricció d'unicitat (conservar)",
-      "NO_DATA": "Sense dades o estadístiques no recollides — no es pot jutjar",
+      "NO_DATA": "Sense dades o estadístiques no recollides: no es pot determinar",
       "OBSERVING": "En observació (menys de 7 dies)",
       "UNUSED_CAND": "Candidat no utilitzat"
     },
@@ -245,14 +245,14 @@
       "RATE": "Massa sol·licituds. Torna-ho a provar d'aquí a un minut."
     },
     "schema": "Esquema",
-    "schemaHint": "Només es comparen les taules regulars i particionades d'aquest esquema (vistes excloses). Per defecte public — els esquemes interns de Supabase (auth, storage, …) s'ometen.",
-    "truncated": "{names} ha arribat al límit de {max} files i s'ha truncat — alguns resultats de \"no a la DB\" / \"no al model\" poden ser falsos. Reduïu l'esquema i torneu a executar.",
+    "schemaHint": "Només compara taules regulars i particionades en aquest esquema (excloent vistes). Per defecte, públic: els esquemes interns de Supabase (auth, storage, etc.) estan exclosos.",
+    "truncated": "La consulta de {names} s'ha truncat a {max} files. Algunes deteccions de 'No a la DB'/'No al model' poden ser falsos positius. Redueix l'esquema i torna a detectar.",
     "colUnchecked": "Com que la consulta de columnes es va truncar, {n} resultats de columnes que falten/extra es tracten com a no verificables i s'exclouen del recompte de discrepàncies de columnes.",
-    "renamed": "{n} índex(s) PK aplicat(s) sota l'antiga regla de noms (_PKEY) existeixen a la DB amb el nou nom (PK_) — normal",
-    "superseded": "{n} sol·licitud(s) més antiga(s) es van excloure perquè una sol·licitud posterior va recrear la mateixa taula (DROP … CASCADE) — normal",
+    "renamed": "{n} índexs PK aplicats amb la convenció de noms antiga (_PKEY) estan a la DB amb el nom nou (PK_). Normal.",
+    "superseded": "{n} sol·licituds anteriors es van excloure de la comparació perquè sol·licituds posteriors van recrear la mateixa taula (DROP … CASCADE). Normal.",
     "supersededItem": "Sol·licitud {id} → substituïda per la sol·licitud {by}",
     "sysCols": "{n} columna(s) del sistema afegida(s) automàticament en la generació de DDL no estan al model per disseny i s'exclouen de les discrepàncies",
-    "groupOwn": "Prefix del projecte {pfx} — candidats que falten al model",
+    "groupOwn": "Aquest prefix de projecte {pfx}: candidats a model que falten",
     "groupOther": "Altres sistemes {pfx}",
     "basis": "Est. files {rows} · des de {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Si els objectes encara desapareixen després de tornar a aplicar, sospiteu d'una eliminació manual o una reversió i comproveu l'activitat del compte de connexió amb el vostre DBA."
       },
       "extraTables": {
-        "s1": "Aquest paquet de prefixos de projecte = candidats a models que falten — importeu-los al model mitjançant schema.pi → Configuració → Invers, o decidiu si els voleu suprimir si són taules no utilitzades.",
-        "s2": "Altres grups de prefix = altres sistemes que comparteixen aquesta DB — no són elements d'acció per a aquest projecte.",
+        "s1": "Aquest grup de prefixos de projecte = candidats a model que falten: importa al model mitjançant schema.pi → Configuració → Invers, o decideix si l'has d'eliminar si la taula no s'utilitza.",
+        "s2": "Altres grups de prefixos = altres sistemes que utilitzen la mateixa DB: no són objecte d'acció per part d'aquest projecte.",
         "s3": "Si l'esquema de destinació no és public, canvieu el camp \"Esquema\" anterior i torneu a executar."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "El tipus/NULL difereix = alineeu-vos amb el model (font de veritat); abans de reduir la longitud o canviar a NOT NULL, confirmeu que les files existents ho satisfan."
       },
       "idxUsage": {
-        "s1": "Abans d'eliminar, comproveu ① que la finestra d'estadístiques cobreixi almenys un cicle de negoci (p. ex., lot de final de mes) — vegeu \"des de\".",
+        "s1": "Abans d'eliminar, comprova ① si el període de recollida d'estadístiques és almenys un cicle operatiu (p. ex., lot de final de mes): consulta la data de referència.",
         "s2": "② No és un índex únic/PK (aquests es mostren per separat com a \"restricció d'unicitat\").",
         "s3": "③ EXPLAIN el SQL representatiu de la taula a SQL Tuning i confirmeu que aquest índex no s'utilitza.",
         "s4": "Un cop confirmats els tres, elimineu l'índex del model a schema.pi i apliqueu-lo mitjançant DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Com emetre un testimoni de connexió",
     "how1": "Inicia sessió a schema.pi i obre l'àrea temàtica a la qual et vols connectar",
     "how2": "Ves a Àrea temàtica → Configuració → Testimoni de connexió i prem 'Emetre testimoni' (rol d'administrador d'àrea o DA)",
-    "how3": "Copia el testimoni que comença per slk_ — només es mostra una vegada quan s'emet",
+    "how3": "Copia el testimoni que comença per slk_ que s'ha emès. L'original només es mostra una vegada en el moment de l'emissió.",
     "how4": "Enganxa'l a continuació i registra'l",
     "openSchema": "Obre schema.pi",
     "registerTitle": "Registra la connexió",
@@ -384,7 +384,7 @@
     "retry": "Torna a provar",
     "pickerLink": "Enllaç",
     "pickerConn": "Connexió",
-    "pickerEmpty": "No hi ha connexions —",
+    "pickerEmpty": "No hi ha connexions.",
     "pickerGo": "registra'n una a /connect",
     "errors": {
       "LINK_AUTH": "El testimoni de connexió ha caducat o ha estat revocat. Emet un nou testimoni a schema.pi i registra'l de nou",
@@ -432,8 +432,8 @@
     "optsHint": "El paral·lelisme és el nombre de taules que es carreguen al mateix temps dins d'un nivell. La mida del bloc és la unitat de commit (files) que utilitzarà el motor d'execució.",
     "order": "Ordre de càrrega",
     "orderHint": "Ordenat topològicament per relacions de disseny (no FK físiques) perquè les taules pare vinguin primer. Les taules del mateix nivell no depenen les unes de les altres i es poden carregar en paral·lel.",
-    "cycles": "{n} grup(s) circular(s) — col·locats al mateix nivell. Estableix el seu ordre manualment i posposa les comprovacions de referència fins després de la càrrega.",
-    "selfRefs": "Taules autoreferenciades (jeràrquiques) — carrega primer les files pare dins de la taula",
+    "cycles": "{n} cicles: col·locats a la mateixa etapa. Estableix manualment l'ordre de càrrega i posposa les comprovacions de referència fins després de la càrrega.",
+    "selfRefs": "Taules amb autoreferència (jeràrquiques): files pare primer dins de la mateixa taula.",
     "level": "Nivell {n}",
     "checklist": "Llista de comprovació de transició",
     "toReady": "Marca com a a punt",
@@ -471,7 +471,7 @@
     },
     "verify": "SQL de verificació",
     "verifyHint": "Genera consultes de recompte, suma de columnes numèriques, clau duplicada i hash de clau per taula en ordre de càrrega. Executa-les tu mateix a l'origen i a la destinació i compara (aquesta pantalla no les executa).",
-    "noHashOracle": "Les funcions hash i la representació de text d'Oracle·Tibero difereixen de PostgreSQL, de manera que s'ometen les consultes hash — compara els recomptes, les sumes i les claus duplicades.",
+    "noHashOracle": "Oracle i Tibero ometen la cerca per hash perquè les funcions hash i les representacions de caràcters difereixen de PostgreSQL. Compara per recompte, suma i duplicació de claus.",
     "copy": "Copia",
     "copied": "Copiat",
     "copyFail": "No s'ha pogut copiar. Selecciona el text i copia'l manualment.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "La sol·licitud no és vàlida."
     },
     "board": {
-      "subtitle": "Què fer en aquesta DB ara mateix — 14 senyals d'estat OK, advertència o risc, amb solucions, d'un cop d'ull.",
+      "subtitle": "Què fer ara en aquesta DB: Consulta l'estat normal, d'advertència i de risc de 14 senyals i les seves solucions d'un cop d'ull.",
       "refresh": {
         "updated": "A partir de les {time} · s'actualitza cada minut",
         "now": "Actualitza ara",
@@ -564,11 +564,11 @@
         "NA": "N/A"
       },
       "overall": {
-        "RISK": "Risc — cal actuar ara",
-        "WARN": "Avís — alguns elements necessiten una revisió",
-        "UNKNOWN": "Desconegut — comproveu la connexió",
-        "OK": "Correcte — tots els senyals estan dins dels límits",
-        "CONN_DOWN": "No es pot accedir a la DB — comproveu primer la connexió",
+        "RISK": "Risc: Cal una acció immediata",
+        "WARN": "Advertència: Elements a revisar",
+        "UNKNOWN": "No es pot confirmar: Comprova l'estat de la connexió",
+        "OK": "Normal: Tots els senyals estan dins dels criteris",
+        "CONN_DOWN": "No es pot connectar a la DB. Comprova primer la connexió.",
         "NA": "N/A"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Mostra menys",
         "setup": "Configureu-ho per veure'n més",
         "none": "No hi ha elements de risc o avís que requereixin acció ara mateix.",
-        "unknown": "No s'han pogut comprovar {n} senyal(s) — vegeu les targetes per saber el motiu.",
+        "unknown": "No es poden confirmar {n} elements: Comprova el motiu a la targeta.",
         "myRule": "La meva regla s'ha incomplert: {rule}",
         "copySql": "Copia SQL",
         "copied": "Copiat"
@@ -622,34 +622,34 @@
         "REPL": "Retard de replicació"
       },
       "fix": {
-        "AVAIL": "Resposta lenta o un reinici recent — comproveu la configuració de la connexió i l'estat del servidor de la DB.",
-        "AVAIL_DOWN": "No s'ha pogut connectar a la DB — comproveu la configuració de la connexió i que el servidor de la DB estigui actiu.",
-        "CONN_USE": "{sess}/{max} sessions en aquesta DB (no a tot el clúster — s'exclouen altres bases de dades) — tanqueu les connexions inactives o afegiu un agrupador de connexions (pgbouncer).",
-        "URL": "{n} URL comprovades fallen · resposta màxima {ms}ms — vegeu el monitor de schema.pi per saber la causa.",
-        "LONG_QRY": "Una consulta s'ha estat executant durant {sec}s — reviseu el seu pla i ajusteu-la, o feu que un DBA la cancel·li.",
-        "IDLE_TX": "Una transacció ha estat inactiva durant {sec}s — trobeu el commit que falta a l'aplicació i establiu un temps d'espera.",
-        "LOCK_WAIT": "{n} sessions estan esperant bloquejos — trobeu la sessió que bloqueja i finalitzeu la seva transacció.",
-        "CACHE_HIT": "Taxa d'èxit de la memòria cau {pct}% — busqueu exploracions completes de taules grans o reviseu shared_buffers.",
-        "XACT_ERR": "Taxa de rollback {pct}%, {dlck} interbloquejos — comproveu les transaccions fallides i els registres d'errors de l'aplicació.",
-        "SLOW_SQL": "Hi ha una consulta que triga fins a {ms}ms per execució — visualitzeu el pla d'execució i ajusteu-lo, començant pel temps d'execució individual més alt.",
-        "STORAGE": "La DB ({gb} GB) està a prop del seu límit (dies restants {days}) — netegeu taules grans o afegiu capacitat.",
-        "VACUUM": "{tbl} té moltes files mortes o estadístiques obsoletes — reviseu la configuració de VACUUM (ANALYZE) i autovacuum.",
-        "INDEX": "{n} troballes d'índex (invàlid, no utilitzat, exploracions completes) — vegeu la pestanya d'estat de la taula i l'índex per als objectius.",
-        "BACKUP": "L'arxivament de WAL està desactivat o aturat — comproveu archive_mode, archive_command i l'estat de la còpia de seguretat.",
-        "REPL": "Retard de replicació {sec}s — comproveu l'estat de l'espera i la xarxa.",
-        "PGSS": "pg_stat_statements no està instal·lat, per tant, el SQL lent no està disponible — activeu-lo amb el SQL següent (es requereix reiniciar el servidor)."
+        "AVAIL": "Resposta lenta o acabat de reiniciar. Comprova la informació de connexió i l'estat del servidor de la DB.",
+        "AVAIL_DOWN": "No s'ha pogut connectar a la DB. Comprova la informació de connexió i si el servidor de la DB està actiu.",
+        "CONN_USE": "Aquesta sessió de DB {sess}/{max} (no a tot el clúster, altres connexions de DB excloses): Neteja les connexions inactives o configura un agrupador de connexions (pgbouncer).",
+        "URL": "{n} comprovacions d'URL fallides · Resposta màxima {ms}ms: Comprova la causa al monitor de schema.pi.",
+        "LONG_QRY": "Una consulta s'ha estat executant durant {sec} segons. Revisa el pla d'execució i ajusta'l, o fes que un DBA l'aturi.",
+        "IDLE_TX": "Una transacció ha estat oberta i inactiva durant {sec} segons. Troba els commits que falten a l'aplicació i estableix un temps d'espera.",
+        "LOCK_WAIT": "{n} sessions estan esperant bloquejos: Troba la sessió que bloqueja i finalitza la seva transacció.",
+        "CACHE_HIT": "Taxa d'encerts de la memòria cau {pct}%: Busca exploracions completes de taules grans o revisa shared_buffers.",
+        "XACT_ERR": "Taxa de retrocés {pct}%, {dlck} interbloquejos: Comprova les transaccions fallides i els registres d'errors de l'aplicació.",
+        "SLOW_SQL": "Hi ha una consulta amb un temps màxim únic de {ms}ms. Revisa el pla d'execució i ajusta des del temps màxim únic superior.",
+        "STORAGE": "La DB de {gb}GB s'acosta al seu límit (resten {days} dies). Neteja taules grans o augmenta la capacitat.",
+        "VACUUM": "{tbl} té moltes files mortes o estadístiques obsoletes. Revisa la configuració de VACUUM (ANALYZE) i autovacuum.",
+        "INDEX": "{n} comprovacions d'índex (invàlid, no utilitzat, exploració completa): Comprova els objectius a la pestanya de salut de la taula/índex.",
+        "BACKUP": "L'arxivament de WAL està desactivat o aturat. Comprova archive_mode, archive_command i l'estat de la còpia de seguretat.",
+        "REPL": "Retard de replicació {sec} segons: Comprova l'estat del servidor en espera i la xarxa.",
+        "PGSS": "Falta l'extensió pg_stat_statements, de manera que no es poden veure les SQL lentes. Habilita-la amb la SQL següent (es requereix reiniciar el servidor)."
       },
       "reason": {
         "CONN_DOWN": "No s'ha jutjat perquè la connexió a la DB està caiguda.",
         "PGSS": "pg_stat_statements no està instal·lat.",
         "VER": "Disponible a PostgreSQL 13 o posterior.",
         "SAMPLE": "Encara no hi ha prou mostres.",
-        "NO_LIMIT": "No hi ha límit de mida, per tant, l'ús no es jutja — afegiu una regla de mida de DB (MB) (>) per utilitzar-la com a límit.",
+        "NO_LIMIT": "L'ús no es determina ja que no hi ha límit de capacitat. Afegir una regla de mida de DB (MB) (>) l'utilitzarà com a límit.",
         "RESET": "Les estadístiques es van restablir fa menys de 7 dies, per tant, els índexs no utilitzats no es jutgen.",
         "STALE": "No hi ha registres de comprovació recents.",
         "STANDBY": "No aplicable en un servidor en espera.",
         "NONE": "Res a comprovar.",
-        "GRANT": "Falten privilegis — concediu el rol pg_monitor al compte de connexió.",
+        "GRANT": "No es pot veure per manca de permisos. Concedeix el rol pg_monitor al compte de connexió.",
         "LINK": "La consulta de schema.pi ha fallat ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Si no està en streaming, comproveu els registres de l'espera."
         }
       },
-      "sqlNote": "El SQL següent és de només lectura, per a la comprovació — les correccions (VACUUM, DROP INDEX, pg_terminate_backend) les executa un DBA.",
+      "sqlNote": "La SQL següent és només per a la verificació de només lectura. Les accions (VACUUM, DROP INDEX, pg_terminate_backend) les executa directament un DBA.",
       "go": {
         "activity": "Activitat i bloquejos",
         "top": "Consultes lentes",
@@ -766,8 +766,8 @@
           "tree": "Què ocupa espai i què cal netejar?"
         },
         "asTable": "Mostra com a taula",
-        "needHistory": "Encara no hi ha tendència — mantingueu aquesta pantalla oberta uns minuts.",
-        "needPerf": "No hi ha historial de mida — recopileu-lo a la pestanya de rendiment o mantingueu aquesta pantalla oberta.",
+        "needHistory": "Encara no hi ha tendència. Es dibuixarà si deixes aquesta pantalla oberta durant uns minuts.",
+        "needPerf": "No hi ha historial de capacitat. Recull-lo des de la pestanya Rendiment o deixa aquesta pantalla oberta.",
         "noSess": "No hi ha sessions.",
         "noWait": "Sense esperes",
         "noData": "No hi ha dades per mostrar.",
@@ -840,17 +840,17 @@
         "noStat": "Sense estadístiques"
       },
       "empty": {
-        "noConn": "Aquesta taxonomia no té cap connexió de servidor PostgreSQL per monitoritzar — només es mostren les URL i l'estat del servei.",
+        "noConn": "No hi ha connexions de servidor PostgreSQL per monitoritzar en aquesta taxonomia. Només es mostren l'URL i l'estat d'enllaç.",
         "unsupported": "Aquesta connexió no admet la monitorització (només connexions de servidor PostgreSQL).",
-        "connFail": "No s'ha pogut connectar a la base de dades — comproveu la configuració de la connexió i l'estat de la DB.",
-        "linkDown": "No s'ha pogut accedir a schema.pi — es torna a intentar automàticament.",
-        "linkAuth": "El testimoni de connexió ha caducat — emeteu un nou testimoni a schema.pi i registreu-lo.",
-        "timeout": "Les respostes són lentes — es torna a intentar automàticament.",
+        "connFail": "No s'ha pogut connectar a la DB. Comprova la informació de connexió i l'estat de la DB.",
+        "linkDown": "No s'ha pogut connectar a schema.pi. Es tornarà a intentar automàticament en breu.",
+        "linkAuth": "El testimoni de connexió ha caducat. Torna a emetre i registra el testimoni des de schema.pi.",
+        "timeout": "La resposta és lenta. Es tornarà a intentar automàticament en breu.",
         "rate": "Massa sol·licituds, per tant, l'interval d'actualització s'ha augmentat."
       },
       "aux": {
         "rules": "Les meves regles d'alerta ({n} actives)",
-        "schemaSvc": "Estat del servei — respostes de schema.pi",
+        "schemaSvc": "Estat d'enllaç: resposta del servei schema.pi",
         "schemaSvcNote": "Mètriques de l'aplicació dels últims 60 minuts emmagatzemades per schema.pi.",
         "source": "Font de dades: la DB de destinació és de només lectura mitjançant consultes amb nom de schema.pi (només lectura); les tendències emmagatzemen estadístiques només a dbms.pi (sense dades de fila)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Encara no hi ha diagnòstic. Prem \"Executa el diagnòstic\"",
     "lastRun": "Últim diagnòstic {dtm}",
     "readOnly": "El diagnòstic només llegeix (SELECT). L'assessorament és una guia i depèn de la memòria del servidor, la càrrega i la càrrega de treball.",
-    "truncated": "Massa objectes — només s'han comprovat els primers 500",
+    "truncated": "Massa objectes : només s'han comprovat els primers 500",
     "paramsNote": "La memòria total del servidor és desconeguda, per la qual cosa s'estima a partir de shared_buffers ≈ 25% de la RAM. random_page_cost assumeix SSD.",
     "auditNote": "Les taules amb RLS desactivat i els comptes no utilitzats es comprovaran un cop la consulta del vincle els admeti.",
-    "replNote": "La línia base és Active-Standby (A-S) — un primari + en espera. Retard de reproducció ≥ 5s = advertència, ≥ 60s = risc (referència RPO mesurada).",
+    "replNote": "El criteri principal és Active-Standby (A-S): 1 Primari + Standby. Advertència per a un retard de reproducció >= 5 segons, risc per a >= 60 segons (consulta la mesura RPO real).",
     "lagIdle": "Sense canvis",
     "pager": "Paginació",
     "prev": "Anterior",
@@ -1019,7 +1019,7 @@
       "intro": "Recull ara llegeix les estadístiques de consultes principals, taules, índexs i mides una vegada i les emmagatzema com a instantània. Recull almenys dues vegades per veure els canvis i les tendències de mida.",
       "run": "Recull ara",
       "running": "Recollint…",
-      "done": "Recollit a {dtm} — {qry} consultes · {tbl} taules · {idx} índexs",
+      "done": "Recollida completada {dtm}: {qry} consultes · {tbl} taules · {idx} índexs",
       "auto": {
         "title": "Recollida automàtica",
         "desc": "Quan està activada, aquesta connexió es recull automàticament cada dia a les 3 AM (hora de Corea). Després de 7 o més dies, podeu confiar en la classificació de consultes lentes i la llista d'índexs no utilitzats",
@@ -1041,13 +1041,13 @@
       "sortCalls": "Crides",
       "empty": "Encara no hi ha instantànies. Prem Recull ara a la pestanya Recull.",
       "range": "Canvi entre {from} → {to}",
-      "first": "Primera instantània a {dtm} — valors acumulats (canvis a partir de la següent instantània)",
+      "first": "Primera recollida {dtm}: Acumulativa (augment/disminució des de la següent recollida)",
       "query": "Consulta (literals emmascarats)",
       "calls": "Crides",
       "totalMs": "Total ms",
       "meanMs": "Mitjana ms",
       "rows": "Files",
-      "reset": "Detecció de restabliment d'estadístiques — es mostra com a acumulatiu",
+      "reset": "Detecció de restabliment d'estadístiques: Mostrat com a acumulatiu",
       "src": "Origen",
       "srcToggle": "Mostrar o amagar detalls de l'origen",
       "openSqlLab": "Obrir a SQL Tuning",
@@ -1055,7 +1055,7 @@
       "sortMax": "Temps màxim d'execució individual",
       "maxMs": "Màx. individual ms",
       "diagToggle": "Diagnostica la causa",
-      "noMax": "Sense valor màxim — {n} elements són de col·leccions antigues sense valor màxim, per la qual cosa s'han ordenat temporalment per mitjana (no per temps total). La recollida ara omplirà el valor màxim."
+      "noMax": "Sense valor màxim: {n} elements són col·leccions antigues sense un valor màxim únic, de manera que s'ordenen temporalment per mitjana única (no per temps total). Els valors màxims s'ompliran amb la col·lecció actual."
     },
     "health": {
       "empty": "Encara no hi ha instantànies. Premeu Recull ara a la pestanya Recull",
@@ -1063,9 +1063,9 @@
       "unusedIdx": "Índexs no utilitzats",
       "unusedIdxHint": "Índexs mai utilitzats des de l'últim restabliment d'estadístiques (per mida). No elimineu els índexs de PK o de restricció única",
       "fullScan": "Escanejos complets excessius",
-      "fullScanHint": "Taules amb més de 1.000 files actives on els escanejos complets són almenys la meitat — reviseu els índexs a les columnes de filtre",
+      "fullScanHint": "Taules amb més de 1.000 files efectives i més de la meitat d'exploracions completes: Revisa els índexs de les columnes de condició.",
       "dead": "Tuples mortes excessives",
-      "deadHint": "Relació de tuples mortes del 20% o més — comproveu la configuració de VACUUM i autovacuum",
+      "deadHint": "Relació de tuples mortes superior al 20%: Revisa la configuració de VACUUM i autovacuum.",
       "none": "Cap",
       "scans": "escanejos"
     },
@@ -1082,7 +1082,7 @@
     },
     "activity": {
       "refresh": "Actualitza",
-      "live": "Consulta en viu — no s'emmagatzema",
+      "live": "Consulta en temps real: No es guarda",
       "sessions": "Activitat de la sessió",
       "locks": "Bloquejos",
       "none": "Cap"
@@ -1109,7 +1109,7 @@
         "BATCH": "Sembla un lot o una feina programada. Distribuïu els temps d'execució fora dels pics de negoci i reduïu la feina per commit. Comproveu els índexs i les estadístiques (ANALYZE) a les taules de destinació i dividiu les transaccions llargues. Posar el nom de la feina a application_name fa que la següent classificació sigui més precisa",
         "PROGRAM": "Sembla una consulta executada per l'aplicació. Comproveu el pla d'execució a l'ajust de SQL. Si el temps màxim d'execució individual és llarg, primer mireu els índexs i l'ordre de les unions. Si una sola execució és curta però el nombre de trucades és alt, mireu les trucades repetides (N+1) i la memòria cau. Poseu el nom del servei a l'application_name del pool de connexions.",
         "PLATFORM": "Sembla una feina interna de la DB o de la plataforma, com ara autovacuum o replicació. Normalment no cal cap acció. Si es manté a la part superior, reviseu els llindars d'autovacuum i maintenance_work_mem",
-        "MONITOR": "Aquesta és una consulta d'autocol·lecció de dbms.pi — la connexió schema.pi és una sentència fixa que només llegeix vistes/catàlegs estadístics (pg_stat_*·pg_catalog), per tant, no és una consulta de negoci i no es requereix cap acció per part del client. Si la càrrega de la base de dades de destinació és un problema, reduïu el nombre de vegades que obriu el botó de recollida/pantalla de monitorització. Les sentències d'altres eines de monitorització que llegeixen les mateixes vistes estadístiques també s'agrupen aquí.",
+        "MONITOR": "Consulta de recollida pròpia de dbms.pi. La connexió schema.pi només llegeix vistes estadístiques i catàlegs (pg_stat_*, pg_catalog) amb declaracions fixes, de manera que no és una consulta de negoci i no es requereix cap acció del client. Si la càrrega de la base de dades de destinació és un problema, redueix la freqüència d'obertura del botó de recollida o de la pantalla de monitorització. Les declaracions d'altres eines de monitorització que llegeixen les mateixes vistes estadístiques també s'agrupen aquí.",
         "UNKNOWN": "No hi ha cap pista sobre l'origen. Definiu application_name en cada connexió i dividiu els comptes per propòsit; es classificarà a partir de les properes mostres"
       },
       "detail": {
@@ -1120,7 +1120,7 @@
         "period": "Observat",
         "none": "(buit)"
       },
-      "noSample": "Encara no hi ha mostres — les sessions en execució es mostren quan visualitzeu el tauler de monitorització o la pestanya Activitat i bloquejos. Per ara, es classifica només a partir del nom del compte",
+      "noSample": "Encara no hi ha mostres. Les sessions en execució s'acumulen com a mostres quan es visualitzen les pestanyes Tauler de monitorització o Activitat/Bloquejos. Actualment, només es classifiquen per nom de compte per a referència.",
       "verOff": "Aquesta DB és anterior a PostgreSQL 14, per la qual cosa les sessions en execució no tenen ID de consulta. Només es mostra el compte (segur)",
       "privOff": "El compte d'enllaç no pot veure els detalls de la sessió d'altres comptes, per la qual cosa no es recullen mostres. Demaneu a un administrador de DB que executi GRANT pg_read_all_stats TO {user};",
       "linkUsr": "compte d'enllaç",
@@ -1131,11 +1131,11 @@
     "diag": {
       "title": "Diagnostica la causa",
       "fix": "Acció:",
-      "none": "Cap causa revelada per les estadístiques — comproveu el pla d'execució a SQL Tuning.",
-      "cum": "Cap trucada en aquest interval — acumulatiu (des del restabliment de les estadístiques)",
-      "basis": "Base — Màxim 1 vegada {max}ms · Mitjana {mean}ms · Crides {calls} · Files per crida {rpc} · Ràtio de lectura de disc {read} · Blocs temporals {tmp}",
+      "none": "Cap causa revelada per les estadístiques. Obre el pla d'execució a SQL Tuning per comprovar-ho.",
+      "cum": "Sense trucades en aquest interval: Acumulatiu (des del restabliment de les estadístiques)",
+      "basis": "Base: Màxim únic {max}ms · Mitjana {mean}ms · Trucades {calls} · Files per trucada {rpc} · Taxa de lectura de disc {read} · Blocs temporals {tmp}",
       "SELF_MON": {
-        "cause": "Consulta d'autocol·lecció de dbms.pi — declaració de monitorització que només llegeix vistes/catàlegs estadístics.",
+        "cause": "Consulta de recollida pròpia de dbms.pi: Declaració de monitorització que només llegeix vistes estadístiques i catàlegs.",
         "fix": "No es requereix cap acció del client. Si la càrrega de la base de dades de destinació és un problema, reduïu el nombre de vegades que obriu la pantalla de recollida/monitorització."
       },
       "NO_MAX": {
@@ -1143,31 +1143,31 @@
         "fix": "Feu clic a 'Recollir' una vegada ara per omplir els valors màxims per a un diagnòstic precís."
       },
       "SLOW_EACH": {
-        "cause": "Sempre lent — Triga molt de temps cada vegada que s'executa, amb un màxim de {max}ms i una mitjana de {mean}ms.",
+        "cause": "Lent cada vegada: Triga molt de temps en cada execució amb un màxim de {max}ms i una mitjana de {mean}ms.",
         "fix": "① Obriu el pla d'execució a 'Obrir a SQL Tuning'. ② Si hi ha escanejos complets (Seq Scan) o ordenacions grans, reviseu els índexs a les columnes de condició WHERE/JOIN. ③ Reduïu les condicions per llegir només les columnes/files necessàries."
       },
       "SPIKE": {
-        "cause": "Retard intermitent — Mitjana {mean}ms, però ocasionalment triga molt de temps amb un màxim de {max}ms ({x} vegades la mitjana).",
+        "cause": "Retard intermitent: Mitjana {mean}ms, però ocasionalment triga molt de temps amb un màxim de {max}ms ({x} vegades la mitjana).",
         "fix": "① Quan sigui lent, comproveu les esperes de bloqueig (wait_event) a la pestanya Activitat/Bloquejos. ② Si només la primera execució és lenta, la memòria cau estava buida i es va llegir el disc. ③ Compareu la mateixa consulta amb diferents valors a SQL Tuning per veure si el pla d'execució canvia segons els valors."
       },
       "DISK_READ": {
-        "cause": "Error de memòria cau — El {pct}% ({read} blocs) dels blocs llegits es van llegir del disc, no de la memòria.",
+        "cause": "Error de memòria cau: El {pct}% ({read} blocs) dels blocs llegits es van llegir del disc, no de la memòria.",
         "fix": "① Reduïu l'interval de lectura amb índexs. ② Reduïu el període/condicions de la consulta. ③ Si les dades llegides amb freqüència continuen sent altes, reviseu shared_buffers (memòria)."
       },
       "TEMP_SPILL": {
-        "cause": "Desbordament de memòria — L'ordenació/hash va superar work_mem i va escriure {blk} blocs (aprox. {mb}MB, {perCall} blocs per crida) a fitxers temporals.",
+        "cause": "Desbordament de memòria: L'ordenació/hash va superar work_mem i va escriure {blk} blocs (aprox. {mb}MB, {perCall} blocs per trucada) a fitxers temporals.",
         "fix": "① Col·locar índexs a les columnes ORDER BY/GROUP BY omet l'ordenació. ② Primer, reduïu el nombre de files a ordenar (LIMIT a l'interior). ③ Si és absolutament necessari, augmenteu SET LOCAL work_mem només per a aquesta transacció de consulta."
       },
       "MANY_ROWS": {
-        "cause": "Recuperació excessiva — Recupera {perCall} files per crida.",
+        "cause": "Consulta excessiva: Recupera {perCall} files per trucada.",
         "fix": "① Les llistes de pantalla es recuperen pàgina per pàgina. ② SELECT només selecciona les columnes que s'utilitzen. ③ Les agregacions es realitzen a la base de dades i només es reben els resultats."
       },
       "PGRST_EMBED": {
-        "cause": "Declaració de filtre incrustat de PostgREST (!inner) — filtrar els pares per condicions de fills pot escanejar tot el conjunt abans de les condicions de classificació.",
+        "cause": "Declaració de filtre incrustat de PostgREST (!inner): Filtrar els pares per condicions de fills pot escanejar tota la taula abans de la condició de classificació.",
         "fix": "① Comproveu si hi ha índexs a les claus d'unió i a les columnes de filtre. ② Moveu els filtres a les condicions de la taula pare. ③ Inseriu els fills en una consulta pare ja existent o combineu-los en una única funció de base de dades."
       },
       "OFFSET_PAGING": {
-        "cause": "Paginació OFFSET — Es torna progressivament més lenta a mesura que llegeix i descarta les files precedents per a pàgines posteriors.",
+        "cause": "Paginació OFFSET: Les pàgines posteriors llegeixen i descarten les files anteriors, fent-se progressivament més lentes.",
         "fix": "Canvieu a la paginació de conjunts de claus (WHERE id > last_id ORDER BY id LIMIT n) que llegeix des de la clau després de l'última clau rebuda."
       }
     }
@@ -1200,8 +1200,8 @@
       "toDraft": "Crea un esborrany de pipeline a partir de {n} seleccionats"
     },
     "ready": {
-      "ok": "Replicació lògica WAL preparada — les taules amb PK poden utilitzar LOGICAL",
-      "no": "Replicació lògica WAL no preparada — captura mitjançant sondeig o comparació de claus",
+      "ok": "Replicació lògica WAL preparada: Les taules amb PK poden utilitzar el mètode LOGICAL.",
+      "no": "Replicació lògica WAL no preparada: Recull utilitzant el mètode de sondeig/comparació de claus.",
       "senders": "{n} connexions de replicació"
     },
     "adapter": {
@@ -1216,20 +1216,20 @@
       "HAS_SOFT_DEL": "Té columna de supressió suau",
       "NO_SOFT_DEL": "No té columna de supressió suau",
       "HAS_PK": "Té clau primària",
-      "NO_PK": "No té clau primària — no es poden identificar les files canviades",
+      "NO_PK": "Sense PK: No es poden identificar les files canviades.",
       "DELETE_UNSEEN": "El sondeig no pot capturar DELETEs físics (es recomana columna de supressió suau)",
       "LOGICAL_NOT_READY": "Pot canviar a LOGICAL un cop la replicació lògica WAL estigui preparada",
-      "FULL_RELOAD_ONLY": "Sense PK ni columna de temps de canvi, per tant, sense captura incremental — afegiu una PK",
+      "FULL_RELOAD_ONLY": "Sense PK/marca de temps de canvi, per tant, no és possible la recollida incremental: Es recomana afegir PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level no és logical (canviar-lo requereix un reinici de la DB)",
       "NO_SLOTS": "max_replication_slots és 0",
       "NO_SENDERS": "max_wal_senders és 0",
-      "IS_STANDBY": "Servidor en espera — preneu la replicació lògica del primari",
+      "IS_STANDBY": "Servidor en espera: Rep la replicació lògica del servidor primari.",
       "SETTINGS_UNKNOWN": "No s'han pogut llegir les configuracions, l'estat de preparació és desconegut"
     },
     "ed": {
       "title": "Definicions de pipeline",
-      "draftOnly": "Només disseny — desat com a esborranys (DRAFT)",
+      "draftOnly": "Només disseny: Guarda només com a ESBORRANY.",
       "new": "Nou pipeline",
       "empty": "No hi ha pipelines desats",
       "manual": "Manual",
@@ -1298,8 +1298,8 @@
     },
     "warn": {
       "none": "Sense advertències notables.",
-      "SEQ_SCAN_LARGE": "Escaneig complet a {relation} (aproximadament {rows} files) — considereu un índex a les columnes de filtre.",
-      "NESTED_LOOP_HIGH": "El bucle niuat produeix aproximadament {rows} files — considereu una unió hash o merge, o un índex a la condició de la unió.",
+      "SEQ_SCAN_LARGE": "La taula {relation} està realitzant una exploració completa (aproximadament {rows} files): Revisa els índexs de les columnes de condició.",
+      "NESTED_LOOP_HIGH": "El resultat del bucle niuat és d'aproximadament {rows} files. Revisa les unions hash/merge o els índexs de les condicions d'unió.",
       "SORT_SPILL": "La mida de l'ordenació és d'aproximadament {kb}KB, per sobre del work_mem predeterminat (4MB); pot desbordar-se al disc."
     },
     "lint": {
@@ -1313,14 +1313,14 @@
         "char": "caràcter"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — seleccioneu només les columnes que necessiteu (E/S extra, sense índex de cobertura).",
-        "FUNC_ON_COLUMN": "La columna de filtre {column} està encapsulada en una funció o expressió, de manera que el seu índex no es pot utilitzar — transformeu la constant en el seu lloc.",
-        "LEADING_WILDCARD": "LIKE amb un % inicial no pot utilitzar un índex B-tree — considereu un índex GIN de pg_trgm.",
-        "OR_DIFF_COLUMNS": "Condicions OR en columnes diferents — considereu dividir amb UNION (afegiu una condició d'exclusió de duplicats si és UNION ALL) o revisar els índexs per columna.",
-        "IMPLICIT_CAST": "{column} es compara amb un número entre cometes — feu coincidir els tipus de columna i constant (conversió implícita).",
-        "NOT_IN_SUBQUERY": "NOT IN (subconsulta) no retorna res quan hi ha NULLs i és lent — utilitzeu NOT EXISTS.",
-        "NO_WHERE": "Sense clàusula WHERE — en una taula gran això és un escaneig complet (afegiu una condició o LIMIT).",
-        "DOMAIN_MISMATCH": "{column} és de tipus {expected} segons el domini estàndard, però es compara amb una constant d'un altre tipus — la conversió implícita pot impedir l'ús de l'índex."
+        "SELECT_STAR": "SELECT *: Selecciona només les columnes necessàries (E/S innecessària, índex de cobertura no possible).",
+        "FUNC_ON_COLUMN": "La columna de condició {column} és processada per una funció/operació, de manera que no es poden utilitzar índexs. Processa el costat constant.",
+        "LEADING_WILDCARD": "LIKE amb un % inicial no pot utilitzar un índex B-tree. Revisa els índexs GIN de pg_trgm.",
+        "OR_DIFF_COLUMNS": "Les condicions de columnes diferents s'agrupen amb OR. Revisa la separació UNION (afegeix una condició d'exclusió de duplicats si UNION ALL) o els índexs per columna.",
+        "IMPLICIT_CAST": "{column} es compara amb un número entre cometes. Fes coincidir el tipus de columna i el tipus de constant (conversió de tipus implícita).",
+        "NOT_IN_SUBQUERY": "NOT IN (subconsulta) pot estar buit i ser lent si es barregen valors NULL. Canvia a NOT EXISTS.",
+        "NO_WHERE": "Sense condició WHERE. Si és una taula gran, és una exploració completa (afegeix LIMIT o condicions).",
+        "DOMAIN_MISMATCH": "{column} és de tipus {expected} segons el domini estàndard, però es compara amb una constant d'un tipus diferent. La conversió de tipus implícita pot impedir l'ús de l'índex."
       }
     },
     "saved": {
@@ -1393,10 +1393,10 @@
       "copy": "Copia",
       "copied": "Copiat",
       "rule": {
-        "SEQ_SCAN_INDEX": "Escaneig complet de {relation}: creeu un índex a la columna de filtre {column} (substituïu NN al nom de l'índex per un número de seqüència).",
-        "SEQ_SCAN_STATS": "Escaneig complet de {relation}: comproveu les columnes de filtre i assegureu-vos que les estadístiques (ANALYZE) estiguin actualitzades.",
-        "NESTED_LOOP": "El bucle niuat espera {rows} files: actualitzeu les estadístiques i considereu els índexs de clau d'unió o una unió hash.",
-        "SORT_SPILL": "L'ordenació d'uns {kb} KB pot desbordar-se al disc: considereu augmentar la work_mem de la sessió o indexar les columnes d'ordenació.",
+        "SEQ_SCAN_INDEX": "Exploració completa de {relation}: Crea un índex a la columna de condició {column} (el nom de l'índex NN es substituirà per un número de seqüència).",
+        "SEQ_SCAN_STATS": "Exploració completa de {relation}: Comprova les columnes de condició i assegura't que les estadístiques (ANALYZE) estiguin actualitzades.",
+        "NESTED_LOOP": "El resultat del bucle niuat és d'aproximadament {rows} files: Actualitza les estadístiques i revisa els índexs de la condició d'unió o les unions hash.",
+        "SORT_SPILL": "L'ordenació pot desbordar-se al disc en aproximadament {kb}KB. Revisa l'augment de work_mem de la sessió o els índexs de les columnes d'ordenació.",
         "SELECT_STAR": "Seleccioneu només les columnes que necessiteu en lloc de SELECT * (menys E/S, possibles índexs de cobertura).",
         "FUNC_ON_COLUMN": "Moveu la funció/expressió a la columna de filtre {column} al costat constant (permet l'ús d'índexs).",
         "IMPLICIT_CAST": "Feu coincidir els tipus de {column} i la constant (elimineu la conversió implícita).",
@@ -1456,9 +1456,9 @@
     },
     "desc": {
       "FREE": "Explorar i aprendre",
-      "D1": "Operador — Comprova si la base de dades està bé ara",
-      "D2": "Desenvolupador i ajustador — Corregeix SQL lent",
-      "D3": "DBA i DA — Des de la seguretat operativa fins a la implementació i el llac"
+      "D1": "Operador: Comprova si la base de dades està en bon estat ara.",
+      "D2": "Desenvolupador/Ajustador: Corregeix SQL lent.",
+      "D3": "DBA/DA: Seguretat operativa, migració i fins i tot data lake."
     },
     "feat": {
       "FREE": "Tauler de monitorització, vista del pla d'execució, aprenentatge bàsic",
@@ -1501,7 +1501,7 @@
       "required": "Aquesta funció està disponible a partir del pla {plan}.",
       "limit": "Heu utilitzat tots els intents disponibles per a aquest període. Podeu utilitzar-ne més actualitzant al pla {plan}.",
       "limitTop": "Heu utilitzat tots els intents disponibles per a aquest període. Podeu tornar a utilitzar-lo el pròxim període.",
-      "expired": "El vostre pla de schema.pi ha caducat — feu un pagament a la pantalla del pla de schema.pi.",
+      "expired": "El teu pla de schema.pi ha caducat. Si us plau, paga a la pantalla del pla de schema.pi.",
       "go": "Veure pla",
       "close": "Tancar"
     }

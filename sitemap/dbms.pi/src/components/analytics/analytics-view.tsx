@@ -18,7 +18,7 @@ import type { MonSummary } from '@/lib/monitor/rules'
 const SCHEMA_URL = 'https://schem.vercel.app'
 const CARD = 'bg-surface rounded-2xl p-4'
 const fmt = (v: number | null | undefined, d = 1) =>
-  v === null || v === undefined ? '—' : v.toLocaleString(undefined, { maximumFractionDigits: d })
+  v === null || v === undefined ? '-' : v.toLocaleString(undefined, { maximumFractionDigits: d })
 
 type KpiRes = {
   areaNm: string
@@ -397,7 +397,7 @@ function LakeSection({ linkId }: { linkId: string }) {
                                   {c.pk && <span className="text-accent ml-1">{t('lake.pk')}</span>}
                                 </td>
                                 <td className="py-1 pr-2 font-mono break-all">{c.stdNm}</td>
-                                <td className="py-1 pr-2">{c.phyTpNm ?? '—'}</td>
+                                <td className="py-1 pr-2">{c.phyTpNm ?? '-'}</td>
                                 <td className={`py-1 ${c.conform ? '' : 'text-danger'}`}>{c.conform ? t('lake.ok') : t('lake.ng')}</td>
                               </tr>
                             ))}

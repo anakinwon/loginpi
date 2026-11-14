@@ -227,9 +227,9 @@ function LinkCard({ link, onRemoved }: { link: LinkItem; onRemoved: () => void }
                     </td>
                     <td className="py-1 pr-2">{c.dbmsCd}</td>
                     <td className="py-1 pr-2">{c.execMthdCd}</td>
-                    <td className="py-1 pr-2 font-mono">{c.hostMasked ?? '—'}</td>
+                    <td className="py-1 pr-2 font-mono">{c.hostMasked ?? '-'}</td>
                     <td className="py-1 pr-2 tabular-nums">{dtm(c.lstTestDtm)}</td>
-                    <td className="py-1 tabular-nums">{c.execMthdCd === 'AGT' ? dtm(c.agtLstSeenDtm) : '—'}</td>
+                    <td className="py-1 tabular-nums">{c.execMthdCd === 'AGT' ? dtm(c.agtLstSeenDtm) : '-'}</td>
                   </tr>
                 ))}
               </tbody>

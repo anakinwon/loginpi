@@ -83,7 +83,7 @@ function Board({ linkId }: { linkId: string }) {
             {info.upgrades.map((u) => (
               <li key={u.plan_cd + u.prd} className="flex flex-wrap items-center gap-2 text-sm">
                 <span className="min-w-0 flex-1">
-                  {t('upgradeTo', { plan: t(`names.${u.plan_cd}`), prd: t(u.prd === 'Y' ? 'yearly' : 'monthly') })} — {money(u.due, u.pi)}
+                  {t('upgradeTo', { plan: t(`names.${u.plan_cd}`), prd: t(u.prd === 'Y' ? 'yearly' : 'monthly') })} : {money(u.due, u.pi)}
                 </span>
                 <Buy linkId={linkId} args={{ plan_cd: u.plan_cd, prd_cd: 'U', prd: u.prd }} onDone={reload} />
               </li>

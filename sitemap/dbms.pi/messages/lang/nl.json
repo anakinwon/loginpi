@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analyse & Lake",
     "intro": "dbms-activiteit-KPI's, drielaags lake-ontwerp en datasetcatalogus op één plek.",
-    "storageNotice": "Lake-opslag (klantzijde of cloud) is nog niet besloten (PRD sectie 10 #7). Alleen ontwerpen en naamtoewijzingen worden voorlopig opgeslagen — geen rijgegevens.",
+    "storageNotice": "Lake-opslag (klantzijde of cloud) is nog niet besloten (PRD sectie 10 #7). Alleen ontwerpen en naamtoewijzingen worden voorlopig opgeslagen : geen rijgegevens.",
     "noLink": "Selecteer of registreer eerst een schema.pi-koppeling.",
     "goConnect": "Koppeling registreren",
     "loading": "Laden…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP-analyse — Model↔DB",
+    "title": "GAP-analyse: Model↔DB",
     "intro": "Vergelijk het schema.pi-ontwerpmodel en de DDL-toepassingsgeschiedenis met de live DB-catalogus om drift te vinden, en meet of ontworpen indexen daadwerkelijk worden gebruikt. Klantrijgegevens worden nooit gelezen of opgeslagen.",
     "needLink": "Kies eerst een schema.pi-koppeling hierboven. Als u er geen heeft, registreer dan een token in het menu 'Koppeling'.",
     "needConn": "Kies de DB-verbinding om hierboven te vergelijken.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Verzoek {id}",
     "notSaved": "Kon deze run niet opslaan in de geschiedenis (resultaten worden normaal weergegeven).",
-    "capped": "Te veel items — toont de eerste {cap} per sectie (aantallen zijn compleet).",
+    "capped": "Te veel items : toont de eerste {cap} per sectie (aantallen zijn compleet).",
     "statsMissing": "Indexgebruiksstatistieken waren niet beschikbaar, dus het gebruik kon niet worden beoordeeld.",
     "sum": {
       "missingTables": "Tabellen ontbreken in DB",
@@ -230,7 +230,7 @@
       "USED": "In gebruik",
       "NO_STATS": "Geen statistieken",
       "CONSTRAINT": "Uniciteitsbeperking (behouden)",
-      "NO_DATA": "Geen gegevens of statistieken niet verzameld — kan niet beoordelen",
+      "NO_DATA": "Geen gegevens of statistieken niet verzameld: kan niet bepalen",
       "OBSERVING": "Onder observatie (minder dan 7 dagen)",
       "UNUSED_CAND": "Kandidaat ongebruikt"
     },
@@ -245,14 +245,14 @@
       "RATE": "Te veel aanvragen. Probeer het over een minuut opnieuw."
     },
     "schema": "Schema",
-    "schemaHint": "Alleen reguliere en gepartitioneerde tabellen in dit schema worden vergeleken (views uitgesloten). Standaard public — Supabase interne schema's (auth, storage, …) worden weggelaten.",
-    "truncated": "{names} heeft de limiet van {max} rijen bereikt en is afgekapt — sommige 'niet in DB' / 'niet in model' resultaten kunnen vals zijn. Verfijn het schema en voer opnieuw uit.",
+    "schemaHint": "Vergelijkt alleen reguliere en gepartitioneerde tabellen in dit schema (exclusief views). Standaard public: Supabase interne schema's (auth, storage, etc.) zijn uitgesloten.",
+    "truncated": "De query voor {names} is afgekapt bij {max} rijen. Sommige 'Niet in DB'/'Niet in Model' detecties kunnen vals-positieven zijn. Verfijn het schema en detecteer opnieuw.",
     "colUnchecked": "Omdat de kolomquery is afgekapt, worden {n} ontbrekende/extra kolomresultaten als onverifieerbaar behandeld en uitgesloten van het aantal kolomverschillen.",
-    "renamed": "{n} PK-index(en) toegepast onder de oude naamgevingsregel (_PKEY) bestaan in de DB onder de nieuwe naam (PK_) — normaal",
-    "superseded": "{n} oudere verzoek(en) zijn uitgesloten omdat een later verzoek dezelfde tabel opnieuw heeft gemaakt (DROP … CASCADE) — normaal",
+    "renamed": "{n} PK-indexen die zijn toegepast met de oude naamgevingsconventie (_PKEY) bevinden zich in de DB met de nieuwe naam (PK_). Normaal.",
+    "superseded": "{n} eerdere verzoeken zijn uitgesloten van vergelijking omdat latere verzoeken dezelfde tabel opnieuw hebben aangemaakt (DROP … CASCADE). Normaal.",
     "supersededItem": "Verzoek {id} → vervangen door verzoek {by}",
     "sysCols": "{n} systeemkolom(men) die automatisch zijn toegevoegd bij DDL-generatie, zijn opzettelijk niet in het model en zijn uitgesloten van verschillen.",
-    "groupOwn": "Projectvoorvoegsel {pfx} — kandidaten die ontbreken in het model",
+    "groupOwn": "Dit projectvoorvoegsel {pfx}: model ontbrekende kandidaten",
     "groupOther": "Ander systeem {pfx}",
     "basis": "Gesch. rijen {rows} · sinds {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Als objecten na opnieuw toepassen nog steeds verdwijnen, vermoed dan een handmatige drop of rollback en controleer de activiteit van het verbindingsaccount met uw DBA."
       },
       "extraTables": {
-        "s1": "Dit projectvoorvoegselpakket = ontbrekende modelkandidaten — importeer ze in het model via schema.pi → Instellingen → Reverse, of besluit ze te verwijderen als het ongebruikte tabellen zijn.",
-        "s2": "Andere voorvoegselgroepen = andere systemen die deze DB delen — geen actiepunten voor dit project.",
+        "s1": "Deze projectvoorvoegselgroep = model ontbrekende kandidaten: importeer naar model via schema.pi → Instellingen → Reverse, of beslis of u wilt verwijderen als de tabel niet wordt gebruikt.",
+        "s2": "Andere voorvoegselgroepen = andere systemen die dezelfde DB gebruiken: niet onderworpen aan actie door dit project.",
         "s3": "Als het doelschema niet public is, wijzig dan het veld 'Schema' hierboven en voer opnieuw uit."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Type/NULL verschilt = stem af op het model (bron van waarheid); controleer voordat u de lengte verkleint of overschakelt naar NOT NULL of bestaande rijen eraan voldoen."
       },
       "idxUsage": {
-        "s1": "Controleer vóór verwijdering ① of het statistiekenvenster ten minste één bedrijfscyclus (bijv. batch einde maand) omvat — zie 'sinds'.",
+        "s1": "Controleer vóór het verwijderen ① of de statistiekverzamelingsperiode ten minste één bedrijfscyclus is (bijv. batch aan het einde van de maand): raadpleeg de referentiedatum.",
         "s2": "② Het is geen unieke/PK-index (deze worden afzonderlijk weergegeven als 'uniciteitsbeperking').",
         "s3": "③ EXPLAIN de representatieve SQL van de tabel in SQL Tuning en bevestig dat deze index niet wordt gebruikt.",
         "s4": "Zodra alle drie zijn bevestigd, verwijdert u de index uit het model in schema.pi en past u deze toe via DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Hoe een verbindingstoken uit te geven",
     "how1": "Meld u aan bij schema.pi en open het onderwerpgebied om verbinding te maken",
     "how2": "Ga naar Onderwerpgebied → Instellingen → Verbindingstoken en druk op 'Token uitgeven' (gebiedsbeheerder of DA-rol)",
-    "how3": "Kopieer het token dat begint met slk_ — het wordt slechts één keer getoond bij uitgifte",
+    "how3": "Kopieer het token dat begint met slk_ en dat is uitgegeven. Het origineel wordt slechts één keer weergegeven op het moment van uitgifte.",
     "how4": "Plak het hieronder en registreer",
     "openSchema": "Open schema.pi",
     "registerTitle": "Verbinding registreren",
@@ -384,7 +384,7 @@
     "retry": "Opnieuw proberen",
     "pickerLink": "Koppeling",
     "pickerConn": "Verbinding",
-    "pickerEmpty": "Geen verbindingen —",
+    "pickerEmpty": "Geen verbindingen.",
     "pickerGo": "registreer er een op /connect",
     "errors": {
       "LINK_AUTH": "Het verbindingstoken is verlopen of ingetrokken. Geef een nieuw token uit in schema.pi en registreer opnieuw",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Gegevensmigratie (PiMig)",
-    "intro": "Berekent de laadvolgorde van tabellen op basis van de relaties in uw schema.pi-ontwerpmodel, organiseert de chunkgrootte, parallellisme en de cutover-checklist, en genereert verificatie-SQL die u zelf uitvoert op bron en doel. Dit scherm plant en controleert alleen — het verplaatst geen gegevens of leest geen klant-DB-rijen.",
+    "intro": "Berekent de laadvolgorde van tabellen op basis van de relaties in uw schema.pi-ontwerpmodel, organiseert de chunkgrootte, parallellisme en de cutover-checklist, en genereert verificatie-SQL die u zelf uitvoert op bron en doel. Dit scherm plant en controleert alleen : het verplaatst geen gegevens of leest geen klant-DB-rijen.",
     "needLink": "Kies eerst een schema.pi-koppeling hierboven. Als u er geen heeft, registreer dan een token onder 'Verbinden'.",
     "loading": "Laden…",
     "newPlan": "Nieuw migratieplan",
@@ -432,8 +432,8 @@
     "optsHint": "Parallellisme is het aantal tabellen dat tegelijkertijd binnen een niveau wordt geladen. Chunkgrootte is de commit-eenheid (rijen) die de uitvoeringsengine zal gebruiken.",
     "order": "Laadvolgorde",
     "orderHint": "Topologisch gesorteerd op ontwerp-relaties (niet fysieke FK's), zodat oudertabellen eerst komen. Tabellen op hetzelfde niveau zijn niet afhankelijk van elkaar en kunnen parallel worden geladen.",
-    "cycles": "{n} circulaire groep(en) — op hetzelfde niveau geplaatst. Stel hun volgorde handmatig in en stel referentiecontroles uit tot na het laden.",
-    "selfRefs": "Zelfrefererende (hiërarchische) tabellen — laad eerst oudertabellen binnen de tabel",
+    "cycles": "{n} cycli: in dezelfde fase geplaatst. Stel handmatig de laadvolgorde in en stel referentiecontroles uit tot na het laden.",
+    "selfRefs": "Zelfrefererende (hiërarchische) tabellen: bovenliggende rijen eerst binnen dezelfde tabel.",
     "level": "Niveau {n}",
     "checklist": "Cutover checklist",
     "toReady": "Markeren als gereed",
@@ -471,7 +471,7 @@
     },
     "verify": "Verificatie SQL",
     "verifyHint": "Genereert telling, numerieke kolom som, dubbele sleutel en sleutel hash queries per tabel in laadvolgorde. Voer ze zelf uit op bron en doel en vergelijk (dit scherm voert ze niet uit).",
-    "noHashOracle": "Oracle·Tibero hashfuncties en tekstweergave verschillen van PostgreSQL, dus hash-queries worden weggelaten — vergelijk tellingen, sommen en dubbele sleutels.",
+    "noHashOracle": "Oracle en Tibero slaan hash-opzoekingen over omdat hash-functies en tekenrepresentaties verschillen van PostgreSQL. Vergelijk op aantal, som en sleutelduplicatie.",
     "copy": "Kopiëren",
     "copied": "Gekopieerd",
     "copyFail": "Kopiëren mislukt. Selecteer de tekst en kopieer deze handmatig.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Het verzoek is ongeldig."
     },
     "board": {
-      "subtitle": "Wat te doen op deze DB nu — 14 signalen van OK, waarschuwing of risico met oplossingen, in één oogopslag.",
+      "subtitle": "Wat nu te doen in deze DB: Bekijk in één oogopslag de normale, waarschuwings- en risicostatus van 14 signalen en hun oplossingen.",
       "refresh": {
         "updated": "Per {time} · vernieuwt elke minuut",
         "now": "Nu vernieuwen",
@@ -564,11 +564,11 @@
         "NA": "N.v.t."
       },
       "overall": {
-        "RISK": "Risico — actie nu nodig",
-        "WARN": "Waarschuwing — sommige items moeten worden bekeken",
-        "UNKNOWN": "Onbekend — controleer de verbinding",
-        "OK": "OK — elk signaal is binnen de limieten",
-        "CONN_DOWN": "Kan geen verbinding maken met de DB — controleer eerst de verbinding",
+        "RISK": "Risico: Onmiddellijke actie vereist",
+        "WARN": "Waarschuwing: Te beoordelen items",
+        "UNKNOWN": "Kan niet bevestigen: Controleer de verbindingsstatus",
+        "OK": "Normaal: Alle signalen voldoen aan de criteria",
+        "CONN_DOWN": "Kan geen verbinding maken met de DB. Controleer eerst de verbinding.",
         "NA": "N.v.t."
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Minder tonen",
         "setup": "Stel deze in om meer te zien",
         "none": "Geen risico- of waarschuwingsitems vereisen nu actie.",
-        "unknown": "Kon {n} signaal/signalen niet controleren — zie de kaarten voor de reden.",
+        "unknown": "Kan {n} items niet bevestigen: Controleer de reden op de kaart.",
         "myRule": "Mijn regel overtreden: {rule}",
         "copySql": "SQL kopiëren",
         "copied": "Gekopieerd"
@@ -622,34 +622,34 @@
         "REPL": "Replicatievertraging"
       },
       "fix": {
-        "AVAIL": "Trage respons of een recente herstart — controleer de verbindingsinstellingen en de DB-serverstatus.",
-        "AVAIL_DOWN": "Kon geen verbinding maken met de DB — controleer de verbindingsinstellingen en of de DB-server actief is.",
-        "CONN_USE": "{sess}/{max} sessies op deze DB (niet clusterbreed — andere databases zijn uitgesloten) — sluit inactieve verbindingen of voeg een connection pooler (pgbouncer) toe.",
-        "URL": "{n} gecontroleerde URL's falen · maximale respons {ms}ms — zie de schema.pi-monitor voor de oorzaak.",
-        "LONG_QRY": "Een query draait al {sec}s — bekijk het plan en optimaliseer het, of laat een DBA het annuleren.",
-        "IDLE_TX": "Een transactie is al {sec}s inactief — zoek de ontbrekende commit in de app en stel een timeout in.",
-        "LOCK_WAIT": "{n} sessies wachten op locks — zoek de blokkerende sessie en beëindig de transactie.",
-        "CACHE_HIT": "Cache-hitrate {pct}% — zoek naar volledige scans van grote tabellen of controleer shared_buffers.",
-        "XACT_ERR": "Rollback-percentage {pct}%, {dlck} deadlocks — controleer de falende transacties en app-foutenlogboeken.",
-        "SLOW_SQL": "Er is een query die tot {ms}ms per uitvoering duurt — bekijk het uitvoeringsplan en stem het af, beginnend bij de hoogste enkele uitvoeringstijd.",
-        "STORAGE": "De DB ({gb} GB) nadert zijn limiet (dagen over {days}) — ruim grote tabellen op of voeg capaciteit toe.",
-        "VACUUM": "{tbl} heeft veel dode rijen of verouderde statistieken — controleer VACUUM (ANALYZE) en autovacuum-instellingen.",
-        "INDEX": "{n} indexbevindingen (ongeldig, ongebruikt, volledige scans) — zie het tabblad tabel- & indexstatus voor de doelen.",
-        "BACKUP": "WAL-archivering is uitgeschakeld of vastgelopen — controleer archive_mode, archive_command en de back-upstatus.",
-        "REPL": "Replicatievertraging {sec}s — controleer de standby-status en het netwerk.",
-        "PGSS": "pg_stat_statements is niet geïnstalleerd, dus trage SQL is niet beschikbaar — schakel het in met de onderstaande SQL (serverherstart vereist)."
+        "AVAIL": "Trage respons of net opnieuw opgestart. Controleer de verbindingsinformatie en de DB-serverstatus.",
+        "AVAIL_DOWN": "Kan geen verbinding maken met de DB. Controleer de verbindingsinformatie en of de DB-server actief is.",
+        "CONN_USE": "Deze DB-sessie {sess}/{max} (niet clusterbreed, andere DB-verbindingen uitgesloten): Ruim inactieve verbindingen op of stel een verbindingspooler (pgbouncer) in.",
+        "URL": "{n} URL-controles mislukt · Max. respons {ms}ms: Controleer de oorzaak in schema.pi monitor.",
+        "LONG_QRY": "Een query draait al {sec} seconden. Bekijk het uitvoeringsplan en tune het, of laat een DBA het stoppen.",
+        "IDLE_TX": "Een transactie is al {sec} seconden open en inactief. Zoek ontbrekende commits in de app en stel een time-out in.",
+        "LOCK_WAIT": "{n} sessies wachten op locks: Zoek de blokkerende sessie en beëindig de transactie.",
+        "CACHE_HIT": "Cache hit rate {pct}%: Zoek naar volledige tabelscans van grote tabellen of bekijk shared_buffers.",
+        "XACT_ERR": "Rollback rate {pct}%, {dlck} deadlocks: Controleer mislukte transacties en app-foutlogboeken.",
+        "SLOW_SQL": "Er is een query met een enkele maximale tijd van {ms}ms. Bekijk het uitvoeringsplan en tune vanaf de hoogste enkele maximale tijd.",
+        "STORAGE": "DB {gb}GB nadert zijn limiet (resterende {days} dagen). Ruim grote tabellen op of verhoog de capaciteit.",
+        "VACUUM": "{tbl} heeft veel dode rijen of verouderde statistieken. Bekijk VACUUM (ANALYZE) en autovacuum-instellingen.",
+        "INDEX": "{n} indexcontroles (ongeldig, ongebruikt, volledige scan): Controleer doelen op het tabblad tabel-/indexgezondheid.",
+        "BACKUP": "WAL-archivering is uitgeschakeld of gestopt. Controleer archive_mode, archive_command en back-upstatus.",
+        "REPL": "Replicatievertraging {sec} seconden: Controleer de status van de standby-server en het netwerk.",
+        "PGSS": "De pg_stat_statements-extensie ontbreekt, dus trage SQL kan niet worden bekeken. Schakel deze in met de onderstaande SQL (serverherstart vereist)."
       },
       "reason": {
         "CONN_DOWN": "Niet beoordeeld omdat de DB-verbinding verbroken is.",
         "PGSS": "pg_stat_statements is niet geïnstalleerd.",
         "VER": "Alleen beschikbaar op PostgreSQL 13 of hoger.",
         "SAMPLE": "Nog niet genoeg samples.",
-        "NO_LIMIT": "Geen groottelimiet, dus gebruik wordt niet beoordeeld — voeg een DB-grootte (MB) regel (>) toe om het als limiet te gebruiken.",
+        "NO_LIMIT": "Het gebruik wordt niet bepaald omdat er geen capaciteitslimiet is. Het toevoegen van een DB-grootte (MB) regel (>) zal deze als limiet gebruiken.",
         "RESET": "Statistieken zijn minder dan 7 dagen geleden gereset, dus ongebruikte indexen worden niet beoordeeld.",
         "STALE": "Geen recente controleverslagen.",
         "STANDBY": "Niet van toepassing op een standby-server.",
         "NONE": "Niets te controleren.",
-        "GRANT": "Ontbrekende privileges — verleen de pg_monitor-rol aan het verbindingsaccount.",
+        "GRANT": "Kan niet bekijken vanwege gebrek aan machtigingen. Geef de pg_monitor-rol aan het verbindingsaccount.",
         "LINK": "schema.pi-query mislukt ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Als het niet streamt, controleer dan de standby-logboeken."
         }
       },
-      "sqlNote": "De onderstaande SQL is alleen-lezen, ter controle — fixes (VACUUM, DROP INDEX, pg_terminate_backend) worden uitgevoerd door een DBA.",
+      "sqlNote": "De onderstaande SQL is alleen voor read-only verificatie. Acties (VACUUM, DROP INDEX, pg_terminate_backend) worden rechtstreeks door een DBA uitgevoerd.",
       "go": {
         "activity": "Activiteit & locks",
         "top": "Trage queries",
@@ -766,8 +766,8 @@
           "tree": "Wat neemt ruimte in beslag en wat moet worden opgeruimd?"
         },
         "asTable": "Bekijken als tabel",
-        "needHistory": "Nog geen trend — houd dit scherm een paar minuten open.",
-        "needPerf": "Geen grootteschiedenis — verzamel op het tabblad prestaties of houd dit scherm open.",
+        "needHistory": "Nog geen trend. Deze wordt getekend als u dit scherm een paar minuten open laat.",
+        "needPerf": "Geen capaciteitsgeschiedenis. Verzamel deze via het tabblad Prestaties of laat dit scherm open.",
         "noSess": "Geen sessies.",
         "noWait": "Geen wachttijden",
         "noData": "Niets om te tonen.",
@@ -840,17 +840,17 @@
         "noStat": "Geen statistieken"
       },
       "empty": {
-        "noConn": "Deze taxonomie heeft geen PostgreSQL-serververbinding om te monitoren — toont alleen URL's en servicestatus.",
+        "noConn": "Er zijn geen PostgreSQL-serververbindingen om te monitoren in deze taxonomie. Alleen URL- en koppelingsstatus worden weergegeven.",
         "unsupported": "Deze verbinding ondersteunt geen monitoring (alleen PostgreSQL-serververbindingen).",
-        "connFail": "Kon geen verbinding maken met de database — controleer de verbindingsinstellingen en DB-status.",
-        "linkDown": "Kon schema.pi niet bereiken — probeert automatisch opnieuw.",
-        "linkAuth": "Het verbindingstoken is verlopen — geef een nieuw token uit in schema.pi en registreer het.",
-        "timeout": "Reacties zijn traag — probeert automatisch opnieuw.",
+        "connFail": "Kan geen verbinding maken met de DB. Controleer de verbindingsinformatie en de DB-status.",
+        "linkDown": "Kan geen verbinding maken met schema.pi. Zal binnenkort automatisch opnieuw proberen.",
+        "linkAuth": "Verbindingstoken is verlopen. Geef het token opnieuw uit en registreer het via schema.pi.",
+        "timeout": "De respons is traag. Zal binnenkort automatisch opnieuw proberen.",
         "rate": "Te veel verzoeken, dus het vernieuwingsinterval is verhoogd."
       },
       "aux": {
         "rules": "Mijn waarschuwingsregels ({n} actief)",
-        "schemaSvc": "Servicestatus — schema.pi-reacties",
+        "schemaSvc": "Koppelingsstatus: schema.pi service respons",
         "schemaSvcNote": "App-metrieken van de laatste 60 minuten opgeslagen door schema.pi.",
         "source": "Gegevensbron: de doel-DB is alleen-lezen via benoemde queries van schema.pi (alleen-lezen); trends slaan alleen statistieken op in dbms.pi (geen rijgegevens)."
       }
@@ -865,10 +865,10 @@
     "noRun": "Nog geen diagnose. Druk op \"Diagnose uitvoeren\"",
     "lastRun": "Laatste diagnose {dtm}",
     "readOnly": "Diagnose leest alleen (SELECT). Advies is een leidraad en hangt af van servergeheugen, belasting en workload",
-    "truncated": "Te veel objecten — alleen de eerste 500 zijn gecontroleerd",
+    "truncated": "Te veel objecten : alleen de eerste 500 zijn gecontroleerd",
     "paramsNote": "Totaal servergeheugen is onbekend, dus het wordt geschat op basis van shared_buffers ≈ 25% van RAM. random_page_cost gaat uit van SSD",
     "auditNote": "Tabellen met RLS uitgeschakeld en ongebruikte accounts worden gecontroleerd zodra de linkquery deze ondersteunt",
-    "replNote": "Baseline is Active-Standby (A-S) — één primaire + standby. Replay lag ≥ 5s = waarschuwing, ≥ 60s = risico (gemeten RPO-referentie)",
+    "replNote": "Primair criterium is Active-Standby (A-S): 1 Primary + Standby. Waarschuwing voor replayvertraging >= 5 seconden, risico voor >= 60 seconden (raadpleeg de werkelijke RPO-meting).",
     "lagIdle": "Geen wijzigingen",
     "pager": "Paginering",
     "prev": "Vorige",
@@ -1018,7 +1018,7 @@
       "intro": "Nu verzamelen leest de top query statistieken, tabellen, indexen en groottes één keer en slaat deze op als een snapshot. Verzamel minstens twee keer om wijzigingen en groottetrends te zien",
       "run": "Nu verzamelen",
       "running": "Verzamelen…",
-      "done": "Verzameld op {dtm} — {qry} queries · {tbl} tabellen · {idx} indexen",
+      "done": "Verzameling voltooid {dtm}: {qry} queries · {tbl} tabellen · {idx} indexen",
       "auto": {
         "title": "Automatische verzameling",
         "desc": "Indien ingeschakeld, worden de statistieken van deze verbinding elke dag om 3 uur 's ochtends (Koreaanse tijd) automatisch verzameld. Na 7 of meer dagen kunt u vertrouwen op de rangschikking van trage queries en de lijst met ongebruikte indexen.",
@@ -1040,13 +1040,13 @@
       "sortCalls": "Oproepen",
       "empty": "Nog geen snapshots. Druk op Nu verzamelen op het tabblad Verzamelen",
       "range": "Wijziging tussen {from} → {to}",
-      "first": "Eerste snapshot op {dtm} — cumulatieve waarden (wijzigingen vanaf het volgende snapshot)",
+      "first": "Eerste verzameling {dtm}: Cumulatief (toename/afname vanaf volgende verzameling)",
       "query": "Query (literalen gemaskeerd)",
       "calls": "Oproepen",
       "totalMs": "Totaal ms",
       "meanMs": "Gemiddelde ms",
       "rows": "Rijen",
-      "reset": "Statistieken reset gedetecteerd — weergegeven als cumulatief",
+      "reset": "Statistieken reset gedetecteerd: Weergegeven als cumulatief",
       "src": "Bron",
       "srcToggle": "Brondetails tonen of verbergen",
       "openSqlLab": "Openen in SQL Tuning",
@@ -1054,7 +1054,7 @@
       "sortMax": "Max. enkele uitvoeringstijd",
       "maxMs": "Max. enkele ms",
       "diagToggle": "Oorzaak diagnosticeren",
-      "noMax": "Geen maximumwaarde — {n} items zijn afkomstig van oudere verzamelingen zonder maximumwaarde, dus ze zijn tijdelijk gesorteerd op gemiddelde (niet op totale tijd). Nu verzamelen zal de maximumwaarde invullen."
+      "noMax": "Geen maximale waarde: {n} items zijn oude verzamelingen zonder een enkele maximale waarde, dus ze zijn tijdelijk gesorteerd op enkel gemiddelde (niet op totale tijd). Maximale waarden worden gevuld met de huidige verzameling."
     },
     "health": {
       "empty": "Nog geen snapshots. Druk nu op Verzamelen op het tabblad Verzamelen",
@@ -1062,9 +1062,9 @@
       "unusedIdx": "Ongebruikte indexen",
       "unusedIdxHint": "Indexen die sinds de laatste statistiekenreset (op grootte) nooit zijn gebruikt. Verwijder geen PK- of unieke-constraint-indexen",
       "fullScan": "Overmatige volledige scans",
-      "fullScanHint": "Tabellen met 1.000+ live rijen waarbij volledige scans minstens de helft zijn — controleer indexen op filterkolommen",
+      "fullScanHint": "Tabellen met 1.000+ effectieve rijen en meer dan de helft volledige scans: Bekijk indexen op conditiekolommen.",
       "dead": "Overmatige dode tuples",
-      "deadHint": "Dode tuple-ratio 20% of meer — controleer VACUUM- en autovacuum-instellingen",
+      "deadHint": "Dode tuple-ratio boven 20%: Bekijk VACUUM en autovacuum-instellingen.",
       "none": "Geen",
       "scans": "scans"
     },
@@ -1081,7 +1081,7 @@
     },
     "activity": {
       "refresh": "Vernieuwen",
-      "live": "Live query — niet opgeslagen",
+      "live": "Realtime query: Niet opgeslagen",
       "sessions": "Sessieactiviteit",
       "locks": "Vergrendelingen",
       "none": "Geen"
@@ -1108,7 +1108,7 @@
         "BATCH": "Lijkt op een batch- of geplande taak. Spreid de looptijden buiten de piekuren en verklein het werk per commit. Controleer indexen en statistieken (ANALYZE) op de doeltabellen en splits lange transacties. Het opnemen van de taaknaam in application_name maakt de volgende classificatie preciezer.",
         "PROGRAM": "Dit lijkt een query te zijn die door de applicatie is uitgevoerd. Controleer het uitvoeringsplan in SQL-tuning. Als de maximale enkele uitvoeringstijd lang is, kijk dan eerst naar indexen en de join-volgorde. Als een enkele uitvoering kort is maar het aantal aanroepen hoog, kijk dan naar herhaalde aanroepen (N+1) en caching. Plaats de servicenaam in de application_name van de connection pool.",
         "PLATFORM": "Lijkt op DB- of platformintern werk zoals autovacuum of replicatie. Meestal is er geen actie nodig. Als het bovenaan blijft staan, controleer dan de autovacuum-drempels en maintenance_work_mem.",
-        "MONITOR": "Dit is een dbms.pi zelfverzamelingsquery — de schema.pi-verbinding is een vaste instructie die alleen statistische views/catalogi (pg_stat_*·pg_catalog) leest, dus het is geen bedrijfskritische query en er is geen klantactie vereist. Als de belasting van de doordatabase een probleem is, verminder dan het aantal keren dat u de verzamelknop/monitoringscherm opent. Instructies van andere monitoringtools die dezelfde statistische views lezen, worden hier ook gegroepeerd.",
+        "MONITOR": "dbms.pi's eigen verzamelquery. De schema.pi-verbinding leest alleen statistische views en catalogi (pg_stat_*, pg_catalog) met vaste instructies, dus het is geen zakelijke query en er is geen klantactie vereist. Als de belasting van de doeldatabase een probleem is, verminder dan de frequentie van het openen van de verzamelknop of het monitoringscherm. Instructies van andere monitoringtools die dezelfde statistische views lezen, worden hier ook gegroepeerd.",
         "UNKNOWN": "Er is geen aanwijzing voor de bron. Stel application_name in op elke verbinding en splits accounts per doel; het wordt geclassificeerd vanaf de volgende monsters."
       },
       "detail": {
@@ -1119,7 +1119,7 @@
         "period": "Waargenomen",
         "none": "(leeg)"
       },
-      "noSample": "Nog geen monsters — actieve sessies worden bemonsterd wanneer u het monitoringbord of het tabblad Activiteit & vergrendelingen bekijkt. Voorlopig wordt het alleen geclassificeerd op basis van de accountnaam.",
+      "noSample": "Nog geen samples. Actieve sessies accumuleren als samples bij het bekijken van het Monitoring Board of de tabbladen Activiteit/Locks. Momenteel worden ze alleen geclassificeerd op accountnaam ter referentie.",
       "verOff": "Deze DB is ouder dan PostgreSQL 14, dus actieve sessies hebben geen query-ID. Alleen het account (zeker) wordt getoond.",
       "privOff": "Het linkaccount kan de sessiedetails van andere accounts niet zien, dus er worden geen monsters verzameld. Vraag een DB-beheerder om GRANT pg_read_all_stats TO {user}; uit te voeren.",
       "linkUsr": "linkaccount",
@@ -1130,11 +1130,11 @@
     "diag": {
       "title": "Oorzaak diagnosticeren",
       "fix": "Actie:",
-      "none": "Geen oorzaak onthuld door statistieken — controleer het uitvoeringsplan in SQL Tuning.",
-      "cum": "Geen aanroepen in dit interval — cumulatief (sinds reset van statistieken)",
-      "basis": "Basis — Max 1-keer {max}ms · Gem. {mean}ms · Aanroepen {calls} · Rijen per aanroep {rpc} · Schijfleesverhouding {read} · Tijdelijke blokken {tmp}",
+      "none": "Geen oorzaak onthuld door statistieken. Open het uitvoeringsplan in SQL Tuning om te controleren.",
+      "cum": "Geen oproepen in dit interval: Cumulatief (sinds statistieken reset)",
+      "basis": "Basis: Max. enkele {max}ms · Gem. {mean}ms · Oproepen {calls} · Rijen per oproep {rpc} · Schijfleesratio {read} · Tijdelijke blokken {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi zelfverzamelingsquery — monitoringinstructie die alleen statistische weergaven/catalogi leest.",
+        "cause": "dbms.pi's eigen verzamelquery: Monitoringinstructie die alleen statistische views en catalogi leest.",
         "fix": "Geen klantactie vereist. Als de belasting van de doeldatabase een probleem is, verminder dan het aantal keren dat u het verzamel-/monitoringscherm opent."
       },
       "NO_MAX": {
@@ -1142,31 +1142,31 @@
         "fix": "Klik nu één keer op 'Verzamelen' om maximale waarden in te vullen voor een nauwkeurige diagnose."
       },
       "SLOW_EACH": {
-        "cause": "Altijd traag — Duurt elke keer lang om uit te voeren, met max {max}ms en gemiddeld {mean}ms.",
+        "cause": "Elke keer traag: Duurt lang bij elke uitvoering met max. {max}ms en gemiddeld {mean}ms.",
         "fix": "① Open het uitvoeringsplan in 'Openen in SQL Tuning'. ② Als er volledige scans (Seq Scan) of grote sorteringen zijn, controleer dan de indexen op WHERE/JOIN-conditiekolommen. ③ Beperk de condities om alleen noodzakelijke kolommen/rijen te lezen."
       },
       "SPIKE": {
-        "cause": "Intermitterende vertraging — Gemiddeld {mean}ms, maar duurt af en toe lang met max {max}ms ({x} keer het gemiddelde).",
+        "cause": "Intermitterende vertraging: Gemiddeld {mean}ms, maar duurt af en toe lang met max. {max}ms ({x} keer het gemiddelde).",
         "fix": "① Controleer bij traagheid op lock waits (wait_event) in het tabblad Activiteit/Locks. ② Als alleen de eerste uitvoering traag is, was de cache leeg en werd er van schijf gelezen. ③ Vergelijk dezelfde query met verschillende waarden in SQL Tuning om te zien of het uitvoeringsplan verandert op basis van waarden."
       },
       "DISK_READ": {
-        "cause": "Cache Miss — {pct}% ({read} blokken) van de gelezen blokken werden van schijf gelezen, niet uit het geheugen.",
+        "cause": "Cache miss: {pct}% ({read} blokken) van gelezen blokken werden van schijf gelezen, niet van geheugen.",
         "fix": "① Verminder het leesbereik met indexen. ② Beperk de queryperiode/condities. ③ Als veelgelezen gegevens hoog blijven, controleer dan shared_buffers (geheugen)."
       },
       "TEMP_SPILL": {
-        "cause": "Geheugenoverloop — Sorteren/hashen overschreed work_mem en schreef {blk} blokken (ongeveer {mb}MB, {perCall} blokken per aanroep) naar tijdelijke bestanden.",
+        "cause": "Geheugenoverloop: Sorteren/hashen overschreed work_mem en schreef {blk} blokken (ongeveer {mb}MB, {perCall} blokken per oproep) naar tijdelijke bestanden.",
         "fix": "① Het plaatsen van indexen op ORDER BY/GROUP BY-kolommen slaat sorteren over. ② Verminder eerst het aantal te sorteren rijen (LIMIT binnenin). ③ Indien absoluut noodzakelijk, verhoog SET LOCAL work_mem alleen voor deze querytransactie."
       },
       "MANY_ROWS": {
-        "cause": "Overmatige ophaalactie — Haalt {perCall} rijen per aanroep op.",
+        "cause": "Overmatige query: Haalt {perCall} rijen per oproep op.",
         "fix": "① Schermlijsten worden pagina voor pagina opgehaald. ② SELECT selecteert alleen de kolommen die worden gebruikt. ③ Aggregaties worden uitgevoerd in de database, en alleen de resultaten worden ontvangen."
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST embedded filter (!inner) instructie — het filteren van ouders op kindcondities kan de hele set scannen vóór classificatiecondities.",
+        "cause": "PostgREST ingebedde filter (!inner) instructie: Het filteren van ouders op kindcondities kan de hele tabel scannen vóór de classificatieconditie.",
         "fix": "① Controleer of er indexen zijn op join-sleutels en filterkolommen. ② Verplaats filters naar de voorwaarden van de bovenliggende tabel. ③ Sluit onderliggende elementen in een reeds bestaande bovenliggende query in of combineer ze tot één databasefunctie."
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET Paging — Wordt geleidelijk trager naarmate het voorgaande rijen leest en weggooit voor latere pagina's.",
+        "cause": "OFFSET-paginering: Latere pagina's lezen en negeren eerdere rijen, waardoor het steeds trager wordt.",
         "fix": "Wijzig naar keyset paging (WHERE id > last_id ORDER BY id LIMIT n) die leest vanaf de sleutel na de laatst ontvangen sleutel."
       }
     }
@@ -1199,8 +1199,8 @@
       "toDraft": "Pipeline-concept maken van {n} geselecteerde"
     },
     "ready": {
-      "ok": "WAL logische replicatie gereed — tabellen met een PK kunnen LOGICAL gebruiken",
-      "no": "WAL logische replicatie niet gereed — vastleggen via polling of sleutelvergelijking",
+      "ok": "WAL logische replicatie gereed: Tabellen met PK kunnen de LOGICAL-methode gebruiken.",
+      "no": "WAL logische replicatie niet gereed: Verzamel met polling/sleutelvergelijkingsmethode.",
       "senders": "{n} replicatieverbindingen"
     },
     "adapter": {
@@ -1215,20 +1215,20 @@
       "HAS_SOFT_DEL": "Heeft soft-delete kolom",
       "NO_SOFT_DEL": "Geen soft-delete kolom",
       "HAS_PK": "Heeft primaire sleutel",
-      "NO_PK": "Geen primaire sleutel — gewijzigde rijen kunnen niet worden geïdentificeerd",
+      "NO_PK": "Geen PK: Kan gewijzigde rijen niet identificeren.",
       "DELETE_UNSEEN": "Polling kan fysieke DELETEs niet vastleggen (soft-delete kolom aanbevolen)",
       "LOGICAL_NOT_READY": "Kan overschakelen naar LOGICAL zodra WAL logische replicatie gereed is",
-      "FULL_RELOAD_ONLY": "Geen PK of wijzigingstijdskolom, dus geen incrementele vastlegging — voeg een PK toe",
+      "FULL_RELOAD_ONLY": "Geen PK/wijzigingstijdstempel, dus incrementele verzameling niet mogelijk: PK-toevoeging aanbevolen.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level is niet logical (wijzigen vereist een DB-herstart)",
       "NO_SLOTS": "max_replication_slots is 0",
       "NO_SENDERS": "max_wal_senders is 0",
-      "IS_STANDBY": "Standby-server — neem logische replicatie van de primaire",
+      "IS_STANDBY": "Standby-server: Ontvang logische replicatie van de primaire server.",
       "SETTINGS_UNKNOWN": "Kon instellingen niet lezen, gereedheid onbekend"
     },
     "ed": {
       "title": "Pipeline-definities",
-      "draftOnly": "Alleen ontwerp — opgeslagen als concepten (DRAFT)",
+      "draftOnly": "Alleen ontwerp: Alleen opslaan als CONCEPT.",
       "new": "Nieuwe pipeline",
       "empty": "Geen opgeslagen pipelines",
       "manual": "Handmatig",
@@ -1297,8 +1297,8 @@
     },
     "warn": {
       "none": "Geen opmerkelijke waarschuwingen.",
-      "SEQ_SCAN_LARGE": "Volledige scan op {relation} (ongeveer {rows} rijen) — overweeg een index op de filterkolommen.",
-      "NESTED_LOOP_HIGH": "Geneste lus produceert ongeveer {rows} rijen — overweeg een hash- of merge-join, of een index op de join-conditie.",
+      "SEQ_SCAN_LARGE": "Tabel {relation} voert een volledige scan uit (geschat {rows} rijen): Bekijk indexen op conditiekolommen.",
+      "NESTED_LOOP_HIGH": "Geneste lusresultaat is een geschatte {rows} rijen. Bekijk hash-/merge-joins of indexen op joincondities.",
       "SORT_SPILL": "Sorteergrootte is ongeveer {kb}KB, boven de standaard work_mem (4MB); het kan naar schijf morsen."
     },
     "lint": {
@@ -1312,14 +1312,14 @@
         "char": "teken"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — selecteer alleen de kolommen die u nodig heeft (extra I/O, geen covering index).",
-        "FUNC_ON_COLUMN": "De filterkolom {column} is verpakt in een functie of expressie, dus de index kan niet worden gebruikt — transformeer in plaats daarvan de constante.",
-        "LEADING_WILDCARD": "LIKE met een voorloop % kan geen B-tree index gebruiken — overweeg een pg_trgm GIN index.",
-        "OR_DIFF_COLUMNS": "OR-condities op verschillende kolommen — overweeg splitsing met UNION (voeg een dubbele uitsluitingsconditie toe indien UNION ALL) of controleer indexen per kolom.",
-        "IMPLICIT_CAST": "{column} wordt vergeleken met een geciteerd nummer — match de kolom- en constantetypen (impliciete cast).",
-        "NOT_IN_SUBQUERY": "NOT IN (subquery) retourneert niets wanneer NULLs aanwezig zijn en is traag — gebruik NOT EXISTS.",
-        "NO_WHERE": "Geen WHERE-clausule — op een grote tabel is dit een volledige scan (voeg een conditie of LIMIT toe).",
-        "DOMAIN_MISMATCH": "{column} is een {expected} type volgens standaard domein, maar wordt vergeleken met een constante van een ander type — de impliciete cast kan indexgebruik voorkomen."
+        "SELECT_STAR": "SELECT *: Selecteer alleen noodzakelijke kolommen (onnodige I/O, covering index niet mogelijk).",
+        "FUNC_ON_COLUMN": "Conditiekolom {column} wordt verwerkt door een functie/bewerking, dus indexen kunnen niet worden gebruikt. Verwerk de constante zijde.",
+        "LEADING_WILDCARD": "LIKE met een voorloop '%' kan geen B-tree-index gebruiken. Bekijk pg_trgm GIN-indexen.",
+        "OR_DIFF_COLUMNS": "Verschillende kolomcondities zijn gegroepeerd met OR. Bekijk UNION-scheiding (voeg dubbele uitsluitingsconditie toe indien UNION ALL) of per-kolom indexen.",
+        "IMPLICIT_CAST": "{column} wordt vergeleken met een geciteerd nummer. Match kolomtype en constant type (impliciete typeconversie).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) kan leeg en traag zijn als NULLs gemengd zijn. Wijzig naar NOT EXISTS.",
+        "NO_WHERE": "Geen WHERE-conditie. Als het een grote tabel is, is het een volledige scan (voeg LIMIT of condities toe).",
+        "DOMAIN_MISMATCH": "{column} is type {expected} volgens standaarddomein, maar vergeleken met een constante van een ander type. Impliciete typeconversie kan indexgebruik voorkomen."
       }
     },
     "saved": {
@@ -1345,12 +1345,12 @@
     },
     "ai": {
       "title": "AI tuning advies",
-      "intro": "Kies één opgeslagen plan om advies te genereren. Alleen SQL en plannen met constanten gemaskeerd als ? worden verzonden (regelgebaseerd advies indien geen sleutel of bij fout). Nadat de linkeigenaar heeft goedgekeurd, voert u de explain opnieuw uit voor dezelfde SQL, slaat u deze op en meet u de impact met dat latere plan — pas dan wordt het geregistreerd als toegepast.",
+      "intro": "Kies één opgeslagen plan om advies te genereren. Alleen SQL en plannen met constanten gemaskeerd als ? worden verzonden (regelgebaseerd advies indien geen sleutel of bij fout). Nadat de linkeigenaar heeft goedgekeurd, voert u de explain opnieuw uit voor dezelfde SQL, slaat u deze op en meet u de impact met dat latere plan : pas dan wordt het geregistreerd als toegepast.",
       "pickPlan": "Selecteer een opgeslagen plan voor advies",
       "create": "Advies genereren",
       "creating": "Genereren… (maximaal 30 s)",
       "noPlans": "Geen opgeslagen plannen. Bekijk een explain plan hierboven en sla het op.",
-      "note": "Eén advies per plan. Verwijder het bestaande advies om opnieuw te genereren. DDL wordt alleen voorgesteld — pas het toe in schema.pi.",
+      "note": "Eén advies per plan. Verwijder het bestaande advies om opnieuw te genereren. DDL wordt alleen voorgesteld : pas het toe in schema.pi.",
       "empty": "Nog geen advies.",
       "noItems": "Geen verbeteringen gevonden voor dit plan.",
       "cost": "Kosten vooraf",
@@ -1392,10 +1392,10 @@
       "copy": "Kopiëren",
       "copied": "Gekopieerd",
       "rule": {
-        "SEQ_SCAN_INDEX": "Volledige scan van {relation} — maak een index op filterkolom {column} (vervang NN in de indexnaam door een volgnummer).",
-        "SEQ_SCAN_STATS": "Volledige scan van {relation} — controleer de filterkolommen en zorg ervoor dat de statistieken (ANALYZE) actueel zijn.",
-        "NESTED_LOOP": "Geneste lus verwacht {rows} rijen — vernieuw statistieken en overweeg join-key-indexen of een hash join.",
-        "SORT_SPILL": "Sortering van ongeveer {kb} KB kan naar schijf overlopen — overweeg om de sessie work_mem te verhogen of de sorteerkolommen te indexeren.",
+        "SEQ_SCAN_INDEX": "{relation} volledige scan: Maak een index aan op conditiekolom {column} (indexnaam NN wordt vervangen door een volgnummer).",
+        "SEQ_SCAN_STATS": "{relation} volledige scan: Controleer conditiekolommen en zorg ervoor dat statistieken (ANALYZE) up-to-date zijn.",
+        "NESTED_LOOP": "Geneste lusresultaat is een geschatte {rows} rijen: Update statistieken en bekijk joinconditie-indexen of hash-joins.",
+        "SORT_SPILL": "Sorteren kan naar schijf overlopen met ongeveer {kb}KB. Bekijk het verhogen van de sessie work_mem of indexen op sorteerkolommen.",
         "SELECT_STAR": "Selecteer alleen de kolommen die u nodig hebt in plaats van SELECT * (minder I/O, covering indexes mogelijk).",
         "FUNC_ON_COLUMN": "Verplaats de functie/expressie op filterkolom {column} naar de constante zijde (maakt indexgebruik mogelijk).",
         "IMPLICIT_CAST": "Match de typen van {column} en de constante (verwijder de impliciete cast).",
@@ -1455,9 +1455,9 @@
     },
     "desc": {
       "FREE": "Verkennen & Leren",
-      "D1": "Operator — Controleert of de database nu in orde is.",
-      "D2": "Ontwikkelaar & Tuner — Lost trage SQL op",
-      "D3": "DBA & DA — Van operationele veiligheid tot implementatie en lake"
+      "D1": "Operator: Controleert of de database nu gezond is.",
+      "D2": "Ontwikkelaar/Tuner: Lost trage SQL op.",
+      "D3": "DBA/DA: Operationele veiligheid, migratie en zelfs data lake."
     },
     "feat": {
       "FREE": "Monitoringbord, uitvoeringsplanweergave, basisleren",
@@ -1500,7 +1500,7 @@
       "required": "Deze functie is beschikbaar vanaf het {plan}-abonnement.",
       "limit": "U heeft alle beschikbare pogingen voor deze periode gebruikt. U kunt meer gebruiken door te upgraden naar het {plan}-abonnement.",
       "limitTop": "U heeft alle beschikbare pogingen voor deze periode gebruikt. U kunt het de volgende periode opnieuw gebruiken.",
-      "expired": "Uw schema.pi-abonnement is verlopen — voer een betaling uit op het schema.pi-abonnementsscherm.",
+      "expired": "Uw schema.pi-abonnement is verlopen. Betaal op het schema.pi-abonnementenscherm.",
       "go": "Bekijk abonnement",
       "close": "Sluiten"
     }

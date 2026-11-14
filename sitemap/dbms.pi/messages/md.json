@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analiză și Lac",
     "intro": "KPI-uri de activitate dbms, design de lac cu trei straturi și catalog de seturi de date într-un singur loc.",
-    "storageNotice": "Stocarea lacului (la client sau în cloud) nu este încă decisă (secțiunea 10 #7 din PRD). Deocamdată sunt stocate doar designurile și mapările de nume — fără date pe rânduri.",
+    "storageNotice": "Stocarea lacului (la client sau în cloud) nu este încă decisă (secțiunea 10 #7 din PRD). Deocamdată sunt stocate doar designurile și mapările de nume : fără date pe rânduri.",
     "noLink": "Selectează sau înregistrează mai întâi o legătură schema.pi.",
     "goConnect": "Înregistrează o legătură",
     "loading": "Se încarcă…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Analiză GAP — Model↔DB",
+    "title": "Analiză GAP: Model↔DB",
     "intro": "Compară modelul de design schema.pi și istoricul aplicării DDL cu catalogul DB live pentru a găsi drift-ul și măsoară dacă indexurile proiectate sunt utilizate efectiv. Datele pe rânduri ale clienților nu sunt niciodată citite sau stocate.",
     "needLink": "Alege mai întâi o legătură schema.pi de mai sus. Dacă nu ai niciuna, înregistrează un token în meniul 'Legătură'.",
     "needConn": "Alege conexiunea DB de comparat de mai sus.",
@@ -188,7 +188,7 @@
     "model": "Model",
     "reqNo": "Cerere {id}",
     "notSaved": "Nu s-a putut salva această rulare în istoric (rezultatele sunt afișate normal).",
-    "capped": "Prea multe elemente — se afișează primele {cap} pe secțiune (numărul total este complet).",
+    "capped": "Prea multe elemente : se afișează primele {cap} pe secțiune (numărul total este complet).",
     "statsMissing": "Statisticile de utilizare a indexului nu au fost disponibile, deci utilizarea nu a putut fi judecată.",
     "sum": {
       "missingTables": "Tabele lipsă în DB",
@@ -230,7 +230,7 @@
       "USED": "În uz",
       "NO_STATS": "Fără statistici",
       "CONSTRAINT": "Constraint de unicitate (păstrează)",
-      "NO_DATA": "Fără date sau statistici necolectate — nu se poate judeca",
+      "NO_DATA": "Nu există date sau statisticile nu sunt colectate: nu se poate determina",
       "OBSERVING": "Sub observație (mai puțin de 7 zile)",
       "UNUSED_CAND": "Candidat neutilizat"
     },
@@ -245,14 +245,14 @@
       "RATE": "Prea multe cereri. Te rugăm să încerci din nou într-un minut."
     },
     "schema": "Schemă",
-    "schemaHint": "Doar tabelele regulate și partiționate din această schemă sunt comparate (vizualizările sunt excluse). Public implicit — schemele interne Supabase (auth, storage, …) sunt omise.",
-    "truncated": "{names} au atins limita de {max} rânduri și au fost trunchiate — unele rezultate „nu în DB” / „nu în model” pot fi false. Restrângeți schema și rulați din nou.",
+    "schemaHint": "Comparați doar tabelele obișnuite și cele partiționate din această schemă (excluzând vizualizările). Public implicit: schemele interne Supabase (auth, storage etc.) sunt excluse.",
+    "truncated": "Interogarea {names} a fost trunchiată la {max} rânduri. Unele detecții „Nu în DB”/„Nu în Model” pot fi false pozitive. Restrângeți schema și re-detectați.",
     "colUnchecked": "Deoarece interogarea coloanei a fost trunchiată, {n} rezultate de coloane lipsă/suplimentare sunt tratate ca neverificabile și excluse din numărul de nepotriviri de coloane.",
-    "renamed": "{n} indecși PK aplicați conform vechii reguli de denumire (_PKEY) există în DB sub noul nume (PK_) — normal",
-    "superseded": "{n} solicitări mai vechi au fost excluse deoarece o solicitare ulterioară a recreat aceeași tabelă (DROP … CASCADE) — normal",
+    "renamed": "{n} indexuri PK aplicate cu vechea convenție de denumire (_PKEY) sunt în DB cu noul nume (PK_). Normal.",
+    "superseded": "{n} cereri anterioare au fost excluse din comparație deoarece cererile ulterioare au recreat același tabel (DROP … CASCADE). Normal.",
     "supersededItem": "Solicitare {id} → înlocuită de solicitarea {by}",
     "sysCols": "{n} coloane de sistem (adăugate automat la generarea DDL) nu sunt în model prin design și sunt excluse din nepotriviri",
-    "groupOwn": "Prefix proiect {pfx} — candidați lipsă din model",
+    "groupOwn": "Acest prefix de proiect {pfx}: candidați lipsă din model",
     "groupOther": "Alt sistem {pfx}",
     "basis": "Est. rânduri {rows} · de la {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Dacă obiectele dispar în continuare după re-aplicare, suspectați o ștergere manuală sau o revenire și verificați activitatea contului de conexiune cu DBA-ul dumneavoastră."
       },
       "extraTables": {
-        "s1": "Acest pachet de prefixe de proiect = candidați de model lipsă — importați-i în model prin schema.pi → Setări → Inversare, sau decideți dacă să-i ștergeți dacă sunt tabele neutilizate.",
-        "s2": "Alte grupuri de prefix = alte sisteme care partajează această DB — nu sunt elemente de acțiune pentru acest proiect.",
+        "s1": "Acest grup de prefixe de proiect = candidați lipsă din model: importați în model prin schema.pi → Setări → Inversare, sau decideți dacă să ștergeți dacă tabelul nu este utilizat.",
+        "s2": "Alte grupuri de prefixe = alte sisteme care utilizează aceeași DB: nu fac obiectul acțiunii acestui proiect.",
         "s3": "Dacă schema țintă nu este publică, schimbați câmpul „Schemă” de mai sus și rulați din nou."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Tip/NULL diferă = aliniați la model (sursa de adevăr); înainte de a reduce lungimea sau de a trece la NOT NULL, confirmați că rândurile existente satisfac acest lucru."
       },
       "idxUsage": {
-        "s1": "Înainte de a elimina, verificați ① dacă fereastra de statistici acoperă cel puțin un ciclu de afaceri (ex. lot de sfârșit de lună) — vezi „de la”.",
+        "s1": "Înainte de a șterge, verificați ① dacă perioada de colectare a statisticilor este de cel puțin un ciclu de operare (de exemplu, lot de sfârșit de lună): consultați data de referință.",
         "s2": "② Nu este un index unic/PK (acestea apar separat ca „constraint de unicitate”).",
         "s3": "③ EXPLAIN SQL-ul reprezentativ al tabelei în SQL Tuning și confirmați că acest index nu este utilizat.",
         "s4": "Odată ce toate trei sunt confirmate, eliminați indexul din model în schema.pi și aplicați prin DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Cum să emiți un token de conexiune",
     "how1": "Conectează-te la schema.pi și deschide aria de subiect la care vrei să te conectezi",
     "how2": "Mergi la Aria de subiect → Setări → Token de conexiune și apasă 'Emite token' (rol de administrator de arie sau DA)",
-    "how3": "Copiază tokenul care începe cu slk_ — este afișat o singură dată la emitere",
+    "how3": "Copiați tokenul care începe cu slk_ și care a fost emis. Originalul este afișat o singură dată la momentul emiterii.",
     "how4": "Lipește-l mai jos și înregistrează-l",
     "openSchema": "Deschide schema.pi",
     "registerTitle": "Înregistrează conexiunea",
@@ -384,7 +384,7 @@
     "retry": "Reîncearcă",
     "pickerLink": "Legătură",
     "pickerConn": "Conexiune",
-    "pickerEmpty": "Nicio conexiune —",
+    "pickerEmpty": "Nu există conexiuni.",
     "pickerGo": "înregistrează una la /connect",
     "errors": {
       "LINK_AUTH": "Tokenul de conexiune a expirat sau a fost revocat. Emite un nou token în schema.pi și înregistrează-l din nou",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Migrare date (PiMig)",
-    "intro": "Calculează ordinea de încărcare a tabelelor din relațiile din modelul tău de design schema.pi, organizează dimensiunea segmentului, paralelismul și lista de verificare a transferului, și generează SQL de verificare pe care îl rulezi singur pe sursă și țintă. Acest ecran doar planifică și verifică — nu mută date sau citește rânduri din DB-ul clientului.",
+    "intro": "Calculează ordinea de încărcare a tabelelor din relațiile din modelul tău de design schema.pi, organizează dimensiunea segmentului, paralelismul și lista de verificare a transferului, și generează SQL de verificare pe care îl rulezi singur pe sursă și țintă. Acest ecran doar planifică și verifică : nu mută date sau citește rânduri din DB-ul clientului.",
     "needLink": "Alege mai întâi o legătură schema.pi de mai sus. Dacă nu ai niciuna, înregistrează un token în meniul 'Conectare'.",
     "loading": "Se încarcă…",
     "newPlan": "Plan nou de migrare",
@@ -432,8 +432,8 @@
     "optsHint": "Paralelismul este numărul de tabele încărcate simultan într-un nivel. Dimensiunea blocului este unitatea de commit (rânduri) pe care o va utiliza motorul de execuție.",
     "order": "Ordine de încărcare",
     "orderHint": "Sortate topologic după relațiile de design (nu FK-uri fizice), astfel încât tabelele părinte să vină primele. Tabelele de același nivel nu depind una de alta și pot fi încărcate în paralel.",
-    "cycles": "{n} grup(uri) circular(e) — plasate la același nivel. Setați manual ordinea lor și amânați verificările de referință până după încărcare.",
-    "selfRefs": "Tabele cu auto-referință (ierarhice) — încarcă rândurile părinte mai întâi în cadrul tabelului",
+    "cycles": "{n} cicluri: plasate în aceeași etapă. Setați manual ordinea de încărcare și amânați verificările de referință până după încărcare.",
+    "selfRefs": "Tabele cu auto-referințe (ierarhice): rândurile părinte mai întâi în cadrul aceluiași tabel.",
     "level": "Nivel {n}",
     "checklist": "Listă de verificare pentru tranziție",
     "toReady": "Marchează ca gata",
@@ -471,7 +471,7 @@
     },
     "verify": "SQL de verificare",
     "verifyHint": "Generează interogări de număr, sumă coloană numerică, cheie duplicat și hash cheie per tabel în ordinea de încărcare. Rulați-le singur pe sursă și țintă și comparați (acest ecran nu le execută).",
-    "noHashOracle": "Funcțiile hash și redarea textului Oracle·Tibero diferă de PostgreSQL, astfel încât interogările hash sunt omise — comparați numerele, sumele și cheile duplicate.",
+    "noHashOracle": "Oracle și Tibero omit căutarea hash deoarece funcțiile hash și reprezentările caracterelor diferă de PostgreSQL. Comparați după număr, sumă și duplicarea cheilor.",
     "copy": "Copiază",
     "copied": "Copiat",
     "copyFail": "Nu s-a putut copia. Selectați textul și copiați-l manual.",
@@ -549,6 +549,7 @@
       "INVALID_INPUT": "Cererea este invalidă."
     },
     "board": {
+      "subtitle": "Ce trebuie făcut acum în această DB: Vedeți dintr-o privire starea normală, de avertizare și de risc a 14 semnale și soluțiile acestora.",
       "refresh": {
         "updated": "La {time} · se reîmprospătează în fiecare minut",
         "now": "Reîmprospătați acum",
@@ -563,10 +564,11 @@
         "NA": "N/A"
       },
       "overall": {
-        "RISK": "Risc — este necesară acțiune acum",
-        "WARN": "Avertisment — unele elemente necesită atenție",
-        "UNKNOWN": "Necunoscut — verificați conexiunea",
-        "OK": "OK — fiecare semnal este în limite",
+        "RISK": "Risc: Acțiune imediată necesară",
+        "WARN": "Avertisment: Elemente de revizuit",
+        "UNKNOWN": "Nu se poate confirma: Verificați starea conexiunii",
+        "OK": "Normal: Toate semnalele sunt în limitele criteriilor",
+        "CONN_DOWN": "Nu se poate conecta la DB. Verificați mai întâi conexiunea.",
         "NA": "N/A"
       },
       "kpi": {
@@ -581,7 +583,7 @@
         "less": "Afișați mai puțin",
         "setup": "Configurați acestea pentru a vedea mai multe",
         "none": "Niciun element de risc sau avertisment nu necesită acțiune chiar acum.",
-        "unknown": "Nu s-a putut verifica {n} semnal(e) — vedeți cardurile pentru motiv.",
+        "unknown": "Nu se pot confirma {n} elemente: Verificați motivul pe card.",
         "myRule": "Regula mea a fost încălcată: {rule}",
         "copySql": "Copiați SQL",
         "copied": "Copiat"
@@ -620,34 +622,34 @@
         "REPL": "Întârziere replicare"
       },
       "fix": {
-        "AVAIL": "Răspuns lent sau o repornire recentă — verificați setările conexiunii și starea serverului DB.",
-        "AVAIL_DOWN": "Nu s-a putut conecta la DB — verificați setările conexiunii și dacă serverul DB este activ.",
-        "CONN_USE": "{sess}/{max} sesiuni pe acest DB (nu la nivel de cluster — alte baze de date sunt excluse) — închideți conexiunile inactive sau adăugați un pooler de conexiuni (pgbouncer).",
-        "URL": "{n} URL-uri verificate eșuează · răspuns maxim {ms}ms — vedeți monitorul schema.pi pentru cauză.",
-        "LONG_QRY": "O interogare rulează de {sec}s — revizuiți planul și optimizați-o, sau cereți unui DBA să o anuleze.",
-        "IDLE_TX": "O tranzacție a fost inactivă timp de {sec}s — găsiți commit-ul lipsă în aplicație și setați un timeout.",
-        "LOCK_WAIT": "{n} sesiuni așteaptă blocări — găsiți sesiunea de blocare și încheiați tranzacția acesteia.",
-        "CACHE_HIT": "Rata de succes a cache-ului {pct}% — căutați scanări complete ale tabelelor mari sau revizuiți shared_buffers.",
-        "XACT_ERR": "Rata de rollback {pct}%, {dlck} blocaje — verificați tranzacțiile eșuate și jurnalele de erori ale aplicației.",
-        "SLOW_SQL": "Există o interogare care durează până la {ms}ms per execuție — vizualizați planul de execuție și optimizați-o, începând cu cel mai mare timp de execuție individual.",
-        "STORAGE": "DB-ul ({gb} GB) este aproape de limită (zile rămase {days}) — curățați tabelele mari sau adăugați capacitate.",
-        "VACUUM": "{tbl} are multe rânduri moarte sau statistici învechite — revizuiți setările VACUUM (ANALYZE) și autovacuum.",
-        "INDEX": "{n} constatări de index (invalid, neutilizat, scanări complete) — vedeți fila de stare a tabelelor și indexurilor pentru ținte.",
-        "BACKUP": "Arhivarea WAL este oprită sau blocată — verificați archive_mode, archive_command și starea backup-ului.",
-        "REPL": "Întârziere replicare {sec}s — verificați starea standby-ului și rețeaua.",
-        "PGSS": "pg_stat_statements nu este instalat, deci SQL lent nu este disponibil — activați-l cu SQL-ul de mai jos (este necesară repornirea serverului)."
+        "AVAIL": "Răspuns lent sau tocmai a fost repornit. Verificați informațiile de conectare și starea serverului DB.",
+        "AVAIL_DOWN": "Conectarea la DB a eșuat. Verificați informațiile de conectare și dacă serverul DB este activ.",
+        "CONN_USE": "Această sesiune DB {sess}/{max} (nu la nivel de cluster, alte conexiuni DB excluse): Curățați conexiunile inactive sau configurați un pooler de conexiuni (pgbouncer).",
+        "URL": "{n} verificări URL au eșuat · Răspuns maxim {ms}ms: Verificați cauza în monitorul schema.pi.",
+        "LONG_QRY": "O interogare rulează de {sec} secunde. Revizuiți planul de execuție și optimizați-l, sau cereți unui DBA să o oprească.",
+        "IDLE_TX": "O tranzacție a fost deschisă și inactivă timp de {sec} secunde. Găsiți commit-urile lipsă în aplicație și setați un timeout.",
+        "LOCK_WAIT": "{n} sesiuni așteaptă blocări: Găsiți sesiunea de blocare și încheiați tranzacția acesteia.",
+        "CACHE_HIT": "Rata de hit a cache-ului {pct}%: Căutați scanări complete de tabele mari sau revizuiți shared_buffers.",
+        "XACT_ERR": "Rata de rollback {pct}%, {dlck} blocaje: Verificați tranzacțiile eșuate și jurnalele de erori ale aplicației.",
+        "SLOW_SQL": "Există o interogare cu un timp maxim unic de {ms}ms. Revizuiți planul de execuție și optimizați de la timpul maxim unic de top.",
+        "STORAGE": "DB {gb}GB este aproape de limită (mai sunt {days} zile). Curățați tabelele mari sau măriți capacitatea.",
+        "VACUUM": "{tbl} are multe rânduri moarte sau statistici învechite. Revizuiți setările VACUUM (ANALYZE) și autovacuum.",
+        "INDEX": "{n} verificări de index (invalid, neutilizat, scanare completă): Verificați țintele în fila de sănătate a tabelului/indexului.",
+        "BACKUP": "Arhivarea WAL este oprită sau întreruptă. Verificați archive_mode, archive_command și starea backup-ului.",
+        "REPL": "Întârziere de replicare {sec} secunde: Verificați starea serverului standby și a rețelei.",
+        "PGSS": "Extensia pg_stat_statements lipsește, deci SQL-ul lent nu poate fi vizualizat. Activați-o cu SQL-ul de mai jos (este necesară repornirea serverului)."
       },
       "reason": {
         "CONN_DOWN": "Nu a fost judecat deoarece conexiunea DB este întreruptă.",
         "PGSS": "pg_stat_statements nu este instalat.",
         "VER": "Disponibil pe PostgreSQL 13 sau o versiune ulterioară.",
         "SAMPLE": "Nu sunt suficiente eșantioane încă.",
-        "NO_LIMIT": "Fără limită de dimensiune, deci utilizarea nu este judecată — adăugați o regulă de dimensiune DB (MB) (>) pentru a o utiliza ca limită.",
+        "NO_LIMIT": "Utilizarea nu este determinată deoarece nu există o limită de capacitate. Adăugarea unei reguli de dimensiune DB (MB) (>) o va utiliza ca limită.",
         "RESET": "Statisticile au fost resetate cu mai puțin de 7 zile în urmă, deci indexurile neutilizate nu sunt judecate.",
         "STALE": "Nu există înregistrări recente de verificare.",
         "STANDBY": "Nu se aplică pe un server standby.",
         "NONE": "Nimic de verificat.",
-        "GRANT": "Privilegii lipsă — acordați rolul pg_monitor contului de conexiune.",
+        "GRANT": "Nu se poate vizualiza din lipsă de permisiuni. Acordați rolul pg_monitor contului de conectare.",
         "LINK": "Interogarea schema.pi a eșuat ({code})"
       },
       "steps": {
@@ -713,7 +715,8 @@
         },
         "BACKUP": {
           "1": "Vedeți archive_mode și ultimul timp de arhivare în fila de backup și recuperare.",
-          "2": "Dacă arhivarea eșuează, verificați archive_command și spațiul liber la destinație."
+          "2": "Dacă arhivarea eșuează, verificați archive_command și spațiul liber la destinație.",
+          "3": "Pe o DB gestionată, verificați setările de backup ale furnizorului."
         },
         "REPL": {
           "1": "Vedeți starea și întârzierea fiecărui standby în fila de replicare și DR.",
@@ -721,7 +724,7 @@
           "3": "Dacă nu este streaming, verificați jurnalele standby-ului."
         }
       },
-      "sqlNote": "SQL-ul de mai jos este doar pentru verificare, în modul citire — remediile (VACUUM, DROP INDEX, pg_terminate_backend) sunt rulate de un DBA.",
+      "sqlNote": "SQL-ul de mai jos este pentru verificare doar în citire. Acțiunile (VACUUM, DROP INDEX, pg_terminate_backend) sunt executate direct de un DBA.",
       "go": {
         "activity": "Activitate și blocări",
         "top": "Interogări lente",
@@ -763,8 +766,8 @@
           "tree": "Ce ocupă spațiu și ce necesită curățare?"
         },
         "asTable": "Vizualizați ca tabel",
-        "needHistory": "Încă nu există o tendință — mențineți acest ecran deschis câteva minute.",
-        "needPerf": "Nu există istoric de dimensiune — colectați în fila de performanță sau mențineți acest ecran deschis.",
+        "needHistory": "Încă nu există o tendință. Va fi desenată dacă lăsați acest ecran deschis câteva minute.",
+        "needPerf": "Nu există istoric de capacitate. Colectați-l din fila Performanță sau lăsați acest ecran deschis.",
         "noSess": "Nicio sesiune.",
         "noWait": "Fără așteptări",
         "noData": "Nimic de afișat.",
@@ -837,17 +840,17 @@
         "noStat": "Fără statistici"
       },
       "empty": {
-        "noConn": "Această taxonomie nu are o conexiune la serverul PostgreSQL de monitorizat — se afișează doar URL-uri și starea serviciului.",
+        "noConn": "Nu există conexiuni la serverul PostgreSQL de monitorizat în această taxonomie. Se afișează doar starea URL și a legăturii.",
         "unsupported": "Această conexiune nu acceptă monitorizarea (doar conexiuni la serverul PostgreSQL).",
-        "connFail": "Nu s-a putut conecta la baza de date — verificați setările conexiunii și starea DB.",
-        "linkDown": "Nu s-a putut accesa schema.pi — se reîncearcă automat.",
-        "linkAuth": "Tokenul de conexiune a expirat — emiteți un nou token în schema.pi și înregistrați-l.",
-        "timeout": "Răspunsurile sunt lente — se reîncearcă automat.",
+        "connFail": "Conectarea la DB a eșuat. Verificați informațiile de conectare și starea DB.",
+        "linkDown": "Conectarea la schema.pi a eșuat. Se va reîncerca automat în scurt timp.",
+        "linkAuth": "Tokenul de conectare a expirat. Reemiteți și înregistrați tokenul din schema.pi.",
+        "timeout": "Răspunsul este lent. Se va reîncerca automat în scurt timp.",
         "rate": "Prea multe cereri, așa că intervalul de reîmprospătare a fost mărit."
       },
       "aux": {
         "rules": "Regulile mele de alertă ({n} active)",
-        "schemaSvc": "Starea serviciului — răspunsuri schema.pi",
+        "schemaSvc": "Stare de legătură: răspunsul serviciului schema.pi",
         "schemaSvcNote": "Metricile aplicației pentru ultimele 60 de minute stocate de schema.pi.",
         "source": "Sursă de date: DB-ul țintă este citit doar prin interogări numite schema.pi (doar citire); tendințele stochează statistici doar în dbms.pi (fără date de rând)."
       }
@@ -862,10 +865,10 @@
     "noRun": "Încă nu există diagnosticări. Apăsați „Execută diagnosticare”",
     "lastRun": "Ultima diagnosticare {dtm}",
     "readOnly": "Diagnosticarea citește doar (SELECT). Sfaturile sunt un ghid și depind de memoria serverului, încărcare și volumul de lucru.",
-    "truncated": "Prea multe obiecte — au fost verificate doar primele 500",
+    "truncated": "Prea multe obiecte : au fost verificate doar primele 500",
     "paramsNote": "Memoria totală a serverului este necunoscută, deci este estimată din shared_buffers ≈ 25% din RAM. random_page_cost presupune SSD.",
     "auditNote": "Tabelele cu RLS dezactivat și conturile neutilizate vor fi verificate odată ce interogarea link-ului le va suporta.",
-    "replNote": "Linia de bază este Active-Standby (A-S) — un primar + standby. Lag de redare ≥ 5s = avertisment, ≥ 60s = risc (referință RPO măsurată).",
+    "replNote": "Criteriul principal este Active-Standby (A-S): 1 Primary + Standby. Avertisment pentru întârziere de replay >= 5 secunde, risc pentru >= 60 secunde (consultați măsurarea RPO reală).",
     "lagIdle": "Nicio modificare",
     "pager": "Paginație",
     "prev": "Anterior",
@@ -939,7 +942,7 @@
       "ckpt_ok": "Într-un interval rezonabil",
       "wal_minimal": "wal_level=minimal face imposibile PITR și replicarea. Utilizați replica sau o valoare mai mare.",
       "wal_ok": "Nivelul WAL suportă PITR și replicarea.",
-      "rpc_hdd": "Valoarea implicită pentru HDD (4). Pentru SSD, se recomandă 1.1–2.",
+      "rpc_hdd": "Valoarea implicită pentru HDD (4). Pentru SSD, se recomandă 1.1~2.",
       "rpc_ok": "Potrivit pentru SSD.",
       "super_many": "Doi sau mai mulți superuseri. Păstrați unul pentru administrare și acordați doar privilegiile necesare celorlalți.",
       "super_ok": "Cel mult un superuser.",
@@ -1014,7 +1017,7 @@
       "intro": "Colectează acum citește statisticile de top ale interogărilor, tabelele, indecșii și dimensiunile o singură dată și le stochează ca un instantaneu. Colectați de cel puțin două ori pentru a vedea modificările și tendințele de dimensiune.",
       "run": "Colectează acum",
       "running": "Se colectează…",
-      "done": "Colectat la {dtm} — {qry} interogări · {tbl} tabele · {idx} indecși",
+      "done": "Colectare finalizată {dtm}: {qry} interogări · {tbl} tabele · {idx} indexuri",
       "auto": {
         "title": "Colectare automată",
         "desc": "Când este activată, această conexiune este colectată automat în fiecare zi la ora 3 AM (ora Coreei). După 7 sau mai multe zile, vă puteți baza pe clasamentul interogărilor lente și pe lista de indecși neutilizați",
@@ -1036,13 +1039,13 @@
       "sortCalls": "Apeluri",
       "empty": "Încă nu există instantanee. Apăsați Colectează acum pe fila Colectează.",
       "range": "Modificare între {from} → {to}",
-      "first": "Primul instantaneu la {dtm} — valori cumulative (modificări de la următorul instantaneu)",
+      "first": "Prima colectare {dtm}: Cumulativ (creștere/scădere de la următoarea colectare)",
       "query": "Interogare (literali mascați)",
       "calls": "Apeluri",
       "totalMs": "Total ms",
       "meanMs": "Medie ms",
       "rows": "Rânduri",
-      "reset": "Resetare statistici detectată — afișat ca cumulativ",
+      "reset": "Resetare statistici detectată: Afișat ca cumulativ",
       "src": "Sursă",
       "srcToggle": "Afișează sau ascunde detaliile sursei",
       "openSqlLab": "Deschide în SQL Tuning",
@@ -1050,7 +1053,7 @@
       "sortMax": "Timp maxim de execuție individual",
       "maxMs": "Max individual ms",
       "diagToggle": "Diagnosticați cauza",
-      "noMax": "Fără valoare maximă — {n} elemente provin din colecții mai vechi fără o valoare maximă, deci sunt sortate temporar după medie (nu după timpul total). Colectarea acum va popula valoarea maximă."
+      "noMax": "Fără valoare maximă: {n} elemente sunt colecții vechi fără o singură valoare maximă, deci sunt sortate temporar după media unică (nu după timpul total). Valorile maxime vor fi populate cu colectarea curentă."
     },
     "health": {
       "empty": "Nu există încă instantanee. Apăsați Colectează acum pe fila Colectează",
@@ -1058,9 +1061,9 @@
       "unusedIdx": "Indexuri neutilizate",
       "unusedIdxHint": "Indexuri neutilizate niciodată de la ultima resetare a statisticilor (după dimensiune). Nu ștergeți indexurile PK sau cu constrângere unică",
       "fullScan": "Scanări complete excesive",
-      "fullScanHint": "Tabele cu peste 1.000 de rânduri active unde scanările complete reprezintă cel puțin jumătate — revizuiți indexurile pe coloanele de filtrare",
+      "fullScanHint": "Tabele cu peste 1.000 de rânduri efective și peste jumătate scanări complete: Revizuiți indexurile pe coloanele de condiție.",
       "dead": "Tupluri moarte excesive",
-      "deadHint": "Raportul tuplurilor moarte de 20% sau mai mult — verificați setările VACUUM și autovacuum",
+      "deadHint": "Raportul de tupluri moarte peste 20%: Revizuiți setările VACUUM și autovacuum.",
       "none": "Niciunul",
       "scans": "scanări"
     },
@@ -1076,7 +1079,7 @@
     },
     "activity": {
       "refresh": "Reîmprospătare",
-      "live": "Interogare live — nu este stocată",
+      "live": "Interogare în timp real: Nu este salvată",
       "sessions": "Activitatea sesiunii",
       "locks": "Blocări",
       "none": "Niciunul"
@@ -1103,7 +1106,7 @@
         "BATCH": "Pare a fi un lot sau o lucrare programată. Distribuiți timpii de execuție în afara orelor de vârf ale afacerii și reduceți volumul de muncă per commit. Verificați indecșii și statisticile (ANALYZE) pe tabelele țintă și împărțiți tranzacțiile lungi. Includerea numelui lucrării în application_name face următoarea clasificare mai precisă.",
         "PROGRAM": "Aceasta pare a fi o interogare executată de aplicație. Verificați planul de execuție în optimizarea SQL. Dacă timpul maxim de execuție individual este lung, uitați-vă mai întâi la indecși și ordinea de join. Dacă o singură execuție este scurtă, dar numărul de apeluri este mare, uitați-vă la apelurile repetate (N+1) și la cache. Puneți numele serviciului în application_name al pool-ului de conexiuni.",
         "PLATFORM": "Pare a fi o lucrare internă a DB-ului sau a platformei, cum ar fi autovacuum sau replicare. De obicei nu este necesară nicio acțiune. Dacă rămâne în top, revizuiți pragurile autovacuum și maintenance_work_mem.",
-        "MONITOR": "Aceasta este o interogare de auto-colectare dbms.pi — conexiunea schema.pi este o instrucțiune fixă care citește doar vizualizări/cataloage statistice (pg_stat_*·pg_catalog), deci nu este o interogare de afaceri și nu necesită acțiunea clientului. Dacă încărcarea bazei de date țintă este o problemă, reduceți numărul de ori în care deschideți butonul de colectare/ecranul de monitorizare. Instrucțiunile de la alte instrumente de monitorizare care citesc aceleași vizualizări statistice sunt, de asemenea, grupate aici.",
+        "MONITOR": "Interogare de colectare proprie dbms.pi. Conexiunea schema.pi citește doar vizualizări statistice și cataloage (pg_stat_*, pg_catalog) cu instrucțiuni fixe, deci nu este o interogare de afaceri și nu este necesară nicio acțiune a clientului. Dacă încărcarea bazei de date țintă este o problemă, reduceți frecvența deschiderii butonului de colectare sau a ecranului de monitorizare. Instrucțiunile de la alte instrumente de monitorizare care citesc aceleași vizualizări statistice sunt, de asemenea, grupate aici.",
         "UNKNOWN": "Nu există niciun indiciu despre sursă. Setați application_name la fiecare conexiune și împărțiți conturile după scop; va fi clasificat din următoarele eșantioane."
       },
       "detail": {
@@ -1114,7 +1117,8 @@
         "period": "Observat",
         "none": "(gol)"
       },
-      "noSample": "Încă nu există eșantioane — sesiunile în curs sunt eșantionate când vizualizați panoul de monitorizare sau fila Activitate și blocări. Deocamdată este clasificat doar după numele contului.",
+      "noSample": "Încă nu există mostre. Sesiunile în curs se acumulează ca mostre la vizualizarea panoului de monitorizare sau a filelor Activitate/Blocări. În prezent, sunt clasificate doar după numele contului pentru referință.",
+      "verOff": "Această DB este mai veche decât PostgreSQL 14, deci sesiunile în curs nu au un ID de interogare. Se afișează doar contul (cert).",
       "privOff": "Contul de legătură nu poate vedea detaliile sesiunilor altor conturi, deci nu sunt colectate eșantioane. Rugați un administrator DB să ruleze GRANT pg_read_all_stats TO {user};",
       "linkUsr": "cont de legătură",
       "qidOff": "Detaliile sesiunii sunt vizibile, dar ID-ul interogării este gol (compute_query_id este dezactivat). Verificați cu SHOW compute_query_id; apoi rulați ALTER SYSTEM SET compute_query_id = 'auto'; și reîncărcați (SELECT pg_reload_conf();)",
@@ -1124,11 +1128,11 @@
     "diag": {
       "title": "Diagnosticați cauza",
       "fix": "Acțiune:",
-      "none": "Nicio cauză relevată de statistici — verificați planul de execuție în SQL Tuning.",
-      "cum": "Niciun apel în acest interval — cumulativ (de la resetarea statisticilor)",
-      "basis": "Bază — Max o singură dată {max}ms · Medie {mean}ms · Apeluri {calls} · Rânduri per apel {rpc} · Raport citire disc {read} · Blocuri temporare {tmp}",
+      "none": "Nicio cauză nu a fost dezvăluită de statistici. Deschideți planul de execuție în SQL Tuning pentru a verifica.",
+      "cum": "Niciun apel în acest interval: Cumulativ (de la resetarea statisticilor)",
+      "basis": "Bază: Max unic {max}ms · Medie {mean}ms · Apeluri {calls} · Rânduri per apel {rpc} · Raport citire disc {read} · Blocuri temporare {tmp}",
       "SELF_MON": {
-        "cause": "Interogare de auto-colectare dbms.pi — instrucțiune de monitorizare care citește doar vizualizări/cataloage statistice.",
+        "cause": "Interogare de colectare proprie dbms.pi: Instrucțiune de monitorizare care citește doar vizualizări statistice și cataloage.",
         "fix": "Nu este necesară nicio acțiune a clientului. Dacă încărcarea bazei de date țintă este o problemă, reduceți numărul de ori în care deschideți ecranul de colectare/monitorizare."
       },
       "NO_MAX": {
@@ -1136,37 +1140,38 @@
         "fix": "Faceți clic pe 'Colectează' o dată acum pentru a completa valorile maxime pentru o diagnosticare precisă."
       },
       "SLOW_EACH": {
-        "cause": "Întotdeauna lent — Durează mult timp de fiecare dată când rulează, cu maxim {max}ms și medie {mean}ms.",
+        "cause": "Lent de fiecare dată: Durează mult la fiecare execuție cu max {max}ms și medie {mean}ms.",
         "fix": "① Deschideți planul de execuție în 'Deschide în SQL Tuning'. ② Dacă există scanări complete (Seq Scan) sau sortări mari, revizuiți indecșii pe coloanele condițiilor WHERE/JOIN. ③ Restrângeți condițiile pentru a citi doar coloanele/rândurile necesare."
       },
       "SPIKE": {
-        "cause": "Întârziere intermitentă — Medie {mean}ms, dar ocazional durează mult timp la maxim {max}ms ({x} ori media).",
+        "cause": "Întârziere intermitentă: Medie {mean}ms, dar ocazional durează mult cu max {max}ms ({x} ori media).",
         "fix": "① Când este lent, verificați așteptările de blocare (wait_event) în fila Activitate/Blocări. ② Dacă doar prima execuție este lentă, cache-ul a fost gol și discul a fost citit. ③ Comparați aceeași interogare cu valori diferite în SQL Tuning pentru a vedea dacă planul de execuție se modifică în funcție de valori."
       },
       "DISK_READ": {
-        "cause": "Cache Miss — {pct}% ({read} blocuri) din blocurile citite au fost citite de pe disc, nu din memorie.",
+        "cause": "Cache miss: {pct}% ({read} blocuri) din blocurile citite au fost citite de pe disc, nu din memorie.",
         "fix": "① Reduceți intervalul de citire cu indecși. ② Restrângeți perioada/condițiile interogării. ③ Dacă datele citite frecvent rămân ridicate, revizuiți shared_buffers (memoria)."
       },
       "TEMP_SPILL": {
-        "cause": "Depășire memorie — Sortarea/hash-ul a depășit work_mem și a scris {blk} blocuri (aprox. {mb}MB, {perCall} blocuri per apel) în fișiere temporare.",
+        "cause": "Depășire memorie: Sortarea/hash-ul a depășit work_mem și a scris {blk} blocuri (aprox. {mb}MB, {perCall} blocuri per apel) în fișiere temporare.",
         "fix": "① Plasarea indecșilor pe coloanele ORDER BY/GROUP BY omite sortarea. ② Mai întâi, reduceți numărul de rânduri de sortat (LIMIT în interior). ③ Dacă este absolut necesar, măriți SET LOCAL work_mem doar pentru această tranzacție de interogare."
       },
       "MANY_ROWS": {
-        "cause": "Recuperare excesivă — Extrage {perCall} rânduri per apel.",
+        "cause": "Interogare excesivă: Extrage {perCall} rânduri per apel.",
         "fix": "① Listele de ecran sunt preluate pagină cu pagină. ② SELECT selectează doar coloanele utilizate. ③ Agregările sunt efectuate în baza de date și se primesc doar rezultatele."
       },
       "PGRST_EMBED": {
-        "cause": "Instrucțiune de filtru încorporat PostgREST (!inner) — filtrarea părinților după condițiile copilului poate scana întregul set înainte de condițiile de clasificare.",
+        "cause": "Instrucțiune de filtru încorporat PostgREST (!inner): Filtrarea părinților după condițiile copilului poate scana întregul tabel înainte de condiția de clasificare.",
         "fix": "① Verificați dacă există indexuri pe cheile de join și coloanele de filtrare. ② Mutați filtrele la condițiile tabelului părinte. ③ Încorporați copiii într-o interogare părinte existentă sau combinați-i într-o singură funcție de bază de date."
       },
       "OFFSET_PAGING": {
-        "cause": "Paginare OFFSET — Devine progresiv mai lentă pe măsură ce citește și aruncă rândurile precedente pentru paginile ulterioare.",
+        "cause": "Paginare OFFSET: Paginile ulterioare citesc și aruncă rândurile anterioare, devenind progresiv mai lente.",
         "fix": "Schimbați la paginarea keyset (WHERE id > last_id ORDER BY id LIMIT n) care citește de la cheia de după ultima cheie primită."
       }
     }
   },
   "pipeline": {
     "title": "PiCDC · Pipeline-uri",
+    "intro": "Verificați dacă o DB sursă este pregătită pentru capturarea datelor modificate (CDC) și proiectați pipeline-uri sursă → transformare → țintă. Această etapă doar verifică și proiectează; nu sunt citite sau stocate datele rândurilor clienților.",
     "needLink": "Alegeți mai întâi un link schema.pi de mai sus. Dacă nu aveți niciunul, înregistrați un token în meniul „Link”.",
     "needConn": "Alegeți conexiunea DB de verificat de mai sus.",
     "loading": "Se încarcă…",
@@ -1192,8 +1197,8 @@
       "toDraft": "Creează schiță de pipeline din {n} selectate"
     },
     "ready": {
-      "ok": "Replicare logică WAL pregătită — tabelele cu PK pot utiliza LOGICAL",
-      "no": "Replicare logică WAL nu este pregătită — captură prin interogare sau comparație de chei",
+      "ok": "Replicare logică WAL pregătită: Tabelele cu PK pot utiliza metoda LOGICAL.",
+      "no": "Replicare logică WAL nu este pregătită: Colectați utilizând metoda de interogare/comparație a cheilor.",
       "senders": "{n} conexiuni de replicare"
     },
     "adapter": {
@@ -1208,20 +1213,20 @@
       "HAS_SOFT_DEL": "Are coloană ștergere soft",
       "NO_SOFT_DEL": "Nu are coloană ștergere soft",
       "HAS_PK": "Are cheie primară",
-      "NO_PK": "Nu are cheie primară — rândurile modificate nu pot fi identificate",
+      "NO_PK": "Fără PK: Nu se pot identifica rândurile modificate.",
       "DELETE_UNSEEN": "Interogarea nu poate captura ștergeri fizice (se recomandă coloana de ștergere soft)",
       "LOGICAL_NOT_READY": "Poate trece la LOGICAL odată ce replicarea logică WAL este pregătită",
-      "FULL_RELOAD_ONLY": "Fără PK sau coloană timp de modificare, deci fără captură incrementală — adăugați un PK",
+      "FULL_RELOAD_ONLY": "Fără PK/timestamp de modificare, deci colectarea incrementală nu este posibilă: se recomandă adăugarea PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level nu este logical (modificarea necesită o repornire a DB)",
       "NO_SLOTS": "max_replication_slots este 0",
       "NO_SENDERS": "max_wal_senders este 0",
-      "IS_STANDBY": "Server standby — preluați replicarea logică de la serverul primar",
+      "IS_STANDBY": "Server standby: Primiți replicarea logică de la serverul primar.",
       "SETTINGS_UNKNOWN": "Nu s-au putut citi setările, starea de pregătire este necunoscută"
     },
     "ed": {
       "title": "Definiții pipeline",
-      "draftOnly": "Doar proiectare — salvat ca schițe (DRAFT)",
+      "draftOnly": "Doar design: Salvați doar ca DRAFT.",
       "new": "Pipeline nou",
       "empty": "Nu există pipeline-uri salvate",
       "manual": "Manual",
@@ -1290,8 +1295,8 @@
     },
     "warn": {
       "none": "Fără avertismente notabile.",
-      "SEQ_SCAN_LARGE": "Scanare completă pe {relation} (aproximativ {rows} rânduri) — luați în considerare un index pe coloanele de filtrare.",
-      "NESTED_LOOP_HIGH": "Bucla imbricată produce aproximativ {rows} rânduri — luați în considerare o joncțiune hash sau merge, sau un index pe condiția de joncțiune.",
+      "SEQ_SCAN_LARGE": "Tabelul {relation} efectuează o scanare completă (estimat {rows} rânduri): Revizuiți indexurile pe coloanele de condiție.",
+      "NESTED_LOOP_HIGH": "Rezultatul buclei imbricate este un estimat de {rows} rânduri. Revizuiți join-urile hash/merge sau indexurile pe condițiile de join.",
       "SORT_SPILL": "Dimensiunea sortării este de aproximativ {kb}KB, peste work_mem implicit (4MB); ar putea scrie pe disc."
     },
     "lint": {
@@ -1305,14 +1310,14 @@
         "char": "caracter"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — selectați doar coloanele de care aveți nevoie (I/O suplimentar, fără index de acoperire).",
-        "FUNC_ON_COLUMN": "Coloana de filtrare {column} este încapsulată într-o funcție sau expresie, deci indexul său nu poate fi utilizat — transformați constanta în schimb.",
-        "LEADING_WILDCARD": "LIKE cu un % inițial nu poate utiliza un index B-tree — luați în considerare un index GIN pg_trgm.",
-        "OR_DIFF_COLUMNS": "Condiții OR pe coloane diferite — luați în considerare împărțirea cu UNION (adăugați o condiție de excludere a duplicatelor dacă UNION ALL) sau revizuirea indexurilor pe coloană.",
-        "IMPLICIT_CAST": "{column} este comparată cu un număr între ghilimele — potriviți tipurile coloanei și constantei (conversie implicită).",
-        "NOT_IN_SUBQUERY": "NOT IN (subinterogare) nu returnează nimic când sunt prezente valori NULL și este lent — utilizați NOT EXISTS.",
-        "NO_WHERE": "Fără clauză WHERE — pe un tabel mare aceasta este o scanare completă (adăugați o condiție sau LIMIT).",
-        "DOMAIN_MISMATCH": "{column} este de tip {expected} conform domeniului standard, dar este comparată cu o constantă de alt tip — conversia implicită poate împiedica utilizarea indexului."
+        "SELECT_STAR": "SELECT *: Selectați doar coloanele necesare (I/O inutil, index de acoperire imposibil).",
+        "FUNC_ON_COLUMN": "Coloana de condiție {column} este procesată de o funcție/operație, deci indexurile nu pot fi utilizate. Procesează partea constantă.",
+        "LEADING_WILDCARD": "LIKE cu un % inițial nu poate utiliza un index B-tree. Revizuiți indexurile pg_trgm GIN.",
+        "OR_DIFF_COLUMNS": "Condițiile de coloane diferite sunt grupate cu OR. Revizuiți separarea UNION (adăugați condiția de excludere a duplicatelor dacă UNION ALL) sau indexurile pe coloană.",
+        "IMPLICIT_CAST": "{column} este comparat cu un număr între ghilimele. Potriviți tipul coloanei și tipul constantei (conversie implicită de tip).",
+        "NOT_IN_SUBQUERY": "NOT IN (subinterogare) poate fi gol și lent dacă sunt amestecate valori NULL. Schimbați la NOT EXISTS.",
+        "NO_WHERE": "Fără condiție WHERE. Dacă este un tabel mare, este o scanare completă (adăugați LIMIT sau condiții).",
+        "DOMAIN_MISMATCH": "{column} este de tip {expected} conform domeniului standard, dar este comparat cu o constantă de un tip diferit. Conversia implicită de tip poate împiedica utilizarea indexului."
       }
     },
     "saved": {
@@ -1338,12 +1343,12 @@
     },
     "ai": {
       "title": "Sfaturi de optimizare AI",
-      "intro": "Alegeți un plan salvat pentru a genera sfaturi. Sunt trimise doar SQL și planuri cu constante mascate ca ? (sfaturi bazate pe reguli dacă nu există cheie sau în caz de eșec). După ce proprietarul linkului aprobă, rulați din nou explicația pentru același SQL, salvați-o și măsurați impactul cu acel plan ulterior — abia atunci este înregistrat ca aplicat.",
+      "intro": "Alegeți un plan salvat pentru a genera sfaturi. Sunt trimise doar SQL și planuri cu constante mascate ca ? (sfaturi bazate pe reguli dacă nu există cheie sau în caz de eșec). După ce proprietarul linkului aprobă, rulați din nou explicația pentru același SQL, salvați-o și măsurați impactul cu acel plan ulterior : abia atunci este înregistrat ca aplicat.",
       "pickPlan": "Selectați un plan salvat pentru sfaturi",
       "create": "Generați sfaturi",
       "creating": "Se generează… (până la 30 s)",
       "noPlans": "Nu există planuri salvate. Vizualizați un plan de explicație mai sus și salvați-l.",
-      "note": "Un singur sfat per plan. Ștergeți sfatul existent pentru a regenera. DDL este doar sugerat — aplicați-l în schema.pi.",
+      "note": "Un singur sfat per plan. Ștergeți sfatul existent pentru a regenera. DDL este doar sugerat : aplicați-l în schema.pi.",
       "empty": "Nu există încă sfaturi.",
       "noItems": "Nu s-au găsit îmbunătățiri pentru acest plan.",
       "cost": "Cost anterior",
@@ -1385,10 +1390,10 @@
       "copy": "Copiați",
       "copied": "Copiat",
       "rule": {
-        "SEQ_SCAN_INDEX": "Scanare completă a {relation} — creați un index pe coloana de filtrare {column} (înlocuiți NN din numele indexului cu un număr de secvență).",
-        "SEQ_SCAN_STATS": "Scanare completă a {relation} — verificați coloanele de filtrare și asigurați-vă că statisticile (ANALYZE) sunt actuale.",
-        "NESTED_LOOP": "Bucla imbricată așteaptă {rows} rânduri — reîmprospătați statisticile și luați în considerare indexuri pentru cheia de join sau un hash join.",
-        "SORT_SPILL": "Sortarea de aproximativ {kb} KB poate fi transferată pe disc — luați în considerare creșterea work_mem a sesiunii sau indexarea coloanelor de sortare.",
+        "SEQ_SCAN_INDEX": "Scanare completă {relation}: Creați un index pe coloana de condiție {column} (numele indexului NN va fi înlocuit cu un număr de secvență).",
+        "SEQ_SCAN_STATS": "Scanare completă {relation}: Verificați coloanele de condiție și asigurați-vă că statisticile (ANALYZE) sunt actualizate.",
+        "NESTED_LOOP": "Rezultatul buclei imbricate este un estimat de {rows} rânduri: Actualizați statisticile și revizuiți indexurile condițiilor de join sau join-urile hash.",
+        "SORT_SPILL": "Sortarea poate depăși pe disc cu aproximativ {kb}KB. Revizuiți creșterea work_mem a sesiunii sau indexurile pe coloanele de sortare.",
         "SELECT_STAR": "Selectați doar coloanele de care aveți nevoie în loc de SELECT * (mai puțin I/O, indexuri de acoperire posibile).",
         "FUNC_ON_COLUMN": "Mutați funcția/expresia pe coloana de filtrare {column} pe partea constantă (permite utilizarea indexului).",
         "IMPLICIT_CAST": "Potriviți tipurile lui {column} și ale constantei (eliminați conversia implicită).",
@@ -1448,9 +1453,9 @@
     },
     "desc": {
       "FREE": "Explorați și învățați",
-      "D1": "Operator — Verifică dacă baza de date este în regulă acum",
-      "D2": "Dezvoltator și Optimizator — Corectează SQL-ul lent",
-      "D3": "DBA și DA — De la siguranța operațională la implementare și lake"
+      "D1": "Operator: Verifică dacă baza de date este sănătoasă acum.",
+      "D2": "Dezvoltator/Tuner: Rezolvă SQL-ul lent.",
+      "D3": "DBA/DA: Siguranță operațională, migrare și chiar data lake."
     },
     "feat": {
       "FREE": "Tablou de bord de monitorizare, vizualizare plan de execuție, învățare de bază",
@@ -1493,7 +1498,7 @@
       "required": "Această funcționalitate este disponibilă începând cu planul {plan}.",
       "limit": "Ați folosit toate încercările disponibile pentru această perioadă. Puteți utiliza mai mult prin upgrade la planul {plan}.",
       "limitTop": "Ați folosit toate încercările disponibile pentru această perioadă. O puteți utiliza din nou în perioada următoare.",
-      "expired": "Planul dvs. schema.pi a expirat — vă rugăm să efectuați o plată pe ecranul planului schema.pi.",
+      "expired": "Planul dumneavoastră schema.pi a expirat. Vă rugăm să plătiți pe ecranul planului schema.pi.",
       "go": "Vizualizați planul",
       "close": "Închideți"
     }

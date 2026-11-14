@@ -65,7 +65,7 @@ const LVL_IDX: Record<Lvl, number> = {
   WARN: 3,
   RISK: 4,
 }
-const LVL_MARK = ['–', '✓', '?', '▲', '✕']
+const LVL_MARK = ['-', '✓', '?', '▲', '✕']
 const LVL_COLOR = [C.na, C.ok, C.unknown, C.warn, C.risk]
 const mark = (l: Lvl) => LVL_MARK[LVL_IDX[l]]
 const lvlColor = (l: Lvl) => LVL_COLOR[LVL_IDX[l]]
@@ -263,7 +263,7 @@ function Table({
   )
 }
 const dash = (v: number | null | undefined) =>
-  v === null || v === undefined ? '—' : v
+  v === null || v === undefined ? '-' : v
 
 // 게이지 눈금 칸 수 — 범위가 10 이하 정수면 1단위 칸(정수 눈금), 아니면 5칸
 function gaugeSplit(sc: { min: number; max: number } | null): number {
@@ -304,7 +304,7 @@ function Gauges({ signals }: { signals: Map<SigId, Signal> }) {
           name: id === 'AVAIL' ? t('chart.rsp') : t(`sig.${id}`),
           noLimit: id === 'STORAGE' && s?.reason === 'NO_LIMIT',
           txt:
-            sc && s ? `${s.value}${unitTxt(s.unit)}` : ('—' as string | number),
+            sc && s ? `${s.value}${unitTxt(s.unit)}` : ('-' as string | number),
         }
       }),
     [signals, t],
@@ -390,7 +390,7 @@ function Gauges({ signals }: { signals: Map<SigId, Signal> }) {
             `${mark(g.lvl)} ${t(`level.${g.lvl}`)}`,
             g.s?.thr
               ? `▲ ${g.s.thr.warn}${unitTxt(g.s.unit)} · ✕ ${g.s.thr.risk}${unitTxt(g.s.unit)}`
-              : '—',
+              : '-',
           ])}
         />
       }
@@ -711,7 +711,7 @@ function SizeTreemap({ slow }: { slow: BoardSlow | null }) {
               .map((x) => x.name)
               .filter(Boolean)
               .join(' / '),
-          )}<br/>${fmtBytes(p.value)} · ${t('chart.deadPct')} ${p.data.deadPct === null ? '—' : `${p.data.deadPct}%`}<br/>${mark(p.data.lvl)} ${t(`level.${p.data.lvl}`)}`,
+          )}<br/>${fmtBytes(p.value)} · ${t('chart.deadPct')} ${p.data.deadPct === null ? '-' : `${p.data.deadPct}%`}<br/>${mark(p.data.lvl)} ${t(`level.${p.data.lvl}`)}`,
       },
       series: [
         {
@@ -764,9 +764,9 @@ function SizeTreemap({ slow }: { slow: BoardSlow | null }) {
           const n = c ?? s
           return [
             label(s, true),
-            c ? label(c, false) : '—',
+            c ? label(c, false) : '-',
             fmtBytes(n.value),
-            n.deadPct === null ? '—' : `${n.deadPct}%`,
+            n.deadPct === null ? '-' : `${n.deadPct}%`,
             `${mark(n.lvl)} ${t(`level.${n.lvl}`)}`,
           ]
         }),
@@ -1126,7 +1126,7 @@ function CacheTrend({ rows }: { rows: SnapRow[] | null }) {
         ...base(narrow).tooltip,
         trigger: 'axis',
         valueFormatter: (v: unknown) =>
-          v === null || v === undefined ? '—' : `${v}%`,
+          v === null || v === undefined ? '-' : `${v}%`,
       },
       grid: { left: 8, right: 8, top: 16, bottom: 8, containLabel: true },
       xAxis: timeAxis(narrow),
@@ -1225,7 +1225,7 @@ function Capacity({
         ...base(narrow).tooltip,
         trigger: 'axis',
         valueFormatter: (v: unknown) =>
-          typeof v === 'number' ? `${r1(v)} GB` : '—',
+          typeof v === 'number' ? `${r1(v)} GB` : '-',
       },
       grid: {
         left: 8,
@@ -1313,8 +1313,8 @@ function Capacity({
       {cap && (
         <p className="text-muted-foreground text-xs">
           {t('capNote', {
-            perDay: cap.perDay === null ? '—' : fmtBytes(cap.perDay),
-            days: cap.daysLeft === null ? '—' : Math.floor(cap.daysLeft),
+            perDay: cap.perDay === null ? '-' : fmtBytes(cap.perDay),
+            days: cap.daysLeft === null ? '-' : Math.floor(cap.daysLeft),
           })}
         </p>
       )}

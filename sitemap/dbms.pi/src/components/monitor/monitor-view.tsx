@@ -30,7 +30,7 @@ const MAX_MS = 5 * 60_000
 const TIMEOUT_RISK = 3
 const CARD = 'bg-surface rounded-2xl p-4'
 const nf = (v: number | null, d = 1) =>
-  v === null ? '—' : v.toLocaleString(undefined, { maximumFractionDigits: d })
+  v === null ? '-' : v.toLocaleString(undefined, { maximumFractionDigits: d })
 
 const ChartPanels = dynamic(() => import('./chart-panels'), {
   ssr: false,
@@ -347,7 +347,7 @@ function SchemaSvc({ slow }: { slow: BoardSlow | null }) {
       </p>
       {!a ? (
         <p className="text-muted-foreground text-sm">
-          {slow ? '—' : t('loading')}
+          {slow ? '-' : t('loading')}
         </p>
       ) : (
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">

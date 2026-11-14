@@ -91,7 +91,7 @@
   "analytics": {
     "title": "Analitika dhe Liqeni",
     "intro": "KPI-të e aktivitetit të dbms, dizajni i liqenit me tre shtresa dhe katalogu i grupeve të të dhënave në një vend.",
-    "storageNotice": "Ruajtja e liqenit (në anën e klientit ose në cloud) nuk është vendosur ende (PRD seksioni 10 #7). Për momentin ruhen vetëm dizajnet dhe hartëzimet e emrave — asnjë rresht të dhënash.",
+    "storageNotice": "Ruajtja e liqenit (në anën e klientit ose në cloud) nuk është vendosur ende (PRD seksioni 10 #7). Për momentin ruhen vetëm dizajnet dhe hartëzimet e emrave : asnjë rresht të dhënash.",
     "noLink": "Zgjidhni ose regjistroni një lidhje schema.pi së pari.",
     "goConnect": "Regjistro një lidhje",
     "loading": "Duke u ngarkuar…",
@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "Analiza GAP — Modeli↔DB",
+    "title": "Analiza GAP: Modeli↔DB",
     "intro": "Krahasoni modelin e dizajnit schema.pi dhe historikun e aplikimit DDL me katalogun e drejtpërdrejtë të DB për të gjetur driftin, dhe matni nëse indekset e dizajnuara përdoren në të vërtetë. Të dhënat e rreshtave të klientit nuk lexohen ose ruhen kurrë.",
     "needLink": "Zgjidhni një lidhje schema.pi më lart së pari. Nëse nuk keni asnjë, regjistroni një token në menunë 'Lidhje'.",
     "needConn": "Zgjidhni lidhjen e DB për të krahasuar më lart.",
@@ -188,7 +188,7 @@
     "model": "Modeli",
     "reqNo": "Kërkesa {id}",
     "notSaved": "Nuk mund të ruhej ky ekzekutim në histori (rezultatet shfaqen normalisht).",
-    "capped": "Shumë artikuj — po shfaqen {cap} të parat për seksion (numrat janë të plotë).",
+    "capped": "Shumë artikuj : po shfaqen {cap} të parat për seksion (numrat janë të plotë).",
     "statsMissing": "Statistikat e përdorimit të indeksit nuk ishin të disponueshme, kështu që përdorimi nuk mund të gjykohej.",
     "sum": {
       "missingTables": "Tabela që mungojnë në DB",
@@ -230,7 +230,7 @@
       "USED": "Në përdorim",
       "NO_STATS": "Pa statistika",
       "CONSTRAINT": "Kufizim uniciteti (mbajeni)",
-      "NO_DATA": "Pa të dhëna ose statistika të mbledhura — nuk mund të gjykohet",
+      "NO_DATA": "Nuk ka të dhëna ose statistika të mbledhura: nuk mund të përcaktohet",
       "OBSERVING": "Nën vëzhgim (më pak se 7 ditë)",
       "UNUSED_CAND": "Kandidat i papërdorur"
     },
@@ -245,14 +245,14 @@
       "RATE": "Shumë kërkesa. Ju lutemi provoni përsëri pas një minute."
     },
     "schema": "Skema",
-    "schemaHint": "Krahasohen vetëm tabelat e rregullta dhe të ndara në këtë skemë (pamjet përjashtohen). Publiku i paracaktuar — skemat e brendshme të Supabase (auth, storage, …) lihen jashtë.",
-    "truncated": "{names} arritën kufirin e {max} rreshtave dhe u shkurtuan — disa rezultate \"nuk janë në DB\" / \"nuk janë në model\" mund të jenë të rreme. Ngushtoni skemën dhe ekzekutoni përsëri.",
+    "schemaHint": "Krahasohen vetëm tabelat e rregullta dhe të ndara në këtë skemë (duke përjashtuar pamjet). Publiku i paracaktuar: Skemat e brendshme të Supabase (auth, storage, etj.) përjashtohen.",
+    "truncated": "Kërkimi {names} u shkurtua në {max} rreshta. Disa zbulime 'Nuk është në DB'/'Nuk është në Model' mund të jenë pozitive të rreme. Ngushtoni skemën dhe ridetectoni.",
     "colUnchecked": "Për shkak se kërkesa e kolonës u shkurtua, {n} rezultate të kolonave që mungojnë/shtesë trajtohen si të paverifikueshme dhe përjashtohen nga numri i moskorrespondimeve të kolonave.",
-    "renamed": "{n} indeks(e) PK të aplikuar sipas rregullit të vjetër të emërtimit (_PKEY) ekzistojnë në DB me emrin e ri (PK_) — normale",
-    "superseded": "{n} kërkesa më të vjetra u përjashtuan sepse një kërkesë e mëvonshme rikrijoi të njëjtën tabelë (DROP … CASCADE) — normale",
+    "renamed": "{n} indekse PK të aplikuara me konventën e vjetër të emërtimit (_PKEY) janë në DB me emrin e ri (PK_). Normale.",
+    "superseded": "{n} kërkesa të mëparshme u përjashtuan nga krahasimi sepse kërkesat e mëvonshme rikrijuan të njëjtën tabelë (DROP … CASCADE). Normale.",
     "supersededItem": "Kërkesa {id} → zëvendësuar nga kërkesa {by}",
     "sysCols": "{n} kolonë(a) sistemi të shtuara automatikisht gjatë gjenerimit të DDL nuk janë në model sipas dizajnit dhe përjashtohen nga moskorrespondimet",
-    "groupOwn": "Prefiksi i projektit {pfx} — kandidatë që mungojnë nga modeli",
+    "groupOwn": "Ky prefiks projekti {pfx}: kandidatët që mungojnë në model",
     "groupOther": "Sistem tjetër {pfx}",
     "basis": "Rreshta të vlerësuar {rows} · që nga {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "Nëse objektet ende zhduken pas riaplikimit, dyshoni për një fshirje manuale ose kthim prapa dhe kontrolloni aktivitetin e llogarisë së lidhjes me DBA-në tuaj."
       },
       "extraTables": {
-        "s1": "Ky grup prefiksesh projekti = kandidatë modelesh të munguar — importojini në model përmes schema.pi → Cilësimet → Reverse, ose vendosni nëse do t'i fshini nëse janë tabela të papërdorura.",
-        "s2": "Grupe të tjera prefiksash = sisteme të tjera që ndajnë këtë DB — nuk janë artikuj veprimi për këtë projekt.",
+        "s1": "Ky grup prefiks projekti = kandidatët që mungojnë në model: importoni në model përmes schema.pi → Cilësimet → Reverse, ose vendosni nëse do ta fshini nëse tabela nuk përdoret.",
+        "s2": "Grupet e tjera të prefikseve = sisteme të tjera që përdorin të njëjtën DB: nuk janë objekt veprimi nga ky projekt.",
         "s3": "Nëse skema e synuar nuk është publike, ndryshoni fushën \"Skema\" më lart dhe ekzekutoni përsëri."
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "Tipi/NULL ndryshon = rreshtojeni me modelin (burimi i së vërtetës); para se të zvogëloni gjatësinë ose të kaloni në NOT NULL, konfirmoni që rreshtat ekzistues e plotësojnë atë."
       },
       "idxUsage": {
-        "s1": "Para se të hiqni, kontrolloni ① që dritarja e statistikave mbulon të paktën një cikël biznesi (p.sh. grupi i fundit të muajit) — shihni \"që nga\".",
+        "s1": "Para fshirjes, kontrolloni ① nëse periudha e mbledhjes së statistikave është të paktën një cikël operativ (p.sh., grupi i fundit të muajit): referojuni datës së referencës.",
         "s2": "② Nuk është një indeks unik/PK (ato shfaqen veçmas si \"kufizim uniciteti\").",
         "s3": "③ EXPLAIN SQL-in përfaqësues të tabelës në SQL Tuning dhe konfirmoni që ky indeks nuk përdoret.",
         "s4": "Pasi të konfirmohen të treja, hiqni indeksin nga modeli në schema.pi dhe aplikoni përmes DDL."
@@ -354,7 +354,7 @@
     "howTitle": "Si të lëshoni një token lidhjeje",
     "how1": "Hyni në schema.pi dhe hapni fushën e subjektit për t'u lidhur",
     "how2": "Shkoni te Fusha e subjektit → Cilësimet → Tokeni i lidhjes dhe shtypni 'Lësho token' (administrator i fushës ose roli DA)",
-    "how3": "Kopjoni tokenin që fillon me slk_ — ai shfaqet vetëm një herë kur lëshohet",
+    "how3": "Kopjoni tokenin që fillon me slk_ që u lëshua. Origjinali shfaqet vetëm një herë në momentin e lëshimit.",
     "how4": "Ngjiteni më poshtë dhe regjistrojeni",
     "openSchema": "Hap schema.pi",
     "registerTitle": "Regjistro lidhjen",
@@ -384,7 +384,7 @@
     "retry": "Provo përsëri",
     "pickerLink": "Lidhja",
     "pickerConn": "Lidhja",
-    "pickerEmpty": "Nuk ka lidhje —",
+    "pickerEmpty": "Nuk ka lidhje.",
     "pickerGo": "regjistro një në /connect",
     "errors": {
       "LINK_AUTH": "Tokeni i lidhjes ka skaduar ose është revokuar. Lëshoni një token të ri në schema.pi dhe regjistrojeni përsëri",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "Migrimi i të Dhënave (PiMig)",
-    "intro": "Llogarit rendin e ngarkimit të tabelave nga marrëdhëniet në modelin tuaj të dizajnit schema.pi, organizon madhësinë e copave, paralelizmin dhe listën e kontrollit të kalimit, dhe gjeneron SQL-in e verifikimit që e ekzekutoni vetë në burim dhe target. Ky ekran vetëm planifikon dhe kontrollon — nuk lëviz të dhëna ose nuk lexon rreshtat e DB të klientit.",
+    "intro": "Llogarit rendin e ngarkimit të tabelave nga marrëdhëniet në modelin tuaj të dizajnit schema.pi, organizon madhësinë e copave, paralelizmin dhe listën e kontrollit të kalimit, dhe gjeneron SQL-in e verifikimit që e ekzekutoni vetë në burim dhe target. Ky ekran vetëm planifikon dhe kontrollon : nuk lëviz të dhëna ose nuk lexon rreshtat e DB të klientit.",
     "needLink": "Zgjidhni një lidhje schema.pi më lart së pari. Nëse nuk keni asnjë, regjistroni një token në menunë 'Lidhje'.",
     "loading": "Duke u ngarkuar…",
     "newPlan": "Plan i ri migrimi",
@@ -432,8 +432,8 @@
     "optsHint": "Paralelizmi është numri i tabelave të ngarkuara njëkohësisht brenda një niveli. Madhësia e copës është njësia e commit-it (rreshtat) që do të përdorë motori i ekzekutimit.",
     "order": "Renditja e ngarkimit",
     "orderHint": "Renditur topologjikisht sipas marrëdhënieve të projektimit (jo FK fizike) në mënyrë që tabelat prind të vijnë të parat. Tabelat në të njëjtin nivel nuk varen nga njëra-tjetra dhe mund të ngarkohen paralelisht.",
-    "cycles": "{n} grup(e) qarkore — vendosur në të njëjtin nivel. Vendosni rendin e tyre manualisht dhe shtyjini kontrollet e referencave deri pas ngarkimit.",
-    "selfRefs": "Tabela vetë-referuese (hierarkike) — ngarkoni rreshtat prindër së pari brenda tabelës",
+    "cycles": "{n} cikle: vendosur në të njëjtën fazë. Vendosni manualisht rendin e ngarkimit dhe shtyjeni kontrollet e referencës deri pas ngarkimit.",
+    "selfRefs": "Tabelat me vetë-referencë (hierarkike): rreshtat prindërorë së pari brenda të njëjtës tabelë.",
     "level": "Niveli {n}",
     "checklist": "Lista e kontrollit të kalimit",
     "toReady": "Shëno si gati",
@@ -471,7 +471,7 @@
     },
     "verify": "SQL i verifikimit",
     "verifyHint": "Gjeneron pyetje për numërimin, shumën e kolonave numerike, çelësat e dyfishtë dhe hash-in e çelësit për çdo tabelë në rendin e ngarkimit. Ekzekutojini vetë në burim dhe objektiv dhe krahasoni (ky ekran nuk i ekzekuton ato).",
-    "noHashOracle": "Funksionet hash dhe paraqitja e tekstit të Oracle·Tibero ndryshojnë nga PostgreSQL, kështu që pyetjet hash janë lënë jashtë — krahasoni numrat, shumat dhe çelësat e dyfishtë.",
+    "noHashOracle": "Oracle dhe Tibero heqin dorë nga kërkimi i hash-it sepse funksionet e hash-it dhe paraqitjet e karaktereve ndryshojnë nga PostgreSQL. Krahaso me numër, shumë dhe dublikim çelësash.",
     "copy": "Kopjo",
     "copied": "U kopjua",
     "copyFail": "Nuk mund të kopjohej. Zgjidhni tekstin dhe kopjojeni manualisht.",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "Kërkesa është e pavlefshme."
     },
     "board": {
-      "subtitle": "Çfarë duhet bërë në këtë DB tani – 14 sinjale OK, paralajmërim ose rrezik, me zgjidhje, me një shikim.",
+      "subtitle": "Çfarë duhet bërë tani në këtë DB: Shihni statusin normal, paralajmërues dhe të rrezikut të 14 sinjaleve dhe zgjidhjet e tyre me një shikim.",
       "refresh": {
         "updated": "Që nga {time} · rifreskohet çdo minutë",
         "now": "Rifresko tani",
@@ -564,11 +564,11 @@
         "NA": "N/A"
       },
       "overall": {
-        "RISK": "Rrezik — nevojitet veprim tani",
-        "WARN": "Paralajmërim — disa artikuj duhet të shikohen",
-        "UNKNOWN": "E panjohur — kontrolloni lidhjen",
-        "OK": "OK — çdo sinjal është brenda kufijve",
-        "CONN_DOWN": "Nuk mund të arrihet DB – kontrolloni së pari lidhjen",
+        "RISK": "Rrezik: Kërkohet veprim i menjëhershëm",
+        "WARN": "Paralajmërim: Artikuj për t'u rishikuar",
+        "UNKNOWN": "Nuk mund të konfirmohet: Kontrolloni statusin e lidhjes",
+        "OK": "Normale: Të gjitha sinjalet janë brenda kritereve",
+        "CONN_DOWN": "Nuk mund të lidhet me DB. Kontrolloni lidhjen së pari.",
         "NA": "N/A"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "Shfaq më pak",
         "setup": "Konfigurojini këto për të parë më shumë",
         "none": "Asnjë artikull rreziku ose paralajmërimi nuk kërkon veprim tani.",
-        "unknown": "Nuk mund të kontrollohej {n} sinjal(e) — shihni kartat për arsyen.",
+        "unknown": "Nuk mund të konfirmohen {n} artikuj: Kontrolloni arsyen në kartë.",
         "myRule": "Rregulli im u shkel: {rule}",
         "copySql": "Kopjo SQL",
         "copied": "U kopjua"
@@ -622,34 +622,34 @@
         "REPL": "Vonesa e replikimit"
       },
       "fix": {
-        "AVAIL": "Përgjigje e ngadaltë ose një rindezje e fundit — kontrolloni cilësimet e lidhjes dhe statusin e serverit të DB-së.",
-        "AVAIL_DOWN": "Nuk mund të lidhej me DB-në — kontrolloni cilësimet e lidhjes dhe nëse serveri i DB-së është aktiv.",
-        "CONN_USE": "{sess}/{max} sesione në këtë DB (jo në të gjithë grupin — bazat e të dhënave të tjera janë të përjashtuara) — mbyllni lidhjet e papërdorura ose shtoni një pooler lidhjesh (pgbouncer).",
-        "URL": "{n} URL të kontrolluara dështojnë · përgjigje maksimale {ms}ms — shihni monitorin schema.pi për shkakun.",
-        "LONG_QRY": "Një pyetje ka qenë duke u ekzekutuar për {sec}s — rishikoni planin e saj dhe rregullojeni, ose kërkoni nga një DBA ta anulojë.",
-        "IDLE_TX": "Një transaksion ka qenë i papërdorur për {sec}s — gjeni commit-in e munguar në aplikacion dhe vendosni një timeout.",
-        "LOCK_WAIT": "{n} sesione po presin bllokime — gjeni sesionin bllokues dhe përfundoni transaksionin e tij.",
-        "CACHE_HIT": "Shkalla e goditjes së cache-it {pct}% — kërkoni skanime të plota të tabelave të mëdha ose rishikoni shared_buffers.",
-        "XACT_ERR": "Shkalla e rikthimit {pct}%, {dlck} bllokime — kontrolloni transaksionet e dështuara dhe logjet e gabimeve të aplikacionit.",
-        "SLOW_SQL": "Ka një pyetje që zgjat deri në {ms}ms për ekzekutim — shikoni planin e ekzekutimit dhe akordojeni, duke filluar nga koha më e lartë e ekzekutimit të vetëm.",
-        "STORAGE": "DB ({gb} GB) është afër kufirit të saj (ditë të mbetura {days}) — pastroni tabelat e mëdha ose shtoni kapacitet.",
-        "VACUUM": "{tbl} ka shumë rreshta të vdekur ose statistika të vjetruara — rishikoni cilësimet VACUUM (ANALYZE) dhe autovacuum.",
-        "INDEX": "{n} gjetje indeksi (të pavlefshme, të papërdorura, skanime të plota) — shihni skedën e shëndetit të tabelës dhe indeksit për objektivat.",
-        "BACKUP": "Arkivimi WAL është i fikur ose i bllokuar — kontrolloni archive_mode, archive_command dhe statusin e backup-it.",
-        "REPL": "Vonesa e replikimit {sec}s — kontrolloni statusin e standby-t dhe rrjetin.",
-        "PGSS": "pg_stat_statements nuk është instaluar, kështu që SQL i ngadaltë nuk është i disponueshëm — aktivizojeni me SQL-në më poshtë (kërkohet rindezje e serverit)."
+        "AVAIL": "Përgjigje e ngadaltë ose sapo u rifillua. Kontrolloni informacionin e lidhjes dhe statusin e serverit DB.",
+        "AVAIL_DOWN": "Dështoi të lidhej me DB. Kontrolloni informacionin e lidhjes dhe nëse serveri DB është aktiv.",
+        "CONN_USE": "Kjo sesion DB {sess}/{max} (jo në të gjithë grupin, lidhjet e tjera DB përjashtohen): Pastroni lidhjet e papërdorura ose konfiguroni një pishinë lidhjesh (pgbouncer).",
+        "URL": "{n} kontrolle URL dështuan · Përgjigje maksimale {ms}ms: Kontrolloni shkakun në monitorin schema.pi.",
+        "LONG_QRY": "Një kërkesë ka qenë duke u ekzekutuar për {sec} sekonda. Rishikoni planin e ekzekutimit dhe akordojeni, ose kërkoni nga një DBA ta ndalojë.",
+        "IDLE_TX": "Një transaksion ka qenë i hapur dhe i papërdorur për {sec} sekonda. Gjeni commit-et që mungojnë në aplikacion dhe vendosni një kohëmatës.",
+        "LOCK_WAIT": "{n} sesione po presin për bllokime: Gjeni sesionin bllokues dhe përfundoni transaksionin e tij.",
+        "CACHE_HIT": "Shkalla e goditjes së cache-it {pct}%: Kërkoni skanime të plota të tabelave të mëdha ose rishikoni shared_buffers.",
+        "XACT_ERR": "Shkalla e kthimit mbrapa {pct}%, {dlck} bllokime: Kontrolloni transaksionet që dështojnë dhe logjet e gabimeve të aplikacionit.",
+        "SLOW_SQL": "Ekziston një kërkesë me një kohë maksimale të vetme prej {ms}ms. Rishikoni planin e ekzekutimit dhe akordojeni nga koha maksimale e vetme më e lartë.",
+        "STORAGE": "DB {gb}GB është afër limitit të saj (kanë mbetur {days} ditë). Pastroni tabelat e mëdha ose rritni kapacitetin.",
+        "VACUUM": "{tbl} ka shumë rreshta të vdekur ose statistika të vjetruara. Rishikoni cilësimet e VACUUM (ANALYZE) dhe autovacuum.",
+        "INDEX": "{n} kontrolle indeksi (i pavlefshëm, i papërdorur, skanim i plotë): Kontrolloni objektivat në skedën e shëndetit të tabelës/indeksit.",
+        "BACKUP": "Arkivimi i WAL është i fikur ose i ndalur. Kontrolloni archive_mode, archive_command dhe statusin e backup-it.",
+        "REPL": "Vonesa e replikimit {sec} sekonda: Kontrolloni statusin e serverit standby dhe rrjetin.",
+        "PGSS": "Mungon zgjerimi pg_stat_statements, kështu që SQL i ngadaltë nuk mund të shihet. Aktivizojeni me SQL-in më poshtë (kërkohet rifillim i serverit)."
       },
       "reason": {
         "CONN_DOWN": "Nuk u gjykua sepse lidhja e DB-së është e fikur.",
         "PGSS": "pg_stat_statements nuk është instaluar.",
         "VER": "E disponueshme në PostgreSQL 13 ose më vonë.",
         "SAMPLE": "Nuk ka ende mostra të mjaftueshme.",
-        "NO_LIMIT": "Nuk ka kufi madhësie, kështu që përdorimi nuk gjykohet — shtoni një rregull të madhësisë së DB-së (MB) (>) për ta përdorur si kufi.",
+        "NO_LIMIT": "Përdorimi nuk përcaktohet pasi nuk ka kufi kapaciteti. Shtimi i një rregulli të madhësisë së DB (MB) (>) do ta përdorë atë si kufi.",
         "RESET": "Statistikat u rivendosën më pak se 7 ditë më parë, kështu që indekset e papërdorura nuk gjykohen.",
         "STALE": "Nuk ka regjistrime të fundit kontrolli.",
         "STANDBY": "Nuk aplikohet në një server standby.",
         "NONE": "Asgjë për të kontrolluar.",
-        "GRANT": "Privilegje të mungueshme — jepni rolin pg_monitor llogarisë së lidhjes.",
+        "GRANT": "Nuk mund të shihet për shkak të mungesës së lejeve. Jepni rolin pg_monitor llogarisë së lidhjes.",
         "LINK": "Pyetja schema.pi dështoi ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "Nëse nuk po transmeton, kontrolloni logjet e standby-t."
         }
       },
-      "sqlNote": "SQL-ja më poshtë është vetëm për lexim, për kontroll — rregullimet (VACUUM, DROP INDEX, pg_terminate_backend) ekzekutohen nga një DBA.",
+      "sqlNote": "SQL-i më poshtë është për verifikim vetëm për lexim. Veprimet (VACUUM, DROP INDEX, pg_terminate_backend) ekzekutohen direkt nga një DBA.",
       "go": {
         "activity": "Aktiviteti dhe bllokimet",
         "top": "Pyetjet e ngadalta",
@@ -766,8 +766,8 @@
           "tree": "Çfarë zë hapësirë dhe çfarë duhet pastruar?"
         },
         "asTable": "Shiko si tabelë",
-        "needHistory": "Nuk ka ende trend — mbajeni këtë ekran të hapur për disa minuta.",
-        "needPerf": "Nuk ka histori madhësie — mblidhni në skedën e performancës ose mbajeni këtë ekran të hapur.",
+        "needHistory": "Nuk ka ende trend. Do të vizatohet nëse e lini këtë ekran të hapur për disa minuta.",
+        "needPerf": "Nuk ka histori kapaciteti. Mblidheni nga skeda Performanca ose lëreni këtë ekran të hapur.",
         "noSess": "Nuk ka sesione.",
         "noWait": "Nuk ka pritje",
         "noData": "Asgjë për të shfaqur.",
@@ -840,17 +840,17 @@
         "noStat": "Pa statistika"
       },
       "empty": {
-        "noConn": "Kjo taksonomi nuk ka lidhje serveri PostgreSQL për të monitoruar — shfaqen vetëm URL-të dhe statusi i shërbimit.",
+        "noConn": "Nuk ka lidhje serveri PostgreSQL për të monitoruar në këtë taksonomi. Shfaqen vetëm statusi i URL-së dhe lidhjes.",
         "unsupported": "Kjo lidhje nuk mbështet monitorimin (vetëm lidhjet e serverit PostgreSQL).",
-        "connFail": "Nuk mund të lidhej me bazën e të dhënave — kontrolloni cilësimet e lidhjes dhe statusin e DB-së.",
-        "linkDown": "Nuk mund të arrihej schema.pi — po ritentohet automatikisht.",
-        "linkAuth": "Tokeni i lidhjes ka skaduar — lëshoni një token të ri në schema.pi dhe regjistrojeni atë.",
-        "timeout": "Përgjigjet janë të ngadalta — po ritentohet automatikisht.",
+        "connFail": "Dështoi të lidhej me DB. Kontrolloni informacionin e lidhjes dhe statusin e DB.",
+        "linkDown": "Dështoi të lidhej me schema.pi. Do të riprovohet automatikisht së shpejti.",
+        "linkAuth": "Tokeni i lidhjes ka skaduar. Rishpërndani dhe regjistroni tokenin nga schema.pi.",
+        "timeout": "Përgjigja është e ngadaltë. Do të riprovohet automatikisht së shpejti.",
         "rate": "Shumë kërkesa, kështu që intervali i rifreskimit u rrit."
       },
       "aux": {
         "rules": "Rregullat e mia të alarmit ({n} aktive)",
-        "schemaSvc": "Statusi i shërbimit — përgjigjet e schema.pi",
+        "schemaSvc": "Statusi i lidhjes: përgjigja e shërbimit schema.pi",
         "schemaSvcNote": "Metrikat e aplikacionit për 60 minutat e fundit të ruajtura nga schema.pi.",
         "source": "Burimi i të dhënave: DB e synuar lexohet vetëm përmes pyetjeve të emërtuara të schema.pi (vetëm për lexim); trendet ruajnë statistika vetëm në dbms.pi (nuk ka të dhëna rreshtash)."
       }
@@ -866,10 +866,10 @@
     "noRun": "Ende nuk ka diagnozë. Shtypni \"Ekzekuto diagnozën\"",
     "lastRun": "Diagnoza e fundit {dtm}",
     "readOnly": "Diagnoza lexon vetëm (SELECT). Këshilla është një udhëzues dhe varet nga memoria e serverit, ngarkesa dhe ngarkesa e punës",
-    "truncated": "Shumë objekte — u kontrolluan vetëm 500 të parat",
+    "truncated": "Shumë objekte : u kontrolluan vetëm 500 të parat",
     "paramsNote": "Memoria totale e serverit është e panjohur, kështu që vlerësohet nga shared_buffers ≈ 25% e RAM-it. random_page_cost supozon SSD",
     "auditNote": "Tabelat me RLS të fikur dhe llogaritë e papërdorura do të kontrollohen pasi pyetja e lidhjes t'i mbështesë ato",
-    "replNote": "Baza është Active-Standby (A-S) — një primar + standby. Vonesa e riprodhimit ≥ 5s = paralajmërim, ≥ 60s = rrezik (referencë RPO e matur)",
+    "replNote": "Kriteri kryesor është Active-Standby (A-S): 1 Primary + Standby. Paralajmërim për vonesë replay >= 5 sekonda, rrezik për >= 60 sekonda (referojuni matjes aktuale RPO).",
     "lagIdle": "Pa ndryshime",
     "pager": "Faqosja",
     "prev": "Para",
@@ -943,7 +943,7 @@
       "ckpt_ok": "Brenda një diapazoni të arsyeshëm",
       "wal_minimal": "wal_level=minimal e bën PITR dhe replikimin të pamundur. Përdorni replica ose më lart",
       "wal_ok": "Niveli WAL mbështet PITR dhe replikimin",
-      "rpc_hdd": "Paracaktimi i HDD (4). Për SSD, rekomandohet 1.1–2",
+      "rpc_hdd": "Paracaktimi i HDD (4). Për SSD, rekomandohet 1.1~2",
       "rpc_ok": "I përshtatshëm për SSD",
       "super_many": "Dy ose më shumë superpërdorues. Mbani një për administrim dhe jepni vetëm privilegjet e nevojshme të tjerëve",
       "super_ok": "Më së shumti një superpërdorues",
@@ -1022,7 +1022,7 @@
       "intro": "Mbledhja tani lexon statistikat kryesore të pyetjeve, tabelat, indekset dhe madhësitë një herë dhe i ruan ato si një pamje. Mblidhni të paktën dy herë për të parë ndryshimet dhe tendencat e madhësisë",
       "run": "Mblidh tani",
       "running": "Po mblidhet…",
-      "done": "Mbledhur në {dtm} — {qry} pyetje · {tbl} tabela · {idx} indekse",
+      "done": "Mbledhja u përfundua {dtm}: {qry} kërkesa · {tbl} tabela · {idx} indekse",
       "auto": {
         "title": "Mbledhje automatike",
         "desc": "Kur është aktiv, statistikat e kësaj lidhjeje mblidhen automatikisht çdo ditë në orën 3 të mëngjesit (ora e Koresë). Pas 7 ose më shumë ditësh, mund të mbështeteni te renditja e kërkesave të ngadalta dhe lista e indekseve të papërdorura.",
@@ -1044,13 +1044,13 @@
       "sortCalls": "Thirrjet",
       "empty": "Ende nuk ka pamje. Shtypni Mblidh tani në skedën Mblidh",
       "range": "Ndryshimi midis {from} → {to}",
-      "first": "Pamja e parë në {dtm} — vlera kumulative (ndryshimet nga pamja tjetër)",
+      "first": "Mbledhja e parë {dtm}: Kumulative (rritje/zvogëlim nga mbledhja tjetër)",
       "query": "Pyetje (literale të maskuara)",
       "calls": "Thirrjet",
       "totalMs": "Total ms",
       "meanMs": "Mesatarja ms",
       "rows": "Rreshta",
-      "reset": "Rivendosja e statistikave u zbulua — shfaqet si kumulative",
+      "reset": "U zbulua rivendosja e statistikave: Shfaqet si kumulative",
       "src": "Burimi",
       "srcToggle": "Shfaq ose fsheh detajet e burimit",
       "openSqlLab": "Hap në SQL Tuning",
@@ -1058,7 +1058,7 @@
       "sortMax": "Koha maksimale e ekzekutimit të vetëm",
       "maxMs": "Maksimumi i vetëm ms",
       "diagToggle": "Diagnostikoni Shkakun",
-      "noMax": "Pa vlerë maksimale — {n} artikuj janë nga koleksione më të vjetra pa vlerë maksimale, kështu që ato janë renditur përkohësisht sipas mesatares (jo sipas kohës totale). Mbledhja tani do të popullojë vlerën maksimale."
+      "noMax": "Nuk ka vlerë maksimale: {n} artikuj janë mbledhje të vjetra pa një vlerë maksimale të vetme, kështu që ato renditen përkohësisht sipas mesatares së vetme (jo sipas kohës totale). Vlerat maksimale do të plotësohen me mbledhjen aktuale."
     },
     "health": {
       "empty": "Nuk ka ende pamje. Shtypni Mblidh tani në skedën Mblidh",
@@ -1066,9 +1066,9 @@
       "unusedIdx": "Indekse të papërdorura",
       "unusedIdxHint": "Indekse të papërdorura që nga rivendosja e fundit e statistikave (sipas madhësisë). Mos hiqni indekset PK ose ato me kufizim unik",
       "fullScan": "Skanime të tepërta të plota",
-      "fullScanHint": "Tabelat me 1,000+ rreshta aktivë ku skanimet e plota janë të paktën gjysma — rishikoni indekset në kolonat e filtrit",
+      "fullScanHint": "Tabelat me 1,000+ rreshta efektivë dhe mbi gjysmën e skanimeve të plota: Rishikoni indekset në kolonat e kushteve.",
       "dead": "Tuple të tepërta të vdekura",
-      "deadHint": "Raporti i tupleve të vdekura 20% ose më shumë — kontrolloni cilësimet VACUUM dhe autovacuum",
+      "deadHint": "Raporti i tupleve të vdekur mbi 20%: Rishikoni cilësimet e VACUUM dhe autovacuum.",
       "none": "Asnjë",
       "scans": "skanime"
     },
@@ -1085,7 +1085,7 @@
     },
     "activity": {
       "refresh": "Rifresko",
-      "live": "Kërkesë e drejtpërdrejtë — nuk ruhet",
+      "live": "Kërkesë në kohë reale: Nuk ruhet",
       "sessions": "Aktiviteti i sesionit",
       "locks": "Bllokime",
       "none": "Asnjë"
@@ -1112,7 +1112,7 @@
         "BATCH": "Duket si një grup ose punë e planifikuar. Shpërndani kohët e ekzekutimit larg pikut të biznesit dhe zvogëloni punën për çdo angazhim. Kontrolloni indekset dhe statistikat (ANALYZE) në tabelat e synuara, dhe ndani transaksionet e gjata. Vendosja e emrit të punës në application_name e bën klasifikimin tjetër më të saktë",
         "PROGRAM": "Kjo duket të jetë një pyetje e ekzekutuar nga aplikacioni. Kontrolloni planin e ekzekutimit në akordimin e SQL. Nëse koha maksimale e ekzekutimit të vetëm është e gjatë, shikoni së pari indekset dhe rendin e bashkimit. Nëse një ekzekutim i vetëm është i shkurtër por numri i thirrjeve është i lartë, shikoni thirrjet e përsëritura (N+1) dhe ruajtjen në cache. Vendosni emrin e shërbimit në application_name të grupit të lidhjeve.",
         "PLATFORM": "Duket si punë e brendshme e DB ose platformës si autovacuum ose replikimi. Zakonisht nuk nevojitet asnjë veprim. Nëse qëndron në krye, rishikoni pragjet e autovacuum dhe maintenance_work_mem",
-        "MONITOR": "Kjo është një pyetje vetë-mbledhëse e dbms.pi — lidhja schema.pi është një deklaratë fikse që lexon vetëm pamjet/katalogët statistikorë (pg_stat_*·pg_catalog), kështu që nuk është një pyetje biznesi dhe nuk kërkohet asnjë veprim nga klienti. Nëse ngarkesa e bazës së të dhënave të synuar është problem, zvogëloni numrin e herëve që hapni butonin e mbledhjes/ekranin e monitorimit. Deklaratat nga mjete të tjera monitorimi që lexojnë të njëjtat pamje statistikore grupohen gjithashtu këtu.",
+        "MONITOR": "Kërkesa e mbledhjes së vetë dbms.pi. Lidhja schema.pi lexon vetëm pamjet statistikore dhe katalogët (pg_stat_*, pg_catalog) me deklarata fikse, kështu që nuk është një kërkesë biznesi dhe nuk kërkohet veprim nga klienti. Nëse ngarkesa e bazës së të dhënave të synuar është një problem, zvogëloni frekuencën e hapjes së butonit të mbledhjes ose ekranit të monitorimit. Deklaratat nga mjete të tjera monitorimi që lexojnë të njëjtat pamje statistikore grupohen gjithashtu këtu.",
         "UNKNOWN": "Nuk ka asnjë të dhënë për burimin. Vendosni application_name në çdo lidhje dhe ndani llogaritë sipas qëllimit; do të klasifikohet nga mostrat e ardhshme"
       },
       "detail": {
@@ -1123,7 +1123,7 @@
         "period": "Vëzhguar",
         "none": "(bosh)"
       },
-      "noSample": "Ende nuk ka mostra — sesionet në ekzekutim merren mostra kur shikoni bordin e monitorimit ose skedën Aktivitet & bllokime. Për momentin klasifikohet vetëm nga emri i llogarisë",
+      "noSample": "Nuk ka ende mostra. Sesionet në ekzekutim grumbullohen si mostra kur shihni Bordin e Monitorimit ose skedat Aktivitet/Bllokime. Aktualisht, ato klasifikohen vetëm sipas emrit të llogarisë për referencë.",
       "verOff": "Kjo DB është më e vjetër se PostgreSQL 14, kështu që sesionet në ekzekutim nuk kanë ID kërkese. Shfaqet vetëm llogaria (e sigurt)",
       "privOff": "Llogaria e lidhjes nuk mund të shohë detajet e sesionit të llogarive të tjera, kështu që nuk mblidhen mostra. Kërkoni një administrator DB të ekzekutojë GRANT pg_read_all_stats TO {user};",
       "linkUsr": "llogaria e lidhjes",
@@ -1134,11 +1134,11 @@
     "diag": {
       "title": "Diagnostikoni Shkakun",
       "fix": "Veprimi:",
-      "none": "Asnjë shkak i zbuluar nga statistikat — kontrolloni planin e ekzekutimit në SQL Tuning.",
-      "cum": "Asnjë thirrje në këtë interval — kumulative (që nga rivendosja e statistikave)",
-      "basis": "Baza — Maksimumi 1 herë {max}ms · Mesatarja {mean}ms · Thirrje {calls} · Rreshta për thirrje {rpc} · Raporti i leximit të diskut {read} · Blloqe të përkohshme {tmp}",
+      "none": "Nuk ka shkak të zbuluar nga statistikat. Hapni planin e ekzekutimit në SQL Tuning për të kontrolluar.",
+      "cum": "Nuk ka thirrje në këtë interval: Kumulative (që nga rivendosja e statistikave)",
+      "basis": "Baza: Maksimumi i vetëm {max}ms · Mesatarja {mean}ms · Thirrje {calls} · Rreshta për thirrje {rpc} · Raporti i leximit të diskut {read} · Blloqe të përkohshme {tmp}",
       "SELF_MON": {
-        "cause": "Pyetje vetë-mbledhëse e dbms.pi — deklaratë monitorimi që lexon vetëm pamjet/katalogët statistikorë.",
+        "cause": "Kërkesa e mbledhjes së vetë dbms.pi: Deklaratë monitorimi që lexon vetëm pamjet statistikore dhe katalogët.",
         "fix": "Nuk kërkohet asnjë veprim nga klienti. Nëse ngarkesa e bazës së të dhënave të synuar është problem, zvogëloni numrin e herëve që hapni ekranin e mbledhjes/monitorimit."
       },
       "NO_MAX": {
@@ -1146,31 +1146,31 @@
         "fix": "Klikoni 'Mblidh' një herë tani për të plotësuar vlerat maksimale për diagnozë të saktë."
       },
       "SLOW_EACH": {
-        "cause": "Gjithmonë i Ngadaltë — Zgjat shumë kohë sa herë që ekzekutohet, me maksimum {max}ms dhe mesatare {mean}ms.",
+        "cause": "Ngadalë çdo herë: Merr shumë kohë çdo ekzekutim me maksimum {max}ms dhe mesatare {mean}ms.",
         "fix": "① Hapni planin e ekzekutimit në 'Hap në SQL Tuning'. ② Nëse ka skanime të plota (Seq Scan) ose renditje të mëdha, rishikoni indekset në kolonat e kushteve WHERE/JOIN. ③ Ngushtoni kushtet për të lexuar vetëm kolonat/rreshtat e nevojshëm."
       },
       "SPIKE": {
-        "cause": "Vonesë e Ndërprerë — Mesatarja {mean}ms, por herë pas here zgjat shumë kohë në maksimum {max}ms ({x} herë mesatarja).",
+        "cause": "Vonesë e ndërprerë: Mesatarja {mean}ms, por herë pas here merr shumë kohë me maksimum {max}ms ({x} herë mesatarja).",
         "fix": "① Kur është i ngadaltë, kontrolloni për pritjet e bllokimit (wait_event) në skedën Aktivitet/Bllokime. ② Nëse vetëm ekzekutimi i parë është i ngadaltë, cache ishte bosh dhe disku u lexua. ③ Krahasoni të njëjtën pyetje me vlera të ndryshme në SQL Tuning për të parë nëse plani i ekzekutimit ndryshon bazuar në vlera."
       },
       "DISK_READ": {
-        "cause": "Mungesë Cache — {pct}% ({read} blloqe) të blloqeve të lexuara u lexuan nga disku, jo nga memoria.",
+        "cause": "Mungesë cache: {pct}% ({read} blloqe) të blloqeve të lexuara u lexuan nga disku, jo nga memoria.",
         "fix": "① Zvogëloni diapazonin e leximit me indekse. ② Ngushtoni periudhën/kushtet e pyetjes. ③ Nëse të dhënat e lexuara shpesh mbeten të larta, rishikoni shared_buffers (memoria)."
       },
       "TEMP_SPILL": {
-        "cause": "Mbushje Memorie — Renditja/hash kaloi work_mem dhe shkroi {blk} blloqe (afërsisht {mb}MB, {perCall} blloqe për thirrje) në skedarë të përkohshëm.",
+        "cause": "Mbushje memorie: Renditja/hash-i tejkaloi work_mem dhe shkroi {blk} blloqe (afërsisht {mb}MB, {perCall} blloqe për thirrje) në skedarë të përkohshëm.",
         "fix": "① Vendosja e indekseve në kolonat ORDER BY/GROUP BY anashkalon renditjen. ② Së pari, zvogëloni numrin e rreshtave për t'u renditur (LIMIT brenda). ③ Nëse është absolutisht e nevojshme, rritni SET LOCAL work_mem vetëm për këtë transaksion pyetjeje."
       },
       "MANY_ROWS": {
-        "cause": "Marrje e Tepërt — Merr {perCall} rreshta për thirrje.",
+        "cause": "Kërkesë e tepërt: Merr {perCall} rreshta për thirrje.",
         "fix": "① Listat e ekranit merren faqe pas faqe. ② SELECT zgjedh vetëm kolonat që përdoren. ③ Agregimet kryhen në bazën e të dhënave dhe merren vetëm rezultatet."
       },
       "PGRST_EMBED": {
-        "cause": "Deklaratë e filtrit të integruar PostgREST (!inner) — filtrimi i prindërve sipas kushteve të fëmijëve mund të skanojë të gjithë grupin para kushteve të klasifikimit.",
+        "cause": "Deklaratë e filtrit të integruar të PostgREST (!inner): Filtrimi i prindërve sipas kushteve të fëmijëve mund të skanojë të gjithë tabelën para kushtit të klasifikimit.",
         "fix": "① Kontrolloni nëse ka indekse në çelësat e bashkimit dhe kolonat e filtrit. ② Zhvendosni filtrat në kushtet e tabelës prind. ③ Futni fëmijët në një pyetje prind ekzistuese ose kombinoni ato në një funksion të vetëm të bazës së të dhënave."
       },
       "OFFSET_PAGING": {
-        "cause": "Paginim OFFSET — Bëhet gradualisht më i ngadaltë ndërsa lexon dhe hedh rreshtat paraprakë për faqet e mëvonshme.",
+        "cause": "Paginimi OFFSET: Faqet e mëvonshme lexojnë dhe hedhin rreshtat e mëparshëm, duke u bërë gradualisht më të ngadalta.",
         "fix": "Ndryshoni në paginim keyset (WHERE id > last_id ORDER BY id LIMIT n) i cili lexon nga çelësi pas çelësit të fundit të marrë."
       }
     }
@@ -1203,8 +1203,8 @@
       "toDraft": "Krijo draft pipeline nga {n} të zgjedhura"
     },
     "ready": {
-      "ok": "Replikimi logjik WAL gati — tabelat me një PK mund të përdorin LOGICAL",
-      "no": "Replikimi logjik WAL nuk është gati — kapni përmes polling-ut ose krahasimit të çelësave",
+      "ok": "Replikimi logjik WAL gati: Tabelat me PK mund të përdorin metodën LOGICAL.",
+      "no": "Replikimi logjik WAL nuk është gati: Mblidhni duke përdorur metodën e votimit/krahasimit të çelësave.",
       "senders": "{n} lidhje replikimi"
     },
     "adapter": {
@@ -1219,20 +1219,20 @@
       "HAS_SOFT_DEL": "Ka kolonë të fshirjes së butë",
       "NO_SOFT_DEL": "Nuk ka kolonë të fshirjes së butë",
       "HAS_PK": "Ka çelës primar",
-      "NO_PK": "Nuk ka çelës primar — rreshtat e ndryshuar nuk mund të identifikohen",
+      "NO_PK": "Nuk ka PK: Nuk mund të identifikohen rreshtat e ndryshuar.",
       "DELETE_UNSEEN": "Polling-u nuk mund të kapë DELETE-t fizike (rekomandohet kolona e fshirjes së butë)",
       "LOGICAL_NOT_READY": "Mund të kalojë në LOGICAL pasi të jetë gati replikimi logjik WAL",
-      "FULL_RELOAD_ONLY": "Nuk ka PK ose kolonë të kohës së ndryshimit, kështu që nuk ka kapje inkrementale — shtoni një PK",
+      "FULL_RELOAD_ONLY": "Nuk ka PK/kohë ndryshimi, kështu që mbledhja inkrementale nuk është e mundur: Rekomandohet shtimi i PK.",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level nuk është logjik (ndryshimi i tij kërkon një rinisje të DB-së)",
       "NO_SLOTS": "max_replication_slots është 0",
       "NO_SENDERS": "max_wal_senders është 0",
-      "IS_STANDBY": "Server standby — merrni replikimin logjik nga primari",
+      "IS_STANDBY": "Server standby: Merrni replikimin logjik nga serveri primar.",
       "SETTINGS_UNKNOWN": "Nuk mund të lexoheshin cilësimet, gatishmëria e panjohur"
     },
     "ed": {
       "title": "Përkufizimet e pipeline-it",
-      "draftOnly": "Vetëm dizajn — ruhet si drafte (DRAFT)",
+      "draftOnly": "Vetëm dizajn: Ruaj vetëm si DRAFT.",
       "new": "Pipeline i ri",
       "empty": "Nuk ka pipeline të ruajtura",
       "manual": "Manual",
@@ -1301,8 +1301,8 @@
     },
     "warn": {
       "none": "Nuk ka paralajmërime të rëndësishme.",
-      "SEQ_SCAN_LARGE": "Skanim i plotë në {relation} (rreth {rows} rreshta) — merrni parasysh një indeks në kolonat e filtrit.",
-      "NESTED_LOOP_HIGH": "Cikli i ndërthurur prodhon rreth {rows} rreshta — merrni parasysh një bashkim hash ose merge, ose një indeks në kushtin e bashkimit.",
+      "SEQ_SCAN_LARGE": "Tabela {relation} po kryen një skanim të plotë (rreshta të vlerësuar {rows}): Rishikoni indekset në kolonat e kushteve.",
+      "NESTED_LOOP_HIGH": "Rezultati i ciklit të folezuar është një vlerësim prej {rows} rreshtash. Rishikoni bashkimet hash/merge ose indekset në kushtet e bashkimit.",
       "SORT_SPILL": "Madhësia e renditjes është rreth {kb}KB, mbi work_mem-in e paracaktuar (4MB); mund të derdhet në disk."
     },
     "lint": {
@@ -1316,14 +1316,14 @@
         "char": "karakter"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — zgjidhni vetëm kolonat që ju nevojiten (I/O shtesë, pa indeks mbulues).",
-        "FUNC_ON_COLUMN": "Kolona e filtrit {column} është e mbështjellë në një funksion ose shprehje, kështu që indeksi i saj nuk mund të përdoret — transformoni konstanten në vend të kësaj.",
-        "LEADING_WILDCARD": "LIKE me një % kryesor nuk mund të përdorë një indeks B-tree — merrni parasysh një indeks pg_trgm GIN.",
-        "OR_DIFF_COLUMNS": "Kushtet OR në kolona të ndryshme — merrni parasysh ndarjen me UNION (shtoni një kusht përjashtimi të dublikatës nëse UNION ALL) ose rishikoni indekset për kolonë.",
-        "IMPLICIT_CAST": "{column} krahasohet me një numër të cituar — përputhni llojet e kolonës dhe konstantes (konvertim i nënkuptuar).",
-        "NOT_IN_SUBQUERY": "NOT IN (subquery) nuk kthen asgjë kur ka NULL dhe është i ngadalshëm — përdorni NOT EXISTS.",
-        "NO_WHERE": "Nuk ka klauzolë WHERE — në një tabelë të madhe ky është një skanim i plotë (shtoni një kusht ose LIMIT).",
-        "DOMAIN_MISMATCH": "{column} është një tip {expected} sipas domenit standard, por krahasohet me një konstante të një tipi tjetër — konvertimi i nënkuptuar mund të parandalojë përdorimin e indeksit."
+        "SELECT_STAR": "SELECT *: Zgjidhni vetëm kolonat e nevojshme (I/O i panevojshëm, indeksi mbulues nuk është i mundur).",
+        "FUNC_ON_COLUMN": "Kolona e kushtit {column} përpunohet nga një funksion/operacion, kështu që indekset nuk mund të përdoren. Përpunoni anën konstante.",
+        "LEADING_WILDCARD": "LIKE me një % në fillim nuk mund të përdorë një indeks B-tree. Rishikoni indekset pg_trgm GIN.",
+        "OR_DIFF_COLUMNS": "Kushtet e ndryshme të kolonave grupohen me OR. Rishikoni ndarjen UNION (shtoni kushtin e përjashtimit të dublikatave nëse UNION ALL) ose indekset për kolonë.",
+        "IMPLICIT_CAST": "{column} krahasohet me një numër të cituar. Përputhni tipin e kolonës dhe tipin konstant (konvertim i tipit implicit).",
+        "NOT_IN_SUBQUERY": "NOT IN (subquery) mund të jetë bosh dhe i ngadaltë nëse NULL-at janë të përzier. Ndryshoni në NOT EXISTS.",
+        "NO_WHERE": "Nuk ka kusht WHERE. Nëse është një tabelë e madhe, është një skanim i plotë (shtoni LIMIT ose kushte).",
+        "DOMAIN_MISMATCH": "{column} është i tipit {expected} sipas domenit standard, por krahasohet me një konstante të një tipi tjetër. Konvertimi i tipit implicit mund të parandalojë përdorimin e indeksit."
       }
     },
     "saved": {
@@ -1349,12 +1349,12 @@
     },
     "ai": {
       "title": "Këshilla për optimizim me AI",
-      "intro": "Zgjidhni një plan të ruajtur për të gjeneruar këshilla. Dërgohen vetëm SQL dhe planet me konstante të maskuara si ? (këshilla të bazuara në rregulla nëse nuk ka çelës ose në rast dështimi). Pasi pronari i lidhjes të miratojë, ri-ekzekutoni shpjegimin për të njëjtin SQL, ruajeni atë dhe matni ndikimin me atë plan të mëvonshëm — vetëm atëherë regjistrohet si i aplikuar.",
+      "intro": "Zgjidhni një plan të ruajtur për të gjeneruar këshilla. Dërgohen vetëm SQL dhe planet me konstante të maskuara si ? (këshilla të bazuara në rregulla nëse nuk ka çelës ose në rast dështimi). Pasi pronari i lidhjes të miratojë, ri-ekzekutoni shpjegimin për të njëjtin SQL, ruajeni atë dhe matni ndikimin me atë plan të mëvonshëm : vetëm atëherë regjistrohet si i aplikuar.",
       "pickPlan": "Zgjidhni një plan të ruajtur për këshilla",
       "create": "Gjenero këshilla",
       "creating": "Po gjenerohet… (deri në 30 s)",
       "noPlans": "Nuk ka plane të ruajtura. Shikoni një plan shpjegimi më lart dhe ruajeni atë.",
-      "note": "Një këshillë për plan. Fshini këshillën ekzistuese për të rigjeneruar. DDL vetëm sugjerohet — aplikojeni në schema.pi.",
+      "note": "Një këshillë për plan. Fshini këshillën ekzistuese për të rigjeneruar. DDL vetëm sugjerohet : aplikojeni në schema.pi.",
       "empty": "Ende nuk ka këshilla.",
       "noItems": "Nuk u gjetën përmirësime për këtë plan.",
       "cost": "Kostoja e mëparshme",
@@ -1396,10 +1396,10 @@
       "copy": "Kopjo",
       "copied": "Kopjuar",
       "rule": {
-        "SEQ_SCAN_INDEX": "Skanim i plotë i {relation} — krijoni një indeks në kolonën e filtrit {column} (zëvendësoni NN në emrin e indeksit me një numër rendor).",
-        "SEQ_SCAN_STATS": "Skanim i plotë i {relation} — kontrolloni kolonat e filtrit dhe sigurohuni që statistikat (ANALYZE) janë aktuale.",
-        "NESTED_LOOP": "Cikli i folezuar pret {rows} rreshta — rifreskoni statistikat dhe merrni parasysh indekset e çelësave të bashkimit ose një bashkim hash.",
-        "SORT_SPILL": "Renditja prej rreth {kb} KB mund të derdhet në disk — merrni parasysh rritjen e work_mem të sesionit ose indeksimin e kolonave të renditjes.",
+        "SEQ_SCAN_INDEX": "Skanim i plotë {relation}: Krijoni një indeks në kolonën e kushtit {column} (emri i indeksit NN do të zëvendësohet nga një numër sekuence).",
+        "SEQ_SCAN_STATS": "Skanim i plotë {relation}: Kontrolloni kolonat e kushteve dhe sigurohuni që statistikat (ANALYZE) janë të përditësuara.",
+        "NESTED_LOOP": "Rezultati i ciklit të folezuar është një vlerësim prej {rows} rreshtash: Përditësoni statistikat dhe rishikoni indekset e kushteve të bashkimit ose bashkimet hash.",
+        "SORT_SPILL": "Renditja mund të derdhet në disk me afërsisht {kb}KB. Rishikoni rritjen e work_mem të sesionit ose indekset në kolonat e renditjes.",
         "SELECT_STAR": "Zgjidhni vetëm kolonat që ju nevojiten në vend të SELECT * (më pak I/O, indekse mbuluese të mundshme).",
         "FUNC_ON_COLUMN": "Zhvendosni funksionin/shprehjen në kolonën e filtrit {column} në anën konstante (mundëson përdorimin e indeksit).",
         "IMPLICIT_CAST": "Përputhni tipet e {column} dhe konstantes (hiqni konvertimin implicit).",
@@ -1459,9 +1459,9 @@
     },
     "desc": {
       "FREE": "Eksploro & Mëso",
-      "D1": "Operatori — Kontrollon nëse baza e të dhënave është në rregull tani",
-      "D2": "Zhvilluesi & Akorduesi — Rregullon SQL-in e ngadaltë",
-      "D3": "DBA & DA — Nga siguria operacionale te zbatimi dhe liqeni"
+      "D1": "Operatori: Kontrollon nëse baza e të dhënave është e shëndetshme tani.",
+      "D2": "Zhvilluesi/Akorduesi: Rregullon SQL-in e ngadaltë.",
+      "D3": "DBA/DA: Siguria operacionale, migrimi, dhe madje edhe data lake."
     },
     "feat": {
       "FREE": "Paneli i monitorimit, pamja e planit të ekzekutimit, mësimi bazë",
@@ -1504,7 +1504,7 @@
       "required": "Ky funksion është i disponueshëm nga plani {plan}.",
       "limit": "Keni përdorur të gjitha tentativat e disponueshme për këtë periudhë. Mund të përdorni më shumë duke përmirësuar në planin {plan}.",
       "limitTop": "Keni përdorur të gjitha tentativat e disponueshme për këtë periudhë. Mund ta përdorni përsëri në periudhën tjetër.",
-      "expired": "Plani juaj schema.pi ka skaduar — ju lutemi bëni një pagesë në ekranin e planit schema.pi.",
+      "expired": "Plani juaj schema.pi ka skaduar. Ju lutemi paguani në ekranin e planit schema.pi.",
       "go": "Shiko Planin",
       "close": "Mbyll"
     }

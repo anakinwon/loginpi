@@ -170,7 +170,7 @@
     }
   },
   "drift": {
-    "title": "GAP分析 — 模型↔DB",
+    "title": "GAP分析：模型↔DB",
     "intro": "将 schema.pi 设计模型和 DDL 应用历史与实时 DB 目录进行比较，以查找漂移，并测量设计的索引是否实际使用。绝不读取或存储客户行数据。",
     "needLink": "请先在上方选择一个 schema.pi 链接。如果没有，请在“链接”菜单中注册一个令牌。",
     "needConn": "请在上方选择要比较的 DB 连接。",
@@ -188,7 +188,7 @@
     "model": "模型",
     "reqNo": "请求 {id}",
     "notSaved": "无法将此运行保存到历史记录（结果正常显示）。",
-    "capped": "项目过多 — 每部分显示前 {cap} 个（计数完整）。",
+    "capped": "项目过多 : 每部分显示前 {cap} 个（计数完整）。",
     "statsMissing": "索引使用统计信息不可用，因此无法判断使用情况。",
     "sum": {
       "missingTables": "DB 中缺失的表",
@@ -230,7 +230,7 @@
       "USED": "使用中",
       "NO_STATS": "无统计信息",
       "CONSTRAINT": "用于保证唯一性（非删除对象）",
-      "NO_DATA": "无数据或未收集统计信息 — 无法判断",
+      "NO_DATA": "无数据或未收集统计信息：无法判断",
       "OBSERVING": "观察中（不足7天）",
       "UNUSED_CAND": "未使用的候选"
     },
@@ -245,14 +245,14 @@
       "RATE": "请求过多。请在一分钟后重试。"
     },
     "schema": "模式",
-    "schemaHint": "仅比较此模式下的常规表和分区表（视图除外）。默认public — Supabase内部模式（auth、storage等）不包括在内。",
-    "truncated": "{names} 查询达到 {max} 行上限并被截断 — 部分“不在DB中”·“不在模型中”的判断可能是误报。请缩小模式范围并重新检测。",
+    "schemaHint": "仅对比此模式的普通表和分区表（视图除外）。默认 public：不包含 Supabase 内部模式（auth·storage 等）。",
+    "truncated": "{names} 查询达到 {max} 行上限，已被截断。部分“DB 中不存在”·“模型中不存在”的判断可能是误报。请缩小模式范围后重新检测。",
     "colUnchecked": "由于列查询被截断，缺失·额外列 {n} 项被视为无法验证，并从列不匹配计数中排除。",
-    "renamed": "旧命名规则（_PKEY）应用的PK索引 {n} 项在DB中以新名称（PK_）存在 — 正常",
-    "superseded": "旧请求 {n} 项被排除，因为后来的请求重新创建了相同的表（DROP … CASCADE） — 正常",
+    "renamed": "DB 中有 {n} 个以旧命名规则 (_PKEY) 应用的 PK 索引，已更改为新名称 (PK_)。正常",
+    "superseded": "之前的 {n} 个请求已被排除在对比之外，因为后续请求重新创建了相同的表 (DROP … CASCADE)。正常",
     "supersededItem": "请求 {id} → 被请求 {by} 替代",
     "sysCols": "系统列（DDL生成时自动添加） {n} 项在模型中不存在是正常的，因此从不匹配中排除",
-    "groupOwn": "此项目前缀 {pfx} — 模型中缺失的候选",
+    "groupOwn": "此项目前缀 {pfx}：模型缺失候选",
     "groupOther": "其他系统 {pfx}",
     "basis": "预计行数 {rows} · 截至 {since}",
     "guide": {
@@ -263,8 +263,8 @@
         "s3": "如果重新应用后仍然消失，请怀疑是手动删除或回滚，并与您的DBA确认此连接账户的操作历史。"
       },
       "extraTables": {
-        "s1": "此项目前缀包 = 缺失模型候选 — schema.pi → 设置 → 反向导入到模型中，如果是不使用的表，请决定是否删除。",
-        "s2": "其他前缀组 = 使用相同DB的其他系统 — 不属于此项目的操作项。",
+        "s1": "此项目前缀组 = 模型缺失候选：请通过 schema.pi → 设置 → 反向导入到模型中，或者如果是不使用的表，请决定是否删除。",
+        "s2": "其他前缀组 = 使用相同 DB 的其他系统：不属于此项目的处理范围。",
         "s3": "如果目标模式不是public，请更改上方“模式”字段并重新检测。"
       },
       "colMismatches": {
@@ -273,7 +273,7 @@
         "s3": "类型·NULL不同 = 以模型（真相来源）为准进行对齐，但在缩短长度或转换为NOT NULL之前，请先确认现有行满足条件。"
       },
       "idxUsage": {
-        "s1": "删除前确认 ① 统计收集期间是否覆盖至少一个业务周期（例如月末批处理） — 请查看“截至”。",
+        "s1": "删除前确认 ① 统计信息收集周期是否超过一个运营周期（月末批处理等）：请查看基准日期。",
         "s2": "② 是否不是唯一性保证·PK索引（如果是，则判断会单独显示为“用于保证唯一性”）。",
         "s3": "③ 在SQL Tuning中EXPLAIN该表的代表性SQL，确认此索引未被使用。",
         "s4": "确认以上三点后，在schema.pi中删除模型索引并通过DDL反映。"
@@ -354,7 +354,7 @@
     "howTitle": "如何颁发连接令牌",
     "how1": "登录 schema.pi 并打开要连接的主题区域",
     "how2": "转到“主题区域”→“设置”→“连接令牌”并按“颁发令牌”（区域管理员或 DA 角色）",
-    "how3": "复制以 slk_ 开头的令牌 — 它在颁发时只显示一次",
+    "how3": "复制以 slk_ 开头的已颁发令牌。原文仅在颁发时显示一次",
     "how4": "将其粘贴到下方并注册",
     "openSchema": "打开 schema.pi",
     "registerTitle": "注册连接",
@@ -384,7 +384,7 @@
     "retry": "重试",
     "pickerLink": "链接",
     "pickerConn": "连接",
-    "pickerEmpty": "无连接 —",
+    "pickerEmpty": "无连接。",
     "pickerGo": "在 /connect 注册一个",
     "errors": {
       "LINK_AUTH": "连接令牌已过期或已撤销。请在 schema.pi 中颁发新令牌并重新注册",
@@ -404,7 +404,7 @@
   },
   "migration": {
     "title": "数据迁移 (PiMig)",
-    "intro": "根据 schema.pi 设计模型中的关系计算表加载顺序，组织分块大小、并行度和切换清单，并生成您在源和目标上自行运行的验证 SQL。此屏幕仅用于规划和检查 — 它不移动数据或读取客户 DB 行。",
+    "intro": "根据 schema.pi 设计模型中的关系计算表加载顺序，组织分块大小、并行度和切换清单，并生成您在源和目标上自行运行的验证 SQL。此屏幕仅用于规划和检查 : 它不移动数据或读取客户 DB 行。",
     "needLink": "请先在上方选择一个 schema.pi 链接。如果没有，请在“连接”菜单下注册一个令牌。",
     "loading": "加载中…",
     "newPlan": "新迁移计划",
@@ -432,8 +432,8 @@
     "optsHint": "并行度是同一级别中同时加载的表数量。块大小是执行引擎将使用的提交单位（行）。",
     "order": "加载顺序",
     "orderHint": "按设计关系（非物理外键）进行拓扑排序，因此父表优先。同一级别的表之间不相互依赖，可以并行加载。",
-    "cycles": "{n}个循环组 — 放置在同一级别。手动设置它们的顺序，并将引用检查推迟到加载之后。",
-    "selfRefs": "自引用（分层）表 — 在表内优先加载父行",
+    "cycles": "循环关系 {n} 组：已置于同一阶段。请手动确定加载顺序，并将参照检查推迟到加载之后。",
+    "selfRefs": "自参照（层次）表：同一表内父行优先",
     "level": "级别 {n}",
     "checklist": "切换清单",
     "toReady": "标记为准备就绪",
@@ -471,7 +471,7 @@
     },
     "verify": "验证SQL",
     "verifyHint": "按加载顺序为每个表生成计数、数字列总和、重复键和键哈希查询。在源和目标上自行运行它们并进行比较（此屏幕不执行它们）。",
-    "noHashOracle": "Oracle·Tibero 的哈希函数和文本渲染与PostgreSQL不同，因此省略了哈希查询 — 请比较计数、总和和重复键。",
+    "noHashOracle": "Oracle·Tibero 的哈希函数·字符表示与 PostgreSQL 不同，因此省略哈希查询。请通过行数·总和·键重复进行对比。",
     "copy": "复制",
     "copied": "已复制",
     "copyFail": "无法复制。请选择文本并手动复制。",
@@ -549,7 +549,7 @@
       "INVALID_INPUT": "请求无效。"
     },
     "board": {
-      "subtitle": "此 DB 当前需要做什么 — 14 个信号的正常、警告、风险和解决方案一目了然。",
+      "subtitle": "此 DB 当前需要做什么：一目了然地查看 14 个信号的正常·注意·危险状态及解决方案。",
       "refresh": {
         "updated": "截至 {time} · 每分钟刷新",
         "now": "立即刷新",
@@ -564,11 +564,11 @@
         "NA": "不适用"
       },
       "overall": {
-        "RISK": "风险 — 需立即采取行动",
-        "WARN": "警告 — 某些项目需要关注",
-        "UNKNOWN": "未知 — 检查连接",
-        "OK": "正常 — 所有信号都在限制范围内",
-        "CONN_DOWN": "无法连接到 DB — 请先检查连接",
+        "RISK": "危险：需要立即采取措施",
+        "WARN": "注意：有需要查看的项目",
+        "UNKNOWN": "无法确认：请检查连接状态",
+        "OK": "正常：所有信号都在标准范围内",
+        "CONN_DOWN": "无法连接到 DB。请先检查连接。",
         "NA": "不适用"
       },
       "kpi": {
@@ -583,7 +583,7 @@
         "less": "显示更少",
         "setup": "设置这些以查看更多",
         "none": "目前没有需要处理的风险或警告项。",
-        "unknown": "无法检查 {n} 个信号 — 请查看卡片了解原因。",
+        "unknown": "无法确认 {n} 项：请在卡片中查看原因。",
         "myRule": "我的规则违规：{rule}",
         "copySql": "复制 SQL",
         "copied": "已复制"
@@ -622,34 +622,34 @@
         "REPL": "复制延迟"
       },
       "fix": {
-        "AVAIL": "响应缓慢或刚刚重启 — 请检查连接设置和DB服务器状态。",
-        "AVAIL_DOWN": "无法连接到DB — 请检查连接设置和DB服务器是否正常运行。",
-        "CONN_USE": "此DB会话 {sess}/{max} 个（非集群范围 — 其他DB连接已排除） — 请关闭空闲连接或添加连接池（pgbouncer）。",
-        "URL": "{n} 个已检查的 URL 失败 · 最大响应 {ms}ms — 请查看 schema.pi 监控以了解原因。",
-        "LONG_QRY": "一个查询已运行 {sec} 秒 — 请查看其计划并进行优化，或让 DBA 取消它。",
-        "IDLE_TX": "一个事务已空闲 {sec} 秒 — 请在应用程序中查找缺失的提交并设置超时。",
-        "LOCK_WAIT": "{n} 个会话正在等待锁 — 请查找阻塞会话并结束其事务。",
-        "CACHE_HIT": "缓存命中率 {pct}% — 请查找大型表的完全扫描或检查 shared_buffers。",
-        "XACT_ERR": "回滚率 {pct}%，{dlck} 个死锁 — 请检查失败的事务和应用程序错误日志。",
-        "SLOW_SQL": "有查询单次最高耗时 {ms}ms — 请从单次最高耗时排名靠前的查询开始，查看执行计划并进行调优。",
-        "STORAGE": "DB {gb}GB 接近上限（剩余天数 {days}） — 请清理大表或增加容量。",
-        "VACUUM": "{tbl} 有许多死行或过时的统计信息 — 请检查 VACUUM (ANALYZE) 和 autovacuum 设置。",
-        "INDEX": "{n} 个索引发现（无效、未使用、完全扫描）— 请查看表和索引健康状况选项卡以了解目标。",
-        "BACKUP": "WAL 归档已关闭或停滞 — 请检查 archive_mode、archive_command 和备份状态。",
-        "REPL": "复制延迟 {sec} 秒 — 请检查备用服务器状态和网络。",
-        "PGSS": "未安装 pg_stat_statements 扩展，因此无法查看慢速 SQL — 请使用以下 SQL 启用它（需要重启服务器）。"
+        "AVAIL": "响应缓慢或刚重启。请检查连接信息和 DB 服务器状态。",
+        "AVAIL_DOWN": "未能连接到 DB。请检查连接信息和 DB 服务器是否正常运行。",
+        "CONN_USE": "此 DB 会话 {sess}/{max} 个（非整个集群，不包含其他 DB 连接）：请清理空闲连接或设置连接池 (pgbouncer)。",
+        "URL": "{n} 个检查 URL 失败 · 最大响应 {ms}ms：请在 schema.pi 监控中查看原因。",
+        "LONG_QRY": "有查询已运行 {sec} 秒。请查看执行计划进行调优或由 DBA 中断。",
+        "IDLE_TX": "事务已打开并停止 {sec} 秒。请查找应用程序中缺失的提交并设置超时。",
+        "LOCK_WAIT": "有 {n} 个会话正在等待锁：请找到阻塞会话并结束其事务。",
+        "CACHE_HIT": "缓存命中率 {pct}%：请查找大表的完整读取或审查 shared_buffers。",
+        "XACT_ERR": "回滚率 {pct}%，死锁 {dlck} 次：请检查失败的事务和应用程序错误日志。",
+        "SLOW_SQL": "有查询单次最高 {ms}ms。请从单次最高时间排名前列的查询开始，查看执行计划并进行调优。",
+        "STORAGE": "DB {gb}GB 接近上限（剩余 {days} 天）。请清理大表或增加容量。",
+        "VACUUM": "{tbl} 中死行过多或统计信息过旧。请审查 VACUUM(ANALYZE)·autovacuum 设置。",
+        "INDEX": "索引检查 {n} 项（无效·未使用·完整读取）：请在表·索引健康选项卡中查看目标。",
+        "BACKUP": "WAL 归档已关闭或停止。请检查 archive_mode·archive_command 和备份状态。",
+        "REPL": "复制延迟 {sec} 秒：请检查备用服务器状态和网络。",
+        "PGSS": "缺少 pg_stat_statements 扩展，无法查看慢速 SQL。请使用以下 SQL 开启（需要重启服务器）。"
       },
       "reason": {
         "CONN_DOWN": "由于DB连接中断，未进行判断。",
         "PGSS": "未安装 pg_stat_statements。",
         "VER": "仅适用于 PostgreSQL 13 或更高版本。",
         "SAMPLE": "样本不足，暂不判断。",
-        "NO_LIMIT": "无容量上限，因此不判断使用率 — 添加DB大小（MB）规则（>）即可用作上限。",
+        "NO_LIMIT": "无容量限制，不判断使用率。添加 DB 大小 (MB) 规则 (>) 后将作为限制使用。",
         "RESET": "统计信息重置不足 7 天，因此不判断未使用的索引。",
         "STALE": "没有最近的检查记录。",
         "STANDBY": "不适用于备用服务器。",
         "NONE": "没有可检查的对象。",
-        "GRANT": "缺少权限 — 请授予连接帐户 pg_monitor 角色。",
+        "GRANT": "无权限查看。请为连接账户授予 pg_monitor 角色。",
         "LINK": "schema.pi 查询失败 ({code})"
       },
       "steps": {
@@ -724,7 +724,7 @@
           "3": "如果未进行流式传输，请检查备用服务器日志。"
         }
       },
-      "sqlNote": "以下 SQL 仅用于只读检查 — 修复（VACUUM、DROP INDEX、pg_terminate_backend）由 DBA 执行。",
+      "sqlNote": "以下 SQL 仅用于只读检查。操作（VACUUM·DROP INDEX·pg_terminate_backend）由 DBA 直接执行。",
       "go": {
         "activity": "活动与锁",
         "top": "慢速查询",
@@ -766,8 +766,8 @@
           "tree": "什么占用了空间，什么需要清理？"
         },
         "asTable": "以表格形式查看",
-        "needHistory": "尚无趋势 — 请保持此屏幕打开几分钟。",
-        "needPerf": "无大小历史记录 — 请在性能选项卡中收集或保持此屏幕打开。",
+        "needHistory": "暂无趋势。保持此屏幕打开几分钟即可绘制。",
+        "needPerf": "无容量历史记录。请在性能选项卡中收集或保持此屏幕打开。",
         "noSess": "无会话。",
         "noWait": "无等待",
         "noData": "无数据显示。",
@@ -840,17 +840,17 @@
         "noStat": "无统计数据"
       },
       "empty": {
-        "noConn": "此分类法没有要监控的 PostgreSQL 服务器连接 — 仅显示 URL 和服务状态。",
+        "noConn": "此分类体系中没有要监控的 PostgreSQL 服务器连接。仅查看 URL·联动状态。",
         "unsupported": "此连接不支持监控（仅限 PostgreSQL 服务器连接）。",
-        "connFail": "无法连接到 DB — 请检查连接信息和 DB 状态。",
-        "linkDown": "无法连接到 schema.pi — 正在自动重试。",
-        "linkAuth": "连接令牌已过期 — 请在 schema.pi 中重新颁发令牌并注册。",
-        "timeout": "响应缓慢 — 正在自动重试。",
+        "connFail": "未能连接到 DB。请检查连接信息和 DB 状态。",
+        "linkDown": "未能连接到 schema.pi。稍后将自动重试。",
+        "linkAuth": "连接令牌已过期。请在 schema.pi 中重新颁发令牌并注册。",
+        "timeout": "响应缓慢。稍后将自动重试。",
         "rate": "请求过多，因此刷新间隔已增加。"
       },
       "aux": {
         "rules": "我的警报规则（{n} 个活动）",
-        "schemaSvc": "服务状态 — schema.pi 响应",
+        "schemaSvc": "联动状态：schema.pi 服务响应",
         "schemaSvcNote": "schema.pi 存储的最近 60 分钟应用程序指标。",
         "source": "数据来源：目标DB仅通过schema.pi的命名查询（只读）读取，趋势仅在dbms.pi中存储统计数据（不存储行数据）。"
       }
@@ -866,10 +866,10 @@
     "noRun": "暂无诊断记录。请按“运行诊断”",
     "lastRun": "上次诊断 {dtm}",
     "readOnly": "诊断只读取（SELECT）。建议仅供参考，并取决于服务器内存、负载和工作负载",
-    "truncated": "对象过多 — 仅检查了前500个",
+    "truncated": "对象过多 : 仅检查了前500个",
     "paramsNote": "服务器总内存未知，因此根据shared_buffers ≈ 25% RAM的惯例进行估算。random_page_cost 假设为SSD",
     "auditNote": "当连接查询支持时，将检查RLS关闭的表和未使用的账户",
-    "replNote": "基线是Active-Standby（A-S）— 一个主库 + 备库。重放延迟 ≥ 5秒 = 警告，≥ 60秒 = 风险（测量的RPO参考）",
+    "replNote": "主要标准是 Active-Standby (A-S)：1 个 Primary + 1 个 Standby。replay 延迟 5 秒以上警告，60 秒以上危险（RPO 实测参考值）",
     "lagIdle": "无更改",
     "pager": "分页",
     "prev": "上一页",
@@ -1022,7 +1022,7 @@
       "intro": "立即收集会一次性读取顶部查询统计信息、表、索引和大小，并将其存储为快照。至少收集两次才能查看更改和大小趋势",
       "run": "立即收集",
       "running": "正在收集…",
-      "done": "已于 {dtm} 收集 — {qry}个查询 · {tbl}个表 · {idx}个索引",
+      "done": "{dtm} 收集完成：查询 {qry} 条 · 表 {tbl} 个 · 索引 {idx} 个",
       "auto": {
         "title": "自动收集",
         "desc": "开启后，此连接的统计信息将每天凌晨 3 点（韩国时间）自动收集。数据积累 7 天以上后，您可以查看慢查询排名和未使用的索引列表。",
@@ -1044,13 +1044,13 @@
       "sortCalls": "调用次数",
       "empty": "暂无快照。请在“收集”选项卡上点击“立即收集”",
       "range": "{from} → {to} 之间的变化",
-      "first": "首次快照于 {dtm} — 累积值（从下一个快照开始变化）",
+      "first": "{dtm} 首次收集：为累计值（下次收集开始显示增减）",
       "query": "查询（字面量已屏蔽）",
       "calls": "调用次数",
       "totalMs": "总毫秒",
       "meanMs": "平均毫秒",
       "rows": "行",
-      "reset": "检测到统计信息重置 — 显示为累计值",
+      "reset": "检测到统计信息初始化：显示为累计值",
       "src": "来源",
       "srcToggle": "显示·隐藏来源详情",
       "openSqlLab": "在SQL Tuning中打开",
@@ -1058,7 +1058,7 @@
       "sortMax": "单次最高执行时间",
       "maxMs": "单次最高 ms",
       "diagToggle": "诊断原因",
-      "noMax": "无最高值 — {n}个旧收集项没有最高值，因此暂时按平均值排序（而非总时间）。现在收集将填充最高值。"
+      "noMax": "无最高值：{n} 项是旧的收集数据，没有最高单次值，因此暂时按单次平均值排序（非总时间顺序）。现在收集即可填充最高值"
     },
     "health": {
       "empty": "暂无快照。请在“收集”选项卡上点击“立即收集”",
@@ -1066,9 +1066,9 @@
       "unusedIdx": "未使用的索引",
       "unusedIdxHint": "自上次统计信息重置以来从未使用的索引（按大小）。请勿删除主键或唯一约束索引",
       "fullScan": "全表扫描过多",
-      "fullScanHint": "活动行数超过 1,000 且全表扫描至少占一半的表 — 请检查过滤列上的索引",
+      "fullScanHint": "有效行数 1,000 行以上且全表扫描超过一半的表：请审查条件列索引",
       "dead": "死元组过多",
-      "deadHint": "死元组比率达到或超过 20% — 请检查 VACUUM 和 autovacuum 设置",
+      "deadHint": "死元组比例 20% 以上：请检查 VACUUM·autovacuum 设置",
       "none": "无",
       "scans": "次扫描"
     },
@@ -1085,7 +1085,7 @@
     },
     "activity": {
       "refresh": "刷新",
-      "live": "实时查询 — 不存储",
+      "live": "实时查询：不保存",
       "sessions": "会话活动",
       "locks": "锁",
       "none": "无"
@@ -1112,7 +1112,7 @@
         "BATCH": "看起来是批处理·计划任务。请避开业务高峰期分散执行时间，并减少每次提交的工作量。检查目标表的索引和统计信息（ANALYZE），并拆分长事务。在application_name中放入任务名称将使下次分类更精确。",
         "PROGRAM": "这似乎是应用程序执行的查询。请在 SQL 调优中检查执行计划。如果单次最高耗时较长，请优先查看索引和连接顺序；如果单次耗时较短但调用次数很多，请查看重复调用 (N+1) 和缓存。请在连接池的 application_name 中设置服务名称。",
         "PLATFORM": "看起来是autovacuum·复制等DB·平台内部工作。通常无需采取措施。如果持续排在前面，请审查autovacuum阈值和maintenance_work_mem。",
-        "MONITOR": "这是 dbms.pi 自收集查询 — schema.pi 连接是只读取统计视图/目录（pg_stat_*·pg_catalog）的固定语句，不是业务查询，无需客户操作。如果目标数据库负载有问题，请减少打开收集按钮/监控屏幕的次数。其他监控工具读取相同统计视图的语句也会归入此处。",
+        "MONITOR": "dbms.pi 自身收集查询。schema.pi 连接只读取统计视图·目录 (pg_stat_*·pg_catalog) 的固定语句，并非业务查询，客户无需采取措施。如果目标数据库负载有问题，请减少打开收集按钮·监控屏幕的次数。其他监控工具读取相同统计视图的语句也归入此处",
         "UNKNOWN": "没有线索可以识别来源。请为所有连接设置application_name，并按用途划分账户，下次采样时将进行分类。"
       },
       "detail": {
@@ -1123,7 +1123,7 @@
         "period": "观察期间",
         "none": "(空值)"
       },
-      "noSample": "暂无样本 — 在查看监控面板或活动·锁选项卡时，正在运行的会话会被采样。目前仅根据账户名称进行参考分类。",
+      "noSample": "暂无样本。查看监控面板或活动·锁选项卡时，正在运行的会话将作为样本累积。目前仅按账户名称进行参考分类",
       "verOff": "此DB版本低于PostgreSQL 14，因此正在运行的会话没有查询ID。仅显示账户（确定）。",
       "privOff": "连接账户无权查看其他账户的会话详情，因此未收集样本。请DB管理员执行 GRANT pg_read_all_stats TO {user};",
       "linkUsr": "连接账户",
@@ -1134,11 +1134,11 @@
     "diag": {
       "title": "诊断原因",
       "fix": "措施：",
-      "none": "统计数据未显示原因 — 请在 SQL 调优中打开执行计划进行确认",
-      "cum": "此区间无调用 — 基于累计（自统计重置后）",
-      "basis": "依据 — 最高1次 {max}ms · 平均 {mean}ms · 调用 {calls}次 · 每次行数 {rpc} · 磁盘读取率 {read} · 临时块 {tmp}",
+      "none": "统计信息未显示原因。请在 SQL 调优中打开执行计划进行确认",
+      "cum": "此区间无调用：累计（自统计信息重置后）基准",
+      "basis": "依据：单次最高 {max}ms · 平均 {mean}ms · 调用 {calls} 次 · 每次行数 {rpc} · 磁盘读取比例 {read} · 临时块 {tmp}",
       "SELF_MON": {
-        "cause": "dbms.pi 自身收集查询 — 仅读取统计视图·目录的监控语句",
+        "cause": "dbms.pi 自身收集查询：只读取统计视图·目录的监控语句",
         "fix": "客户无需采取任何措施。如果目标数据库负载有问题，请减少收集/监控屏幕的查询次数。"
       },
       "NO_MAX": {
@@ -1146,31 +1146,31 @@
         "fix": "现在点击一次收集，最高值将被填充，诊断将更准确"
       },
       "SLOW_EACH": {
-        "cause": "每次都慢 — 最高 {max}ms，平均 {mean}ms，每次执行都耗时较长",
+        "cause": "每次都慢：每次执行都耗时较长，最高 {max}ms，平均 {mean}ms",
         "fix": "① 通过“在 SQL 调优中打开”查看执行计划 ② 如果有全表扫描（Seq Scan）·大排序，请检查 WHERE·JOIN 条件列索引 ③ 缩小条件，只读取必要的列·行"
       },
       "SPIKE": {
-        "cause": "间歇性延迟 — 平均 {mean}ms，但最高 {max}ms（平均的 {x}倍），偶尔耗时较长",
+        "cause": "间歇性延迟：平均 {mean}ms，但偶尔最高 {max}ms（平均值的 {x} 倍），耗时较长",
         "fix": "① 慢时在活动·锁标签中确认锁等待（wait_event） ② 如果只有第一次执行慢，可能是缓存为空，读取了磁盘 ③ 在 SQL 调优中用不同值比较相同的查询，看执行计划是否随值变化"
       },
       "DISK_READ": {
-        "cause": "缓存未命中 — 读取的块中 {pct}%（{read}块）是从磁盘而非内存读取的",
+        "cause": "缓存未命中：读取的块中 {pct}%（{read} 块）是从磁盘而非内存中读取的",
         "fix": "① 通过索引减少读取范围 ② 缩小查询期间·条件 ③ 如果是频繁读取的数据且持续较高，请检查 shared_buffers（内存）"
       },
       "TEMP_SPILL": {
-        "cause": "内存溢出 — 排序·哈希超出 work_mem，写入了 {blk}块（约 {mb}MB，每次 {perCall}块）到临时文件",
+        "cause": "内存溢出：排序·哈希超出 work_mem，将 {blk} 块（约 {mb}MB，每次 {perCall} 块）写入临时文件",
         "fix": "① 在 ORDER BY·GROUP BY 列上创建索引可以跳过排序 ② 首先减少排序的行数（将 LIMIT 移到内部） ③ 如果确实需要，只为此查询事务提高 SET LOCAL work_mem"
       },
       "MANY_ROWS": {
-        "cause": "查询过多 — 每次获取 {perCall}行",
+        "cause": "查询过多：单次获取 {perCall} 行",
         "fix": "① 屏幕列表按页面查询 ② SELECT 只选择使用的列 ③ 聚合在数据库中完成，只接收结果"
       },
       "PGRST_EMBED": {
-        "cause": "PostgREST 嵌入式过滤器（!inner）语句 — 通过子条件过滤父级，可能在分类条件之前遍历整个表",
+        "cause": "PostgREST 嵌入式过滤器 (!inner) 语句：如果通过子表条件过滤父表，可能会在分类条件之前遍历整个表",
         "fix": "① 检查连接键和过滤列是否有索引 ② 将过滤器移至父表条件 ③ 将子表嵌入到已有的父表查询中，或合并为一个数据库函数"
       },
       "OFFSET_PAGING": {
-        "cause": "OFFSET 分页 — 越往后页，越需要读取并丢弃前面的行，因此会越来越慢",
+        "cause": "OFFSET 分页：越往后翻页，越会读取并丢弃前面的行，因此会越来越慢",
         "fix": "改为从最后接收到的键之后读取的键集分页（WHERE id > 最后 id ORDER BY id LIMIT n）"
       }
     }
@@ -1203,8 +1203,8 @@
       "toDraft": "从选定的 {n} 个创建管道草稿"
     },
     "ready": {
-      "ok": "WAL 逻辑复制已就绪 — 具有主键的表可以使用 LOGICAL 方式",
-      "no": "WAL 逻辑复制未就绪 — 通过轮询或键比较捕获",
+      "ok": "WAL 逻辑复制已准备就绪：带有 PK 的表可以使用 LOGICAL 方式",
+      "no": "WAL 逻辑复制未准备就绪：将通过轮询·键比较方式收集",
       "senders": "{n} 个复制连接"
     },
     "adapter": {
@@ -1219,20 +1219,20 @@
       "HAS_SOFT_DEL": "有软删除列",
       "NO_SOFT_DEL": "无软删除列",
       "HAS_PK": "有主键",
-      "NO_PK": "无主键 — 无法识别变更行",
+      "NO_PK": "无 PK：无法识别更改行",
       "DELETE_UNSEEN": "轮询无法捕获物理 DELETE（建议使用软删除列）",
       "LOGICAL_NOT_READY": "WAL 逻辑复制就绪后可切换到 LOGICAL",
-      "FULL_RELOAD_ONLY": "无主键或变更时间列，因此无法增量捕获 — 请添加主键",
+      "FULL_RELOAD_ONLY": "无 PK·更改时间，无法增量收集：建议添加 PK",
       "WAL_LOGICAL": "wal_level = logical",
       "WAL_NOT_LOGICAL": "wal_level 不是 logical（更改它需要重启 DB）",
       "NO_SLOTS": "max_replication_slots 为 0",
       "NO_SENDERS": "max_wal_senders 为 0",
-      "IS_STANDBY": "备用服务器 — 从主服务器获取逻辑复制",
+      "IS_STANDBY": "备用 (standby) 服务器：请从主服务器接收逻辑复制",
       "SETTINGS_UNKNOWN": "无法读取设置，准备状态未知"
     },
     "ed": {
       "title": "管道定义",
-      "draftOnly": "仅设计 — 保存为草稿 (DRAFT)",
+      "draftOnly": "仅限设计：仅保存为草稿 (DRAFT)",
       "new": "新建管道",
       "empty": "没有保存的管道",
       "manual": "手动",
@@ -1301,8 +1301,8 @@
     },
     "warn": {
       "none": "无明显警告。",
-      "SEQ_SCAN_LARGE": "对 {relation} 进行全表扫描（约 {rows} 行）— 考虑在过滤列上添加索引。",
-      "NESTED_LOOP_HIGH": "嵌套循环产生约 {rows} 行 — 考虑哈希或合并连接，或在连接条件上添加索引。",
+      "SEQ_SCAN_LARGE": "全表扫描 {relation} 表（预计 {rows} 行）：请审查条件列索引。",
+      "NESTED_LOOP_HIGH": "嵌套循环结果预计 {rows} 行。请审查哈希·合并连接或连接条件索引。",
       "SORT_SPILL": "排序大小约为 {kb}KB，超过默认的 work_mem (4MB)；可能会溢出到磁盘。"
     },
     "lint": {
@@ -1316,14 +1316,14 @@
         "char": "字符"
       },
       "codes": {
-        "SELECT_STAR": "SELECT * — 仅选择您需要的列（额外的 I/O，无覆盖索引）。",
-        "FUNC_ON_COLUMN": "过滤列 {column} 被函数或表达式包裹，因此无法使用其索引 — 请转换常量。",
-        "LEADING_WILDCARD": "以 % 开头的 LIKE 无法使用 B-tree 索引 — 考虑 pg_trgm GIN 索引。",
-        "OR_DIFF_COLUMNS": "不同的列条件通过 OR 组合在一起 — 请考虑使用 UNION 分离（如果是 UNION ALL，则添加去重条件）或检查每列的索引。",
-        "IMPLICIT_CAST": "{column} 与带引号的数字进行比较 — 匹配列和常量类型（隐式转换）。",
-        "NOT_IN_SUBQUERY": "NOT IN (子查询) 在存在 NULL 时返回空且速度慢 — 请使用 NOT EXISTS。",
-        "NO_WHERE": "无 WHERE 子句 — 在大型表上这将是全表扫描（添加条件或 LIMIT）。",
-        "DOMAIN_MISMATCH": "{column} 根据标准域是 {expected} 类型，但与另一种类型的常量进行比较 — 隐式转换可能会阻止索引使用。"
+        "SELECT_STAR": "SELECT *：请只选择所需的列（不必要的 I/O·无法使用覆盖索引）。",
+        "FUNC_ON_COLUMN": "条件列 {column} 经过函数·运算处理，无法使用索引。请处理常量侧。",
+        "LEADING_WILDCARD": "前面带 % 的 LIKE 无法使用 B-tree 索引。请审查 pg_trgm GIN 索引。",
+        "OR_DIFF_COLUMNS": "将不同列的条件用 OR 组合。请审查 UNION 分离（如果是 UNION ALL，则添加去重条件）或按列创建索引。",
+        "IMPLICIT_CAST": "将 {column} 与带引号的数字进行比较。请匹配列类型和常量类型（隐式类型转换）。",
+        "NOT_IN_SUBQUERY": "NOT IN (子查询) 如果混有 NULL，结果会为空且速度慢。请替换为 NOT EXISTS。",
+        "NO_WHERE": "没有 WHERE 条件。如果是大表，则为全表扫描（添加 LIMIT 或条件）。",
+        "DOMAIN_MISMATCH": "{column} 在标准域中是 {expected} 类型，但与不同类型的常量进行比较。隐式类型转换可能导致无法使用索引。"
       }
     },
     "saved": {
@@ -1349,12 +1349,12 @@
     },
     "ai": {
       "title": "AI 调优建议",
-      "intro": "选择一个已保存的计划以生成建议。仅发送SQL和将常量屏蔽为?的计划（如果没有密钥或失败，则基于规则的建议）。在链接所有者批准后，重新运行相同SQL的解释，保存它，然后使用该后续计划测量影响——只有这样才会被记录为已应用。",
+      "intro": "选择一个已保存的计划以生成建议。仅发送SQL和将常量屏蔽为?的计划（如果没有密钥或失败，则基于规则的建议）。在链接所有者批准后，重新运行相同SQL的解释，保存它，然后使用该后续计划测量影响 : : 只有这样才会被记录为已应用。",
       "pickPlan": "选择一个已保存的计划以获取建议",
       "create": "生成建议",
       "creating": "正在生成…（最多30秒）",
       "noPlans": "没有已保存的计划。在上方查看执行计划并保存。",
-      "note": "每个计划只有一个建议。删除现有建议以重新生成。DDL仅为建议——请在schema.pi中应用。",
+      "note": "每个计划只有一个建议。删除现有建议以重新生成。DDL仅为建议 : : 请在schema.pi中应用。",
       "empty": "暂无建议。",
       "noItems": "未找到此计划的改进。",
       "cost": "之前成本",
@@ -1396,10 +1396,10 @@
       "copy": "复制",
       "copied": "已复制",
       "rule": {
-        "SEQ_SCAN_INDEX": "{relation} 的全表扫描 — 在过滤列 {column} 上创建索引（将索引名称中的NN替换为序列号）。",
-        "SEQ_SCAN_STATS": "{relation} 的全表扫描 — 检查过滤列并确保统计信息（ANALYZE）是最新的。",
-        "NESTED_LOOP": "嵌套循环预计 {rows} 行 — 刷新统计信息并考虑连接键索引或哈希连接。",
-        "SORT_SPILL": "约 {kb} KB 的排序可能会溢出到磁盘 — 考虑提高会话 work_mem 或为排序列创建索引。",
+        "SEQ_SCAN_INDEX": "{relation} 全表扫描：请在条件列 {column} 上创建索引（索引名 NN 替换为序号）。",
+        "SEQ_SCAN_STATS": "{relation} 全表扫描：请检查条件列并确认统计信息 (ANALYZE) 是否最新。",
+        "NESTED_LOOP": "嵌套循环结果预计 {rows} 行：请更新统计信息并审查连接条件索引或哈希连接。",
+        "SORT_SPILL": "排序可能溢出到磁盘，约 {kb}KB。请审查提高会话 work_mem 或排序列索引。",
         "SELECT_STAR": "只选择您需要的列，而不是 SELECT *（减少I/O，可能实现覆盖索引）。",
         "FUNC_ON_COLUMN": "将过滤列 {column} 上的函数/表达式移到常量侧（启用索引使用）。",
         "IMPLICIT_CAST": "匹配 {column} 和常量的类型（移除隐式类型转换）。",
@@ -1459,9 +1459,9 @@
     },
     "desc": {
       "FREE": "浏览·学习",
-      "D1": "操作员 — 检查数据库是否正常",
-      "D2": "开发者·调优师 — 修复慢速 SQL",
-      "D3": "DBA·DA — 运营安全·迁移·数据湖"
+      "D1": "运维人员：检查数据库是否正常",
+      "D2": "开发人员·调优师：修复慢速 SQL",
+      "D3": "DBA·DA：运营安全·迁移·数据湖"
     },
     "feat": {
       "FREE": "监控板·执行计划查看·基础学习",
@@ -1504,7 +1504,7 @@
       "required": "此功能仅适用于 {plan} 套餐。",
       "limit": "本期使用次数已用完。升级到 {plan} 套餐可获得更多使用次数。",
       "limitTop": "本期使用次数已用完。下期可再次使用。",
-      "expired": "schema.pi 套餐已过期 — 请在 schema.pi 套餐页面支付。",
+      "expired": "schema.pi 订阅已过期。请在 schema.pi 订阅页面进行支付。",
       "go": "查看套餐",
       "close": "关闭"
     }

@@ -16,7 +16,7 @@ export const LEVEL_ICON = {
   WARN: '▲',
   OK: '✓',
   UNKNOWN: '?',
-  NA: '–',
+  NA: '-',
 } as const
 // 신호 카드 테두리
 export const LEVEL_CARD = {
