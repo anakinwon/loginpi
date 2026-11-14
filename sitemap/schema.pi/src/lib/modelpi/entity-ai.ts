@@ -46,7 +46,7 @@ export async function suggestLogicalAi(t: IndstryTmpl | null, subj: { nm: string
           role: 'user',
           content: [
             t ? `업종 : ${t.nm} (업무 ${t.traits.biz} / 데이터 ${t.traits.data})` : '업종 : 미지정',
-            `주제영역 : ${subj.nm}${subj.desc ? ` — ${subj.desc}` : ''}`,
+            `주제영역 : ${subj.nm}${subj.desc ? ` : ${subj.desc}` : ''}`,
             ents.length ? `등록된 엔터티 :\n${ents.map((e) => `- ${e.ent_log_nm}${e.ent_desc ? ` : ${e.ent_desc}` : ''}`).join('\n')}` : '등록된 엔터티 : 없음',
           ].join('\n'),
         },

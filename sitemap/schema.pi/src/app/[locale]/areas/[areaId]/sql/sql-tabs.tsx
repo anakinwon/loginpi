@@ -15,7 +15,7 @@ type SaveSt = { st: 'idle' } | { st: 'saving' } | { st: 'ok'; at: string } | { s
 const AUTO_MS = 60_000
 const KEEPALIVE_MAX = 60_000 // 한 번 떠날 때 keepalive 본문 합계 예산(UTF-8 바이트, 브라우저 한도 64KB) — 넘는 탭은 일반 요청(떠날 때 끊길 수 있음)
 const JSON_H = { 'content-type': 'application/json' }
-const errText = (j: { message?: string; detail?: unknown }) => `${j.message ?? '요청이 실패했습니다'}${typeof j.detail === 'string' ? ` — ${j.detail}` : ''}`
+const errText = (j: { message?: string; detail?: unknown }) => `${j.message ?? '요청이 실패했습니다'}${typeof j.detail === 'string' ? ` : ${j.detail}` : ''}`
 
 export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: (v: boolean) => void) {
   const [tabs, setTabs] = useState<Tab[]>([])
@@ -64,7 +64,7 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
         if (texts.current[id] == null) return // 저장 중 탭을 닫음
         if (r.status === 404) {
           const c = await (await send(`${api}/sql/tabs`, { method: 'POST', headers: JSON_H, body: JSON.stringify({ sql_txt: t }) }, keepalive)).json()
-          if (!c.ok) return (setSave({ st: 'err' }), setMsg(`다른 곳에서 닫힌 탭을 다시 만들지 못했습니다 — ${errText(c)}`))
+          if (!c.ok) return (setSave({ st: 'err' }), setMsg(`다른 곳에서 닫힌 탭을 다시 만들지 못했습니다. ${errText(c)}`))
           const nid: string = c.item.sql_tab_id
           ;(texts.current[nid] = texts.current[id]), (saved.current[nid] = t)
           delete texts.current[id], delete saved.current[id]
@@ -74,7 +74,7 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
           setSave({ st: 'ok', at: c.item.mod_dtm ?? new Date().toISOString() })
           return setMsg(`다른 곳에서 닫힌 탭이라 지금 내용을 새 탭 '${c.item.tab_nm}'(으)로 저장했습니다`)
         }
-        if (!j.ok) return (setSave({ st: 'err' }), setMsg(`탭 저장 실패 — ${errText(j)}`))
+        if (!j.ok) return (setSave({ st: 'err' }), setMsg(`탭 저장 실패 : ${errText(j)}`))
         saved.current[id] = t
         syncDirty()
         setSave({ st: 'ok', at: j.item?.mod_dtm ?? new Date().toISOString() })
@@ -132,7 +132,7 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
         const r = await piFetch(`${api}/sql/tabs`)
         if (r.status === 403) return setDenied(true)
         const j = await r.json()
-        if (!j.ok) return fail(`SQL 탭을 불러오지 못했습니다 — ${errText(j)}`)
+        if (!j.ok) return fail(`SQL 탭을 불러오지 못했습니다. ${errText(j)}`)
         setLimit(j.limit), setPlan(j.plan)
         let items: Tab[] = (j.items as (Tab & { sql_txt: string })[]).map((x) => {
           texts.current[x.sql_tab_id] = saved.current[x.sql_tab_id] = x.sql_txt ?? ''
@@ -239,7 +239,7 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
             탭 다시 불러오기
           </button>
         )}
-        <button type="button" className="btn-ghost btn-icon btn-sm mb-0.5 shrink-0" disabled={full || !tabs.length} onClick={() => void add().then((ok) => ok && onPick?.())} aria-label="새 탭" title={full ? `요금제(${PLAN_NM[plan]}) 상한 ${limit}개 — 탭을 닫거나 요금제를 올리십시오` : `새 탭(요금제 ${PLAN_NM[plan]} 상한 ${limit}개)`}>
+        <button type="button" className="btn-ghost btn-icon btn-sm mb-0.5 shrink-0" disabled={full || !tabs.length} onClick={() => void add().then((ok) => ok && onPick?.())} aria-label="새 탭" title={full ? `요금제(${PLAN_NM[plan]}) 상한 ${limit}개 : 탭을 닫거나 요금제를 올리십시오` : `새 탭(요금제 ${PLAN_NM[plan]} 상한 ${limit}개)`}>
           <Plus aria-hidden />
         </button>
       </div>
@@ -252,7 +252,7 @@ export function useSqlTabs(api: string, setMsg: (m: string) => void, setDenied: 
           '저장 중…'
         ) : save.st === 'err' ? (
           <button type="button" className="font-sans text-danger hover:underline" onClick={() => void saveAll()}>
-            저장 실패 — 다시 시도
+            저장 실패 : 다시 시도
           </button>
         ) : save.st === 'ok' ? (
           `저장됨 ${new Date(save.at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`

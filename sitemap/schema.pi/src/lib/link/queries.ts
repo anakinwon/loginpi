@@ -142,7 +142,7 @@ export async function runNamed(
       fail: 'CONN_FAIL',
       status: 400,
       message:
-        '저장된 비밀번호를 열 수 없습니다 — schema.pi 접속 관리에서 비밀번호를 다시 입력하십시오',
+        '저장된 비밀번호를 열 수 없습니다. schema.pi 접속 관리에서 비밀번호를 다시 입력하십시오',
     }
   const t = await resolveTarget(c)
   if (t === 'BLOCKED' || t === 'DNS')

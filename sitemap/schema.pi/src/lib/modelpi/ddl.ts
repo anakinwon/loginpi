@@ -76,7 +76,7 @@ export function genDdl(d: DdlIn, head: { prjNm: string; at: string }, opt: { onl
   const tbls = opt.only ? d.tables.filter((t) => opt.only!.has(t.ent_id)) : d.tables
   const nm = (s: string) => renderIdent(s, ddlCase(d.dbms, d.ltr)) // PostgreSQL = 무조건 소문자(마스터 지시 2026-10-18)
   const pg = d.dbms === '0014'
-  const out: string[] = [`-- ${line1(head.prjNm)} 물리 모델 DDL — ${DBMS_PRFL[d.dbms].nm}, 생성 ${line1(head.at)}`, '-- 표준 데이터 모델에서 생성(직접 실행 전 DBA 검토)', '-- PK = 유일 인덱스 먼저 생성 후 그 인덱스로 PK 제약, FK 미생성(관계는 모델·ERD 에만)', `-- ⚠ 테이블마다 CREATE 직전 DROP TABLE … CASCADE${pg ? '' : ' CONSTRAINTS'} 포함 — 기존 테이블·데이터가 삭제됩니다${pg ? '' : '(첫 실행의 테이블 없음 오류는 무시)'}`]
+  const out: string[] = [`-- ${line1(head.prjNm)} 물리 모델 DDL : ${DBMS_PRFL[d.dbms].nm}, 생성 ${line1(head.at)}`, '-- 표준 데이터 모델에서 생성(직접 실행 전 DBA 검토)', '-- PK = 유일 인덱스 먼저 생성 후 그 인덱스로 PK 제약, FK 미생성(관계는 모델·ERD 에만)', `-- ⚠ 테이블마다 CREATE 직전 DROP TABLE … CASCADE${pg ? '' : ' CONSTRAINTS'} 포함 : 기존 테이블·데이터가 삭제됩니다${pg ? '' : '(첫 실행의 테이블 없음 오류는 무시)'}`]
   // 저장 후 예약어 목록이 늘었을 수 있어 내려받을 때 다시 점검(P6 이월)
   for (const t of tbls) for (const n of [t.tbl_nm, ...t.cols.map((c) => c.col_nm)]) if (RSV_WORDS.has(n.toUpperCase())) out.push(line1(`-- ⚠ 예약어 이름 ${t.tbl_nm === n ? n : `${t.tbl_nm}.${n}`} : 실행 전 표준용어 물리명을 조정하십시오`))
   // 저장된 기본값도 DEFAULT 에 넣기 전 다시 허용 목록 검사(편집 경로 밖에서 들어온 값 방어)

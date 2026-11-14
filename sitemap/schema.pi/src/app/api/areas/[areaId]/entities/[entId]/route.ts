@@ -67,7 +67,7 @@ export async function DELETE(req: Request, { params }: Ctx) {
     const ch = await db().from('mdl_rel').select('chld_ent_id, mdl_ent!mdl_rel_chld_ent_id_fkey(ent_log_nm, lgc_sts_cd)').eq('prnt_ent_id', entId).eq('del_yn', 'N')
     if (ch.error) return dbError(ch.error)
     const lockedCh = (ch.data as unknown as { mdl_ent: { ent_log_nm: string; lgc_sts_cd: string } | null }[]).filter((r) => r.mdl_ent?.lgc_sts_cd === 'CMPTN')
-    if (lockedCh.length) return NextResponse.json({ ok: false, code: 'SUBJ_LOCKED', message: errMsg('SUBJ_LOCKED'), why: [`작성완료 자식 엔터티 ${lockedCh.map((r) => r.mdl_ent!.ent_log_nm).join(', ')} — 자식 완료 취소 후 삭제`] }, { status: 409 })
+    if (lockedCh.length) return NextResponse.json({ ok: false, code: 'SUBJ_LOCKED', message: errMsg('SUBJ_LOCKED'), why: [`작성완료 자식 엔터티 ${lockedCh.map((r) => r.mdl_ent!.ent_log_nm).join(', ')} : 자식 완료 취소 후 삭제`] }, { status: 409 })
     const { data, error } = await db().from('mdl_ent').update({ del_yn: 'Y', del_dtm: new Date().toISOString(), ver_no: v.data + 1, modr_id: uid }).eq('ent_id', entId).eq('ver_no', v.data).eq('del_yn', 'N').select('ent_id')
     if (error) return dbError(error)
     if (!data.length) return apiError('VERSION_CONFLICT', 409)
@@ -90,7 +90,7 @@ export async function DELETE(req: Request, { params }: Ctx) {
     if (at.error) console.error('[entities/delete] 속성 논리 삭제 실패', entId, at.error.message)
     if (rl.error) console.error('[entities/delete] 관계 논리 삭제 실패', entId, rl.error.message)
     await audit({ area_id: areaId, tgt_tp_cd: 'ENT', tgt_id: entId, act_cd: 'DEL', bfr_val: cur, aftr_val: { rel_ids: relIds }, usr_id: uid })
-    return NextResponse.json(partial ? { ok: true, partial: true, message: '엔터티는 삭제했지만 속성·관계 정리 일부가 실패했습니다 — 논리 모델 점검에서 확인하십시오' } : { ok: true })
+    return NextResponse.json(partial ? { ok: true, partial: true, message: '엔터티는 삭제했지만 속성·관계 정리 일부가 실패했습니다. 논리 모델 점검에서 확인하십시오' } : { ok: true })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

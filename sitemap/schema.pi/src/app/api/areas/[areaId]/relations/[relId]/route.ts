@@ -52,7 +52,7 @@ export async function DELETE(req: Request, ctx: Ctx) {
   if (error) {
     // 관계는 이미 삭제됨 — 상속 속성은 남아 있으므로 사용자에게 경고(논리 모델 FK 점검에서 다시 드러남)
     console.error('[relations/delete] 상속 속성 처리 실패', relId, error.message)
-    return NextResponse.json({ ok: true, partial: true, fk_mode: mode, fk_attrs: null, message: '관계는 삭제했지만 상속 속성 처리에 실패했습니다 — 속성 패널에서 확인하십시오' })
+    return NextResponse.json({ ok: true, partial: true, fk_mode: mode, fk_attrs: null, message: '관계는 삭제했지만 상속 속성 처리에 실패했습니다. 속성 패널에서 확인하십시오' })
   }
   // 감사 이력은 서로 독립 — 동시 기록(R-P2, 2026-10-24 전수 점검)
   await Promise.all(data.map((a) => audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: a.attr_id as string, act_cd: mode === 'del' ? 'DEL' : 'UPD', aftr_val: { ...a, ...set, rel_id: relId, fk_mode: mode }, usr_id: uid })))

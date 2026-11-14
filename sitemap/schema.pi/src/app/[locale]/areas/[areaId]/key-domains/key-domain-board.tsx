@@ -76,7 +76,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   const cands = attrWords.filter((w) => w.key_dom_yn !== 'Y' && w.forbid_yn !== 'Y')
   const hit = attrWords.find((w) => w.dic_log_nm === pick.trim())
   const cur = hit && cands.includes(hit) ? hit : undefined
-  const why = !pick.trim() || cur ? '' : candErr ? `대표도메인 후보 목록을 불러오지 못했습니다(${candErr}) — 새로고침 후 다시 시도하십시오` : !hit ? '승인완료된 속성 분류어 단어가 아닙니다(표준단어에서 속성 분류어 지정 후 승인 필요)' : hit.key_dom_yn === 'Y' ? '이미 지정된 대표도메인입니다(아래 목록에서 확인)' : '금칙어는 대표도메인으로 지정할 수 없습니다'
+  const why = !pick.trim() || cur ? '' : candErr ? `대표도메인 후보 목록을 불러오지 못했습니다(${candErr}) : 새로고침 후 다시 시도하십시오` : !hit ? '승인완료된 속성 분류어 단어가 아닙니다(표준단어에서 속성 분류어 지정 후 승인 필요)' : hit.key_dom_yn === 'Y' ? '이미 지정된 대표도메인입니다(아래 목록에서 확인)' : '금칙어는 대표도메인으로 지정할 수 없습니다'
 
   // 지정·해제 신청 — 단어 수정 신청(202 = 승인대기, 200 = DA 즉시 승인)
   const send = async (w: { dic_id: string; dic_log_nm: string; ver_no: number }, to: 'Y' | 'N') => {
@@ -140,12 +140,12 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
                   {cur.dic_phy_nm}
                 </span>
               ) : (
-                <p className="flex min-h-8 items-center text-ink-off">—</p>
+                <p className="flex min-h-8 items-center text-ink-off">-</p>
               )}
             </div>
             <div className="md:col-span-2">
               <span className="field-label">설명</span>
-              <p className="flex min-h-8 items-center text-ink-2">{cur?.dic_desc || '—'}</p>
+              <p className="flex min-h-8 items-center text-ink-2">{cur?.dic_desc || '-'}</p>
             </div>
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">

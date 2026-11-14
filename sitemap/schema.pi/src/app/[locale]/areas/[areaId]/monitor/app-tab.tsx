@@ -53,7 +53,7 @@ function Steps({ x }: { x: Pr }) {
     <div className="mt-1 flex flex-wrap items-center gap-1 text-xs">
       <StepBar st={st} />
       {x.dep === 'success' && <span className="ms-1 text-ok">운영 반영 완료</span>}
-      {st.bad && x.sha && <span className="ms-1 text-danger">운영 빌드 실패 — 이전 배포가 계속 서비스됨</span>}
+      {st.bad && x.sha && <span className="ms-1 text-danger">운영 빌드 실패 : 이전 배포가 계속 서비스됨</span>}
     </div>
   )
 }
@@ -87,7 +87,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry, canApv }: { ai: Ai;
   const approve = async (k: string) => {
     const cur = prs[k]
     if (!cur?.number || !cur.head || cur.apv || cur.sha) return
-    if (!confirm(`PR #${cur.number} 을 승인합니다 — master 에 병합하고 바로 운영에 배포합니다(master 의 다른 미배포 커밋도 함께 나감). GitHub 에서 변경 내용을 확인하셨습니까?`)) return
+    if (!confirm(`PR #${cur.number} 을 승인합니다. master 에 병합하고 바로 운영에 배포합니다(master 의 다른 미배포 커밋도 함께 나감). GitHub 에서 변경 내용을 확인하셨습니까?`)) return
     setPrs((p) => ({ ...p, [k]: { ...cur, apv: true, err: undefined } }))
     try {
       const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area_id: areaId, number: cur.number, head: cur.head }) })).json()
@@ -100,13 +100,13 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry, canApv }: { ai: Ai;
   const reject = async (k: string) => {
     const cur = prs[k]
     if (!cur?.number || cur.apv || cur.rjb || cur.sha || cur.rej) return
-    const reason = prompt(`PR #${cur.number} 반려 — PR 을 닫고 병합하지 않습니다(운영 코드는 수정 전 그대로)\n\n사유를 입력하십시오(2자 이상)`)?.trim()
+    const reason = prompt(`PR #${cur.number} 반려 : PR 을 닫고 병합하지 않습니다(운영 코드는 수정 전 그대로)\n\n사유를 입력하십시오(2자 이상)`)?.trim()
     if (!reason) return
     if (reason.length < 2) return setPrs((p) => ({ ...p, [k]: { ...cur, err: '반려 사유를 2자 이상 입력하십시오' } }))
     setPrs((p) => ({ ...p, [k]: { ...cur, rjb: true, err: undefined } }))
     try {
       const j = await (await piFetch('/api/mon/app/fix/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area_id: areaId, number: cur.number, reason }) })).json()
-      setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, rej: true, rjb: false, err: `반려 — ${reason}` } : { ...cur, rjb: false, err: j.message ?? '반려하지 못했습니다' } }))
+      setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, rej: true, rjb: false, err: `반려 : ${reason}` } : { ...cur, rjb: false, err: j.message ?? '반려하지 못했습니다' } }))
     } catch {
       setPrs((p) => ({ ...p, [k]: { ...cur, rjb: false, err: '반려하지 못했습니다(네트워크)' } }))
     }
@@ -176,7 +176,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry, canApv }: { ai: Ai;
       {run?.basis && (
         // 분석 근거(마스터 지시 2026-10-22) — 결과가 달라질 때 구간·표본·소스가 달라서인지 바로 보이게
         <p className="mt-1 text-xs text-ink-3">
-          {run.reused && <span className="badge me-1">이전 분석 재사용 — 데이터·소스 변화 없음</span>}
+          {run.reused && <span className="badge me-1">이전 분석 재사용 : 데이터·소스 변화 없음</span>}
           근거 : {fmtDT(run.basis.at)} 분석 · 구간 {fmtDT(run.basis.from)} ~ {fmtDT(run.basis.to)}
           {run.basis.floor === 'DEPLOY' && ' (최근 AI 수정 배포 이후만)'} · 요청 {fmtN(run.basis.req)} / 오류 {fmtN(run.basis.err)} · 이력 {run.basis.evt}건 · 소스 {run.basis.src ?? '로컬'}
           {run.basis.cut && <span className="text-warn"> · 상한 도달(최근 일부만 분석)</span>}
@@ -224,7 +224,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry, canApv }: { ai: Ai;
                         </div>
                         <p className="text-xs text-ink-2">{x.detail}</p>
                         {x.code === false ? (
-                          <p className="text-xs font-medium text-ok">코드 변경 없는 조치 — PR 불필요</p>
+                          <p className="text-xs font-medium text-ok">코드 변경 없는 조치 : PR 불필요</p>
                         ) : x.files.length > 0 && (
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="font-mono text-xs text-ink-3">{x.files.join(' · ')}</p>
@@ -241,7 +241,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry, canApv }: { ai: Ai;
                                 {prs[`${i}-${j}`].sha ? (
                                   <span className="text-xs text-ink-3">운영에 나간 커밋 {prs[`${i}-${j}`].ahead}개 · 되돌리기는 'AI 수정 이력' 탭</span>
                                 ) : prs[`${i}-${j}`].rej ? (
-                                  <span className="badge" data-tone="danger">반려됨 — 수정 전 코드 유지</span>
+                                  <span className="badge" data-tone="danger">반려됨 : 수정 전 코드 유지</span>
                                 ) : !canApv ? (
                                   <span className="badge" data-tone="warn" title="결재(승인·반려)는 DA 역할 ∩ 요금제4(DA)만">DA 결재 대기</span>
                                 ) : (
@@ -569,7 +569,7 @@ export default function AppTab({ live, min, canApv }: { live: boolean; min: numb
                     <td className="px-3 py-1.5 font-mono text-xs whitespace-nowrap tabular-nums">{fmtS(e.occr_dtm)}</td>
                     <td className="px-3 py-1.5">
                       <div className="font-medium text-ink">{pMenu(e.scr_txt)}</div>
-                      <div className="font-mono text-xs text-ink-3">{e.scr_txt ?? '—'}</div>
+                      <div className="font-mono text-xs text-ink-3">{e.scr_txt ?? '-'}</div>
                     </td>
                     <td className="px-3 py-1.5">
                       <div className="font-medium text-ink">{rMenu(e.route_txt)}</div>

@@ -34,20 +34,20 @@ export default function LinkTokenPanel({ areaId }: { areaId: string }) {
     setBusy(true)
     const j = await (await piFetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area: areaId, tkn_nm: nm, days }) })).json().catch(() => ({ ok: false }))
     setBusy(false)
-    setMsg(j.ok ? '발급했습니다 — 아래 토큰은 지금 한 번만 보입니다' : (j.message ?? '발급하지 못했습니다'))
+    setMsg(j.ok ? '발급했습니다. 아래 토큰은 지금 한 번만 보입니다' : (j.message ?? '발급하지 못했습니다'))
     if (j.ok) {
       setRaw(j.token)
       void load()
     }
   }
   const revoke = async (t: Tkn) => {
-    if (!confirm(`${t.tkn_nm}(${t.tkn_pfx}…) 토큰을 폐기합니다 — 이 토큰을 쓰는 사이트는 즉시 연결이 끊깁니다`)) return
+    if (!confirm(`${t.tkn_nm}(${t.tkn_pfx}…) 토큰을 폐기합니다. 이 토큰을 쓰는 사이트는 즉시 연결이 끊깁니다`)) return
     const j = await (await piFetch(`${API}/${t.tkn_id}?area=${areaId}`, { method: 'DELETE' })).json().catch(() => ({ ok: false }))
     setMsg(j.ok ? '폐기했습니다' : (j.message ?? '폐기하지 못했습니다'))
     if (j.ok) void load()
   }
 
-  if (deny) return <p className="text-sm text-ink-2">{deny} — 사이트 연결 토큰은 유료 요금제의 SYS·DA 역할만 발급합니다</p>
+  if (deny) return <p className="text-sm text-ink-2">{deny} : 사이트 연결 토큰은 유료 요금제의 SYS·DA 역할만 발급합니다</p>
   if (!items) return <p className="text-sm text-ink-3">불러오는 중</p>
   return (
     <div className="space-y-6 text-sm">

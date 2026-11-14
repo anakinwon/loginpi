@@ -21,11 +21,11 @@ type Data = {
 // 판정 → 문구·배지 색조(badge data-tone)
 const VERDICT: Record<Data['verdict'], [string, 'ok' | 'warn' | 'danger' | 'accent']> = {
   DEPLOYING: ['운영 배포 중', 'accent'],
-  FAIL: ['배포 실패 — 이전 배포 유지(재분석 가능)', 'danger'],
-  SLOW: ['느림 그대로 — 배포 후 느림 비율이 줄지 않음', 'warn'],
-  WAIT: ['확인 중 — 배포 후 요청 부족', 'warn'],
-  OK: ['해결 확인 — 배포 후 오류 0', 'ok'],
-  RECUR: ['재발 — 배포 후에도 서버 오류', 'danger'],
+  FAIL: ['배포 실패 : 이전 배포 유지(재분석 가능)', 'danger'],
+  SLOW: ['느림 그대로 : 배포 후 느림 비율이 줄지 않음', 'warn'],
+  WAIT: ['확인 중 : 배포 후 요청 부족', 'warn'],
+  OK: ['해결 확인 : 배포 후 오류 0', 'ok'],
+  RECUR: ['재발 : 배포 후에도 서버 오류', 'danger'],
 }
 const POLL_MS = 5_000
 const hm = (t: string | number) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
@@ -114,7 +114,7 @@ export default function VerifyPanel({ route }: { route: string }) {
           </tbody>
         </table>
       )}
-      {d.aborted > 0 && <p className="mt-1 text-ink-3">끊긴 요청(상태 0, 화면 이동·새로고침) {d.aborted}건 — 판정에서 제외</p>}
+      {d.aborted > 0 && <p className="mt-1 text-ink-3">끊긴 요청(상태 0, 화면 이동·새로고침) {d.aborted}건 : 판정에서 제외</p>}
       {d.evts.length > 0 && (
         <ul className="mt-1 font-mono text-danger">
           {d.evts.slice(0, 5).map((e, i) => (

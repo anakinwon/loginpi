@@ -27,7 +27,7 @@ const SCHEMA = {
         type: 'object',
         properties: {
           title: { type: 'string', description: '원인 한 줄(40자 이내)' },
-          evidence: { type: 'string', description: '근거 1~2문장 — 수치·상태코드·시각·소스 파일(함수명) 중 핵심만' },
+          evidence: { type: 'string', description: '근거 1~2문장 : 수치·상태코드·시각·소스 파일(함수명) 중 핵심만' },
           likelihood: { type: 'string', enum: ['HIGH', 'MID', 'LOW'] },
           fixes: {
             type: 'array',
@@ -318,8 +318,8 @@ export async function analyzeRoute(route: string, min: number, mdlId: string | u
   const body = [
     `API 경로 : ${route} (메뉴 : ${routeMenu(route)})`,
     `느림 기준 ${SLOW_MS}ms, 분석 서버 환경 : ${process.env.VERCEL_ENV ?? process.env.NODE_ENV}${basis.floor ? ', 구간 시작 = 최근 AI 수정 운영 배포 직후(그 전 오류는 제외)' : ''}`,
-    `분 단위 합계(최신순, ${agg.data.length}행${agg.data.length >= MAX_AGG ? ' — 상한, 이보다 오래된 행 생략' : ''}) :\n${aggTxt || '없음'}`,
-    `느림·오류 개별 이력(최신순, ${evt.data.length}건${evt.data.length >= MAX_EVT ? ' — 상한' : ''}) :\n${evtTxt || '없음'}`,
+    `분 단위 합계(최신순, ${agg.data.length}행${agg.data.length >= MAX_AGG ? ' : 상한, 이보다 오래된 행 생략' : ''}) :\n${aggTxt || '없음'}`,
+    `느림·오류 개별 이력(최신순, ${evt.data.length}건${evt.data.length >= MAX_EVT ? ' : 상한' : ''}) :\n${evtTxt || '없음'}`,
     src.found ? `소스 코드(배포본 ${srcCmt ?? '로컬'}) :\n${src.text}` : `소스 코드 : route.ts 를 찾지 못함\n${src.text}`,
   ].join('\n\n')
   // 시점 단위 = 마지막 데이터 이후 경과를 15분 단위로 — 같은 데이터라도 '지금도 나는지' 판단이 바뀔 만큼 시간이 흐르면 새로 분석

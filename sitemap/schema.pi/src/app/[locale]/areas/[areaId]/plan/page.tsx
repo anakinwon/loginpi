@@ -73,7 +73,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
     const prep = await post('/api/payments/prepare', { area_id: areaId, plan_cd: f.plan_cd, prd_cd: f.prd_cd, prd: f.prd })
     if (!prep.ok) return finish({ ok: false, text: prep.message })
     let cur: string | null = null
-    timer.current = setTimeout(() => finish({ ok: false, text: '결제 응답이 없습니다 — 잠시 뒤 화면을 새로 고쳐 결과를 확인하십시오' }), CALLBACK_TIMEOUT_MS)
+    timer.current = setTimeout(() => finish({ ok: false, text: '결제 응답이 없습니다. 잠시 뒤 화면을 새로 고쳐 결과를 확인하십시오' }), CALLBACK_TIMEOUT_MS)
     try {
       window.Pi.createPayment(
         { amount: prep.amount, memo: prep.memo, metadata: prep.metadata },
@@ -86,7 +86,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
           onReadyForServerCompletion: async (paymentId: string, txid: string) => {
             const r = await post('/api/payments/complete', { paymentId, txid })
             if (r.ok) {
-              finish({ ok: true, text: `결제 완료 — ${PLAN_NM[r.plan_cd as PlanCd] ?? r.plan_cd} 요금제, ${dt(r.end_dtm)} 까지` })
+              finish({ ok: true, text: `결제 완료 : ${PLAN_NM[r.plan_cd as PlanCd] ?? r.plan_cd} 요금제, ${dt(r.end_dtm)} 까지` })
               void load()
             } else finish({ ok: false, text: r.message })
           },
@@ -121,7 +121,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
             <h2 className="panel-head">현재 요금제</h2>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-1 px-4 py-3 text-sm text-ink-2">
               <p className="flex items-center gap-2 text-base font-semibold text-ink">
-                {p.plan === 'FREE' ? '없음(무료 — 표준사전 조회만)' : `요금제${p.plan.slice(1)} · ${PLAN_NM[p.plan]}`}
+                {p.plan === 'FREE' ? '없음(무료 : 표준사전 조회만)' : `요금제${p.plan.slice(1)} · ${PLAN_NM[p.plan]}`}
                 {p.grace && (
                   <span className="badge" data-tone="warn">
                     7일 체험
@@ -147,7 +147,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                 계산 방법
               </summary>
               <p className="mt-2">
-                실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 구독 중에는 업그레이드와 현재 요금제 선결제(만료일 뒤로 1개월·1년 연장)만 결제할 수 있고(무료·만료면 일반 결제), 업그레이드 = 상위 요금제(같은 요금제는 월 → 연) 가격 − 현재 가격 × (기준 일수 − 사용 일수) ÷ 기준 일수(월 30·년 365, 결제한 날 = 1일), 0.01 Pi 올림 — 결제한 때부터 새 1개월·1년. 선결제 기간이 있으면 기간마다 (상위 가격 − 현재 가격) 차액을 더해 선결제 기간도 함께 업그레이드합니다(새 주기 뒤로 이어짐).
+                실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 구독 중에는 업그레이드와 현재 요금제 선결제(만료일 뒤로 1개월·1년 연장)만 결제할 수 있고(무료·만료면 일반 결제), 업그레이드 = 상위 요금제(같은 요금제는 월 → 연) 가격 − 현재 가격 × (기준 일수 − 사용 일수) ÷ 기준 일수(월 30·년 365, 결제한 날 = 1일), 0.01 Pi 올림 : 결제한 때부터 새 1개월·1년. 선결제 기간이 있으면 기간마다 (상위 가격 − 현재 가격) 차액을 더해 선결제 기간도 함께 업그레이드합니다(새 주기 뒤로 이어짐).
               </p>
             </details>
           </section>
@@ -202,7 +202,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                     {(!sub || on) && (
                       <div className="mt-3 grid gap-2">
                         {fs.map((f) => (
-                          <button key={f.prd_cd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay(f)} className="btn-key btn-sm" title={sub ? `선결제 — 최종 만료일 ${dt(finalEnd)} 뒤로 1${f.prd_cd === 'Y' ? '년' : '개월'} 연장` : undefined}>
+                          <button key={f.prd_cd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay(f)} className="btn-key btn-sm" title={sub ? `선결제 : 최종 만료일 ${dt(finalEnd)} 뒤로 1${f.prd_cd === 'Y' ? '년' : '개월'} 연장` : undefined}>
                             {busy === `${f.plan_cd}${f.prd_cd}` ? '결제 중…' : `${sub ? '선결제 ' : ''}${f.pi_amt} Pi / ${f.prd_cd === 'Y' ? '년' : '월'}`}
                           </button>
                         ))}
@@ -217,7 +217,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                         ))}
                       </div>
                     )}
-                    {sub && ups[0]?.terms > 0 && <p className={`mt-1 text-xs ${on ? 'text-ink-2' : 'text-ink-3'}`}>선결제 {ups[0].terms}건 차액 {ups[0].prepaid} Pi 포함 — 선결제 기간도 이 요금제로 바뀝니다</p>}
+                    {sub && ups[0]?.terms > 0 && <p className={`mt-1 text-xs ${on ? 'text-ink-2' : 'text-ink-3'}`}>선결제 {ups[0].terms}건 차액 {ups[0].prepaid} Pi 포함 : 선결제 기간도 이 요금제로 바뀝니다</p>}
                   </div>
                 )
               })}

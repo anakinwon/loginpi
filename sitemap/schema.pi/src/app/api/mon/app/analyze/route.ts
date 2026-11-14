@@ -25,11 +25,11 @@ export async function POST(req: Request) {
     if (!r) return apiError('MON_AI_FAIL', 502)
     if ('empty' in r) {
       const from = new Date(r.empty.from).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
-      const msg = `분석할 문제가 없습니다 — ${from}${r.empty.floor ? '(최근 AI 수정 배포 이후)' : ''}부터 이 경로의 오류·느림 0건(요청 ${r.empty.req}건). AI 를 부르지 않았습니다`
+      const msg = `분석할 문제가 없습니다. ${from}${r.empty.floor ? '(최근 AI 수정 배포 이후)' : ''}부터 이 경로의 오류·느림 0건(요청 ${r.empty.req}건). AI 를 부르지 않았습니다`
       return NextResponse.json({ ok: false, code: 'MON_AI_EMPTY', message: msg, ...r }, { status: 200 })
     }
     if ('block' in r) {
-      const msg = r.block === 'DEPLOYING' ? `AI 수정(PR #${r.pr}) 운영 배포 중입니다 — 배포가 끝나면 실시간 확인으로 결과를 보십시오` : `AI 수정(PR #${r.pr}) 배포 직후라 재분석을 막았습니다(배포 전 오류가 섞여 해결된 문제가 미결로 보임) — 실시간 확인으로 판정하십시오`
+      const msg = r.block === 'DEPLOYING' ? `AI 수정(PR #${r.pr}) 운영 배포 중입니다. 배포가 끝나면 실시간 확인으로 결과를 보십시오` : `AI 수정(PR #${r.pr}) 배포 직후라 재분석을 막았습니다(배포 전 오류가 섞여 해결된 문제가 미결로 보임) : 실시간 확인으로 판정하십시오`
       return NextResponse.json({ ok: false, code: 'MON_AI_VERIFY', message: msg, ...r }, { status: 409 })
     }
     return NextResponse.json({ ok: true, ...r }, { headers: { 'Cache-Control': 'private, no-store' } })

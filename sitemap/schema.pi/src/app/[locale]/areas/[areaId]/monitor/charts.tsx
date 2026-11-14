@@ -5,8 +5,8 @@
 const C = { line: 'var(--accent)', grid: 'var(--line)', axis: 'var(--ink-3)', mark: 'var(--accent)', ok: 'var(--ink-off)', warn: 'var(--warn)', bad: 'var(--danger)' }
 const AX = { fill: C.axis, fontFamily: 'var(--font-code)' }
 const fmtT = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false })
-export const fmtN = (v: number | null | undefined, d = 1) => (v === null || v === undefined ? '—' : Math.abs(v) >= 1e6 ? `${(v / 1e6).toFixed(d)}M` : Math.abs(v) >= 1e3 ? `${(v / 1e3).toFixed(d)}K` : `${Math.round(v * 10 ** d) / 10 ** d}`)
-export const fmtB = (v: number | null | undefined) => (v === null || v === undefined ? '—' : v >= 2 ** 40 ? `${(v / 2 ** 40).toFixed(1)}TiB` : v >= 2 ** 30 ? `${(v / 2 ** 30).toFixed(1)}GiB` : v >= 2 ** 20 ? `${(v / 2 ** 20).toFixed(1)}MiB` : `${Math.round(v / 1024)}KiB`)
+export const fmtN = (v: number | null | undefined, d = 1) => (v === null || v === undefined ? '-' : Math.abs(v) >= 1e6 ? `${(v / 1e6).toFixed(d)}M` : Math.abs(v) >= 1e3 ? `${(v / 1e3).toFixed(d)}K` : `${Math.round(v * 10 ** d) / 10 ** d}`)
+export const fmtB = (v: number | null | undefined) => (v === null || v === undefined ? '-' : v >= 2 ** 40 ? `${(v / 2 ** 40).toFixed(1)}TiB` : v >= 2 ** 30 ? `${(v / 2 ** 30).toFixed(1)}GiB` : v >= 2 ** 20 ? `${(v / 2 ** 20).toFixed(1)}MiB` : `${Math.round(v / 1024)}KiB`)
 
 export type Pt = { t: string; v: number | null }
 
@@ -32,7 +32,7 @@ export function Line({ title, pts, unit = '', max, color = C.line, h = 120 }: { 
       <figcaption className="flex items-baseline justify-between gap-2 text-xs font-medium text-ink-2">
         {title}
         <span className="text-sm font-semibold tabular-nums text-ink">
-          {last ? `${fmtN(last.v)}${unit}` : '—'}
+          {last ? `${fmtN(last.v)}${unit}` : '-'}
         </span>
       </figcaption>
       <svg viewBox={`0 0 ${W} ${h}`} className="w-full" role="img" aria-label={`${title} 추이`}>
@@ -139,7 +139,7 @@ export function Stack({ title, bars, h = 120, onPick, sel }: { title: string; ba
               {...(onPick && {
                 role: 'button',
                 tabIndex: 0,
-                'aria-label': `${fmtT(b.t)} 요청 ${b.ok + b.slow + b.err}건 — 누르면 이 분의 느림·오류 상세`,
+                'aria-label': `${fmtT(b.t)} 요청 ${b.ok + b.slow + b.err}건 : 누르면 이 분의 느림·오류 상세`,
                 'aria-pressed': sel === b.t,
                 className: 'cursor-pointer outline-none focus-visible:opacity-70',
                 onClick: () => onPick(b.t),
@@ -151,7 +151,7 @@ export function Stack({ title, bars, h = 120, onPick, sel }: { title: string; ba
                 },
               })}
             >
-              <title>{`${fmtT(b.t)} 요청 ${b.ok + b.slow + b.err} · 정상 ${b.ok} · 느림 ${b.slow} · 오류 ${b.err}${onPick ? ' — 누르면 상세' : ''}`}</title>
+              <title>{`${fmtT(b.t)} 요청 ${b.ok + b.slow + b.err} · 정상 ${b.ok} · 느림 ${b.slow} · 오류 ${b.err}${onPick ? ' : 누르면 상세' : ''}`}</title>
               <rect x={x0} y={pad.t} width={w} height={h - pad.t - pad.b} style={{ fill: sel === b.t ? 'var(--accent-soft)' : 'transparent', stroke: sel === b.t ? C.mark : 'none' }} strokeWidth={0.8} />
               {(
                 [
@@ -199,7 +199,7 @@ export function Tile({ nm, val, sub, warn, onClick, title, on }: { nm: string; v
   )
   const cls = `panel min-h-22 px-4 py-3 ${on ? 'bg-accent-soft ring-1 ring-accent-ink' : ''}`
   return onClick ? (
-    <button type="button" onClick={onClick} title={title} aria-label={`${nm} ${val} — ${title}`} aria-pressed={on} className={`${cls} text-start transition-colors ${on ? '' : 'hover:bg-raised'}`}>
+    <button type="button" onClick={onClick} title={title} aria-label={`${nm} ${val} : ${title}`} aria-pressed={on} className={`${cls} text-start transition-colors ${on ? '' : 'hover:bg-raised'}`}>
       {body}
     </button>
   ) : (

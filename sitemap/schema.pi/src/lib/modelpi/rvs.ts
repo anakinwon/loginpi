@@ -9,7 +9,7 @@ import { SYS_COL_NMS } from './phy.ts'
 // 카탈로그 CSV 머리글(대문자) — 칼럼 1행, FK 는 칼럼 행에 평탄화
 export const CAT_HEADERS = ['TABLE_NAME', 'TABLE_COMMENT', 'COLUMN_NAME', 'COLUMN_ID', 'DATA_TYPE', 'DATA_LENGTH', 'DATA_SCALE', 'NULLABLE', 'DATA_DEFAULT', 'PK_POS', 'COLUMN_COMMENT', 'FK_NAME', 'REF_TABLE', 'REF_COLUMN'] as const
 
-const ORA = `-- Oracle·Tibero 카탈로그 조회(현재 스키마) — 결과를 CSV(머리글 포함, UTF-8)로 저장해 업로드
+const ORA = `-- Oracle·Tibero 카탈로그 조회(현재 스키마) : 결과를 CSV(머리글 포함, UTF-8)로 저장해 업로드
 SELECT c.table_name AS "TABLE_NAME", tc.comments AS "TABLE_COMMENT", c.column_name AS "COLUMN_NAME", c.column_id AS "COLUMN_ID",
        c.data_type AS "DATA_TYPE",
        CASE WHEN c.data_type IN ('NUMBER','FLOAT') THEN c.data_precision WHEN c.data_type LIKE '%CHAR%' THEN c.char_length END AS "DATA_LENGTH",
@@ -29,7 +29,7 @@ SELECT c.table_name AS "TABLE_NAME", tc.comments AS "TABLE_COMMENT", c.column_na
   LEFT JOIN user_cons_columns rc ON rc.constraint_name = r.constraint_name AND rc.position = fc.position
  ORDER BY c.table_name, c.column_id`
 
-const PG = `-- PostgreSQL 카탈로그 조회(public 스키마 — 다른 스키마는 아래 'public' 을 바꿈) — 결과를 CSV(머리글 포함, UTF-8)로 저장해 업로드
+const PG = `-- PostgreSQL 카탈로그 조회(public 스키마 : 다른 스키마는 아래 'public' 을 바꿈) : 결과를 CSV(머리글 포함, UTF-8)로 저장해 업로드
 SELECT c.table_name AS "TABLE_NAME", obj_description(format('%I.%I', c.table_schema, c.table_name)::regclass) AS "TABLE_COMMENT",
        c.column_name AS "COLUMN_NAME", c.ordinal_position AS "COLUMN_ID", upper(c.data_type) AS "DATA_TYPE",
        coalesce(c.character_maximum_length, c.numeric_precision) AS "DATA_LENGTH", c.numeric_scale AS "DATA_SCALE",
@@ -71,7 +71,7 @@ export function csvToRvs(text: string): RvsResult | { missing: string[] } {
   const seen = new Set<string>() // 테이블|칼럼 — 중복 행 O(1) 판정
   for (const r of rows.slice(1)) {
     if (seen.size > 50_000) {
-      warnings.push('칼럼이 50,000개를 넘어 해석을 중단했습니다 — 나누어 올리십시오')
+      warnings.push('칼럼이 50,000개를 넘어 해석을 중단했습니다. 나누어 올리십시오')
       break
     }
     const tn = v(r, 'TABLE_NAME').toUpperCase()

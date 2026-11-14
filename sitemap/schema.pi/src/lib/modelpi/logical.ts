@@ -94,7 +94,7 @@ export function recommendAttrs(i: AttrInput): { pk: AttrCand[]; required: AttrCa
     if (!inherit.length) warn.push('이력 엔터티는 원천 엔터티와 식별 관계를 맺어 원천 식별자를 상속합니다')
   } else if (clss === '관계') {
     pk = inherit
-    if (inherit.length < 2) warn.push('관계(N:M 해소) 엔터티 식별자 = 양쪽 부모 식별자 — 두 부모와 식별 관계를 등록하십시오')
+    if (inherit.length < 2) warn.push('관계(N:M 해소) 엔터티 식별자 = 양쪽 부모 식별자 : 두 부모와 식별 관계를 등록하십시오')
   } else if (clss === '집계' || clss === '통계' || i.tp === 'PROC') {
     pk = [...inherit, ...firstOf(['기준일자', '기준년월'], 'PK', true, '집계 = 기준 시점 + 집계 차원')]
   } else if (clss === '내역' || clss === '로그') {
@@ -105,7 +105,7 @@ export function recommendAttrs(i: AttrInput): { pk: AttrCand[]; required: AttrCa
     pk = [...inherit, ...firstOf([`${core}번호`, `${core}ID`, `${core}코드`], 'PK', true, '본질 식별자 ~번호, 시스템 발급이면 ~ID(04 §2.2)')]
   }
   pk = pk.filter((c, k, a) => a.findIndex((x) => x.term_log_nm === c.term_log_nm) === k)
-  if (pk.length > 3) warn.push(`복합 식별자 ${pk.length}개 — 3개를 넘으면 인조 식별자(${core}번호) 검토(04 §2.2)`)
+  if (pk.length > 3) warn.push(`복합 식별자 ${pk.length}개 : 3개를 넘으면 인조 식별자(${core}번호) 검토(04 §2.2)`)
   pk.forEach((c) => used.add(c.term_log_nm))
 
   // ② 필수 속성
@@ -126,11 +126,11 @@ export function recommendAttrs(i: AttrInput): { pk: AttrCand[]; required: AttrCa
     const fromStd = i.terms.filter((t) => t.term_log_nm.startsWith(core) && re.test(t.term_log_nm) && !used.has(t.term_log_nm)).sort((a, b) => a.term_log_nm.length - b.term_log_nm.length)[0]?.term_log_nm
     const names = [...(fromTmpl ? [fromTmpl] : []), ...rule.filter((n) => byNm.has(n)), ...(fromStd ? [fromStd] : []), ...rule]
     const nm = names.find((n) => byNm.has(n)) ?? names[0]
-    push({ ...cand(nm, 'REQ', true, fromTmpl === nm ? 'industry' : 'rule', `필수 4종 : ${MUST_NM[kind]} — ${reason}`), must: kind })
+    push({ ...cand(nm, 'REQ', true, fromTmpl === nm ? 'industry' : 'rule', `필수 4종 ${MUST_NM[kind]} : ${reason}`), must: kind })
   }
   pickMust('name', [`${core}명`, `${core}명칭`], '식별자가 가리키는 대상의 이름')
   pickMust('dt', act ? [`${core}일시`, `${core}등록일시`] : [`${core}등록일시`, '등록일시', `${core}일시`], act ? `행위(${coreWords[coreWords.length - 1]}) 발생 일시` : '실체 등록 일시')
-  pickMust('st', [`${core}상태유형코드`, '상태유형코드'], '행위·처리 상태(공통코드 유형코드 참조 — 상태 값은 4개 이상·추가 가능)')
+  pickMust('st', [`${core}상태유형코드`, '상태유형코드'], '행위·처리 상태(공통코드 유형코드 참조 : 상태 값은 4개 이상·추가 가능)')
   for (const p of i.parents.filter((x) => x.idnt_yn !== 'Y'))
     for (const t of p.pk) push({ ...cand(t.term_log_nm, 'FK', p.prnt_opt_yn === 'N', 'inherit', `비식별 관계 : ${p.prnt_nm} 참조(${p.prnt_opt_yn === 'N' ? '부모 필수 → 필수' : '부모 선택 → 선택'})`, p.rel_id), term_id: t.term_id, term_phy_nm: t.term_phy_nm, dom_nm: t.dom_nm, missing: false })
   for (const n of i.tmpl?.terms ?? []) if (!i.tmpl?.pk.includes(n)) push(cand(n, 'REQ', true, 'industry', '업종 템플릿 핵심 속성'))
@@ -146,6 +146,6 @@ export function recommendAttrs(i: AttrInput): { pk: AttrCand[]; required: AttrCa
   } else {
     for (const n of [`${core}건수`, `${core}금액`]) firstOf([n], 'REQ', true, '집계 측정값', false).forEach(push)
   }
-  if (!pk.length && !i.havePk) warn.push('필수 4종 : 주식별자가 없습니다 — 식별 관계를 등록하거나 식별자 용어를 신청하십시오')
+  if (!pk.length && !i.havePk) warn.push('필수 4종 : 주식별자가 없습니다. 식별 관계를 등록하거나 식별자 용어를 신청하십시오')
   return { pk: pk.filter((c) => !i.have.has(c.term_log_nm)), required: req, warn, must }
 }

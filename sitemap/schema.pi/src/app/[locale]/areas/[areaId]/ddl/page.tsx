@@ -185,10 +185,10 @@ export default function DdlPage({
     setBusy(false)
     if (!j.ok)
       return setMsg(
-        `${j.message}${Array.isArray(j.detail) && j.detail.length ? ` — ${j.detail.slice(0, 3).join(' · ')}` : ''}`,
+        `${j.message}${Array.isArray(j.detail) && j.detail.length ? ` : ${j.detail.slice(0, 3).join(' · ')}` : ''}`,
       )
     setMsg(
-      '실행을 요청했습니다 — 다른 승인권자(시스템담당자·데이터아키텍트)가 승인하면 실행할 수 있습니다',
+      '실행을 요청했습니다. 다른 승인권자(시스템담당자·데이터아키텍트)가 승인하면 실행할 수 있습니다',
     )
     setRev((r) => r + 1)
     setTab('req')
@@ -510,11 +510,11 @@ export default function DdlPage({
                     </button>
                     <span className="flex w-full items-start gap-1 text-xs text-danger">
                       <TriangleAlert className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
-                      테이블마다 CREATE 직전 DROP … CASCADE 포함 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다
+                      테이블마다 CREATE 직전 DROP … CASCADE 포함 : 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다
                     </span>
                     {!myConns.length && (
                       <span className="w-full text-xs text-ink-3">
-                        이 DBMS 접속 없음 — 'DB 접속' 탭에서 등록(데이터아키텍트)
+                        이 DBMS 접속 없음 : 'DB 접속' 탭에서 등록(데이터아키텍트)
                       </span>
                     )}
                   </div>

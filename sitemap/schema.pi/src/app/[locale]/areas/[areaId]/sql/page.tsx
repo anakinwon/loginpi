@@ -343,7 +343,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
     void (async () => {
       const r = await piFetch(`${api}/sql/meta?conn=${connId}&node=schemas`)
       const j = await r.json()
-      if (!j.ok) return setMsg(typeof j.detail === 'string' ? `${j.message} — ${j.detail}` : j.message)
+      if (!j.ok) return setMsg(typeof j.detail === 'string' ? `${j.message} : ${j.detail}` : j.message)
       setSchemas(j.items)
       const keep = store.get(`sql-schema-${areaId}-${connId}`)
       setSchema(j.items.find((s: { name: string }) => s.name === keep)?.name ?? j.items.find((s: { cur: boolean }) => s.cur)?.name ?? j.items[0]?.name ?? '')
@@ -389,7 +389,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   // 실행 — script = 전체(Alt+X), 아니면 선택 영역 또는 커서가 든 문장(그 문장을 선택해 보여 줌)
   async function run(script: boolean, sqlText?: string, confirm = false, lim = limit, bound = false): Promise<void> {
     if (!conn || busy) return
-    if (manual && pending.length >= PENDING_MAX) return setMsg(`대기 문장이 ${PENDING_MAX}개입니다 — Commit 또는 Rollback 하십시오`)
+    if (manual && pending.length >= PENDING_MAX) return setMsg(`대기 문장이 ${PENDING_MAX}개입니다. Commit 또는 Rollback 하십시오`)
     let text = sqlText
     if (text == null) {
       const s = ed.current!.get()
@@ -417,10 +417,10 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       if (connRef.current !== cid) return // 요청 중 접속을 바꿈
       if (j.code === 'SQL_CONFIRM') {
         const list = (j.detail as { seq: number; txt: string; danger: Danger }[]).map((d) => `${d.seq}. [${DANGER_NM[d.danger]}]\n${d.txt}`).join('\n\n')
-        if (window.confirm(`위험한 문장이 있습니다 — 그래도 실행할까요?\n\n${list}`)) return void (setBusy(false), await run(script, text, true, lim, true))
+        if (window.confirm(`위험한 문장이 있습니다. 그래도 실행할까요?\n\n${list}`)) return void (setBusy(false), await run(script, text, true, lim, true))
         return setMsg('실행을 취소했습니다')
       }
-      if (!j.ok) return setMsg(`${j.message}${j.detail ? ` — ${typeof j.detail === 'string' ? j.detail : (j.detail.txt ?? JSON.stringify(j.detail))}` : ''}`)
+      if (!j.ok) return setMsg(`${j.message}${j.detail ? ` : ${typeof j.detail === 'string' ? j.detail : (j.detail.txt ?? JSON.stringify(j.detail))}` : ''}`)
       setOut({ results: j.results, ms: j.ms, at: j.at, mode: j.mode })
       setLast((j.results as RunRes[]).every((x) => x.kind === 'READ') ? text! : '') // 전체 패치 = 조회만 다시 실행(쓰기 재실행 방지)
       if (j.journal?.length) setPending((p) => [...p, ...j.journal])
@@ -443,14 +443,14 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       const j = await (await piFetch(`${api}/sql/run`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ conn_id: cid, tx: 'MANUAL', pending, commit: true, confirm: true, limit, schema: schema || null }) })).json()
       if (connRef.current !== cid) return false
       setLast('')
-      if (!j.ok) return (setMsg(`${j.message}${j.detail ? ` — ${typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail)}` : ''}`), false)
+      if (!j.ok) return (setMsg(`${j.message}${j.detail ? ` : ${typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail)}` : ''}`), false)
       setOut({ results: j.results, ms: j.ms, at: j.at, mode: j.mode })
       void loadHist(1)
-      if (j.rslt === 'OK') return (setPending([]), flash(`커밋했습니다 — ${pending.length}문장`), true)
-      setMsg('커밋 실패 — 전체 되돌렸습니다(대기 목록은 그대로)')
+      if (j.rslt === 'OK') return (setPending([]), flash(`커밋했습니다. ${pending.length}문장`), true)
+      setMsg('커밋 실패 : 전체 되돌렸습니다(대기 목록은 그대로)')
       return false
     } catch {
-      setMsg('커밋 요청이 실패했습니다(네트워크·시간 초과) — DB 반영 여부를 실행 이력에서 확인하십시오')
+      setMsg('커밋 요청이 실패했습니다(네트워크·시간 초과) : DB 반영 여부를 실행 이력에서 확인하십시오')
       return false
     } finally {
       setBusy(false)
@@ -458,7 +458,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   }
   const rollback = () => {
     if (!pending.length || !window.confirm(`대기 문장 ${pending.length}개를 버릴까요? (DB 는 아직 바뀌지 않았습니다)`)) return
-    setPending([]), flash('Rollback — 대기 목록을 비웠습니다')
+    setPending([]), flash('Rollback : 대기 목록을 비웠습니다')
   }
   const setMode = (m: 'AUTO' | 'MANUAL') => {
     if (m === txMode) return
@@ -470,7 +470,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
 
   // 이름 복사·끌어 놓기 — 편집기(CodeMirror)는 끌어 온 text/plain 을 놓은 자리에 넣음. SQL 에 바로 쓰도록 필요하면 따옴표 식별자
   const copyName = (t: string) => {
-    if (!navigator.clipboard) return setNote('이 브라우저는 복사를 지원하지 않습니다(https 필요) — 끌어 놓기를 쓰십시오')
+    if (!navigator.clipboard) return setNote('이 브라우저는 복사를 지원하지 않습니다(https 필요) : 끌어 놓기를 쓰십시오')
     void navigator.clipboard.writeText(t).then(() => setNote(`복사했습니다 : ${t}`), () => setNote('복사하지 못했습니다(브라우저 권한)'))
     window.setTimeout(() => setNote(''), 3000)
   }
@@ -532,7 +532,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         <PageHead title="SQL 편집기" />
         <div className="panel empty">
           <Icon3D icon={MENU_ICON.sql} />
-          <p>SQL 편집기 권한 없음 — 분류체계 설정 권한자에게 역할 변경 요청</p>
+          <p>SQL 편집기 권한 없음 : 분류체계 설정 권한자에게 역할 변경 요청</p>
         </div>
       </main>
     )
@@ -562,7 +562,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
           {!conns.length && <option value="">접속이 없습니다</option>}
           {conns.map((c) => (
             <option key={c.conn_id} value={c.conn_id} disabled={!usable(c)}>
-              {c.conn_nm} ({DBMS_NM[c.dbms_cd] ?? c.dbms_cd}){c.exec_mthd_cd === 'AGT' ? ' — 에이전트 1차 미지원' : !usable(c) ? ' — 조회 전용 계정 아님' : ''}
+              {c.conn_nm} ({DBMS_NM[c.dbms_cd] ?? c.dbms_cd}){c.exec_mthd_cd === 'AGT' ? ' : 에이전트 1차 미지원' : !usable(c) ? ' : 조회 전용 계정 아님' : ''}
             </option>
           ))}
         </select>
@@ -580,7 +580,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         <button type="button" className={btn} disabled={!conn || busy} onClick={() => run(true)} title="Alt+X">
           <FastForward aria-hidden /> 스크립트
         </button>
-        <button type="button" className={btn} disabled={!conn} onClick={() => ed.current?.format()} title="Ctrl+Shift+F — 선택 영역(없으면 커서 문장)을 강 정렬(키워드 끝 6열)로 다시 배치">
+        <button type="button" className={btn} disabled={!conn} onClick={() => ed.current?.format()} title="Ctrl+Shift+F : 선택 영역(없으면 커서 문장)을 강 정렬(키워드 끝 6열)로 다시 배치">
           <AlignLeft aria-hidden /> 정렬
         </button>
         <span className="ms-auto flex items-center gap-2">
@@ -633,10 +633,10 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         </p>
       )}
       {note && !msg && <p className="shrink-0 px-2 py-1 text-xs text-ink-3" aria-live="polite">{note}</p>}
-      {!conns.some(usable) && conns.length > 0 && <p className="shrink-0 px-2 py-1 text-xs text-ink-3">쓸 수 있는 접속 없음 — 데이터아키텍트가 &lsquo;DDL 생성 › DB 접속&rsquo;에서 서버 직접 접속을 &lsquo;조회 전용 계정&rsquo;으로 지정</p>}
+      {!conns.some(usable) && conns.length > 0 && <p className="shrink-0 px-2 py-1 text-xs text-ink-3">쓸 수 있는 접속 없음 : 데이터아키텍트가 &lsquo;DDL 생성 › DB 접속&rsquo;에서 서버 직접 접속을 &lsquo;조회 전용 계정&rsquo;으로 지정</p>}
       {!conns.length && (
         <p className="shrink-0 px-2 py-1 text-xs text-ink-3">
-          접속 없음 — <Link href={`/areas/${areaId}/ddl`} className="text-accent-ink hover:underline">DDL 생성 › DB 접속</Link>에서 등록
+          접속 없음 : <Link href={`/areas/${areaId}/ddl`} className="text-accent-ink hover:underline">DDL 생성 › DB 접속</Link>에서 등록
         </p>
       )}
 
@@ -725,7 +725,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
               const OI = OBJ_ICON[t.kind] ?? Table2
               return (
                 <span key={t.key} className={`flex shrink-0 items-center rounded-t-control border border-line ${on ? '-mb-px border-b-surface bg-surface font-medium text-ink' : 'bg-raised text-ink-2 hover:bg-surface'}`}>
-                  <button type="button" role="tab" aria-selected={on} onClick={() => (!objCur && void tabs.saveTab(tabs.cur), setObjCur(t.key))} title={`${t.schema}.${t.rel} — 객체 편집기`} className="inline-flex items-center gap-1 py-1 ps-2 font-mono whitespace-nowrap">
+                  <button type="button" role="tab" aria-selected={on} onClick={() => (!objCur && void tabs.saveTab(tabs.cur), setObjCur(t.key))} title={`${t.schema}.${t.rel} : 객체 편집기`} className="inline-flex items-center gap-1 py-1 ps-2 font-mono whitespace-nowrap">
                     <OI className="h-3.5 w-3.5 text-ink-3" aria-hidden />
                     {t.rel}
                   </button>
@@ -900,7 +900,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" onKeyDown={(e) => e.key === 'Escape' && (leave.cancel?.(), setLeave(null))}>
           <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title" className="w-full max-w-xl rounded-sheet border border-line bg-surface p-5 text-sm shadow-2">
             <h2 id="leave-title" className="text-base font-semibold text-danger">
-              커밋하지 않은 대기 문장 {pending.length}개 — {leave.why} 전에 처리
+              커밋하지 않은 대기 문장 {pending.length}개 : {leave.why} 전에 처리
             </h2>
             <p className="mt-1 text-xs text-ink-3">아직 DB 에 반영되지 않음(수동 미리 실행) · Commit = 한 트랜잭션으로 다시 실행해 반영 · Rollback = 버림 · 탭을 그냥 닫으면 Rollback</p>
             <ol className="mt-3 max-h-48 list-decimal overflow-auto rounded-control border border-line bg-well py-1 ps-7 pe-2 font-mono text-xs">

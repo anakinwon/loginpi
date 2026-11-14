@@ -71,12 +71,12 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
 
   const approve = async (r: Row) => {
     if (busy || !r.pr_no || !r.head_cmt_txt) return
-    if (!confirm(`PR #${r.pr_no} '${r.fix_txt}' 을 승인합니다 — master 에 병합하고 바로 운영에 배포합니다(master 의 다른 미배포 커밋도 함께 나감). GitHub 에서 변경 내용을 확인하셨습니까?`)) return
+    if (!confirm(`PR #${r.pr_no} '${r.fix_txt}' 을 승인합니다. master 에 병합하고 바로 운영에 배포합니다(master 의 다른 미배포 커밋도 함께 나감). GitHub 에서 변경 내용을 확인하셨습니까?`)) return
     setBusy(r.fix_id)
     setMsg('')
     try {
       const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area_id: areaId, number: r.pr_no, head: r.head_cmt_txt }) })).json()
-      setMsg(j.ok ? `PR #${r.pr_no} 승인 — 운영 배포 중(커밋 ${j.ahead}개)` : (j.message ?? '승인하지 못했습니다'))
+      setMsg(j.ok ? `PR #${r.pr_no} 승인 : 운영 배포 중(커밋 ${j.ahead}개)` : (j.message ?? '승인하지 못했습니다'))
     } catch {
       setMsg('승인하지 못했습니다(네트워크)')
     } finally {
@@ -88,7 +88,7 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
   // 반려·되돌리기 공용 — 사유 필수(2자 이상), 결과 메시지 후 목록 다시 조회
   const act = async (r: Row, kind: 'reject' | 'rollback') => {
     if (busy) return
-    const label = kind === 'reject' ? `PR #${r.pr_no} 반려 — PR 을 닫고 병합하지 않습니다(운영 코드는 수정 전 그대로)` : `PR #${r.pr_no} 되돌리기 — 이 AI 수정을 수정 전 코드로 되돌리는 커밋을 master 에 만들고 바로 운영에 배포합니다`
+    const label = kind === 'reject' ? `PR #${r.pr_no} 반려 : PR 을 닫고 병합하지 않습니다(운영 코드는 수정 전 그대로)` : `PR #${r.pr_no} 되돌리기 : 이 AI 수정을 수정 전 코드로 되돌리는 커밋을 master 에 만들고 바로 운영에 배포합니다`
     const reason = prompt(`${label}\n\n사유를 입력하십시오(2자 이상)`)?.trim()
     if (!reason) return
     if (reason.length < 2) return setMsg('사유를 2자 이상 입력하십시오')
@@ -97,7 +97,7 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
     try {
       const body = kind === 'reject' ? { area_id: areaId, number: r.pr_no, reason } : { area_id: areaId, fix_id: r.fix_id, reason }
       const j = await (await piFetch(`/api/mon/app/fix/${kind}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
-      setMsg(j.ok ? (kind === 'reject' ? `PR #${r.pr_no} 반려 — PR 을 닫았습니다(수정 전 코드 유지)` : `PR #${r.pr_no} 되돌림 — 수정 전 코드로 운영 배포 중(커밋 ${j.ahead}개)`) : (j.message ?? '처리하지 못했습니다'))
+      setMsg(j.ok ? (kind === 'reject' ? `PR #${r.pr_no} 반려 : PR 을 닫았습니다(수정 전 코드 유지)` : `PR #${r.pr_no} 되돌림 : 수정 전 코드로 운영 배포 중(커밋 ${j.ahead}개)`) : (j.message ?? '처리하지 못했습니다'))
     } catch {
       setMsg('처리하지 못했습니다(네트워크)')
     } finally {
@@ -110,7 +110,7 @@ export default function FixTab({ live, canApv }: { live: boolean; canApv: boolea
     <section className="text-sm">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-sm font-semibold text-ink">AI 수정 이력</h2>
-        <InfoTip>요청 주체 = 수정안을 만든 AI 모델 · 결재 요청자 = 'PR 로 해결'을 누른 사람 · 결재 = 승인(병합·운영 배포) 또는 반려(PR 닫기 — 수정 전 유지) · 배포된 수정은 '되돌리기'로 수정 전 코드로 다시 배포</InfoTip>
+        <InfoTip>요청 주체 = 수정안을 만든 AI 모델 · 결재 요청자 = 'PR 로 해결'을 누른 사람 · 결재 = 승인(병합·운영 배포) 또는 반려(PR 닫기 : 수정 전 유지) · 배포된 수정은 '되돌리기'로 수정 전 코드로 다시 배포</InfoTip>
         <span className="font-mono text-xs text-ink-3 tabular-nums">
           {data ? `${data.total}건` : ''}
           {at && ` · ${at.toLocaleTimeString('ko-KR', { hour12: false })} 기준`}

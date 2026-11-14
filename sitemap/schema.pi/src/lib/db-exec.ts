@@ -105,7 +105,7 @@ export async function runPg(t: Target, pwd: string, stmts: string[], deadline: n
       await tx.unsafe(`SELECT set_config('search_path', quote_ident(coalesce(current_schema(), 'public')), true)`)
       for (let i = 0; i < stmts.length; i++) {
         at = i
-        if (deadline - Date.now() < STMT_MS + 5_000) throw Object.assign(new Error('실행 시간 예산 초과 — 다시 실행하십시오'), { code: 'EXEC_TIMEOUT' })
+        if (deadline - Date.now() < STMT_MS + 5_000) throw Object.assign(new Error('실행 시간 예산 초과 : 다시 실행하십시오'), { code: 'EXEC_TIMEOUT' })
         const s0 = Date.now()
         await tx.unsafe(stmts[i])
         res[i] = { ...res[i], rslt: 'OK', ms: Date.now() - s0 }
@@ -142,7 +142,7 @@ export async function runOracle(t: Target, pwd: string, stmts: string[], deadlin
         const x = e as { code?: string; errorNum?: number; message?: string }
         // CREATE 직전 DROP(IF EXISTS 미지원) 의 '테이블 없음'(ORA-00942) = 성공으로 기록 — 재시도에서 DROP 이 다시 돌아 앞서 만든 테이블을 지우지 않게 OK
         if (x.errorNum === 942 && dropTarget(stmts[i])) {
-          res[i] = { ...res[i], rslt: 'OK', err_msg: '테이블 없음 — DROP 건너뜀', ms: Date.now() - s0 }
+          res[i] = { ...res[i], rslt: 'OK', err_msg: '테이블 없음 : DROP 건너뜀', ms: Date.now() - s0 }
           continue
         }
         res[i] = { ...res[i], rslt: 'ERR', err_cd: String(x.code ?? x.errorNum ?? 'ERR').slice(0, 20), err_msg: maskErr(x.message, hide), ms: Date.now() - s0 }

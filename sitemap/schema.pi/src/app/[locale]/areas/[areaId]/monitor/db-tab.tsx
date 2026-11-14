@@ -44,7 +44,7 @@ export default function DbTab({ areaId, live, min }: { areaId: string; live: boo
     return (
       <div className="panel empty">
         <Icon3D icon={MENU_ICON.monitor} />
-        <p>PostgreSQL 서버 직접 접속 없음 — 설정 › DB 접속에서 등록</p>
+        <p>PostgreSQL 서버 직접 접속 없음 : 설정 › DB 접속에서 등록</p>
       </div>
     )
   const now = data?.now && 'stat' in data.now ? data.now : null
@@ -72,9 +72,9 @@ export default function DbTab({ areaId, live, min }: { areaId: string; live: boo
         </p>
       )}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-        <Tile nm="활성 세션" val={String(now?.stat.sess_cnt ?? '—')} />
-        <Tile nm="접속" val={String(now?.stat.conn_cnt ?? '—')} />
-        <Tile nm="락 대기" val={String(now?.stat.lock_wait_cnt ?? '—')} warn={(now?.stat.lock_wait_cnt ?? 0) > 0} />
+        <Tile nm="활성 세션" val={String(now?.stat.sess_cnt ?? '-')} />
+        <Tile nm="접속" val={String(now?.stat.conn_cnt ?? '-')} />
+        <Tile nm="락 대기" val={String(now?.stat.lock_wait_cnt ?? '-')} warn={(now?.stat.lock_wait_cnt ?? 0) > 0} />
         <Tile nm="트랜잭션/s" val={fmtN(last(v.tps))} sub="최근 1분" />
         <Tile nm="DB 크기" val={fmtB(N(now?.stat.db_sz ?? null))} />
       </div>

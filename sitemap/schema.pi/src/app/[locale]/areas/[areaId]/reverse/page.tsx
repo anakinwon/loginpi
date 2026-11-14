@@ -134,7 +134,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
 
   const onFile = async (f: File | undefined) => {
     if (!f) return
-    if (f.size > 4_000_000) return setMsg('파일이 너무 큽니다(4MB 이하) — 주제영역·스키마 단위로 나누어 올리십시오')
+    if (f.size > 4_000_000) return setMsg('파일이 너무 큽니다(4MB 이하) : 주제영역·스키마 단위로 나누어 올리십시오')
     setText(await f.text())
     setFileNm(f.name)
     setSrc(/\.csv$/i.test(f.name) ? 'CSV' : 'DDL')
@@ -143,7 +143,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
     const t = await (await piFetch(`${base}?catalog=${dbms}`)).text()
     try {
       await navigator.clipboard.writeText(t)
-      setMsg('카탈로그 조회 SQL 을 복사했습니다 — 대상 DB 에서 실행한 결과를 CSV(머리글 포함)로 저장해 올리십시오')
+      setMsg('카탈로그 조회 SQL 을 복사했습니다. 대상 DB 에서 실행한 결과를 CSV(머리글 포함)로 저장해 올리십시오')
     } catch {
       setText(t)
       setMsg('클립보드를 쓸 수 없어 아래 입력란에 SQL 을 넣었습니다')
@@ -155,7 +155,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
     const j = await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ src_cd: src, dbms_cd: dbms, file_nm: fileNm, text }) })).json()
     setBusy(false)
     if (!j.ok) return setMsg(j.message)
-    setMsg(`해석 완료 — 테이블 ${j.tbl_cnt} · 칼럼 ${j.col_cnt} · 용어 매핑 ${j.mapped}${j.warnings?.length ? ` · 경고 ${j.warnings.length}(${j.warnings.slice(0, 3).join(' / ')})` : ''}`)
+    setMsg(`해석 완료 : 테이블 ${j.tbl_cnt} · 칼럼 ${j.col_cnt} · 용어 매핑 ${j.mapped}${j.warnings?.length ? ` · 경고 ${j.warnings.length}(${j.warnings.slice(0, 3).join(' / ')})` : ''}`)
     await loadJobs()
     setJobId(j.rvs_job_id)
   }
@@ -225,12 +225,12 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
       if (r.cols.join() === r.ref_cols.join()) {
         const f = await post(`${api}/relations/${relId}/fk-plan`, {})
         out.push(f.ok ? `성공 관계 ${r.prnt} → ${r.chld} (FK 연결 ${f.applied})` : `확인 관계 ${r.prnt} → ${r.chld} : FK 연결 실패 ${f.message}`)
-      } else out.push(`확인 관계 ${r.prnt} → ${r.chld} : 역할명 FK(${r.cols.join(',')}) — 논리 모델의 관계 FK 버튼에서 연결하십시오`)
+      } else out.push(`확인 관계 ${r.prnt} → ${r.chld} : 역할명 FK(${r.cols.join(',')}) : 논리 모델의 관계 FK 버튼에서 연결하십시오`)
     }
     await mark([], markC)
     setBusy(false)
     setLog(out)
-    setMsg(`반영 완료 — 엔터티 ${markT.length}개. ERD 화면에서 새 엔터티가 자동 배치됩니다`)
+    setMsg(`반영 완료 : 엔터티 ${markT.length}개. ERD 화면에서 새 엔터티가 자동 배치됩니다`)
     await loadDet()
     await loadJobs()
   }
@@ -262,7 +262,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
           <option value="CSV">카탈로그 조회 결과(CSV)</option>
         </select>
         <span className="h-5 w-px bg-line" aria-hidden />
-        <button type="button" onClick={() => void copyCatalog()} className={btn} disabled={!prjId} title="대상 DB 에서 실행할 카탈로그 조회 SQL 복사 — 결과를 CSV(머리글 포함)로 저장해 올림">
+        <button type="button" onClick={() => void copyCatalog()} className={btn} disabled={!prjId} title="대상 DB 에서 실행할 카탈로그 조회 SQL 복사 : 결과를 CSV(머리글 포함)로 저장해 올림">
           <Copy aria-hidden />
           카탈로그 SQL
         </button>
@@ -360,7 +360,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
                         <span className="chip-phy">{t.tbl_nm}</span>
                         {t.tbl_desc && <div className="mt-1 text-xs whitespace-normal text-ink-2">{t.tbl_desc}</div>}
                       </td>
-                      <td className={`${TD} text-xs`}>{ok ? <span className="text-ink-2 tabular-nums">{t.dic_ids!.length}단어</span> : <span className="text-danger">미등록 단어 — 표준단어 신청 후 다시 해석</span>}</td>
+                      <td className={`${TD} text-xs`}>{ok ? <span className="text-ink-2 tabular-nums">{t.dic_ids!.length}단어</span> : <span className="text-danger">미등록 단어 : 표준단어 신청 후 다시 해석</span>}</td>
                       <td className={`${TD} text-xs`}>
                         <ul className="space-y-0.5">
                           {cs.map((c) => (

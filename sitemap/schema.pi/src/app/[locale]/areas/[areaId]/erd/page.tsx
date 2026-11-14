@@ -211,7 +211,7 @@ type Grip = 's' | 't' | 'm'
 type RelData = { sp: Pt; tp: Pt; ps: Side; cs: Side; mx: number | null; my: number | null; edit: boolean; onDrag: (id: string, k: Grip, screen: Pt) => void; onReset: (id: string) => void; bk?: { p: boolean; c: boolean }; rt?: { d: string; lp: Pt; mid: Pt; lt: string } } // bk = 바커 반쪽 점선 여부(부모 쪽·자식 쪽), rt = 계산된 직교 경로(없으면 smoothstep)
 type REdge = Edge<RelData, 'rel'>
 const POS: Record<Side, Position> = { T: Position.Top, R: Position.Right, B: Position.Bottom, L: Position.Left }
-const GRIP_NM: Record<Grip, string> = { s: '부모 끝점 — 끌어서 박스 변을 따라 이동', t: '자식 끝점 — 끌어서 박스 변을 따라 이동', m: '꺾임점 — 끌어서 가운데 선 이동' }
+const GRIP_NM: Record<Grip, string> = { s: '부모 끝점 : 끌어서 박스 변을 따라 이동', t: '자식 끝점 : 끌어서 박스 변을 따라 이동', m: '꺾임점 : 끌어서 가운데 선 이동' }
 
 function RelEdge({ id, data, markerStart, markerEnd, style, label, labelStyle, selected }: EdgeProps<REdge>) {
   const d = data!
@@ -789,7 +789,7 @@ function Erd({ areaId }: { areaId: string }) {
     setNodes((ns) => ns.map((n) => ({ ...n, position: laid[n.id] })))
     midToCenter(null)
     setDirty(true)
-    setMsg(mode === 'all' ? '자동 배치 미리보기 — 저장하면 반영, 되돌리기로 취소(고정 엔터티는 그대로)' : '새 엔터티만 배치했습니다')
+    setMsg(mode === 'all' ? '자동 배치 미리보기 : 저장하면 반영, 되돌리기로 취소(고정 엔터티는 그대로)' : '새 엔터티만 배치했습니다')
     requestAnimationFrame(() => flow.fitView({ padding: 0.15, maxZoom: 1 }))
   }
   const revert = () => {
@@ -822,7 +822,7 @@ function Erd({ areaId }: { areaId: string }) {
   }
   // ERD 작성완료·완료 취소(보고 있는 주제영역 다이어그램) — 완료 = 배치·관계선 잠금, DDL 생성 대상
   const setStage = async (sts: 'WRT' | 'CMPTN') => {
-    if (sts === 'CMPTN' && !window.confirm('ERD 작성완료 — 배치·관계선 편집이 잠기고 DDL 생성 대상이 됩니다(완료 취소 후 편집). 계속할까요?')) return
+    if (sts === 'CMPTN' && !window.confirm('ERD 작성완료 : 배치·관계선 편집이 잠기고 DDL 생성 대상이 됩니다(완료 취소 후 편집). 계속할까요?')) return
     setBusy(true)
     const j = await (await piFetch(`${api}/projects/${prjId}/stage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ layer: 'DGM', sts, subj_id: subj, mdl_lvl_cd: lvl, phy_mdl_id: phyId || undefined }) })).json()
     setBusy(false)
@@ -830,7 +830,7 @@ function Erd({ areaId }: { areaId: string }) {
       setDgmSts(sts)
       setSel(null)
       setSelRel(null)
-      setMsg(sts === 'CMPTN' ? 'ERD 작성완료 — 배치·관계선이 잠겼습니다(DDL 생성 화면에서 대상)' : 'ERD 완료를 취소했습니다 — 배치·관계선을 편집할 수 있습니다')
+      setMsg(sts === 'CMPTN' ? 'ERD 작성완료 : 배치·관계선이 잠겼습니다(DDL 생성 화면에서 대상)' : 'ERD 완료를 취소했습니다. 배치·관계선을 편집할 수 있습니다')
     } else setMsg(j.fail?.[0]?.why?.join(' · ') ?? j.message ?? '')
   }
   const toggleFix = (id: string) => {
@@ -913,7 +913,7 @@ function Erd({ areaId }: { areaId: string }) {
     setNodes((ns) => ns.map((x) => ({ ...x, position: { x: x.position.x + d.dx, y: x.position.y + d.dy } })))
     setLyt((L) => Object.fromEntries(Object.entries(L).map(([k, l]) => [k, l.mx == null || l.my == null ? l : { ...l, mx: l.mx + d.dx, my: l.my + d.dy }])))
     setDirty(true)
-    setMsg(`${next.paper} ${next.orient === 'landscape' ? '가로' : '세로'} — 좌상단 엔터티 기준으로 전체를 같은 위치로 옮겼습니다(배치 저장하면 반영, 되돌리기 가능)`)
+    setMsg(`${next.paper} ${next.orient === 'landscape' ? '가로' : '세로'} : 좌상단 엔터티 기준으로 전체를 같은 위치로 옮겼습니다(배치 저장하면 반영, 되돌리기 가능)`)
     if (shot !== null) snap() // 인쇄 미리보기 중이면 옮긴 그림으로 다시
   }
   const sheets = pr.mode === 'fit' ? [{ no: 1, t: printFit([...geo.boxes.values()], page.cw, page.ch) }] : page.grid.tiles.map((t) => ({ no: t.no, t: { x: -(page.grid.x0 + t.c * page.cw), y: -(page.grid.y0 + t.r * page.ch), zoom: 1 } }))
@@ -1009,7 +1009,7 @@ function Erd({ areaId }: { areaId: string }) {
         <label className={chk2} title="관계로 이어진 다른 주제영역 엔터티를 점선 박스로 함께 표시">
           <input type="checkbox" checked={showRef} onChange={(e) => (setShowRef(e.target.checked), setSel(null))} /> 참조 표시
         </label>
-        <button type="button" className={btn} onClick={() => setNmoDraft(nmo)} title="DA# 개체명 보기옵션 — 보조명·동의어·도메인·논리명 병기">
+        <button type="button" className={btn} onClick={() => setNmoDraft(nmo)} title="DA# 개체명 보기옵션 : 보조명·동의어·도메인·논리명 병기">
           개체명 보기옵션
         </button>
         {sep}
@@ -1044,7 +1044,7 @@ function Erd({ areaId }: { areaId: string }) {
           <input type="checkbox" checked={mini} onChange={(e) => toggleMini(e.target.checked)} /> 미리보기
         </label>
         <span className="flex items-center gap-1">
-          <button type="button" className="btn-ghost btn-sm" disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 — 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
+          <button type="button" className="btn-ghost btn-sm" disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 : 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
             <Printer aria-hidden />
             인쇄
           </button>
@@ -1067,7 +1067,7 @@ function Erd({ areaId }: { areaId: string }) {
                 미표시 {hidden}
               </span>
               <InfoTip label="미표시 엔터티">
-                작성완료 테이블이 아닌 엔터티 {hidden}개는 표시하지 않습니다 —{' '}
+                작성완료 테이블이 아닌 엔터티 {hidden}개는 표시하지 않습니다. {' '}
                 <Link href={`/areas/${areaId}/physical`} className="text-accent-ink hover:underline">
                   물리 모델에서 전환·작성완료
                 </Link>
@@ -1082,7 +1082,7 @@ function Erd({ areaId }: { areaId: string }) {
                 단순 경로{rtLim.far.size > 0 ? ` ${rtLim.far.size}` : ''}
               </span>
               <InfoTip label="관계선 단순 경로">
-                {rtLim.far.size > 0 ? `좌표가 ±${ROUTE_MAX.crd.toLocaleString()}px 밖이거나 크기가 비정상인 엔터티 ${rtLim.far.size}개는 관계선 경로 계산에서 빼고` : '그림 범위가 너무 넓어 관계선 경로 계산을 건너뛰고'} 단순 경로로 그립니다 — 멀리 떨어진 엔터티를 옮기거나 자동 배치 후 저장하면 정리됩니다.
+                {rtLim.far.size > 0 ? `좌표가 ±${ROUTE_MAX.crd.toLocaleString()}px 밖이거나 크기가 비정상인 엔터티 ${rtLim.far.size}개는 관계선 경로 계산에서 빼고` : '그림 범위가 너무 넓어 관계선 경로 계산을 건너뛰고'} 단순 경로로 그립니다. 멀리 떨어진 엔터티를 옮기거나 자동 배치 후 저장하면 정리됩니다.
               </InfoTip>
             </span>
           )}
@@ -1093,7 +1093,7 @@ function Erd({ areaId }: { areaId: string }) {
                 겹침 {boxOvl}
               </span>
               <InfoTip label="박스 겹침">
-                엔터티 박스 {boxOvl}쌍이 서로 겹쳐 있습니다(저장된 위치) — 관계선이 겹친 박스 사이를 지나지 못해 테두리로 돌아갈 수 있습니다. {lay ? '툴바 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.' : '작성완료 ERD 는 완료 취소 후 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.'}
+                엔터티 박스 {boxOvl}쌍이 서로 겹쳐 있습니다(저장된 위치) : 관계선이 겹친 박스 사이를 지나지 못해 테두리로 돌아갈 수 있습니다. {lay ? '툴바 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.' : '작성완료 ERD 는 완료 취소 후 자동 배치를 누르면 박스 간격을 다시 잡아 선이 짧게 정리된 모습을 미리 볼 수 있고, 저장해야 반영됩니다.'}
               </InfoTip>
             </span>
           )}
@@ -1201,7 +1201,7 @@ function Erd({ areaId }: { areaId: string }) {
                   const t = page.grid.tiles.find((x) => x.c === c && x.r === r)
                   return (
                     <div key={i} className="pointer-events-none absolute border-2 border-dashed border-accent/50" style={{ left: page.grid.x0 + c * page.cw, top: page.grid.y0 + r * page.ch, width: page.cw, height: page.ch }}>
-                      <span className="absolute top-1 left-2 text-xs font-medium text-accent-ink/80">{t ? `${t.no}쪽` : '(빈 쪽 — 인쇄 안 함)'} · {pr.paper} {pr.orient === 'landscape' ? '가로' : '세로'}</span>
+                      <span className="absolute top-1 left-2 text-xs font-medium text-accent-ink/80">{t ? `${t.no}쪽` : '(빈 쪽 : 인쇄 안 함)'} · {pr.paper} {pr.orient === 'landscape' ? '가로' : '세로'}</span>
                     </div>
                   )
                 })}
@@ -1297,7 +1297,7 @@ function Erd({ areaId }: { areaId: string }) {
             <div className="flex items-center gap-1 text-ink-3">
               <span>엔터티·관계선 선택</span>
               <InfoTip label="범례" align="end">
-                엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. {lay ? '빈 곳을 왼쪽 버튼으로 끌면 여러 엔터티 선택(Ctrl+클릭 추가) → 하나를 끌면 함께 이동, 화면 이동은 오른쪽·가운데 버튼 끌기' : '작성완료·조회 권한은 엔터티 이동 불가 — 끌기 = 화면 이동(옮기려면 완료 취소)'}. {LEGEND[nt]}
+                엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. {lay ? '빈 곳을 왼쪽 버튼으로 끌면 여러 엔터티 선택(Ctrl+클릭 추가) → 하나를 끌면 함께 이동, 화면 이동은 오른쪽·가운데 버튼 끌기' : '작성완료·조회 권한은 엔터티 이동 불가 : 끌기 = 화면 이동(옮기려면 완료 취소)'}. {LEGEND[nt]}
               </InfoTip>
             </div>
           )}
@@ -1329,7 +1329,7 @@ function Erd({ areaId }: { areaId: string }) {
                   <li key={k}>
                     <button type="button" className="py-0.5 text-start text-ink-2 hover:text-ink hover:underline" onClick={() => focus(i.ent_id)}>
                       <span className="badge me-1">{i.kind}</span>
-                      {ents.find((e) => e.ent_id === i.ent_id)?.ent_log_nm ?? ''} — {i.msg}
+                      {ents.find((e) => e.ent_id === i.ent_id)?.ent_log_nm ?? ''} : {i.msg}
                     </button>
                   </li>
                 ))}
@@ -1443,7 +1443,7 @@ function Erd({ areaId }: { areaId: string }) {
                 {pr.title && (
                   <div className="flex shrink-0 items-end justify-between border-b border-line-strong px-3 text-xs" style={{ height: TITLE_H }}>
                     <span className="pb-1">
-                      <strong className="text-base font-semibold text-ink">ERD — {prjSubjs.find((x) => x.subj_id === subj)?.subj_nm ?? ''}</strong>
+                      <strong className="text-base font-semibold text-ink">ERD : {prjSubjs.find((x) => x.subj_id === subj)?.subj_nm ?? ''}</strong>
                       <span className="ms-2 text-ink-2">{prjs.find((x) => x.prj_id === prjId)?.prj_nm}</span>
                     </span>
                     <span className="pb-1 text-ink-2">

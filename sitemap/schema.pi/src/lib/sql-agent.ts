@@ -84,7 +84,7 @@ export async function claimSql(g: AgtRow, r: WaitRow, conns: SqlConn[]) {
   const by = `AGT:${g.agt_id}`
   const c = conns.find((x) => x.conn_id === r.conn_id)
   if (!c) {
-    const f = await db().from(T).update({ req_sts_cd: 'FAIL', exec_end_dtm: iso(), err_cd: 'DB_CONN_CHANGED', err_msg: '요청 뒤 접속 정보가 바뀌었습니다 — 새로 요청하십시오', modr_id: by }).eq('req_id', r.req_id).eq('agt_id', g.agt_id).eq('area_id', g.area_id).eq('req_sts_cd', 'WAIT')
+    const f = await db().from(T).update({ req_sts_cd: 'FAIL', exec_end_dtm: iso(), err_cd: 'DB_CONN_CHANGED', err_msg: '요청 뒤 접속 정보가 바뀌었습니다. 새로 요청하십시오', modr_id: by }).eq('req_id', r.req_id).eq('agt_id', g.agt_id).eq('area_id', g.area_id).eq('req_sts_cd', 'WAIT')
     if (f.error) throw f.error
     return null
   }

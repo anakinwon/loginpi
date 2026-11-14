@@ -9,9 +9,9 @@ export const directEnabled = () => process.env.DDL_DIRECT_ENABLED === '1'
 // 접속 기능이 꺼진 이유(운영 환경변수 진단, 값·일부 글자는 내보내지 않음) — 없으면 null. key = 키만 볼지(봉인·해제), direct = 서버 직접 실행 스위치도 볼지
 export function connBlock(o: { key?: boolean; direct?: boolean } = { key: true, direct: true }): string | null {
   const raw = process.env.DB_PROFILE_KEY?.trim()
-  if (o.key && !raw) return 'DB_PROFILE_KEY 미설정 — 이 배포에 환경변수가 없습니다(Vercel Production 환경에 추가한 뒤 다시 배포)'
-  if (o.key && !profileKey()) return `DB_PROFILE_KEY 형식 오류 — 32바이트 키(base64 43~44자 또는 hex 64자)가 아닙니다(지금 ${raw!.length}자, 따옴표·공백·이름까지 붙여 넣었는지 확인)`
-  if (o.direct && !directEnabled()) return `DDL_DIRECT_ENABLED 가 1 이 아닙니다(${process.env.DDL_DIRECT_ENABLED ? '다른 값' : '미설정'}) — 서버 직접 실행 꺼짐`
+  if (o.key && !raw) return 'DB_PROFILE_KEY 미설정 : 이 배포에 환경변수가 없습니다(Vercel Production 환경에 추가한 뒤 다시 배포)'
+  if (o.key && !profileKey()) return `DB_PROFILE_KEY 형식 오류 : 32바이트 키(base64 43~44자 또는 hex 64자)가 아닙니다(지금 ${raw!.length}자, 따옴표·공백·이름까지 붙여 넣었는지 확인)`
+  if (o.direct && !directEnabled()) return `DDL_DIRECT_ENABLED 가 1 이 아닙니다(${process.env.DDL_DIRECT_ENABLED ? '다른 값' : '미설정'}) : 서버 직접 실행 꺼짐`
   return null
 }
 // 사설 주소 허용은 개발에서만

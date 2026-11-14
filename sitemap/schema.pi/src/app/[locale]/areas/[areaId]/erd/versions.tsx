@@ -151,7 +151,7 @@ export function VersionPanel({ api, prjId, editor, onClose, onShow }: { api: str
                 <span className="font-mono text-xs text-ink-3 tabular-nums">v{x.ver_seq}</span>
                 <span className="min-w-0 flex-1 font-medium">
                   {x.ver_nm}
-                  {x.ver_desc && <span className="ms-1 text-xs font-normal text-ink-3">— {x.ver_desc}</span>}
+                  {x.ver_desc && <span className="ms-1 text-xs font-normal text-ink-3">: {x.ver_desc}</span>}
                 </span>
                 <span className="text-xs text-ink-3 tabular-nums">
                   엔터티 {x.ent_cnt} · 속성 {x.attr_cnt} · 관계 {x.rel_cnt} · {new Date(x.reg_dtm).toLocaleString()}

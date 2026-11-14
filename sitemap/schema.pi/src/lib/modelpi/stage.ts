@@ -26,13 +26,13 @@ export function dgmWhy(x: { subj: boolean; saved: boolean; own: number; unplaced
   if (!x.saved) return ['배치를 먼저 저장하십시오']
   const why: string[] = []
   if (!x.own) why.push('그린 테이블이 없습니다(테이블 작성완료 후)')
-  if (x.unplaced) why.push(`배치가 저장되지 않은 엔터티 ${x.unplaced}개 — 배치 저장 후 완료`)
+  if (x.unplaced) why.push(`배치가 저장되지 않은 엔터티 ${x.unplaced}개 : 배치 저장 후 완료`)
   return why
 }
 
 // 테이블 상태 변경의 ERD 역순 관문 — 완료 ERD 에 있는 엔터티의 테이블은 완료 취소 불가, 완료 ERD 주제영역에 새 테이블 완료 불가(배치 끼어듦 차단)
 export function phyDgmWhy(sts: Sts, ent: { ent_id: string; subj_id: string }, lock: { ents: Set<string>; subjs: Set<string> }): string[] {
-  if (sts === 'WRT' && lock.ents.has(ent.ent_id)) return ['작성완료 ERD 에 있는 테이블입니다 — ERD 완료 취소 후 테이블 완료 취소']
-  if (sts === 'CMPTN' && lock.subjs.has(ent.subj_id) && !lock.ents.has(ent.ent_id)) return ['주제영역 ERD 가 작성완료입니다 — ERD 완료 취소 후 새 테이블 완료']
+  if (sts === 'WRT' && lock.ents.has(ent.ent_id)) return ['작성완료 ERD 에 있는 테이블입니다. ERD 완료 취소 후 테이블 완료 취소']
+  if (sts === 'CMPTN' && lock.subjs.has(ent.subj_id) && !lock.ents.has(ent.ent_id)) return ['주제영역 ERD 가 작성완료입니다. ERD 완료 취소 후 새 테이블 완료']
   return []
 }

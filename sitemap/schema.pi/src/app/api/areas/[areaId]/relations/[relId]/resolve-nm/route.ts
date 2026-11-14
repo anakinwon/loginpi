@@ -96,7 +96,7 @@ export async function POST(req: Request, { params }: Ctx) {
     for (const prnt of [m.p, m.c]) {
       const row = { area_id: areaId, prnt_ent_id: prnt.ent_id, chld_ent_id: x.ent_id, rel_nm: m.rel.rel_nm, crdn_cd: '1N', idnt_yn: 'Y', prnt_opt_yn: 'N', chld_opt_yn: 'Y', regr_id: uid, modr_id: uid }
       const r = await db().from('mdl_rel').insert(row).select('rel_id').single()
-      if (r.error) return NextResponse.json({ ok: true, partial: true, ent_id: x.ent_id, rel_ids: rels, message: `교차 엔터티는 만들었지만 관계 생성에 실패했습니다(${r.error.code}) — 관계 편집에서 확인하십시오` })
+      if (r.error) return NextResponse.json({ ok: true, partial: true, ent_id: x.ent_id, rel_ids: rels, message: `교차 엔터티는 만들었지만 관계 생성에 실패했습니다(${r.error.code}) : 관계 편집에서 확인하십시오` })
       rels.push(r.data.rel_id)
       await audit({ area_id: areaId, tgt_tp_cd: 'REL', tgt_id: r.data.rel_id, act_cd: 'INS', aftr_val: { ...row, nm_of: relId }, usr_id: uid })
     }

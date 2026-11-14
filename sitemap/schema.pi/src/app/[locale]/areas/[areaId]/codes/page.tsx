@@ -115,7 +115,7 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
       await done(await (await piFetch(`${base}/${encodeURIComponent(edit.cd_id)}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ver_no: edit.ver_no, ...body, ...apvOpt() }) })).json(), '수정·승인 완료')
       return
     }
-    if (!term) return setMsg(`확정 표준용어 '${codeNm}' 가 없습니다 — 표준용어를 먼저 신청·승인하십시오`)
+    if (!term) return setMsg(`확정 표준용어 '${codeNm}' 가 없습니다. 표준용어를 먼저 신청·승인하십시오`)
     await done(await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ term_id: term.term_id, ...body, ...apvOpt() }) })).json(), '등록·승인 완료')
   }
   // 반려 행 = 바로 삭제(서버 규칙), 승인완료 행 = 즉시 승인 선택 시 바로 삭제, 그 외 삭제 신청(승인 후 삭제)
@@ -164,7 +164,7 @@ export default function CodesPage({ params }: { params: Promise<{ areaId: string
                 <input value={master} onChange={(e) => setMaster(e.target.value)} placeholder="마스터코드명" maxLength={200} className="input min-w-48 flex-1" aria-label="마스터코드명" aria-required="true" title="예 : 남녀, 지불수단, 거래" />
                 <select value={kind} onChange={(e) => setKind(e.target.value as CdKind)} className="input w-auto" aria-label="코드 구분" title={CD_KIND[kind].desc}>
                   {(Object.keys(CD_KIND) as CdKind[]).map((k) => (
-                    <option key={k} value={k} title={`${CD_KIND[k].desc} — 예) ${CD_KIND[k].ex}`}>
+                    <option key={k} value={k} title={`${CD_KIND[k].desc} : 예) ${CD_KIND[k].ex}`}>
                       {CD_KIND[k].nm}
                     </option>
                   ))}

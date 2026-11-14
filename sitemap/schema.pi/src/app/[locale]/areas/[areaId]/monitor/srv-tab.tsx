@@ -53,7 +53,7 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
     return (
       <div className="panel empty">
         <Icon3D icon={MENU_ICON.monitor} />
-        <p>등록된 로컬 에이전트 없음 — 설정 › DB 접속에서 등록</p>
+        <p>등록된 로컬 에이전트 없음 : 설정 › DB 접속에서 등록</p>
       </div>
     )
   const top = (k: 'cpu' | 'mem') => [...v.on].sort((a, b) => (b[k] ?? 0) - (a[k] ?? 0)).slice(0, 5)
@@ -65,9 +65,9 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         <Tile nm="서버" val={`${v.on.length} / ${v.rows.length}`} sub="최근 3분 보고 / 등록" />
         <Tile nm="코어 합계" val={String(v.cores)} />
-        <Tile nm="평균 CPU" val={`${avg(v.on.map((r) => r.cpu)) ?? '—'}%`} warn={(avg(v.on.map((r) => r.cpu)) ?? 0) >= 90} />
-        <Tile nm="평균 메모리" val={`${avg(v.on.map((r) => r.mem)) ?? '—'}%`} />
-        <Tile nm="평균 디스크" val={`${avg(v.on.map((r) => r.disk)) ?? '—'}%`} warn={(avg(v.on.map((r) => r.disk)) ?? 0) >= 90} />
+        <Tile nm="평균 CPU" val={`${avg(v.on.map((r) => r.cpu)) ?? '-'}%`} warn={(avg(v.on.map((r) => r.cpu)) ?? 0) >= 90} />
+        <Tile nm="평균 메모리" val={`${avg(v.on.map((r) => r.mem)) ?? '-'}%`} />
+        <Tile nm="평균 디스크" val={`${avg(v.on.map((r) => r.disk)) ?? '-'}%`} warn={(avg(v.on.map((r) => r.disk)) ?? 0) >= 90} />
       </div>
       <div className="grid gap-2 md:grid-cols-3">
         <Line title="평균 CPU(%)" pts={v.cpuAll} unit="%" max={100} />
@@ -79,7 +79,7 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
                 <li key={r.a.agt_id} className="text-xs">
                   <div className="mb-1 flex justify-between gap-2">
                     <span className="truncate text-ink">{r.l?.host_nm ?? r.a.agt_nm}</span>
-                    <span className="tabular-nums">{r[k] ?? '—'}%</span>
+                    <span className="tabular-nums">{r[k] ?? '-'}%</span>
                   </div>
                   <Meter pct={r[k]} />
                 </li>
@@ -98,7 +98,7 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${r.fresh ? 'bg-ok' : 'bg-ink-off'}`} title={r.fresh ? '보고 중' : '최근 3분 보고 없음'} />
                 <span className="font-medium text-ink">{r.a.agt_nm}</span>
                 <span className="truncate text-xs text-ink-3">
-                  {r.l?.host_nm ?? '—'} · {r.l?.os_nm ?? '지표 없음(1.3.0 미만?)'} · {r.l?.core_cnt ?? '—'}코어
+                  {r.l?.host_nm ?? '-'} · {r.l?.os_nm ?? '지표 없음(1.3.0 미만?)'} · {r.l?.core_cnt ?? '-'}코어
                 </span>
               </div>
               <div className="mt-3 grid grid-cols-3 gap-3 text-xs text-ink-2">
@@ -112,7 +112,7 @@ export default function SrvTab({ areaId, live, min }: { areaId: string; live: bo
                   <div key={nm}>
                     <div className="mb-1 flex justify-between">
                       <span>{nm}</span>
-                      <span className="tabular-nums text-ink">{p ?? '—'}%</span>
+                      <span className="tabular-nums text-ink">{p ?? '-'}%</span>
                     </div>
                     <Meter pct={p} />
                     {sub && <div className="mt-1 truncate text-xs text-ink-3 tabular-nums">{sub}</div>}

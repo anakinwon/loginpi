@@ -16,7 +16,7 @@ export const ENT_TP = { BASE: '실체', REF: '기준', ACT: '행위', PROC: '가
 export type EntTp = keyof typeof ENT_TP
 export const ENT_TP_DESC: Record<EntTp, string> = {
   BASE: '실제 물체에 대한 본질적인 데이터를 관리(예 : 고객·상품)',
-  REF: '실체·행위 데이터의 업무 기준이 되는 데이터를 관리(참조 엔터티 — 코드정보·기본 기준 정보)',
+  REF: '실체·행위 데이터의 업무 기준이 되는 데이터를 관리(참조 엔터티 : 코드정보·기본 기준 정보)',
   ACT: '행위·활동으로 발생한 원천 데이터를 관리(가장 많음, 4W1H 복합 식별자, 최대한 통합)',
   PROC: '원천 데이터를 추출·집계한 데이터를 관리(위 3종 외 나머지)',
 }

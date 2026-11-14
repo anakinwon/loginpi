@@ -18,7 +18,7 @@ export function relMark(r: Pick<LRel, 'crdn_cd' | 'idnt_yn' | 'prnt_opt_yn' | 'c
 export function toMermaid(ents: LEnt[], rels: LRel[], title = '') {
   const nm = new Map(ents.map((e) => [e.ent_id, ident(e.tbl_phy_nm)]))
   const out = ['erDiagram']
-  if (title) out.unshift(`%% ${q(title)} — 논리 모델(schema.pi ModelPi)`)
+  if (title) out.unshift(`%% ${q(title)} : 논리 모델(schema.pi ModelPi)`)
   for (const e of ents) {
     out.push(`  ${nm.get(e.ent_id)} {`)
     const attrs = [...e.attrs].sort((a, b) => (a.pk_yn === b.pk_yn ? (a.pk_seq ?? 0) - (b.pk_seq ?? 0) : a.pk_yn === 'Y' ? -1 : 1))

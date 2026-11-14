@@ -176,7 +176,7 @@ export function parseDdl(sql: string): RvsResult {
           const c = parseCol(part)
           if (!c) { warnings.push(`${name} : 해석 못 한 정의 "${part.slice(0, 40)}"`); continue }
           if (seen.has(c.name)) {
-            warnings.push(`${name}.${c.name} : 중복 칼럼 — 뒤의 정의는 무시`)
+            warnings.push(`${name}.${c.name} : 중복 칼럼. 뒤의 정의는 무시`)
             continue
           }
           if (/\bPRIMARY\s+KEY\b/i.test(part)) t.pk.push(c.name)
@@ -190,7 +190,7 @@ export function parseDdl(sql: string): RvsResult {
       { const pkSet = new Set(t.pk); for (const c of t.cols) if (pkSet.has(c.name)) c.nullable = false } // Set 조회(O(n))
       tables.set(name, t)
       if (colTotal > COL_CAP) {
-        warnings.push(`칼럼이 ${COL_CAP.toLocaleString()}개를 넘어 해석을 중단했습니다 — 스키마·주제영역 단위로 나누어 올리십시오`)
+        warnings.push(`칼럼이 ${COL_CAP.toLocaleString()}개를 넘어 해석을 중단했습니다. 스키마·주제영역 단위로 나누어 올리십시오`)
         break
       }
     } else if ((m = /^ALTER\s+TABLE\s+(?:ONLY\s+)?(?:IF\s+EXISTS\s+)?((?:"(?:[^"]|"")*"|[\w$#]+)(?:\s*\.\s*(?:"(?:[^"]|"")*"|[\w$#]+))*)\s+ADD\s+(.*)$/i.exec(s))) {

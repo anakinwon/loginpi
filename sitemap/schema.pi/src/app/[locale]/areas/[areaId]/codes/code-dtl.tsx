@@ -65,7 +65,7 @@ export default function CodeDtl({ areaId, opts, cdId, onPick }: { areaId: string
           <h2>{edit ? `코드상세 수정 : ${nm} · ${edit.cd_val}` : '코드상세 등록'}</h2>
           <InfoTip>코드값 = 주식별자(등록 후 변경 불가, % / \ ? # 사용 불가). 같은 코드기본 안에서 코드값·코드값명은 겹칠 수 없습니다(상호 배타).</InfoTip>
           {rjct && (
-            <span className="badge ms-auto" data-tone="danger" title="반려된 코드기본 — 재신청 후 코드상세를 등록하십시오">
+            <span className="badge ms-auto" data-tone="danger" title="반려된 코드기본 : 재신청 후 코드상세를 등록하십시오">
               코드기본 반려
             </span>
           )}

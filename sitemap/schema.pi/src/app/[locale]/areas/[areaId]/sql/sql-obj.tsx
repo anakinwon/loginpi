@@ -193,7 +193,7 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
 
   // 오른쪽 내용 — 섹션별
   const secBody = () => {
-    if (sec === 'virt') return <p className="p-3 text-xs text-ink-3">DBeaver 가상 키(프로젝트 설정 전용, DB 객체 아님) — 제공하지 않음</p>
+    if (sec === 'virt') return <p className="p-3 text-xs text-ink-3">DBeaver 가상 키(프로젝트 설정 전용, DB 객체 아님) : 제공하지 않음</p>
     if (!cur || cur === 'loading') return <p className="p-3 text-xs text-ink-3">불러오는 중…</p>
     if (!cur.ok) return <Fail r={cur} />
     if (sec === 'ddl')
@@ -201,10 +201,10 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
         <div className="flex h-full min-h-0 flex-col">
           <div className="flex flex-wrap items-center gap-2 border-b border-line bg-canvas px-2 py-1">
             <button type="button" className="btn-key btn-sm" onClick={() => copy(cur.ddl ?? '')}><Copy aria-hidden /> 복사</button>
-            <button type="button" className="btn-key btn-sm" disabled={sqlFull} onClick={() => onNewSql(cur.ddl ?? '')} title={sqlFull ? 'SQL 탭이 요금제 상한입니다 — 탭을 닫거나 요금제를 올리십시오' : '이 DDL 로 새 SQL 탭'}>
+            <button type="button" className="btn-key btn-sm" disabled={sqlFull} onClick={() => onNewSql(cur.ddl ?? '')} title={sqlFull ? 'SQL 탭이 요금제 상한입니다. 탭을 닫거나 요금제를 올리십시오' : '이 DDL 로 새 SQL 탭'}>
               <SquarePlus aria-hidden /> 새 SQL 탭
             </button>
-            {sqlFull && <span className="text-ink-3">SQL 탭 상한 — 탭을 닫으면 열 수 있음</span>}
+            {sqlFull && <span className="text-ink-3">SQL 탭 상한 : 탭을 닫으면 열 수 있음</span>}
             {note && <span className="text-ink-3" aria-live="polite">{note}</span>}
           </div>
           <pre className="paper min-h-0 flex-1 overflow-auto bg-surface p-2 font-mono text-xs whitespace-pre">{cur.ddl}</pre>
@@ -214,7 +214,7 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
       <div className="flex h-full min-h-0 flex-col">
         {sec === 'stats' && (
           <div className="flex flex-wrap items-center gap-2 border-b border-line bg-canvas px-2 py-1">
-            <button type="button" className="btn-key btn-sm" onClick={() => void countRows()} title="SELECT COUNT(*) — 큰 테이블은 오래 걸릴 수 있음">
+            <button type="button" className="btn-key btn-sm" onClick={() => void countRows()} title="SELECT COUNT(*) : 큰 테이블은 오래 걸릴 수 있음">
               실제 행 수 세기
             </button>
             {count != null && <span className="font-mono tabular-nums">{typeof count === 'number' ? `${count.toLocaleString()} 행` : count}</span>}
@@ -312,7 +312,7 @@ export default function ObjEditor({ api, conn, schema, rel, dialect, active, onO
                   return (
                     <div className="flex flex-wrap items-center gap-2 border-t border-line bg-canvas px-2 py-1 text-xs text-ink-2">
                       <span className="min-w-0 flex-1 font-mono tabular-nums" role="status">
-                        {dr.rows?.length ? `${(from + 1).toLocaleString()} – ${(from + dr.rows.length).toLocaleString()}행` : '행 없음'}
+                        {dr.rows?.length ? `${(from + 1).toLocaleString()}~${(from + dr.rows.length).toLocaleString()}행` : '행 없음'}
                         {dr.more && <span className="ms-1 font-medium text-warn">· 더 있음</span>}
                       </span>
                       <label className="flex items-center gap-1">

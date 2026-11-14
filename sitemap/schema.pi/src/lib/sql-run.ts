@@ -85,7 +85,7 @@ type Pg = ReturnType<typeof pgClient>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Q = Pg | any // 트랜잭션 객체(postgres TransactionSql)도 같은 unsafe 사용
 const RBK = '__RBK'
-const pendingErr = (e: unknown) => Object.assign(new Error(`대기 문장 재실행 실패 — Rollback 하십시오 : ${(e as Error).message}`), { code: (e as { code?: string }).code ?? 'PENDING', pending: true })
+const pendingErr = (e: unknown) => Object.assign(new Error(`대기 문장 재실행 실패. Rollback 하십시오 : ${(e as Error).message}`), { code: (e as { code?: string }).code ?? 'PENDING', pending: true })
 
 // 행 모으기 — 행 제한·응답 크기(남은 예산) 중 먼저 걸리는 것까지
 function collector(limit: number, budget: { left: number }) {
@@ -161,7 +161,7 @@ async function runPg(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: Ru
     if (o.mode === 'READ') {
       // 조회 전용 — 문장마다 READ ONLY 트랜잭션, 끝나면 되돌림
       for (let i = 0; i < stmts.length; i++) {
-        if (late()) { res[i] = { ...res[i], err_cd: 'EXEC_TIMEOUT', err_msg: '실행 시간 예산 초과 — 나머지는 다시 실행하십시오' }; break }
+        if (late()) { res[i] = { ...res[i], err_cd: 'EXEC_TIMEOUT', err_msg: '실행 시간 예산 초과 : 나머지는 다시 실행하십시오' }; break }
         const s0 = Date.now()
         try {
           await sql.begin('read only', async (tx) => {
@@ -187,7 +187,7 @@ async function runPg(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: Ru
         }
         for (let i = 0; i < stmts.length; i++) {
           at = i
-          if (late()) throw Object.assign(new Error('실행 시간 예산 초과 — 전체 되돌림'), { code: 'EXEC_TIMEOUT' })
+          if (late()) throw Object.assign(new Error('실행 시간 예산 초과 : 전체 되돌림'), { code: 'EXEC_TIMEOUT' })
           await one(tx, i)
         }
         if (o.mode === 'TRY') throw Object.assign(new Error('rollback'), { code: RBK })
@@ -198,7 +198,7 @@ async function runPg(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: Ru
     await setup(sql, false)
     for (let i = 0; i < stmts.length; i++) {
       at = i
-      if (late()) { res[i] = { ...res[i], err_cd: 'EXEC_TIMEOUT', err_msg: '실행 시간 예산 초과 — 나머지는 다시 실행하십시오' }; break }
+      if (late()) { res[i] = { ...res[i], err_cd: 'EXEC_TIMEOUT', err_msg: '실행 시간 예산 초과 : 나머지는 다시 실행하십시오' }; break }
       const s0 = Date.now()
       try {
         await one(sql, i)
@@ -314,7 +314,7 @@ export async function openConn(areaId: string, connId: string, perms: readonly P
   const d: Dialect | null = c.dbms_cd === '0014' ? 'PG' : c.dbms_cd === '0001' ? 'ORA' : null
   if (!d) return failRes({ code: 'DB_CONN_MISMATCH', status: 400 })
   const pwd = c.pwd_enc_txt ? openPwd(areaId, c.conn_id, c.pwd_enc_txt) : null
-  if (pwd == null) return failRes({ code: 'DB_CONN_FAIL', status: 400, detail: '저장된 비밀번호를 열 수 없습니다 — 접속 관리에서 비밀번호를 다시 입력하십시오' })
+  if (pwd == null) return failRes({ code: 'DB_CONN_FAIL', status: 400, detail: '저장된 비밀번호를 열 수 없습니다. 접속 관리에서 비밀번호를 다시 입력하십시오' })
   const t = await resolveTarget(c)
   if (t === 'BLOCKED') return failRes({ code: 'DB_CONN_BLOCKED', status: 400 })
   if (t === 'DNS') return failRes({ code: 'DB_CONN_FAIL', status: 400, detail: '호스트 이름을 찾을 수 없습니다' })
@@ -333,7 +333,7 @@ export async function runEditor(areaId: string, uid: string, perms: readonly Per
   const prefix: Stmt[] = []
   for (const p of manual ? b.pending : []) {
     const s = splitSql(p, d)
-    if (s.length !== 1 || classify(s[0], d) === 'TXN') return failRes({ code: 'INVALID_INPUT', status: 400, detail: '대기 문장이 올바르지 않습니다 — Rollback 하십시오' })
+    if (s.length !== 1 || classify(s[0], d) === 'TXN') return failRes({ code: 'INVALID_INPUT', status: 400, detail: '대기 문장이 올바르지 않습니다. Rollback 하십시오' })
     prefix.push(s[0])
   }
   if (b.commit && (!manual || !prefix.length)) return failRes({ code: 'INVALID_INPUT', status: 400, detail: '커밋할 대기 문장이 없습니다' })
@@ -349,7 +349,7 @@ export async function runEditor(areaId: string, uid: string, perms: readonly Per
   if (b.limit === ALL_ROWS && write) return failRes({ code: 'INVALID_INPUT', status: 400, detail: '전체 패치는 조회 문장만 다시 실행합니다' })
   if (manual && !b.commit && write) {
     const nw = stmts.filter((_, i) => kinds[i] === 'WRITE')
-    if (prefix.length + nw.length > PENDING_MAX) return failRes({ code: 'INVALID_INPUT', status: 400, detail: `대기 문장은 ${PENDING_MAX}개까지 — Commit 또는 Rollback 한 뒤 실행하십시오` })
+    if (prefix.length + nw.length > PENDING_MAX) return failRes({ code: 'INVALID_INPUT', status: 400, detail: `대기 문장은 ${PENDING_MAX}개까지 : Commit 또는 Rollback 한 뒤 실행하십시오` })
     if (nw.some((s) => s.txt.length > 100_000)) return failRes({ code: 'INVALID_INPUT', status: 400, detail: 'MANUAL 대기 문장은 10만 자까지입니다' })
   }
   if (manual && d === 'ORA') {

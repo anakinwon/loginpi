@@ -148,7 +148,7 @@ export function checkLogical(ents: LEnt[], rels: LRel[], opt: { dbms?: string } 
     }
     // ⑤ 4NF 경고 — 식별 부모 3개 이상
     const idp = parents.filter((x) => x.r.idnt_yn === 'Y')
-    if (idp.length >= 3) issues.push({ kind: '4NF', ent_id: e.ent_id, attr_ids: [], msg: `다치 종속 의심 : 식별 부모 ${idp.length}개(${idp.map((x) => x.p.ent_log_nm).join('·')}) — 서로 독립인 조합이면 관계 엔터티로 분해(04 문단 240)`, action: 'review' })
+    if (idp.length >= 3) issues.push({ kind: '4NF', ent_id: e.ent_id, attr_ids: [], msg: `다치 종속 의심 : 식별 부모 ${idp.length}개(${idp.map((x) => x.p.ent_log_nm).join('·')}) : 서로 독립인 조합이면 관계 엔터티로 분해(04 문단 240)`, action: 'review' })
     // ⑥ 표준 — 폐기·미승인 용어
     for (const a of e.attrs.filter((x) => !x.term_ok)) issues.push({ kind: 'STD', ent_id: e.ent_id, attr_ids: [a.attr_id], msg: `승인완료가 아닌 용어 : ${a.term_log_nm} → 승인 용어로 교체`, action: 'remove' })
     // ⑦ 표준 정합(L5) — 엔터티명 표류·구성 단어 폐기
@@ -161,7 +161,7 @@ export function checkLogical(ents: LEnt[], rels: LRel[], opt: { dbms?: string } 
     for (const r of rels.filter((x) => x.chld_ent_id === e.ent_id && x.prnt_opt_yn === 'N' && x.crdn_cd !== 'NM' && x.prnt_ent_id !== e.ent_id))
       for (const a of e.attrs.filter((x) => x.fk_rel_id === r.rel_id && x.esntl_yn !== 'Y'))
         issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [a.attr_id], msg: `필수 관계(${r.rel_nm ?? '관계'})인데 FK ${a.term_log_nm} 이(가) 선택 → 필수로(관계 편집의 FK 버튼)`, action: 'fix' })
-    if (!e.attrs.length) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [], msg: '속성이 없는 엔터티 — 주식별자·필수 속성을 추가하거나 삭제하십시오', action: 'review' })
+    if (!e.attrs.length) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [], msg: '속성이 없는 엔터티 : 주식별자·필수 속성을 추가하거나 삭제하십시오', action: 'review' })
     if (!(e.ent_desc ?? '').trim()) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [], msg: '엔터티 설명이 없습니다(정의서 필수 항목)', action: 'review' })
   }
   // ⑨ 모델 검토(L4) — 물리 테이블명 중복(프로젝트 안)

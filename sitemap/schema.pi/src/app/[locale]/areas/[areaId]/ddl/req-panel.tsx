@@ -109,7 +109,7 @@ export default function ReqPanel({
     if (
       !det ||
       !window.confirm(
-        `대상 DB 에 DDL 문장 ${det.item.stmt_cnt}개를 실행합니다.\n주의 : DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.\n계속할까요?`,
+        `대상 DB 에 DDL 문장 ${det.item.stmt_cnt}개를 실행합니다.\n주의 : DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다. 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.\n계속할까요?`,
       )
     )
       return
@@ -122,7 +122,7 @@ export default function ReqPanel({
     setMsg(
       j.ok
         ? `실행 ${REQ_STS_NM[j.item.req_sts_cd]}`
-        : `${j.message}${j.detail ? ` — ${j.detail}` : ''}`,
+        : `${j.message}${j.detail ? ` : ${j.detail}` : ''}`,
     )
     await Promise.all([load(), loadDet(det.item.req_id)])
   }
@@ -241,7 +241,7 @@ export default function ReqPanel({
                   if (det.self_approve) {
                     // 데이터아키텍트 1명 분류체계 — 본인 승인은 사유를 남김(감사 이력)
                     const r = window.prompt(
-                      '본인 승인 사유(5자 이상) — 이 분류체계의 데이터아키텍트가 1명이라 본인이 승인합니다',
+                      '본인 승인 사유(5자 이상) : 이 분류체계의 데이터아키텍트가 1명이라 본인이 승인합니다',
                     )
                     if (r && r.trim().length >= 5)
                       void act(
@@ -256,7 +256,7 @@ export default function ReqPanel({
                       setMsg('본인 승인 사유를 5자 이상 입력하십시오')
                     return
                   }
-                  if (window.confirm('표시된 DDL 그대로 실행을 승인할까요?\n주의 : DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.'))
+                  if (window.confirm('표시된 DDL 그대로 실행을 승인할까요?\n주의 : DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다. 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.'))
                     void act(
                       { act: 'approve', expect_hash: det.item.ddl_hash },
                       '승인했습니다',
@@ -329,7 +329,7 @@ export default function ReqPanel({
                   onClick={() =>
                     void act(
                       { act: 'retry' },
-                      '다시 실행 대기 — 에이전트가 다음 확인 때 가져갑니다',
+                      '다시 실행 대기 : 에이전트가 다음 확인 때 가져갑니다',
                     )
                   }
                   className="btn-key btn-sm"
@@ -339,7 +339,7 @@ export default function ReqPanel({
               )}
             {sts === 'RUN' && (
               <span className="text-xs text-ink-3">
-                실행 중 — 잠시 뒤 다시 불러오십시오
+                실행 중 : 잠시 뒤 다시 불러오십시오
               </span>
             )}
           </div>

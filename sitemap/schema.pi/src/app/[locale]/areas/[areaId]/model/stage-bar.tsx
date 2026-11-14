@@ -78,7 +78,7 @@ export default function StageBar({
 
   const post = async (layer: 'LGC' | 'PHY', ids: string[], sts: 'WRT' | 'CMPTN', label: string) => {
     if (!ids.length) return
-    if (sts === 'CMPTN' && !window.confirm(`${label} — 작성완료하면 편집이 잠깁니다(완료 취소 후 편집). 계속할까요?`)) return
+    if (sts === 'CMPTN' && !window.confirm(`${label} : 작성완료하면 편집이 잠깁니다(완료 취소 후 편집). 계속할까요?`)) return
     setBusy(true)
     const j = await (await piFetch(`${api}/projects/${prjId}/stage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ layer, ids, sts, ...(layer === 'PHY' ? { phy_mdl_id: phy?.phy_mdl_id } : {}) }) })).json()
     setBusy(false)
@@ -87,7 +87,7 @@ export default function StageBar({
       setMsg(j.message)
       return
     }
-    setMsg(`${label} : ${j.done?.length ?? 0}건 처리${fail.length ? ` · 실패 ${fail.length}(${fail.slice(0, 3).map((f) => `${f.nm} — ${f.why.join(', ')}`).join(' / ')})` : ''}`)
+    setMsg(`${label} : ${j.done?.length ?? 0}건 처리${fail.length ? ` · 실패 ${fail.length}(${fail.slice(0, 3).map((f) => `${f.nm} : ${f.why.join(', ')}`).join(' / ')})` : ''}`)
     await load()
     onChanged?.()
   }
@@ -150,7 +150,7 @@ export default function StageBar({
                   const t = tblOf.get(e.ent_id)
                   return (
                     <li key={e.ent_id} className="flex flex-wrap items-center gap-2 px-3 py-1.5">
-                      {mode === 'PHY' && <input type="checkbox" disabled={!editor || !canPick(e)} checked={!!picked?.has(e.ent_id)} onChange={(ev) => toggle([e.ent_id], ev.target.checked)} aria-label={`${e.ent_log_nm} 물리 전환 선택`} title={!lg ? '엔터티 작성완료 후 전환할 수 있습니다' : t ? '이미 전환됨 — 논리 변경은 물리 모델 화면의 [논리 변경 반영(동기화)]로 반영' : '전환할 엔터티'} />}
+                      {mode === 'PHY' && <input type="checkbox" disabled={!editor || !canPick(e)} checked={!!picked?.has(e.ent_id)} onChange={(ev) => toggle([e.ent_id], ev.target.checked)} aria-label={`${e.ent_log_nm} 물리 전환 선택`} title={!lg ? '엔터티 작성완료 후 전환할 수 있습니다' : t ? '이미 전환됨 : 논리 변경은 물리 모델 화면의 [논리 변경 반영(동기화)]로 반영' : '전환할 엔터티'} />}
                       <span className="text-ink">{e.ent_log_nm}</span>
                       <span className="chip-phy">{t?.tbl_nm ?? e.tbl_phy_nm}</span>
                       <span className="badge" data-tone={lg ? 'ok' : undefined}>

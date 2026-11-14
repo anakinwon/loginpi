@@ -281,7 +281,7 @@ export async function DELETE(req: Request, { params }: Ctx) {
     if (p.mdl.ver_no !== ver) return apiError('VERSION_CONFLICT', 409)
     // 작성완료 테이블은 잠금 — 모델만 지워지고 테이블이 잠긴 채 남지 않게 먼저 거부
     const locked = p.tables.filter((t) => t.phy_sts_cd === 'CMPTN')
-    if (locked.length) return NextResponse.json({ ok: false, code: 'SUBJ_LOCKED', message: errMsg('SUBJ_LOCKED'), why: [`작성완료 테이블 ${locked.length}개(${locked.slice(0, 3).map((t) => t.tbl_nm).join(', ')}) — 테이블 완료 취소 후 삭제`] }, { status: 409 })
+    if (locked.length) return NextResponse.json({ ok: false, code: 'SUBJ_LOCKED', message: errMsg('SUBJ_LOCKED'), why: [`작성완료 테이블 ${locked.length}개(${locked.slice(0, 3).map((t) => t.tbl_nm).join(', ')}) : 테이블 완료 취소 후 삭제`] }, { status: 409 })
     await delPhy(mdlId!, auth.user.usr_id)
     await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: mdlId!, act_cd: 'DEL', bfr_val: { dbms_cd: p.mdl.dbms_cd, tbl: p.tables.length }, usr_id: auth.user.usr_id })
     return NextResponse.json({ ok: true })

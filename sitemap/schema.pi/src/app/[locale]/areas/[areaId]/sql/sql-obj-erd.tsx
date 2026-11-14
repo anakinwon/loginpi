@@ -77,7 +77,7 @@ export default function ObjErd({ tables, rels, schema, rel, onOpen }: { tables: 
           const mine = k === me
           return (
             <g key={k} transform={`translate(${b.x},${b.y})`} className={mine ? '' : 'cursor-pointer'} onClick={() => !mine && onOpen(b.t.schema, b.t.name)} role={mine ? undefined : 'button'} aria-label={mine ? undefined : `${b.t.name} 객체 탭 열기`}>
-              <title>{mine ? `${b.t.schema}.${b.t.name}` : `${b.t.schema}.${b.t.name} — 누르면 객체 탭 열기`}</title>
+              <title>{mine ? `${b.t.schema}.${b.t.name}` : `${b.t.schema}.${b.t.name} : 누르면 객체 탭 열기`}</title>
               <rect width={L.w} height={b.h} rx={3} fill={mine ? C.self : '#fff'} stroke={mine ? C.head : C.border} strokeWidth={mine ? 1.6 : 1} />
               <rect width={L.w} height={L.head} rx={3} fill={C.head} />
               {/* 안쪽 svg = 박스 너비에서 긴 이름 잘라 냄 */}

@@ -61,7 +61,7 @@ const STEPS: Step[] = [
       { label: '표준단어', value: '410개', src: 'docs/03_standards.md:12' },
       { label: '표준도메인', value: '36개', src: 'docs/03_standards.md:13' },
       { label: '표준용어', value: '1,281개', src: 'docs/03_standards.md:14' },
-      { label: '공통코드', value: '326개(값 1,617 — 유형 313·구분 11·종류 2)', src: 'docs/03_standards.md:15' },
+      { label: '공통코드', value: '326개(값 1,617 : 유형 313·구분 11·종류 2)', src: 'docs/03_standards.md:15' },
     ],
     notes: [
       ["약어 원칙은 '한 단어 = 한 약어'다. 합성어는 '_' 없이 붙인다(MNP·ATRF·TXINV 등). 수납 = RCV, 미납 = UNPD로 정했다", 'docs/03_standards.md:22~36'],
@@ -177,8 +177,8 @@ const STEPS: Step[] = [
 
 // 남은 일(근거는 각 항목 src)
 const OPEN: [text: string, src: string][] = [
-  ['S6 생성기 수정(PK 일시 칼럼을 recent_dtm 계열로)과 15개 테이블 재생성 여부 — 재생성은 별도 결정', 'reviews/11_phase2_approval.md:137, reviews/09_datagen_verify.md:99'],
-  ['편향 미점검 항목: S2 부가서비스 미사용, S4 말일·1일·장애일, S7·S8·S10·S12·S13 — verify.mjs에 지표 추가 필요', 'reviews/09_datagen_verify.md:100'],
+  ['S6 생성기 수정(PK 일시 칼럼을 recent_dtm 계열로)과 15개 테이블 재생성 여부 : 재생성은 별도 결정', 'reviews/11_phase2_approval.md:137, reviews/09_datagen_verify.md:99'],
+  ['편향 미점검 항목: S2 부가서비스 미사용, S4 말일·1일·장애일, S7·S8·S10·S12·S13 : verify.mjs에 지표 추가 필요', 'reviews/09_datagen_verify.md:100'],
   ['S1·S2·S5 목표 미달이 의도된 조정인지 결정 필요', 'reviews/09_datagen_verify.md:101'],
   ['고아 0건 FK 124개가 설계 의도인지 대조 필요', 'reviews/09_datagen_verify.md:102'],
   ['FK 434건 검증은 2026-11-08 결과를 그대로 썼다. 전체를 다시 돌리면 약 1시간 23분 걸린다', 'reviews/09_datagen_verify.md:97'],
@@ -201,7 +201,7 @@ const FIXES: [text: string, src: string][] = [
   ['CONTEXT 5절의 편향 목표 수치 중 일부는 생성기 상수와 다르다. S5 선택 칼럼 NULL은 목표 90~99%, 코드 60%다. S1 법인 100만+, S2 요금제 35%, S6 10~20배는 코드에서 확인되지 않았다. S6은 정상 월 파티션에서도 약 4,150배로 나왔다', 'docs/06_datagen.md:90~103, reviews/09_datagen_verify.md:64'],
 ]
 
-const LEAD = 'PostgreSQL 17 · 주제영역 7 + 정산 모듈 STL · 테이블 214 · 데이터 약 11억 행 — 계획부터 결과검증까지 8단계 요약(2026-11-07 착수, 2026-11-11 데이터 단계 마감 승인)'
+const LEAD = 'PostgreSQL 17 · 주제영역 7 + 정산 모듈 STL · 테이블 214 · 데이터 약 11억 행 : 계획부터 결과검증까지 8단계 요약(2026-11-07 착수, 2026-11-11 데이터 단계 마감 승인)'
 const txt = (a: [text: string, src: string][]) => a.map(([t]) => t)
 // 정적 응답 본문 — 모듈 로드 때 한 번 만든다(요청마다 재계산 없음, R-P2)
 const BODY = { ok: true, lead: LEAD, steps: STEPS.map(({ metrics, notes, ...s }) => ({ ...s, metrics: metrics.map(({ label, value }) => ({ label, value })), notes: txt(notes) })), open: txt(OPEN), fixes: txt(FIXES) }

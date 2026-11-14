@@ -9,7 +9,7 @@ export const maxDuration = 60
 
 export async function GET(req: Request) {
   const sec = process.env.CRON_SECRET
-  if (!sec) return NextResponse.json({ ok: false, message: 'CRON_SECRET 미설정 — 주기 수집 꺼짐' }, { status: 503 })
+  if (!sec) return NextResponse.json({ ok: false, message: 'CRON_SECRET 미설정 : 주기 수집 꺼짐' }, { status: 503 })
   const got = Buffer.from(req.headers.get('authorization') ?? '')
   const want = Buffer.from(`Bearer ${sec}`)
   if (got.length !== want.length || !timingSafeEqual(got, want)) return NextResponse.json({ ok: false }, { status: 401 })

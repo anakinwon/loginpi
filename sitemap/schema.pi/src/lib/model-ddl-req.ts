@@ -259,7 +259,7 @@ export async function approveReq(areaId: string, prjId: string, reqId: string, e
   const self = q.req_usr_id === uid
   if (self) {
     // 요청 때부터 단독 DA + 지금도 단독(요청 뒤 다른 DA 를 빼는 우회 차단 — DB 트리거 sql/044 가 다시 확인)
-    if (q.sole_da_yn !== 'Y' || (await daCount(areaId)) !== 1) return fail('DDL_SELF_APPROVE', 403, '본인 승인은 요청 때부터 유일한 승인권자(시스템담당자·데이터아키텍트)인 경우만 — 다른 승인권자가 승인합니다')
+    if (q.sole_da_yn !== 'Y' || (await daCount(areaId)) !== 1) return fail('DDL_SELF_APPROVE', 403, '본인 승인은 요청 때부터 유일한 승인권자(시스템담당자·데이터아키텍트)인 경우만 : 다른 승인권자가 승인합니다')
     if (!selfRsn || selfRsn.trim().length < 5) return fail('DDL_SELF_APPROVE', 403, '본인 승인 사유를 5자 이상 입력하십시오')
   }
   if (q.ddl_hash !== expectHash) return fail('DDL_CHANGED', 409)
@@ -305,7 +305,7 @@ export async function testConnById(areaId: string, connId: string): Promise<{ ok
   if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503, connBlock())
   const c = c0
   const pwd = c.pwd_enc_txt ? openPwd(areaId, connId, c.pwd_enc_txt) : null
-  if (pwd == null) return fail('DB_CONN_FAIL', 400, '저장된 비밀번호를 열 수 없습니다 — 비밀번호를 다시 입력하십시오')
+  if (pwd == null) return fail('DB_CONN_FAIL', 400, '저장된 비밀번호를 열 수 없습니다. 비밀번호를 다시 입력하십시오')
   const t = await resolveTarget(c)
   if (t === 'BLOCKED') return fail('DB_CONN_BLOCKED', 400)
   if (t === 'DNS') return fail('DB_CONN_FAIL', 400, '호스트 이름을 찾을 수 없습니다')
@@ -317,7 +317,7 @@ export async function testConnById(areaId: string, connId: string): Promise<{ ok
 }
 
 // 인증서 검증 실패 안내 — 자체 CA 서버는 서버 CA 인증서 지정(Supabase 는 화면 체크 한 번)
-export const tlsHint = (m: string) => (/self-signed|unable to (get|verify)|certificate/i.test(m) ? `${m} — 자체 CA 서버입니다 : '서버 CA 인증서'에서 Supabase 를 체크하거나 그 DB 의 CA(PEM)를 붙여 넣으십시오` : m)
+export const tlsHint = (m: string) => (/self-signed|unable to (get|verify)|certificate/i.test(m) ? `${m}. 자체 CA 서버입니다 : '서버 CA 인증서'에서 Supabase 를 체크하거나 그 DB 의 CA(PEM)를 붙여 넣으십시오` : m)
 
 // 저장 전 연결 시험(마스터 지시 2026-10-18 "접속정보 저장 전 접속테스트 필요") — 입력 중인 값으로 SELECT 1, 저장·기록 없음
 //  서버 직접 : 수정 중 비밀번호를 비우면 대상이 그대로일 때만 저장된 비밀번호
@@ -328,10 +328,10 @@ export async function testConnDraft(areaId: string, b: ConnIn, connId?: string):
     if (!b.conn_url_txt) return fail('INVALID_INPUT', 400, 'JNDI 접속은 저장 뒤 [연결 시험]으로 에이전트가 시험합니다')
     if (!urlStorable(b.conn_url_txt, b.dbms_cd)) return fail('INVALID_INPUT', 400, 'JDBC URL 형식이 이 DBMS 와 맞지 않거나 허용되지 않는 인자가 있습니다')
     const p = parseJdbcUrl(b.conn_url_txt)!
-    if (b.dbms_cd === '0013') return fail('DB_CONN_BLOCKED', 400, 'Tibero 는 서버에 드라이버가 없어 시험할 수 없습니다 — 저장한 뒤 [연결 시험]을 누르면 에이전트가 시험합니다')
+    if (b.dbms_cd === '0013') return fail('DB_CONN_BLOCKED', 400, 'Tibero 는 서버에 드라이버가 없어 시험할 수 없습니다. 저장한 뒤 [연결 시험]을 누르면 에이전트가 시험합니다')
     if (!b.usr_nm || !b.pwd) return fail('DB_CONN_FAIL', 400, '사용자와 시험용 비밀번호를 입력하십시오(비밀번호는 저장하지 않음)')
     const t = await resolveTarget({ host_nm: p.host, port_no: p.port, db_nm: p.db, usr_nm: b.usr_nm, ca_cert_txt: b.ca_cert_txt?.trim() || null })
-    if (t === 'BLOCKED') return fail('DB_CONN_BLOCKED', 400, '사내망 주소라 서버가 시험할 수 없습니다 — 저장한 뒤 [연결 시험]을 누르면 에이전트가 시험합니다')
+    if (t === 'BLOCKED') return fail('DB_CONN_BLOCKED', 400, '사내망 주소라 서버가 시험할 수 없습니다. 저장한 뒤 [연결 시험]을 누르면 에이전트가 시험합니다')
     if (t === 'DNS') return fail('DB_CONN_FAIL', 400, '호스트 이름을 찾을 수 없습니다')
     const r = await testConn(b.dbms_cd, t, b.pwd)
     return r.ok ? { ok: true } : fail('DB_CONN_FAIL', 400, tlsHint(r.msg))
@@ -369,7 +369,7 @@ export async function runReq(areaId: string, prjId: string, reqId: string, uid: 
   const denied = deniedAt(stmts)
   if (denied >= 0) return fail('DDL_STMT_DENIED', 400, `${denied + 1}번째 문장`)
   const pwd = c.pwd_enc_txt ? openPwd(areaId, c.conn_id, c.pwd_enc_txt) : null
-  if (pwd == null) return fail('DB_CONN_FAIL', 400, '저장된 비밀번호를 열 수 없습니다 — 비밀번호를 다시 입력하십시오')
+  if (pwd == null) return fail('DB_CONN_FAIL', 400, '저장된 비밀번호를 열 수 없습니다. 비밀번호를 다시 입력하십시오')
   const t = await resolveTarget(c)
   if (t === 'BLOCKED') return fail('DB_CONN_BLOCKED', 400)
   if (t === 'DNS') return fail('DB_CONN_FAIL', 400, '호스트 이름을 찾을 수 없습니다')

@@ -62,13 +62,13 @@ export async function setLgc(areaId: string, prjId: string, entIds: string[], st
     }
     // 완료 취소는 물리 테이블이 작성완료가 아닐 때만(순서 : 테이블 완료 취소 → 엔터티 완료 취소)
     if (sts === 'WRT' && info.phy.some((p) => p.tables.some((t) => t.ent_id === id && t.phy_sts_cd === 'CMPTN'))) {
-      res.fail.push({ id, nm: e.ent_log_nm, why: ['물리 테이블이 작성완료입니다 — 테이블 완료 취소 후 엔터티 완료 취소'] })
+      res.fail.push({ id, nm: e.ent_log_nm, why: ['물리 테이블이 작성완료입니다. 테이블 완료 취소 후 엔터티 완료 취소'] })
       continue
     }
     const r = await db().from('mdl_ent').update({ lgc_sts_cd: sts, lgc_cmptn_dtm: sts === 'CMPTN' ? new Date().toISOString() : null, modr_id: uid }).eq('ent_id', id).eq('area_id', areaId).eq('lgc_sts_cd', e.lgc_sts_cd).select('ent_id')
     if (r.error) throw r.error
     if (!r.data.length) {
-      res.fail.push({ id, nm: e.ent_log_nm, why: ['다른 사용자가 먼저 상태를 바꿨습니다 — 다시 불러오십시오'] })
+      res.fail.push({ id, nm: e.ent_log_nm, why: ['다른 사용자가 먼저 상태를 바꿨습니다. 다시 불러오십시오'] })
       continue
     }
     res.done.push(id)
@@ -121,14 +121,14 @@ export async function setPhy(areaId: string, prjId: string, mdlId: string, tblId
       }
       const n = plan.get(id) ?? 0
       if (n) {
-        res.fail.push({ id, nm: t.tbl_nm, why: [`논리 변경 ${n}건이 아직 반영되지 않았습니다 — '논리 변경 반영' 후 완료`] })
+        res.fail.push({ id, nm: t.tbl_nm, why: [`논리 변경 ${n}건이 아직 반영되지 않았습니다. '논리 변경 반영' 후 완료`] })
         continue
       }
     }
     const r = await db().from('mdl_phy_tbl').update({ phy_sts_cd: sts, phy_cmptn_dtm: sts === 'CMPTN' ? new Date().toISOString() : null, modr_id: uid }).eq('phy_tbl_id', id).eq('phy_sts_cd', t.phy_sts_cd).select('phy_tbl_id')
     if (r.error) throw r.error
     if (!r.data.length) {
-      res.fail.push({ id, nm: t.tbl_nm, why: ['다른 사용자가 먼저 상태를 바꿨습니다 — 다시 불러오십시오'] })
+      res.fail.push({ id, nm: t.tbl_nm, why: ['다른 사용자가 먼저 상태를 바꿨습니다. 다시 불러오십시오'] })
       continue
     }
     res.done.push(id)
@@ -168,6 +168,6 @@ export async function setDgm(areaId: string, prjId: string, subjId: string | nul
   if (!dgm) return { done: [], fail: [{ id: '', nm, why: ['다이어그램이 없습니다'] }] }
   const r = await db().from('mdl_dgm').update({ dgm_sts_cd: sts, dgm_cmptn_dtm: sts === 'CMPTN' ? new Date().toISOString() : null, ver_no: dgm.ver_no + 1, modr_id: uid }).eq('dgm_id', dgm.dgm_id).eq('area_id', areaId).eq('dgm_sts_cd', dgm.dgm_sts_cd).select('dgm_id')
   if (r.error) throw r.error
-  if (!r.data.length) return { done: [], fail: [{ id: dgm.dgm_id, nm, why: ['다른 사용자가 먼저 상태를 바꿨습니다 — 다시 불러오십시오'] }] }
+  if (!r.data.length) return { done: [], fail: [{ id: dgm.dgm_id, nm, why: ['다른 사용자가 먼저 상태를 바꿨습니다. 다시 불러오십시오'] }] }
   return { done: [dgm.dgm_id], fail: [] }
 }

@@ -219,7 +219,7 @@ export default function Dashboard() {
                           {r.nm && <span className="font-medium text-ink">{r.nm} </span>}
                           {code('act', r.act_cd)}
                           <span className="mt-0.5 block text-xs text-ink-3">
-                            {r.usr ?? '—'} · {ago(r.reg_dtm, t)}
+                            {r.usr ?? '-'} · {ago(r.reg_dtm, t)}
                           </span>
                         </li>
                       ))}

@@ -65,7 +65,7 @@ export function alterDdl(ops: SyncOp[], o: { dbms: DbmsCd; ltr: 'UPPER' | 'LOWER
   const nm = (s: string) => renderIdent(s, ddlCase(o.dbms, o.ltr)) // PostgreSQL = 무조건 소문자(마스터 지시 2026-10-18)
   const one = (s: string) => s.replace(/[\p{Cc}\p{Zl}\p{Zp}]/gu, ' ')
   const pg = o.dbms === '0014'
-  const out = [`-- ${one(o.prjNm)} 물리 모델 변경분 DDL — ${DBMS_PRFL[o.dbms].nm}, 생성 ${one(o.at)}`, '-- 데이터 손실 문장(DROP)은 주석 — DBA 확인 후 실행. 새 칼럼은 테이블 끝에 붙음(물리 순서는 재생성 시 반영)', '']
+  const out = [`-- ${one(o.prjNm)} 물리 모델 변경분 DDL : ${DBMS_PRFL[o.dbms].nm}, 생성 ${one(o.at)}`, '-- 데이터 손실 문장(DROP)은 주석 : DBA 확인 후 실행. 새 칼럼은 테이블 끝에 붙음(물리 순서는 재생성 시 반영)', '']
   const colDef = (c: PhyCol) => `${nm(c.col_nm)} ${tpOf(c)}${c.bsc_val_txt && bscOk(c.bsc_val_txt, o.dbms) ? ` DEFAULT ${c.bsc_val_txt}` : ''}${c.null_yn === 'N' ? ' NOT NULL' : ''}`
   // 이름 변경 먼저(칼럼 추가보다 앞) — 같은 테이블에서 바뀐 이름이 기존 이름과 겹치면(맞바꿈·연쇄) 임시 이름을 거침
   const rens = ops.filter((x): x is Extract<SyncOp, { op: 'MOD_COL' }> => x.op === 'MOD_COL' && x.from.col_nm !== x.to.col_nm)

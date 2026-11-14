@@ -107,7 +107,7 @@ export default function UrlTab({ areaId, live, min, editor }: { areaId: string; 
                   </div>
                   {l?.err_txt && <div className="text-xs text-danger">{l.err_txt}</div>}
                 </td>
-                <td className="px-3 py-1 text-right tabular-nums">{l ? `${l.rsp_val}ms` : '—'}</td>
+                <td className="px-3 py-1 text-right tabular-nums">{l ? `${l.rsp_val}ms` : '-'}</td>
                 <td className="px-3 py-1">
                   <Spark pts={hs.map((h) => ({ t: h.bkt_dtm, v: h.rsp_val }))} bad={hs.map((h) => stsCls(h.sts_no) !== 'OK' && stsCls(h.sts_no) !== 'REDIR')} />
                 </td>

@@ -163,7 +163,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setBusy(false)
     if (!j.ok && j.code === 'PHY_NO_REL' && j.exc && !noRelExc && confirm(`관계가 없는 엔터티가 있습니다\n${(j.why ?? []).join('\n')}\n\nDA 예외로 그대로 전환하시겠습니까?(감사 이력에 남습니다)`)) return convert(true)
     if (!j.ok) return setMsg([j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
-    setMsg(`물리 모델을 만들었습니다 — 테이블 ${j.tbl_cnt}·FK ${j.fk_cnt}${j.fk_sync ? ` · 기존 자식 테이블 동기화 ${j.fk_sync}건(FK 칼럼 포함)` : ''}`)
+    setMsg(`물리 모델을 만들었습니다. 테이블 ${j.tbl_cnt}·FK ${j.fk_cnt}${j.fk_sync ? ` · 기존 자식 테이블 동기화 ${j.fk_sync}건(FK 칼럼 포함)` : ''}`)
     setMdlId(j.item.phy_mdl_id)
     setPicked(new Set())
     await loadList()
@@ -254,7 +254,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setBusy(true)
     const j = await (await piFetch(`${base}?sync=1`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phy_mdl_id: det.mdl.phy_mdl_id, ver_no: det.mdl.ver_no }) })).json()
     setBusy(false)
-    setMsg(j.ok ? `동기화했습니다 — 변경 ${j.ops}건, FK 추가 ${j.addFk}·삭제 ${j.delFk}` : [j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
+    setMsg(j.ok ? `동기화했습니다. 변경 ${j.ops}건, FK 추가 ${j.addFk}·삭제 ${j.delFk}` : [j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
     await loadList()
     setStageRev((v) => v + 1)
     await loadDet()
@@ -284,7 +284,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
             </option>
           ))}
         </select>
-        <select value={dbms === '0014' ? 'LOWER' : ltr} disabled={dbms === '0014'} title={dbms === '0014' ? 'PostgreSQL DDL 은 항상 소문자(테이블·칼럼·PK·인덱스) — 물리 모델 이름은 대문자 그대로' : 'DDL 식별자 대소문자'} onChange={(e) => setLtr(e.target.value as '' | 'UPPER' | 'LOWER')} className="input-sm w-auto disabled:text-ink-3" aria-label="식별자 대소문자">
+        <select value={dbms === '0014' ? 'LOWER' : ltr} disabled={dbms === '0014'} title={dbms === '0014' ? 'PostgreSQL DDL 은 항상 소문자(테이블·칼럼·PK·인덱스) : 물리 모델 이름은 대문자 그대로' : 'DDL 식별자 대소문자'} onChange={(e) => setLtr(e.target.value as '' | 'UPPER' | 'LOWER')} className="input-sm w-auto disabled:text-ink-3" aria-label="식별자 대소문자">
           <option value="">대소문자 : DBMS 기본</option>
           <option value="UPPER">대문자</option>
           <option value="LOWER">소문자</option>
@@ -459,7 +459,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                     const why = pk.length !== 1 ? (pk.length ? '복합 PK' : 'PK 없음') : !/^(NUMBER|NUMERIC|DECIMAL|INT|INTEGER|BIGINT|SMALLINT)$/i.test(pk[0].phy_tp_nm) ? '정수형 PK 아님' : pk[0].data_scale ? '소수점 있는 PK' : tbl.phy_sts_cd === 'CMPTN' ? '작성완료(완료 취소 후 변경)' : ''
                     const on = tbl.auto_inc_yn === 'Y'
                     return (
-                      <label className={`inline-flex items-center gap-2 rounded-control border px-2 py-1 text-dense transition-colors ${on ? 'border-accent-ink/40 bg-accent-soft text-accent-ink' : 'border-line'}`} title={why ? `자동 증가 불가 : ${why}` : `단일 PK ${pk[0]?.col_nm ?? ''} 를 자동 증가로 DDL 생성 — ${DBMS_PRFL[det.mdl.dbms_cd as DbmsCd]?.autoInc ?? ''}`}>
+                      <label className={`inline-flex items-center gap-2 rounded-control border px-2 py-1 text-dense transition-colors ${on ? 'border-accent-ink/40 bg-accent-soft text-accent-ink' : 'border-line'}`} title={why ? `자동 증가 불가 : ${why}` : `단일 PK ${pk[0]?.col_nm ?? ''} 를 자동 증가로 DDL 생성 : ${DBMS_PRFL[det.mdl.dbms_cd as DbmsCd]?.autoInc ?? ''}`}>
                         <input type="checkbox" disabled={!editor || busy || (!!why && !on)} checked={on} onChange={(e) => void setAutoInc(e.target.checked)} /> 단일 PK 자동 증가
                         {why && <span className="text-xs text-ink-3">({why})</span>}
                       </label>

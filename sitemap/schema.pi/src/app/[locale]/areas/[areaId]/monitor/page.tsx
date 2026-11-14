@@ -86,7 +86,7 @@ export default function MonitorPage({ params }: { params: Promise<{ areaId: stri
           ))}
         </nav>
         <span className="ms-auto flex items-center gap-2">
-        <button type="button" onClick={() => setLive(!live)} className="btn-key btn-sm" aria-pressed={live} aria-label={live ? '실시간 갱신 멈춤' : '실시간 갱신 시작'} title={live ? '10초마다 갱신 중 — 누르면 멈춤' : '멈춤 — 누르면 10초마다 갱신'}>
+        <button type="button" onClick={() => setLive(!live)} className="btn-key btn-sm" aria-pressed={live} aria-label={live ? '실시간 갱신 멈춤' : '실시간 갱신 시작'} title={live ? '10초마다 갱신 중 : 누르면 멈춤' : '멈춤 : 누르면 10초마다 갱신'}>
           {live ? <Pause aria-hidden /> : <Play aria-hidden />}
           <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-ok' : 'bg-ink-off'}`} aria-hidden />
           실시간

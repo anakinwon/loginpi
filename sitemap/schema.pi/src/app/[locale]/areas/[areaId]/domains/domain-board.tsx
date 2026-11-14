@@ -48,7 +48,7 @@ const TP_DESC: Record<string, { ctl: string; mng: string; ex: string }> = {
   NO: { ctl: '값의 생성 규칙', mng: '채번 규칙, 자릿수 구성, 체크디지트, 형식', ex: '번호, 일련번호, 등록번호' },
   GNRL: { ctl: '값의 형식만', mng: '타입, 길이, 저장·표현형식, 단위, 범위', ex: '명, 내용, 금액, 수량, 율, 연월일' },
 }
-const tpTitle = (c: string) => (TP_DESC[c] ? `${TP_NM[c]} : ${TP_DESC[c].ctl} 통제 — ${TP_DESC[c].mng} (예 : ${TP_DESC[c].ex})` : c)
+const tpTitle = (c: string) => (TP_DESC[c] ? `${TP_NM[c]} : ${TP_DESC[c].ctl} 통제 : ${TP_DESC[c].mng} (예 : ${TP_DESC[c].ex})` : c)
 const EMPTY = { key_dom_nm: '', dom_tp_cd: 'GNRL', dom_grp_id: '', lgc_tp_cd: '', data_len: '', data_scale: '', min_val_txt: '', max_val_txt: '', fmt_txt: '', disp_fmt_txt: '', unit_nm: '', alw_val_txt: '', dom_desc: '', std_se_cd: 'STD' }
 type Field = keyof typeof EMPTY
 // 목록 열 너비(#·도메인명·상태·대표도메인명·유형·그룹·논리타입·길이·설명·작업) 설명은 남는 폭
@@ -144,7 +144,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
     if (!g) return setAutoMsg('도메인그룹을 찾지 못했습니다 : 직접 고르십시오')
     const tp = domTpByGrp(g.dom_grp_nm)
     setForm((f) => (f.key_dom_nm === key ? { ...f, dom_grp_id: g.dom_grp_id, dom_tp_cd: tp } : f))
-    setAutoMsg(`자동 선택 : 그룹 ${g.dom_grp_nm} · 유형 ${TP_NM[tp] ?? tp}${g.dom_grp_id === top ? ` (같은 대표도메인 도메인 ${cnt.get(top)}건 기준)` : ' (그룹 이름 기준)'} — 바꿀 수 있습니다`)
+    setAutoMsg(`자동 선택 : 그룹 ${g.dom_grp_nm} · 유형 ${TP_NM[tp] ?? tp}${g.dom_grp_id === top ? ` (같은 대표도메인 도메인 ${cnt.get(top)}건 기준)` : ' (그룹 이름 기준)'} : 바꿀 수 있습니다`)
   }
   const reset = () => {
     setRsn('')
@@ -242,7 +242,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
                 <select value={form.dom_tp_cd} onChange={set('dom_tp_cd')} className="input" aria-required title={tpTitle(form.dom_tp_cd)}>
                   {Object.entries(TP_NM).map(([v, n]) => (
                     <option key={v} value={v}>
-                      {n} — {TP_DESC[v].ctl}
+                      {n} : {TP_DESC[v].ctl}
                     </option>
                   ))}
                 </select>

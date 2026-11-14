@@ -221,11 +221,11 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
     a.download = `${m?.prj.prj_nm ?? 'model'}_${{ ent: '엔터티정의서', attr: '속성정의서', rel: '관계정의서' }[type]}.csv`
     a.click()
     URL.revokeObjectURL(a.href)
-    if (r.headers.get('X-Doc-Capped')) setMsg('조회 상한을 넘어 정의서가 일부만 출력되었습니다 — 주제영역 단위로 나누어 확인하십시오')
+    if (r.headers.get('X-Doc-Capped')) setMsg('조회 상한을 넘어 정의서가 일부만 출력되었습니다. 주제영역 단위로 나누어 확인하십시오')
   }
   const printDoc = async () => {
     const w = window.open('', '_blank') // 팝업 차단 회피 : 클릭 시점에 창을 먼저 열고 내용을 채움
-    if (!w) return setMsg('팝업이 차단되었습니다 — 팝업을 허용한 뒤 다시 누르십시오')
+    if (!w) return setMsg('팝업이 차단되었습니다. 팝업을 허용한 뒤 다시 누르십시오')
     const r = await piFetch(`${api}/projects/${prjId}/docs?format=html`)
     const html = r.ok ? await r.text() : '<p>정의서를 만들지 못했습니다</p>'
     w.document.open()
@@ -299,7 +299,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
           <div className="flex items-center gap-1">
             <h2 className="text-sm font-semibold text-ink">검증 요약</h2>
             <InfoTip>
-              물리 전환(MD5) 진입 조건 : 모든 엔터티 통과(주식별자·필수 4종·관계·FK·정규화 의심 해소){m?.capped ? ' — 엔터티·속성 상한(500·5,000)에 도달해 일부만 점검' : ''}
+              물리 전환(MD5) 진입 조건 : 모든 엔터티 통과(주식별자·필수 4종·관계·FK·정규화 의심 해소){m?.capped ? ' : 엔터티·속성 상한(500·5,000)에 도달해 일부만 점검' : ''}
             </InfoTip>
             {m?.capped && (
               <span className="badge" data-tone="warn">

@@ -48,7 +48,7 @@ const RULE_MSG: Record<string, string> = { REL_NM_IDNT: 'N:M 관계는 식별 �
 const SIZE = 20
 
 type Need = { src_attr_id: string; term_id: string; term_log_nm: string; reason: 'SELF' | 'OTHER_REL' | 'OWN_PK' }
-const NEED_NM = { SELF: '자기참조 — 자기 식별자와 같은 용어 불가, "상위~" 역할 용어로 상속', OTHER_REL: '같은 용어가 이미 다른 관계로 상속됨 — 역할 용어(예 발신·수신)로 상속', OWN_PK: '자식이 같은 용어를 자기 주식별자로 씀 — 식별 관계로 바꾸거나(권장) 필요하면 역할 용어로 상속(선택)' } as const
+const NEED_NM = { SELF: '자기참조 : 자기 식별자와 같은 용어 불가, "상위~" 역할 용어로 상속', OTHER_REL: '같은 용어가 이미 다른 관계로 상속됨 : 역할 용어(예 발신·수신)로 상속', OWN_PK: '자식이 같은 용어를 자기 주식별자로 씀 : 식별 관계로 바꾸거나(권장) 필요하면 역할 용어로 상속(선택)' } as const
 
 // locked = 선택 주제영역 작성완료(sql/031 MLK01 편집 잠금) → 등록·저장 비활성, 완료 취소 후 편집 안내
 export default function Relations({ api, prjId, editor, entsKey, onSaved, locked = false }: { api: string; prjId: string; editor: boolean; entsKey: unknown; onSaved?: () => void; locked?: boolean }) {
@@ -68,7 +68,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
   }
   const applyNm = async () => {
     const c = nmP?.cands[nmP.pick]
-    if (!nmP || !c?.ok || !confirm(`N:M 관계(${nmP.prnt}–${nmP.chld})를 교차 엔터티 '${c.nm}'로 해소합니다.\n\n· 교차 엔터티(논리) 생성\n· ${nmP.prnt}·${nmP.chld} → ${c.nm} 식별 관계 2개\n· 원래 N:M 관계 삭제\n· 두 부모 주식별자를 교차 엔터티 주식별자로 상속\n\n진행하시겠습니까?`)) return
+    if (!nmP || !c?.ok || !confirm(`N:M 관계(${nmP.prnt}-${nmP.chld})를 교차 엔터티 '${c.nm}'로 해소합니다.\n\n· 교차 엔터티(논리) 생성\n· ${nmP.prnt}·${nmP.chld} → ${c.nm} 식별 관계 2개\n· 원래 N:M 관계 삭제\n· 두 부모 주식별자를 교차 엔터티 주식별자로 상속\n\n진행하시겠습니까?`)) return
     setNmBusy(true)
     const j = await (await piFetch(`${api}/relations/${nmP.relId}/resolve-nm`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ dic_ids: c.dic_ids }) })).json()
     setNmBusy(false)
@@ -134,7 +134,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
       ? await piFetch(`${api}/relations/${edit.rel_id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...body, ver_no: edit.ver_no }) })
       : await piFetch(`${api}/relations`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
     const j = await r.json()
-    setMsg(j.ok ? (edit ? '관계를 수정했습니다' : '관계를 등록했습니다') : j.code === 'SUBJ_LOCKED' ? '작성완료 주제영역은 편집할 수 없습니다 — 완료 취소 후 편집하십시오' : j.message ?? (r.status === 409 ? '같은 부모·자식·관계명의 관계가 이미 있습니다' : '저장하지 못했습니다'))
+    setMsg(j.ok ? (edit ? '관계를 수정했습니다' : '관계를 등록했습니다') : j.code === 'SUBJ_LOCKED' ? '작성완료 주제영역은 편집할 수 없습니다. 완료 취소 후 편집하십시오' : j.message ?? (r.status === 409 ? '같은 부모·자식·관계명의 관계가 이미 있습니다' : '저장하지 못했습니다'))
     if (j.ok) {
       const relId = edit?.rel_id ?? j.item?.rel_id
       setF(F0)
@@ -153,7 +153,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
     const needs: Need[] = pj.needs ?? []
     setRolePick({})
     setRoleNeed(needs.length ? { relId, title: head, items: needs } : null)
-    if (!steps.length) return setMsg(needs.length ? `${head} · 같은 용어로 상속할 수 없는 식별자 ${needs.length}건 — 아래에서 역할 용어를 고르십시오` : `${head} · FK 상속 변경 없음`)
+    if (!steps.length) return setMsg(needs.length ? `${head} · 같은 용어로 상속할 수 없는 식별자 ${needs.length}건 : 아래에서 역할 용어를 고르십시오` : `${head} · FK 상속 변경 없음`)
     const KIND = { add: '추가', link: '연결', fix: 'PK·필수 수정' }
     const list = steps.map((s) => `· ${KIND[s.kind]} ${s.term_log_nm}${s.pk ? ' (PK)' : ''}${s.esntl ? ' 필수' : ' 선택'}`).join('\n')
     if (!confirm(`${head}. 부모 주식별자를 자식에 상속합니다(FK ${steps.length}건) :\n${list}\n\n확인 = 적용 / 취소 = 나중에(논리 모델 FK 점검에 남음)`)) return
@@ -178,7 +178,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
   const del = async (x: Rel) => {
     if (!confirm(`관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm} 을(를) 삭제하시겠습니까?`)) return
     const pv = await (await piFetch(`${api}/relations/${x.rel_id}`)).json().catch(() => null)
-    if (!pv?.ok) return setMsg('상속 속성 미리보기를 불러오지 못해 삭제를 멈췄습니다 — 다시 시도하십시오')
+    if (!pv?.ok) return setMsg('상속 속성 미리보기를 불러오지 못해 삭제를 멈췄습니다. 다시 시도하십시오')
     const fa: { ent_log_nm: string; term_log_nm: string }[] = pv.fk_attrs
     const fk =
       fa.length && confirm(`관계는 삭제됩니다. 이 관계로 상속한 속성 ${fa.length}건(${fa.map((a) => `${a.ent_log_nm}.${a.term_log_nm}`).join(', ')})은 어떻게 할까요?\n\n확인 = 속성도 함께 삭제\n취소 = 속성은 일반 속성으로 남김(관계는 그래도 삭제)`) ? 'del' : 'keep'
@@ -288,7 +288,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
         <div className="panel text-xs" aria-label="N:M 해소">
           <div className="panel-head">
             <span className="truncate">
-              N:M 해소 : {nmP.prnt}–{nmP.chld}
+              N:M 해소 : {nmP.prnt}-{nmP.chld}
               {nmP.rel_nm ? ` (${nmP.rel_nm})` : ''}
             </span>
             <InfoTip>교차 엔터티 이름을 고르십시오(표준단어 조합, 빨강 = 등록 불가)</InfoTip>
@@ -338,7 +338,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved, locked
               </div>
             ))}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setRoleNeed(null)} className="btn-key btn-sm" title={roleNeed.items.every((n) => n.reason === 'OWN_PK') ? '선택 사항 — 그대로 두어도 됨' : 'FK 점검에 "역할명 필요"로 남음'}>
+              <button type="button" onClick={() => setRoleNeed(null)} className="btn-key btn-sm" title={roleNeed.items.every((n) => n.reason === 'OWN_PK') ? '선택 사항 : 그대로 두어도 됨' : 'FK 점검에 "역할명 필요"로 남음'}>
                 닫기
               </button>
               <button type="button" onClick={() => void applyRoles()} disabled={!roleNeed.items.some((n) => rolePick[n.src_attr_id])} className="btn-3d btn-sm">

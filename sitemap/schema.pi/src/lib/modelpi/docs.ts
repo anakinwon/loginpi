@@ -80,5 +80,5 @@ export function docHtml(prjNm: string, at: string, tables: DocTable[], capped = 
 .meta{color:#555;margin-bottom:12px}h2{font-size:13px;margin:14px 0 6px;border-left:4px solid #1f3a68;padding-left:6px}small{color:#666;font-weight:normal}
 table{width:100%;border-collapse:collapse;margin-bottom:8px}thead{display:table-header-group}th,td{border:1px solid #999;padding:3px 4px;vertical-align:top;text-align:left}
 th{background:#e9eff9}tr{page-break-inside:avoid}section{page-break-after:always}section:last-child{page-break-after:auto}
-</style></head><body><h1>${esc(prjNm)} — 논리 모델 정의서</h1><div class="meta">출력 ${esc(at)} · 표준 데이터 모델(승인 표준단어·용어 기준)</div>${capped ? '<p style="color:#b00"><b>※ 조회 상한(엔터티 500·속성 5,000·관계 5,000)을 넘어 일부만 출력되었습니다 — 주제영역 단위로 나누어 출력하십시오</b></p>' : ''}${tables.map(sec).join('')}</body></html>`
+</style></head><body><h1>${esc(prjNm)} : 논리 모델 정의서</h1><div class="meta">출력 ${esc(at)} · 표준 데이터 모델(승인 표준단어·용어 기준)</div>${capped ? '<p style="color:#b00"><b>※ 조회 상한(엔터티 500·속성 5,000·관계 5,000)을 넘어 일부만 출력되었습니다. 주제영역 단위로 나누어 출력하십시오</b></p>' : ''}${tables.map(sec).join('')}</body></html>`
 }

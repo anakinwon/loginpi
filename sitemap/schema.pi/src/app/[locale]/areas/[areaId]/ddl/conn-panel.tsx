@@ -106,7 +106,7 @@ export default function ConnPanel({
   useEffect(() => void load(), [load])
   const fail = (j: { message?: string; detail?: unknown }) =>
     setMsg(
-      `${j.message ?? '실패'}${typeof j.detail === 'string' ? ` — ${j.detail}` : ''}`,
+      `${j.message ?? '실패'}${typeof j.detail === 'string' ? ` : ${j.detail}` : ''}`,
     )
 
   const open = (c?: Conn) => {
@@ -157,7 +157,7 @@ export default function ConnPanel({
         (p.dbms === '0014' && u.includes('?') ? `?${u.split('?')[1]}` : ''),
     })
     setMsg(
-      `URL 을 읽었습니다 — ${dbmsList().find((d) => d.cd === p.dbms)?.nm} ${p.host}:${p.port}/${p.db}${p.pwd ? ' (비밀번호는 비밀번호 칸으로 옮김)' : ''}`,
+      `URL 을 읽었습니다. ${dbmsList().find((d) => d.cd === p.dbms)?.nm} ${p.host}:${p.port}/${p.db}${p.pwd ? ' (비밀번호는 비밀번호 칸으로 옮김)' : ''}`,
     )
   }
   const srv = f.exec_mthd_cd === 'SRV'
@@ -223,7 +223,7 @@ export default function ConnPanel({
     setOkKey(null)
     setMsg(
       j.item.exec_mthd_cd === 'AGT'
-        ? `접속 '${j.item.conn_nm}' 저장 — 에이전트 PC 에 환경변수 ${pwdEnv(j.item.conn_id)} = DB 비밀번호 를 설정하십시오`
+        ? `접속 '${j.item.conn_nm}' 저장 : 에이전트 PC 에 환경변수 ${pwdEnv(j.item.conn_id)} = DB 비밀번호 를 설정하십시오`
         : `접속 '${j.item.conn_nm}' 저장`,
     )
     await load()
@@ -249,7 +249,7 @@ export default function ConnPanel({
     setBusy(false)
     if (j.ok) {
       setOkKey(tKey)
-      return setMsg('연결 성공 — 저장할 수 있습니다')
+      return setMsg('연결 성공 : 저장할 수 있습니다')
     }
     setOkKey(null)
     if (!srv && j.code === 'DB_CONN_BLOCKED') {
@@ -288,7 +288,7 @@ export default function ConnPanel({
     }
     // 에이전트 접속 : 에이전트가 다음 확인(기본 15초) 때 시험 → 3초마다 결과 확인, 최대 60초
     setMsg(
-      `'${c.conn_nm}' 시험 요청 — 에이전트가 확인하면 결과가 표시됩니다(에이전트가 실행 중이어야 함)`,
+      `'${c.conn_nm}' 시험 요청 : 에이전트가 확인하면 결과가 표시됩니다(에이전트가 실행 중이어야 함)`,
     )
     for (let i = 0; i < 20; i++) {
       await new Promise((r) => setTimeout(r, 3000))
@@ -301,14 +301,14 @@ export default function ConnPanel({
         setBusy(false)
         return setMsg(
           x.agt_test_rslt_cd === 'OK'
-            ? `'${c.conn_nm}' 에이전트 연결 성공 — ${x.agt_test_msg ?? ''}`
-            : `'${c.conn_nm}' 에이전트 연결 실패 — ${x.agt_test_msg ?? ''}`,
+            ? `'${c.conn_nm}' 에이전트 연결 성공 : ${x.agt_test_msg ?? ''}`
+            : `'${c.conn_nm}' 에이전트 연결 실패 : ${x.agt_test_msg ?? ''}`,
         )
       }
     }
     setBusy(false)
     setMsg(
-      `'${c.conn_nm}' 60초 안에 에이전트 응답이 없습니다 — 에이전트 PC 에서 schemapi-agent 가 실행 중인지·토큰이 유효한지 확인하십시오(요청은 10분 동안 유지)`,
+      `'${c.conn_nm}' 60초 안에 에이전트 응답이 없습니다. 에이전트 PC 에서 schemapi-agent 가 실행 중인지·토큰이 유효한지 확인하십시오(요청은 10분 동안 유지)`,
     )
     await load()
   }
@@ -351,7 +351,7 @@ export default function ConnPanel({
       {(!keySet || block) && (
         <p className="mb-2 flex items-start gap-1.5 text-xs text-warn">
           <TriangleAlert className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
-          서버 직접 접속을 {keySet ? '시험·실행' : '저장·시험·실행'}할 수 없습니다(에이전트 접속만) — {block ?? '서버 암호화 키(DB_PROFILE_KEY) 확인'}
+          서버 직접 접속을 {keySet ? '시험·실행' : '저장·시험·실행'}할 수 없습니다(에이전트 접속만) : {block ?? '서버 암호화 키(DB_PROFILE_KEY) 확인'}
         </p>
       )}
       {msg && (
@@ -482,7 +482,7 @@ export default function ConnPanel({
                 autoComplete="off"
               />
               <span className="hint block">
-                선택 — 아래 칸을 자동으로 채움(Oracle jdbc:oracle:thin:@//host:1521/서비스 · Tibero jdbc:tibero:thin:@host:8629:DB)
+                선택 : 아래 칸을 자동으로 채움(Oracle jdbc:oracle:thin:@//host:1521/서비스 · Tibero jdbc:tibero:thin:@host:8629:DB)
               </span>
             </label>
             <label className="sm:col-span-2">
@@ -726,7 +726,7 @@ export default function ConnPanel({
                       autoComplete="new-password"
                     />
                     <span className="hint block">
-                      저장 전 연결 시험에만 사용 — 서버에 저장하지 않고, 저장 뒤 표시되는 환경변수 이름으로 에이전트 PC 에 설정
+                      저장 전 연결 시험에만 사용 : 서버에 저장하지 않고, 저장 뒤 표시되는 환경변수 이름으로 에이전트 PC 에 설정
                     </span>
                   </label>
                 )}
@@ -735,13 +735,13 @@ export default function ConnPanel({
             <label className="flex items-start gap-2 rounded-card border border-line bg-well p-3 text-xs text-ink-2 sm:col-span-2">
               <input type="checkbox" checked={f.rdonly} onChange={(e) => setF({ ...f, rdonly: e.target.checked })} className="mt-0.5" />
               <span>
-                <span className="font-semibold text-ink">조회 전용 계정</span> — SELECT 권한만 있는 계정(DB 에서 확인한 뒤 체크). 체크한 접속만 데이터아키텍트가 아닌 역할이 SQL 편집기로 조회할 수 있습니다.
+                <span className="font-semibold text-ink">조회 전용 계정</span> : SELECT 권한만 있는 계정(DB 에서 확인한 뒤 체크). 체크한 접속만 데이터아키텍트가 아닌 역할이 SQL 편집기로 조회할 수 있습니다.
               </span>
             </label>
             {!jndi && (
               <fieldset className="rounded-card border border-line p-3 text-xs sm:col-span-2">
                 <legend className="px-1 font-medium text-ink-2">
-                  서버 CA 인증서(선택 — 인증서 검증 TLS)
+                  서버 CA 인증서(선택 : 인증서 검증 TLS)
                 </legend>
                 <label className="flex items-center gap-2 text-ink-2">
                   <input
@@ -754,7 +754,7 @@ export default function ConnPanel({
                       })
                     }
                   />
-                  Supabase DB·풀러({KNOWN_CA.SUPABASE_2021.nm}) — Supabase 는 자체
+                  Supabase DB·풀러({KNOWN_CA.SUPABASE_2021.nm}) : Supabase 는 자체
                   CA 라 이것이 있어야 접속됩니다
                 </label>
                 <textarea
@@ -785,7 +785,7 @@ export default function ConnPanel({
                     ? '시험 통과'
                     : jndi
                       ? 'JNDI 는 저장 뒤 에이전트가 시험'
-                      : '사내망 — 저장 뒤 에이전트가 시험'
+                      : '사내망 : 저장 뒤 에이전트가 시험'
                   : '연결 시험 통과 후 저장'}
               </span>
               {!jndi && (
@@ -839,7 +839,7 @@ export default function ConnPanel({
                 role="alert"
               >
                 <p className="font-semibold text-ink">
-                  에이전트 '{token.nm}' 토큰 — 지금 한 번만 보입니다. 에이전트 PC
+                  에이전트 '{token.nm}' 토큰 : 지금 한 번만 보입니다. 에이전트 PC
                   의 환경변수 SCHEMAPI_AGENT_TOKEN 에 넣으십시오.
                 </p>
                 <code className="mt-2 block font-mono break-all text-ink select-all">

@@ -402,7 +402,7 @@ FK ${d.fk}
       ...(pf.tbl_pfx_txt ? { tbl_pfx_txt: pf.tbl_pfx_txt } : {}),
       trgt_dbms_cd: pf.trgt_dbms_cd,
     }
-    if (!pf.trgt_dbms_cd) return setMsg('대상 DBMS(예정)를 선택하십시오 — 물리명 미리보기 기준, 물리 모델에서 확정')
+    if (!pf.trgt_dbms_cd) return setMsg('대상 DBMS(예정)를 선택하십시오. 물리명 미리보기 기준, 물리 모델에서 확정')
     if (pf.tbl_pfx_txt && !PFX_RE.test(pf.tbl_pfx_txt)) return setMsg('스키마 접두사는 영문 대문자 2~4자입니다')
     if (!body.prj_nm || !confirm(pEdit ? `프로젝트 '${pEdit.prj_nm}' 수정 내용을 저장하시겠습니까?` : `프로젝트 '${body.prj_nm}'을(를) 등록하시겠습니까?`)) return
     const j = await (
@@ -489,7 +489,7 @@ FK ${d.fk}
       })
     ).json()
     if (!j.ok) return setMsg(j.message ?? '')
-    setMsg(`엔터티 ${cur.ent_log_nm} 등록 완료 — 아래 속성 패널에서 주식별자·필수 속성을 고르십시오`)
+    setMsg(`엔터티 ${cur.ent_log_nm} 등록 완료 : 아래 속성 패널에서 주식별자·필수 속성을 고르십시오`)
     setEf({ name: '', tp: ef.tp, desc: '' })
     setOpenEnt(j.item?.ent_id ?? null)
     loadEnt()
@@ -574,7 +574,7 @@ FK ${d.fk}
                 </span>
               )}
               {prj && (
-                <span className="chip-phy font-normal" title="스키마 접두사 — 물리 테이블명 = 접두사_주제영역약어_단어약어[접미어]">
+                <span className="chip-phy font-normal" title="스키마 접두사 : 물리 테이블명 = 접두사_주제영역약어_단어약어[접미어]">
                   {prj.tbl_pfx_txt}_
                 </span>
               )}
@@ -636,7 +636,7 @@ FK ${d.fk}
               ))}
             </select>
             {!aiP.busy && aiP.dbms && aiP.dbms.cd !== pf.trgt_dbms_cd && (
-              <button type="button" onClick={() => setPf((p) => ({ ...p, trgt_dbms_cd: aiP.dbms!.cd }))} className="btn-key btn-sm" title={`업종 추천 DBMS — ${aiP.dbms.why}`}>
+              <button type="button" onClick={() => setPf((p) => ({ ...p, trgt_dbms_cd: aiP.dbms!.cd }))} className="btn-key btn-sm" title={`업종 추천 DBMS : ${aiP.dbms.why}`}>
                 추천 {dbmsNm(aiP.dbms.cd)}
               </button>
             )}
@@ -644,7 +644,7 @@ FK ${d.fk}
               aiP.prefixes
                 .filter((x) => x !== pf.tbl_pfx_txt)
                 .map((x) => (
-                  <button key={x} type="button" onClick={() => setPf((p) => ({ ...p, tbl_pfx_txt: x }))} className="chip-phy transition-colors hover:bg-accent-soft" title={`${aiP.src} 추천 접두사 — 누르면 접두사 칸에 넣음(같은 분류체계 다른 프로젝트가 쓰는 접두사는 제외)`}>
+                  <button key={x} type="button" onClick={() => setPf((p) => ({ ...p, tbl_pfx_txt: x }))} className="chip-phy transition-colors hover:bg-accent-soft" title={`${aiP.src} 추천 접두사 : 누르면 접두사 칸에 넣음(같은 분류체계 다른 프로젝트가 쓰는 접두사는 제외)`}>
                     {x}_
                   </button>
                 ))}
@@ -662,7 +662,7 @@ FK ${d.fk}
               aiP.names
                 .filter((x) => x !== pf.prj_nm)
                 .map((x) => (
-                  <button key={x} type="button" onClick={() => setPf((p) => ({ ...p, prj_nm: x }))} className="btn-key btn-sm" title={`${aiP.src} 추천 이름 — 누르면 프로젝트명에 넣음`}>
+                  <button key={x} type="button" onClick={() => setPf((p) => ({ ...p, prj_nm: x }))} className="btn-key btn-sm" title={`${aiP.src} 추천 이름 : 누르면 프로젝트명에 넣음`}>
                     {x}
                   </button>
                 ))}
@@ -861,7 +861,7 @@ FK ${d.fk}
                                   {r.desc}
                                 </span>
                               ) : (
-                                <Link href={`/areas/${areaId}/words?new=${encodeURIComponent(r.missing_words[0] ?? r.nm)}`} className="block text-accent-ink hover:underline" title={`표준단어 미등록 : ${r.missing_words.join(', ')} — 신청·승인 후 등록 가능`}>
+                                <Link href={`/areas/${areaId}/words?new=${encodeURIComponent(r.missing_words[0] ?? r.nm)}`} className="block text-accent-ink hover:underline" title={`표준단어 미등록 : ${r.missing_words.join(', ')} : 신청·승인 후 등록 가능`}>
                                   표준단어 신청 필요 : {r.missing_words.join(', ')}
                                 </Link>
                               )}
