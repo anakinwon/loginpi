@@ -186,7 +186,7 @@ export function BeanRevenueDistribution({ period }: { period: number }) {
             if (!alive()) return
             return doFetch(alive)
           }
-          throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
+          throw new Error('세션 만료. 다시 로그인하세요 (HTTP 401)')
         }
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<DistributionData>

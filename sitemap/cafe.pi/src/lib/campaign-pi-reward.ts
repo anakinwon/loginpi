@@ -47,7 +47,7 @@ export async function payCampaignPiReward(
     await upsertLog(db, campaignCd, usrId, piAmt, {
       pi_uid: null,
       reward_st_cd: 'FAILED',
-      fail_reason_tx: 'Pi UID 없음 — Pi 계정으로 로그인 후 재시도 필요',
+      fail_reason_tx: 'Pi UID 없음 : Pi 계정으로 로그인 후 재시도 필요',
     })
     return
   }

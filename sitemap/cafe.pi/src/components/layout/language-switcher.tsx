@@ -91,7 +91,7 @@ function cancelIdle(id: number): void {
 
 // 1 USD 기준 환율 포매팅
 function fmtRate(rate: number | undefined): string {
-  if (!rate) return '—'
+  if (!rate) return '-'
   if (rate >= 1000)
     return rate.toLocaleString('en-US', { maximumFractionDigits: 0 })
   if (rate >= 1) return rate.toFixed(2)

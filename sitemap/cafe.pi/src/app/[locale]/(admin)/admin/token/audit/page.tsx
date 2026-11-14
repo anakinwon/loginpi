@@ -189,7 +189,7 @@ export default function BeanAuditLogPage() {
                           <p className="font-medium">
                             {row.sys_user?.nick_nm ||
                               row.sys_user?.real_nm ||
-                              '—'}
+                              '-'}
                           </p>
                           <p className="text-muted-foreground text-xs">
                             {row.sys_user?.pi_username
@@ -229,7 +229,7 @@ export default function BeanAuditLogPage() {
                               {t('adminToken.audit.viewEvidence')}
                             </a>
                           ) : (
-                            <span className="text-muted-foreground">—</span>
+                            <span className="text-muted-foreground">-</span>
                           )}
                         </td>
                       </tr>

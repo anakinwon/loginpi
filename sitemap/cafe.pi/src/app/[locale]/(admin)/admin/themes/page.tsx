@@ -410,7 +410,7 @@ export default function AdminThemesPage() {
                   className="w-16 text-center text-lg"
                 />
                 <span className="text-2xl" aria-hidden>
-                  {form.theme_emoji || '—'}
+                  {form.theme_emoji || '-'}
                 </span>
                 {suggestedEmojis.length > 0 && (
                   <div className="flex items-center gap-1">
@@ -532,7 +532,7 @@ export default function AdminThemesPage() {
                     {th.theme_nm}
                   </td>
                   <td className="text-muted-foreground px-4 py-3 text-xs">
-                    {th.theme_nm_en ?? '—'}
+                    {th.theme_nm_en ?? '-'}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{th.theme_cd}</td>
                   <td className="px-4 py-3">
@@ -555,7 +555,7 @@ export default function AdminThemesPage() {
                     )}
                   </td>
                   <td className="text-muted-foreground max-w-52 truncate px-4 py-3 text-xs">
-                    {th.theme_desc ?? '—'}
+                    {th.theme_desc ?? '-'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">

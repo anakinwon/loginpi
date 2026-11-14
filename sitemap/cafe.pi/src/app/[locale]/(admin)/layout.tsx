@@ -8,7 +8,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
 import { getQuickMenuItems } from '@/lib/quick-menu'
 
-export const metadata = { title: 'Admin — Next.js Starter Kit' }
+export const metadata = { title: 'Admin : Next.js Starter Kit' }
 
 export default async function AdminLayout({
   children,

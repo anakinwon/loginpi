@@ -71,7 +71,7 @@ function buildReceiptHtml(opts: PaymentReceiptOptions): string {
                     <span style="color:#6b7280;font-weight:600;">내용</span>
                   </td>
                   <td style="padding:14px 20px;background:#fff;border-bottom:1px solid #e5e7eb;">
-                    <span style="color:#111827;">${memo ? esc(memo) : '—'}</span>
+                    <span style="color:#111827;">${memo ? esc(memo) : '-'}</span>
                   </td>
                 </tr>
                 <tr>

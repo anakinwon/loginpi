@@ -48,11 +48,11 @@ const CATEGORY_STYLE: Record<LogTable['category'], string> = {
 }
 
 function fmtDateTime(iso: string | null): string {
-  return iso ? new Date(iso).toLocaleString('ko-KR') : '—'
+  return iso ? new Date(iso).toLocaleString('ko-KR') : '-'
 }
 
 function fmtNum(n: number | null): string {
-  return n == null ? '—' : n.toLocaleString('ko-KR')
+  return n == null ? '-' : n.toLocaleString('ko-KR')
 }
 
 export default function LogsPage() {
@@ -280,7 +280,7 @@ export default function LogsPage() {
                       {fmtNum(row.row_cnt)}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">
-                      {row.size_pretty ?? '—'}
+                      {row.size_pretty ?? '-'}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                       {row.oldest_dtm ? (
@@ -289,7 +289,7 @@ export default function LogsPage() {
                           <br />~ {fmtDateTime(row.newest_dtm)}
                         </>
                       ) : (
-                        '—'
+                        '-'
                       )}
                     </td>
                     <td className="px-4 py-3">

@@ -313,12 +313,12 @@ export default function StdWordsPage() {
                     {w.dic_phy_nm}
                   </td>
                   <td className="text-muted-foreground px-4 py-3 font-mono text-xs">
-                    {w.dic_phy_fll_nm ?? '—'}
+                    {w.dic_phy_fll_nm ?? '-'}
                   </td>
                   <td className="text-muted-foreground px-4 py-3 text-xs">
                     {w.data_type
                       ? `${w.data_type}${w.data_len ? `(${w.data_len})` : ''}`
-                      : '—'}
+                      : '-'}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -328,7 +328,7 @@ export default function StdWordsPage() {
                     </span>
                   </td>
                   <td className="text-muted-foreground max-w-48 truncate px-4 py-3 text-xs">
-                    {w.dic_desc ?? '—'}
+                    {w.dic_desc ?? '-'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">

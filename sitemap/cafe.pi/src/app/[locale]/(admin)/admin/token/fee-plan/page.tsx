@@ -250,11 +250,11 @@ export default function BeanFeePlanPage() {
                       </td>
                       <td className="text-muted-foreground px-3 py-2 text-right text-xs tabular-nums">
                         {row.amt_bean === 0
-                          ? '—'
+                          ? '-'
                           : (row.amt_bean / 100).toFixed(2) + ' π'}
                       </td>
                       <td className="text-muted-foreground max-w-xs truncate px-3 py-2 text-xs">
-                        {row.fee_plan_desc ?? '—'}
+                        {row.fee_plan_desc ?? '-'}
                       </td>
                       <td className="px-3 py-2 text-center">
                         <button

@@ -481,7 +481,7 @@ export function ClientMyShops({
                 {editingShop.owner_verified_yn === 'Y' && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400">
                     {t('verifiedShop', {
-                      method: editingShop.verify_method_cd ?? '—',
+                      method: editingShop.verify_method_cd ?? '-',
                     })}
                   </p>
                 )}

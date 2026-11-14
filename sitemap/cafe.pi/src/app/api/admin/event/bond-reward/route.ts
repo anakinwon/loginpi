@@ -112,7 +112,7 @@ export async function POST(req: Request) {
       ok: true,
       eventId,
       mode: 'PI',
-      message: `PI모드 — ${granted}건 대기 기록. 실송금은 Pi 보상 관리에서 실행하세요.`,
+      message: `PI모드 : ${granted}건 대기 기록. 실송금은 Pi 보상 관리에서 실행하세요.`,
       eligible: targets.length,
       granted,
       already,

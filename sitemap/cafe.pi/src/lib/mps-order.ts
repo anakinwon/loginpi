@@ -573,7 +573,7 @@ async function settleOrder(
       db,
       order,
       actorId,
-      '판매자 Pi 미연동 — 운영자 수동 정산 필요',
+      '판매자 Pi 미연동 : 운영자 수동 정산 필요',
     )
     await markSettleSt(
       db,
@@ -590,7 +590,7 @@ async function settleOrder(
       db,
       order,
       actorId,
-      'A2U 비활성 — 운영자 수동 정산 필요',
+      'A2U 비활성 : 운영자 수동 정산 필요',
     )
     await markSettleSt(
       db,
@@ -619,7 +619,7 @@ async function settleOrder(
       db,
       order,
       actorId,
-      'A2U 송금 실패 — 재시도/수동 정산 필요',
+      'A2U 송금 실패 : 재시도/수동 정산 필요',
     )
     await markSettleSt(
       db,

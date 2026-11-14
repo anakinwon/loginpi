@@ -86,7 +86,7 @@ export function SpikeRunner() {
       update(
         'md',
         'fail',
-        'navigator.mediaDevices 없음 — HTTP 환경이거나 WebRTC 미지원 브라우저',
+        'navigator.mediaDevices 없음 : HTTP 환경이거나 WebRTC 미지원 브라우저',
       )
       update('gum', 'fail', '상위 체크 실패로 건너뜀')
       update('mic', 'fail', '상위 체크 실패로 건너뜀')
@@ -166,7 +166,7 @@ export function SpikeRunner() {
         update(
           'codec',
           'warn',
-          `Opus 없음 — 지원 코덱: ${names || '정보 없음'}`,
+          `Opus 없음. 지원 코덱: ${names || '정보 없음'}`,
         )
       }
     } catch {
@@ -273,12 +273,12 @@ export function SpikeRunner() {
 
           {!running && failCount === 0 && (
             <div className="rounded-xl bg-green-500/10 px-4 py-3 text-sm font-semibold text-green-700 dark:text-green-400">
-              🎉 S0 GO — WebRTC 1:1 음성통화 구현 진행 가능
+              🎉 S0 GO : WebRTC 1:1 음성통화 구현 진행 가능
             </div>
           )}
           {!running && failCount > 0 && (
             <div className="bg-destructive/10 text-destructive rounded-xl px-4 py-3 text-sm font-semibold">
-              🚫 S0 NO-GO — 실패 항목 확인 필요 (PRD 10절 리스크 참조)
+              🚫 S0 NO-GO : 실패 항목 확인 필요 (PRD 10절 리스크 참조)
             </div>
           )}
         </>

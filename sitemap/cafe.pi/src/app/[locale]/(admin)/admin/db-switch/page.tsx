@@ -132,7 +132,7 @@ export default function DbSwitchPage() {
               ) : (
                 <p className="text-red-600 dark:text-red-400">
                   {t('dbSwitch.readFail', {
-                    error: state.connTest?.error ?? '—',
+                    error: state.connTest?.error ?? '-',
                   })}
                   {isProdRo && t('dbSwitch.readFailRoHint')}
                 </p>

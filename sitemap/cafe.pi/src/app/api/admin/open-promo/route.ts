@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
       p_start_dtm: null,
       p_end_dtm: null,
       p_changed_by: changedBy,
-      p_reason_memo: body.reason || '오픈기념행사 종료 — 정상요금 복귀',
+      p_reason_memo: body.reason || '오픈기념행사 종료 : 정상요금 복귀',
     })
 
     if (error)

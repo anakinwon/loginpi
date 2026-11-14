@@ -405,7 +405,7 @@ export default function TokenWalletsPage() {
                       {w.sys_user?.nick_nm ||
                         w.sys_user?.real_nm ||
                         w.sys_user?.display_name ||
-                        '—'}
+                        '-'}
                     </p>
                     <p className="text-muted-foreground text-xs">
                       {w.sys_user?.pi_username

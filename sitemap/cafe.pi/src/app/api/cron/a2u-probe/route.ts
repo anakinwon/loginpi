@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     if (masterRow.tlgm_chat_id && isTelegramEnabled()) {
       const sent = await sendTelegramMessage(
         masterRow.tlgm_chat_id,
-        '🚨 <b>Pi 메인넷 A2U 개방 감지 — 등재 승인 신호!</b>\n\n' +
+        '🚨 <b>Pi 메인넷 A2U 개방 감지 : 등재 승인 신호!</b>\n\n' +
           'A2U 결제 생성이 성공했습니다 (프로브 결제는 즉시 취소됨 · 송금 0).\n' +
           '지금 즉시 <b>0순위 런북</b>을 실행하세요:\n' +
           '① Pi Browser Ecosystem에서 PyCafé 노출 확인\n' +
@@ -144,10 +144,10 @@ export async function GET(request: NextRequest) {
     if (masterRow.tlgm_chat_id && isTelegramEnabled()) {
       const sent = await sendTelegramMessage(
         masterRow.tlgm_chat_id,
-        `📡 <b>메인넷 등재 일일 점검 — 승인 대기 중 (D+${daysSinceApplied()})</b>\n\n` +
-          'A2U 미개방(feature_not_available) — 아직 승인 전 정상 상태입니다.\n' +
+        `📡 <b>메인넷 등재 일일 점검 : 승인 대기 중 (D+${daysSinceApplied()})</b>\n\n` +
+          'A2U 미개방(feature_not_available) : 아직 승인 전 정상 상태입니다.\n' +
           '개방이 감지되는 즉시 🚨 긴급 알람과 0순위 런북 안내가 발송됩니다.\n\n' +
-          '(이 점검 알람이 하루라도 안 오면 감시 체계 이상 — 아소카에게 확인 요청)',
+          '(이 점검 알람이 하루라도 안 오면 감시 체계 이상. 아소카에게 확인 요청)',
       )
       notified = sent.ok
     }
@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
       masterRow.tlgm_chat_id,
       `⚠️ <b>메인넷 프로브 이상 응답 (HTTP ${createRes.status})</b>\n\n` +
         `<code>${escapeHtml(bodyText.slice(0, 200))}</code>\n\n` +
-        '키/시드 회귀·pending 잔류 등 가능 — Vercel 로그 확인 필요.',
+        '키/시드 회귀·pending 잔류 등 가능. Vercel 로그 확인 필요.',
     )
     notified = sent.ok
   }

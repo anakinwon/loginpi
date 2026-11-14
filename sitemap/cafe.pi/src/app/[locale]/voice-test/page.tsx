@@ -14,7 +14,7 @@ export default function VoiceTestPage() {
           Pi Browser에서 이 페이지를 열고 버튼을 누르면 마이크 권한 요청이
           뜹니다.
           <br />
-          허용 후 모든 항목이 ✅이면 <strong>S0 GO</strong> — 음성통화 구현 진행
+          허용 후 모든 항목이 ✅이면 <strong>S0 GO</strong> : 음성통화 구현 진행
           가능합니다.
         </div>
       </div>
@@ -24,17 +24,17 @@ export default function VoiceTestPage() {
       <div className="bg-card text-muted-foreground mt-8 space-y-1 rounded-xl border p-4 text-xs">
         <p className="text-foreground font-medium">체크 항목 설명</p>
         <p>
-          • <strong>getUserMedia</strong> — 브라우저가 마이크 API를 지원하고
+          • <strong>getUserMedia</strong> : 브라우저가 마이크 API를 지원하고
           실제 트랙을 획득하는지
         </p>
         <p>
-          • <strong>RTCPeerConnection</strong> — P2P 연결 객체 존재 여부
+          • <strong>RTCPeerConnection</strong> : P2P 연결 객체 존재 여부
         </p>
         <p>
-          • <strong>Opus 코덱</strong> — 저지연 음성 코덱(24~32kbps) 지원 여부
+          • <strong>Opus 코덱</strong> : 저지연 음성 코덱(24~32kbps) 지원 여부
         </p>
         <p>
-          • <strong>ICE Candidate</strong> — STUN 서버로 공인 IP 반사 주소 획득
+          • <strong>ICE Candidate</strong> : STUN 서버로 공인 IP 반사 주소 획득
           (NAT 통과 가능 여부)
         </p>
         <p className="mt-2">

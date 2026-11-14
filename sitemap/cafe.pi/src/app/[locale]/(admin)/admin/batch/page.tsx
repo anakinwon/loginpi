@@ -4,7 +4,7 @@ import { BatchLogTable } from '@/components/admin/batch-log-table'
 
 export async function generateMetadata() {
   const t = await getTranslations('admin.batch')
-  return { title: `${t('title')} — Admin` }
+  return { title: `${t('title')} : Admin` }
 }
 
 // 자동 작업 스케줄표 — 직접 실행하지 않아도 이력이 기록되는 작업을 명시해 오해 방지

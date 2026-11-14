@@ -282,7 +282,7 @@ export function MonitorDashboard() {
         <Card title={t('monitor.cpuTitle')}>
           <div className="flex items-end gap-3">
             <span className="text-2xl font-bold">
-              {cpuHist.length ? `${cpuHist[cpuHist.length - 1]}%` : '—'}
+              {cpuHist.length ? `${cpuHist[cpuHist.length - 1]}%` : '-'}
             </span>
             <span className="text-muted-foreground mb-1 text-xs">
               {t('monitor.instanceUptime', {

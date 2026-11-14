@@ -35,7 +35,7 @@ export async function payTipPiReward(paymentId: string): Promise<void> {
   if (!piUid) {
     await update(db, paymentId, {
       reward_st_cd: 'FAILED',
-      fail_reason_tx: '받는 사람 Pi UID 없음 — Pi 계정 로그인 후 재시도',
+      fail_reason_tx: '받는 사람 Pi UID 없음 : Pi 계정 로그인 후 재시도',
     })
     return
   }

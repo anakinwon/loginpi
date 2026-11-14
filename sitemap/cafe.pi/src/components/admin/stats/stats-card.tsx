@@ -48,7 +48,7 @@ function TrendBadge({ pct }: { pct: number }) {
     : up
       ? 'text-emerald-700 dark:text-emerald-500'
       : 'text-red-700 dark:text-red-500'
-  const arrow = flat ? '—' : up ? '▲' : '▼'
+  const arrow = flat ? '-' : up ? '▲' : '▼'
   return (
     <span className={cn('ml-2 align-middle text-xs font-semibold', cls)}>
       {arrow} {Math.abs(pct).toFixed(1)}%

@@ -133,10 +133,10 @@ export default function UsersPage() {
                 >
                   <td className="px-4 py-3 font-medium">{user.display_name}</td>
                   <td className="text-muted-foreground px-4 py-3">
-                    {user.pi_username ? `@${user.pi_username}` : '—'}
+                    {user.pi_username ? `@${user.pi_username}` : '-'}
                   </td>
                   <td className="text-muted-foreground px-4 py-3">
-                    {user.google_email ?? '—'}
+                    {user.google_email ?? '-'}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -165,7 +165,7 @@ export default function UsersPage() {
                           minute: '2-digit',
                           hour12: false,
                         })
-                      : '—'}
+                      : '-'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1">

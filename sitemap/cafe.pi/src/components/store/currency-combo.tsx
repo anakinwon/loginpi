@@ -62,7 +62,7 @@ function writeCache(data: Omit<ComboCache, 'ts'>): void {
 
 // 1 USD 기준 환율 포매팅 (헤더와 동일 규칙)
 function fmtRate(rate: number | undefined): string {
-  if (!rate) return '—'
+  if (!rate) return '-'
   if (rate >= 1000)
     return rate.toLocaleString('en-US', { maximumFractionDigits: 0 })
   if (rate >= 1) return rate.toFixed(2)

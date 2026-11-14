@@ -55,7 +55,7 @@ const round7 = (n: number) => Math.round(n * 1e7) / 1e7
 
 // 자국통화 표기 — 등록시점 고정 참고가 (Pi 직거래는 ccy 없음 → '—')
 function fmtCcy(amt: number | null, cd: string | null): string {
-  if (amt == null || !cd) return '—'
+  if (amt == null || !cd) return '-'
   return `${amt.toLocaleString()} ${cd}`
 }
 
@@ -66,13 +66,13 @@ function fmtDate(iso: string): string {
 
 // 정산일시 — 날짜+시각 (성공일자)
 function fmtDateTime(iso: string | null): string {
-  if (!iso) return '—'
+  if (!iso) return '-'
   return new Date(iso).toLocaleString('sv-SE').slice(0, 16)
 }
 
 // txid 축약 — 앞6…뒤6
 function shortTxid(txid: string | null): string {
-  if (!txid) return '—'
+  if (!txid) return '-'
   return txid.length > 14 ? `${txid.slice(0, 6)}…${txid.slice(-6)}` : txid
 }
 
@@ -393,7 +393,7 @@ export function PendingSettleRunner() {
                         <td className="py-2 pr-3 whitespace-nowrap">
                           {s.seller_pi_username
                             ? `@${s.seller_pi_username}`
-                            : '—'}
+                            : '-'}
                         </td>
                         <td className="py-2 pr-3 whitespace-nowrap">
                           {s.buyer_display}
@@ -423,7 +423,7 @@ export function PendingSettleRunner() {
                               {shortTxid(s.release_txid)}
                             </button>
                           ) : (
-                            '—'
+                            '-'
                           )}
                         </td>
                       </tr>

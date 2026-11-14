@@ -18,7 +18,7 @@ import { piFetch } from '@/lib/pi-fetch'
 const ROUTING_LOCALES = new Set<string>(routing.locales)
 
 function fmtRate(rate: number | undefined): string {
-  if (!rate) return '—'
+  if (!rate) return '-'
   if (rate >= 1000)
     return rate.toLocaleString('en-US', { maximumFractionDigits: 0 })
   if (rate >= 1) return rate.toFixed(2)
@@ -545,7 +545,7 @@ export default function I18nPage() {
                           </span>
                         </span>
                       ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
+                        <span className="text-muted-foreground text-xs">-</span>
                       )}
                     </td>
 
@@ -560,7 +560,7 @@ export default function I18nPage() {
                           </span>
                         </span>
                       ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
+                        <span className="text-muted-foreground text-xs">-</span>
                       )}
                     </td>
 
@@ -727,7 +727,7 @@ export default function I18nPage() {
                             </span>
                           </>
                         ) : (
-                          '—'
+                          '-'
                         )}
                       </td>
 
@@ -739,7 +739,7 @@ export default function I18nPage() {
                             {fmtRate(piPrice)}
                           </>
                         ) : (
-                          '—'
+                          '-'
                         )}
                       </td>
 

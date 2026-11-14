@@ -280,10 +280,10 @@ export default function LinksPage() {
                   >
                     <td className="px-4 py-3 font-medium">{u.display_name}</td>
                     <td className="text-muted-foreground px-4 py-3">
-                      {u.pi_username ? `@${u.pi_username}` : '—'}
+                      {u.pi_username ? `@${u.pi_username}` : '-'}
                     </td>
                     <td className="text-muted-foreground px-4 py-3">
-                      {u.google_email ?? '—'}
+                      {u.google_email ?? '-'}
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -307,7 +307,7 @@ export default function LinksPage() {
                             second: '2-digit',
                             hour12: false,
                           })
-                        : '—'}
+                        : '-'}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">

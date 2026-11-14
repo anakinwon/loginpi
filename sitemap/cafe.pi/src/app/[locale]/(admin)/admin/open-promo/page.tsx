@@ -343,11 +343,11 @@ export default function OpenPromoPage() {
                     {state.history.map((h) => (
                       <tr key={h.audit_id} className="border-t">
                         <td className="px-3 py-2 font-mono">
-                          {(h.old_active_yn ?? '—') === 'Y'
+                          {(h.old_active_yn ?? '-') === 'Y'
                             ? t('adminPromo.free')
-                            : (h.old_active_yn ?? '—') === 'N'
+                            : (h.old_active_yn ?? '-') === 'N'
                               ? t('adminPromo.normal')
-                              : '—'}{' '}
+                              : '-'}{' '}
                           →{' '}
                           {h.new_active_yn === 'Y'
                             ? t('adminPromo.free')
@@ -365,7 +365,7 @@ export default function OpenPromoPage() {
                         </td>
                         <td className="px-3 py-2">{h.changed_by}</td>
                         <td className="text-muted-foreground px-3 py-2">
-                          {h.reason_memo ?? '—'}
+                          {h.reason_memo ?? '-'}
                         </td>
                         <td className="text-muted-foreground px-3 py-2">
                           {new Date(h.changed_at).toLocaleString()}

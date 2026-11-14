@@ -9,5 +9,5 @@ export const VOICE_ERRORS = {
   VOICE_MAX_SLOTS: '동시 보이스챗은 멤버 최대 {max}명까지입니다',
   VOICE_INVALID_SIGNAL: '잘못된 시그널 요청',
   VOICE_SLOTS_FULL:
-    '보이스챗 정원(멤버 {max}명)이 가득 찼습니다 — 자리가 나면 다시 신청해 주세요',
+    '보이스챗 정원(멤버 {max}명)이 가득 찼습니다. 자리가 나면 다시 신청해 주세요',
 } as const

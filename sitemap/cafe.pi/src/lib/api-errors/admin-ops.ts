@@ -59,7 +59,7 @@ export const ADMIN_OPS_ERRORS = {
   ADM_DEPLOY_STAGING_HOOK_MISSING: 'VERCEL_STAGING_DEPLOY_HOOK 미설정',
   ADM_DEPLOY_HOOK_STATUS: 'Deploy Hook {status}',
   ADM_DEPLOY_PROD_DIVERGED:
-    'production이 master보다 {n}커밋 앞섬(갈라짐) — fast-forward 불가',
+    'production이 master보다 {n}커밋 앞섬(갈라짐). fast-forward 불가',
   ADM_DEPLOY_NOTHING_TO_PROMOTE: '승격할 커밋 없음(이미 최신)',
   ADM_DEPLOY_MASTER_SHA_FAIL: 'master SHA 조회 실패',
   ADM_DEPLOY_PROMOTE_FAILED: '승격 실패 GitHub {status} {detail}',
@@ -67,7 +67,7 @@ export const ADMIN_OPS_ERRORS = {
   ADM_DB_NOT_STAGING: '스테이징 환경에서만 전환 가능(운영 WAS 불변)',
   ADM_DB_API_MISSING: 'Vercel API 토큰/프로젝트ID/Deploy Hook 미설정',
   ADM_DB_PROD_RO_MISSING:
-    '운영DB(prod-ro) 읽기전용 자격증명(PROD_RO_SUPABASE_URL/KEY) 미설정 — 쓰기 사고 방지로 차단',
+    '운영DB(prod-ro) 읽기전용 자격증명(PROD_RO_SUPABASE_URL/KEY) 미설정. 쓰기 사고 방지로 차단',
   ADM_DB_ENV_UPDATE_FAILED: 'env 변경 실패 Vercel {status} {detail}',
   ADM_DB_ENV_OK_REDEPLOY_FAILED:
     '환경변수는 변경됐으나 재배포에 실패했습니다. 배포 화면에서 상태를 확인하세요.',

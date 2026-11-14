@@ -194,7 +194,7 @@ export default function StdApprovalsPage() {
                       {apv.entity_nm ?? apv.entity_id}
                     </td>
                     <td className="text-muted-foreground max-w-32 truncate px-4 py-3 font-mono text-xs">
-                      {apv.req_by ?? '—'}
+                      {apv.req_by ?? '-'}
                     </td>
                     <td className="px-4 py-3">
                       <span

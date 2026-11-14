@@ -24,9 +24,9 @@ const PAGE_SIZE = 20
 
 // 마지막 수행일시 — 현지 시간대 날짜+시·분·초 (메모리: 현지 형식 표시 규칙)
 function fmtLastDtm(s: string | null): string {
-  if (!s) return '—'
+  if (!s) return '-'
   const d = new Date(s)
-  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString()
+  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleString()
 }
 
 export function CampaignShopBoard() {
@@ -245,7 +245,7 @@ export function CampaignShopBoard() {
                         <div className="text-xs font-medium text-blue-600 dark:text-blue-400">
                           {r.pi_username
                             ? `@${isAdmin ? r.pi_username : maskUsername(r.pi_username)}`
-                            : '—'}
+                            : '-'}
                         </div>
                         {r.shop_count > 1 && (
                           <div className="text-muted-foreground mt-0.5 text-xs">

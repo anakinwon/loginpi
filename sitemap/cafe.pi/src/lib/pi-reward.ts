@@ -34,7 +34,7 @@ export async function triggerPiReward(
   if (!piUid) {
     await upsertRewardLog(db, eventId, userId, 'UNKNOWN', rewardAmt, {
       reward_st_cd: 'FAILED',
-      fail_reason_tx: 'Pi UID 없음 — Pi 계정으로 로그인 후 재시도 필요',
+      fail_reason_tx: 'Pi UID 없음 : Pi 계정으로 로그인 후 재시도 필요',
     })
     return
   }
@@ -191,7 +191,7 @@ export async function recordPendingEvtPiReward(
   if (!piUid) {
     await upsertRewardLog(db, eventId, userId, 'UNKNOWN', rewardAmt, {
       reward_st_cd: 'FAILED',
-      fail_reason_tx: 'Pi UID 없음 — Pi 계정으로 로그인 후 재시도 필요',
+      fail_reason_tx: 'Pi UID 없음 : Pi 계정으로 로그인 후 재시도 필요',
     })
     return 'NO_UID'
   }

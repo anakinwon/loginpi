@@ -419,7 +419,7 @@ export default function StdDomainsPage() {
                     {fmtDataType(d.data_type_cd, d.data_len, d.data_scale)}
                   </td>
                   <td className="text-muted-foreground max-w-52 truncate px-4 py-3 text-xs">
-                    {d.dom_desc ?? '—'}
+                    {d.dom_desc ?? '-'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">

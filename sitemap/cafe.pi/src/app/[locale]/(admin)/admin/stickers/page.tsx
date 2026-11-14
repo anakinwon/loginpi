@@ -307,7 +307,7 @@ export default function StickersPage() {
               value={newTheme}
               onChange={(e) => setNewTheme(e.target.value)}
             >
-              <option value="">—</option>
+              <option value="">-</option>
               {themes.map((th) => (
                 <option key={th.theme_cd} value={th.theme_cd}>
                   {th.theme_emoji} {th.theme_nm}
@@ -537,7 +537,7 @@ function PackTableRow({
               value={es.editTheme}
               onChange={(e) => es.setEditTheme(e.target.value)}
             >
-              <option value="">—</option>
+              <option value="">-</option>
               {themes.map((th) => (
                 <option key={th.theme_cd} value={th.theme_cd}>
                   {th.theme_emoji} {th.theme_nm}
@@ -547,7 +547,7 @@ function PackTableRow({
           ) : p.msg_theme ? (
             `${p.msg_theme.theme_emoji} ${p.msg_theme.theme_nm}`
           ) : (
-            '—'
+            '-'
           )}
         </td>
         <td className="px-4 py-3">

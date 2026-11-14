@@ -46,7 +46,7 @@ interface DeployOverview {
   ghError?: OpsErr
 }
 
-const short = (s?: string | null) => (s ? s.slice(0, 7) : '—')
+const short = (s?: string | null) => (s ? s.slice(0, 7) : '-')
 const TERMINAL = ['READY', 'ERROR', 'CANCELED']
 const isActive = (s: string | null) => !!s && !TERMINAL.includes(s)
 // CSS 클래스만 모듈 스코프 상수로 유지 — 한글 라벨은 StatusBlock 내부에서 t()로 구성
@@ -89,7 +89,7 @@ function StatusBlock({
             STATE_CLS[status.state ?? ''] ?? 'bg-muted',
           )}
         >
-          {stateLabels[status.state ?? ''] ?? status.state ?? '—'}
+          {stateLabels[status.state ?? ''] ?? status.state ?? '-'}
         </span>
         {polling && isActive(status.state) && (
           <span className="text-muted-foreground text-xs">

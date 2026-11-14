@@ -207,7 +207,7 @@ export default function FeeModePage() {
                         </td>
                         <td className="px-3 py-2">{h.changed_by}</td>
                         <td className="text-muted-foreground px-3 py-2">
-                          {h.reason_memo ?? '—'}
+                          {h.reason_memo ?? '-'}
                         </td>
                         <td className="text-muted-foreground px-3 py-2">
                           {new Date(h.changed_at).toLocaleString()}

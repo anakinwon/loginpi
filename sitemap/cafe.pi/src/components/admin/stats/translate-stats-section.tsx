@@ -71,7 +71,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
               `/api/admin/stats/translate?period=${period}`,
             )
             if (retry.status === 401)
-              throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
+              throw new Error('세션 만료. 다시 로그인하세요 (HTTP 401)')
             if (!retry.ok)
               throw new Error(`번역 통계 조회 실패 (HTTP ${retry.status})`)
             const retryBody = (await retry.json()) as TranslateStatsResponse
@@ -81,7 +81,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
             }
             return
           }
-          throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
+          throw new Error('세션 만료. 다시 로그인하세요 (HTTP 401)')
         }
         if (!res.ok) throw new Error(`번역 통계 조회 실패 (HTTP ${res.status})`)
         const body = (await res.json()) as TranslateStatsResponse

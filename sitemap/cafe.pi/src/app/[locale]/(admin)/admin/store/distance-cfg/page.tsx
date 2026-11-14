@@ -91,7 +91,7 @@ export default function DistanceCfgPage() {
           </span>
         ) : (
           <span className="rounded-full bg-blue-100 px-4 py-1 text-base font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-            {current ? labelKm(current.max_dist_km) : '—'}
+            {current ? labelKm(current.max_dist_km) : '-'}
           </span>
         )}
       </div>
@@ -252,7 +252,7 @@ export default function DistanceCfgPage() {
                       )}
                     </td>
                     <td className="text-muted-foreground max-w-xs truncate px-4 py-3 text-xs">
-                      {row.note_txt ?? '—'}
+                      {row.note_txt ?? '-'}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 font-mono text-xs">
                       {row.modr_id.slice(0, 8)}…

@@ -3,7 +3,7 @@ import { StatsDashboard } from '@/components/admin/stats/stats-dashboard'
 
 export async function generateMetadata() {
   const t = await getTranslations('adminStats')
-  return { title: `${t('adminTitle')} — Admin` }
+  return { title: `${t('adminTitle')} : Admin` }
 }
 
 export default async function StatsPage() {

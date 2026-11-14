@@ -74,7 +74,7 @@ export function ShopStaffManager({ shopId }: { shopId: string }) {
         if (res.ok && data.ok) {
           ok++
         } else {
-          toast.error(`${n} — ${apiErr(data, t('staffMgr.addFail'))}`)
+          toast.error(`${n} : ${apiErr(data, t('staffMgr.addFail'))}`)
         }
       }
       if (ok > 0) {

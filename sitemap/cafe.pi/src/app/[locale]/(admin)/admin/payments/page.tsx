@@ -39,7 +39,7 @@ interface TxnRow {
 
 // 사용자 표시명 우선순위 — 별명 → 실명 → display_name
 function userLabel(u: TxnRow['sys_user']): string {
-  return u?.nick_nm || u?.real_nm || u?.display_name || '—'
+  return u?.nick_nm || u?.real_nm || u?.display_name || '-'
 }
 
 const STATUS_STYLE: Record<TxnStatus, string> = {
@@ -109,7 +109,7 @@ export default function PaymentsPage() {
       if (!res.ok) {
         alert(t('refund.fail', { error: d.error ?? res.statusText }))
       } else {
-        alert(t('refund.success', { txid: d.refund?.txid ?? '—' }))
+        alert(t('refund.success', { txid: d.refund?.txid ?? '-' }))
       }
       await loadAll()
     } finally {
@@ -329,7 +329,7 @@ export default function PaymentsPage() {
                             : `↩️ ${t('refund.btn')}`}
                       </button>
                     ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
+                      <span className="text-muted-foreground text-xs">-</span>
                     )}
                   </td>
                   <td
@@ -346,7 +346,7 @@ export default function PaymentsPage() {
                     </span>
                   </td>
                   <td className="text-muted-foreground max-w-[160px] truncate px-4 py-3">
-                    {p.memo ?? '—'}
+                    {p.memo ?? '-'}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -356,7 +356,7 @@ export default function PaymentsPage() {
                     </span>
                   </td>
                   <td className="text-muted-foreground max-w-[120px] truncate px-4 py-3 font-mono text-xs">
-                    {p.payment_id ?? '—'}
+                    {p.payment_id ?? '-'}
                   </td>
                   <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                     {new Date(p.reg_dtm).toLocaleString('ko-KR')}

@@ -564,7 +564,7 @@ function PendingPanel({
                         {r.sys_user?.nick_nm ||
                           r.sys_user?.real_nm ||
                           r.sys_user?.display_name ||
-                          '—'}
+                          '-'}
                       </p>
                       <p className="text-muted-foreground text-xs">
                         {r.sys_user?.pi_username

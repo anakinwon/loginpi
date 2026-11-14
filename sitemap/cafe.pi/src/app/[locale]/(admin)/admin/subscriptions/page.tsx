@@ -244,7 +244,7 @@ export default function SubscriptionsPage() {
                       <p className="font-medium">
                         {user?.pi_username
                           ? `@${user.pi_username}`
-                          : (user?.google_email ?? '—')}
+                          : (user?.google_email ?? '-')}
                       </p>
                       <p className="text-muted-foreground text-xs">
                         {user?.display_name ?? ''}
@@ -267,7 +267,7 @@ export default function SubscriptionsPage() {
                       {cycleLabel(row.bill_cycle_cd)}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-xs">
-                      {row.bean_amt > 0 ? row.bean_amt.toLocaleString() : '—'}
+                      {row.bean_amt > 0 ? row.bean_amt.toLocaleString() : '-'}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                       {fmtDateTime(row.start_dtm)}

@@ -349,7 +349,7 @@ function StatusRow({
     <div className="flex items-center justify-between gap-2 text-sm">
       <span className="text-muted-foreground w-24 shrink-0">{label}</span>
       <span className="flex-1 truncate text-xs">
-        {connected ? (value ?? t('connected')) : '—'}
+        {connected ? (value ?? t('connected')) : '-'}
       </span>
       <span
         className={`shrink-0 text-xs ${

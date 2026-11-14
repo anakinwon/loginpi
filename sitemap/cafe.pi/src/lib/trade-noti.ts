@@ -14,11 +14,11 @@ const MAX_RETRY = 3
 // 상태 전이 → 수신자 역할별 알림 문구 (발신 주체의 상대방에게 통지)
 const TXN_ST_LABEL: Record<string, string> = {
   'PREPARING:BUYER': '🍳 주문이 접수되어 준비 중입니다',
-  'READY:BUYER': '✅ 준비 완료 — 매장에서 수령해 주세요',
+  'READY:BUYER': '✅ 준비 완료 : 매장에서 수령해 주세요',
   'BUYER_DONE:SELLER':
-    '📦 구매자가 수령을 확인했습니다 — 거래완료 처리해 주세요',
+    '📦 구매자가 수령을 확인했습니다. 거래완료 처리해 주세요',
   'DONE:BUYER': '🎉 거래가 완료되었습니다',
-  'DONE:SELLER': '🎉 구매자 수령 완료 — 거래가 종료되었습니다',
+  'DONE:SELLER': '🎉 구매자 수령 완료. 거래가 종료되었습니다',
   'CANCELLED:BUYER': '❌ 주문이 취소되었습니다',
   'CANCELLED:SELLER': '❌ 주문이 취소되었습니다',
 }
@@ -197,7 +197,7 @@ function buildTxnStMessage(body: TxnStBody): string {
 
 function buildFbckMessage(body: FbckBody): string {
   const stars = '⭐'.repeat(Math.max(1, Math.min(5, body.fbck_scr)))
-  const target = body.target_nm ? ` — ${escapeHtml(body.target_nm)}` : ''
+  const target = body.target_nm ? ` : ${escapeHtml(body.target_nm)}` : ''
   return [
     `💌 <b>새 후기가 도착했습니다</b>${target}`,
     '',

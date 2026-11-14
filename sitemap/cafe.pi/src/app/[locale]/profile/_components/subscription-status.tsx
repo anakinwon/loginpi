@@ -28,7 +28,7 @@ const PROD_STYLE: Record<string, string> = {
 // 만료일 — 현지 시간대 날짜 (메모리: 현지 형식 표시 규칙)
 function fmtDate(s: string): string {
   const d = new Date(s)
-  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString()
+  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString()
 }
 
 export function SubscriptionStatus() {

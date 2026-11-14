@@ -159,7 +159,7 @@ export default function TipPresetsPage() {
           {!maxValid && customMax !== '' && (
             <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
               {t('adminToken.tipPresets.capWarn', {
-                max: nums[2] ? nums[2].toLocaleString() : '—',
+                max: nums[2] ? nums[2].toLocaleString() : '-',
               })}
             </p>
           )}

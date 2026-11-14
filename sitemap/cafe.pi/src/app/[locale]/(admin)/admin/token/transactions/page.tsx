@@ -138,7 +138,7 @@ export default function TokenTransactionsPage() {
                       {t.sys_user?.nick_nm ||
                         t.sys_user?.real_nm ||
                         t.sys_user?.display_name ||
-                        '—'}
+                        '-'}
                     </p>
                     <p className="text-muted-foreground truncate text-xs">
                       {t.sys_user?.pi_username
@@ -220,7 +220,7 @@ export default function TokenTransactionsPage() {
                         {t.sys_user?.nick_nm ||
                           t.sys_user?.real_nm ||
                           t.sys_user?.display_name ||
-                          '—'}
+                          '-'}
                       </p>
                       <p className="text-muted-foreground text-xs">
                         {t.sys_user?.pi_username
@@ -251,10 +251,10 @@ export default function TokenTransactionsPage() {
                       <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-sm">
-                      {t.pi_amt != null ? `π ${t.pi_amt}` : '—'}
+                      {t.pi_amt != null ? `π ${t.pi_amt}` : '-'}
                     </td>
                     <td className="text-muted-foreground max-w-[160px] truncate px-4 py-3">
-                      {t.memo_txt ?? '—'}
+                      {t.memo_txt ?? '-'}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                       {new Date(t.reg_dtm).toLocaleString('ko-KR')}

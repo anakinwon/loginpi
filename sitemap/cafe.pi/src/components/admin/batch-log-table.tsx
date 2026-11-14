@@ -139,7 +139,7 @@ export function BatchLogTable() {
                   </td>
                   <td className="py-2 pr-3">{log.regr_id}</td>
                   <td className="text-muted-foreground py-2 text-xs break-all">
-                    {log.result_msg ?? '—'}
+                    {log.result_msg ?? '-'}
                   </td>
                 </tr>
               ))}

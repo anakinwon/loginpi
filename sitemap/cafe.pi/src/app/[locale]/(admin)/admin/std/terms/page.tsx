@@ -402,10 +402,10 @@ export default function StdTermsPage() {
                     {term.term_phy_nm}
                   </td>
                   <td className="text-muted-foreground px-4 py-3 font-mono text-xs">
-                    {term.term_phy_fll_nm ?? '—'}
+                    {term.term_phy_fll_nm ?? '-'}
                   </td>
                   <td className="text-muted-foreground max-w-56 truncate px-4 py-3 text-xs">
-                    {term.term_desc ?? '—'}
+                    {term.term_desc ?? '-'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">
