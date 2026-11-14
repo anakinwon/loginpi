@@ -262,7 +262,7 @@ export function GcalList({ events, urls }: { events: GcalEvent[]; urls: string[]
             <span className="break-words">{e.title}</span>
           </p>
           <p className="text-muted-foreground text-xs">
-            {e.allDay ? t('allDay') : e.end ? `${time(e.start)} – ${time(e.end)}` : time(e.start)}
+            {e.allDay ? t('allDay') : e.end ? `${time(e.start)} ~ ${time(e.end)}` : time(e.start)}
             {e.place && ` · ${e.place}`}
           </p>
           <p className="text-muted-foreground truncate text-xs">{icsLabel(urls[e.cal] ?? '')}</p>

@@ -316,7 +316,7 @@ function TimePanel({ row, onDone }: { row: Row; onDone: () => void }) {
                   delta: `${x.sec > 0 ? '+' : '−'}${dur(Math.abs(x.sec))}`,
                   before: dur(x.before),
                   after: dur(x.after),
-                  by: x.by || '—',
+                  by: x.by || '-',
                 })}
                 {x.reason && ` · ${x.reason}`}
               </li>

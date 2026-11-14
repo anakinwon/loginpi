@@ -6,7 +6,7 @@
   "home": {
     "description": "Hostitelé otevírají semináře a účastníci se připojují k živým video relacím s Pi.",
     "badge": "Živé semináře na krásných ostrovech",
-    "headline": "Sledujte, poslouchejte a učte se společně – živě",
+    "headline": "Sledujte, poslouchejte a učte se společně : živě",
     "ctaBrowse": "Procházet semináře",
     "ctaPlan": "Zobrazit plány",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Semináře",
     "cal": {
       "title": "Kalendář seminářů",
-      "desc": "Od minulých seminářů po nadcházející – klepněte na datum pro podrobnosti.",
+      "desc": "Od minulých seminářů po ty nadcházející: klepněte na datum pro podrobnosti.",
       "legendSmn": "Semináře",
       "legendEnded": "Minulé semináře",
       "legendMine": "Moje události",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Živý video seminář",
-        "desc": "Náš vlastní video engine Galápagos – cílem je jeden prezentující streamující až 30 účastníkům"
+        "desc": "Náš vlastní video engine Galápagos: Cílem je, aby jeden prezentující posílal video až 30 divákům."
       },
       "F02": {
         "name": "Vytvořit seminář",
@@ -254,7 +254,7 @@
       "dubbing": "Přehrávání syntetického hlasu a snížený původní zvuk"
     },
     "refLabel": "Referenční model",
-    "uiRef": "Základ UI – vzory obrazovek a funkcí široce používané webové aplikace pro video schůzky, přizpůsobené pro seminar.pi"
+    "uiRef": "Standardy UI: Použití vzorů obrazovek a funkcí populárních webových konferenčních aplikací pro seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Členové publika nepoužívají kameru ani mikrofon. Po připojení uvidíte a uslyšíte prezentujícího.",
     "preview": {
       "pending": "Příprava kamery a mikrofonu…",
-      "audioOnly": "Kamera není dostupná – odesílám pouze zvuk.",
+      "audioOnly": "Kamera není dostupná : odesílám pouze zvuk.",
       "none": "Kamera a mikrofon nejsou dostupné. Zkontrolujte oprávnění (stále se můžete připojit bez médií).",
-      "videoOnly": "Mikrofon není dostupný – odesílám pouze video. Zkontrolujte oprávnění mikrofonu."
+      "videoOnly": "Mikrofon není dostupný : odesílám pouze video. Zkontrolujte oprávnění mikrofonu."
     },
     "mic": {
       "on": "Vypnout mikrofon",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Váš vstupní průkaz vypršel.",
       "TICKET_EXPIRED": "Váš vstupní průkaz vypršel.",
       "ROOM_FULL": "Tento seminář je plný.",
-      "ROOM_CLOSED": "Místnost byla uzavřena – seminář skončil nebo hostitel byl pryč déle než 5 minut.",
+      "ROOM_CLOSED": "Místnost je zavřená. Seminář skončil nebo hostitel chyběl déle než 5 minut.",
       "DUPLICATE_SESSION": "Připojili jste se z jiného zařízení, takže toto připojení bylo odpojeno.",
       "ROLE_FORBIDDEN": "Nemáte oprávnění prezentovat.",
       "WS_FAILED": "Nepodařilo se připojit k video serveru.",
@@ -488,7 +488,7 @@
     "toDetail": "Přejít na stránku semináře",
     "consent": {
       "title": "Než zapnete mikrofon",
-      "body": "Pokud je v tomto semináři zapnuto nahrávání, titulky nebo poznámky ze schůzky AI, váš hlas může být převeden na text, uložen a přeložen. Zpracování hlasu provádí služba AI mimo vaši zemi. Pokud nesouhlasíte, váš mikrofon se stále zapne – pouze váš hlas nebude zpracován.",
+      "body": "Pokud je v tomto semináři zapnuto nahrávání, titulky nebo poznámky ze schůzky AI, váš hlas může být převeden na text, uložen a přeložen. Zpracování hlasu provádí služba AI mimo vaši zemi. Pokud nesouhlasíte, váš mikrofon se stále zapne : pouze váš hlas nebude zpracován.",
       "privacy": "Zásady ochrany osobních údajů",
       "newTab": "(otevře se v nové záložce)",
       "decline": "Nesouhlasím",
@@ -613,7 +613,7 @@
       "title": "Nahrávání",
       "badge": "Nahrávání",
       "unsupported": "Tento prohlížeč nepodporuje nahrávání. Nahrávejte prosím z běžného prohlížeče na počítači.",
-      "piBrowserOnly": "Nahrávání funguje pouze v běžném prohlížeči (PC nebo mobil). Pi Browser nemůže ukládat nahrávací soubory – otevřete tento seminář v prohlížeči počítače nebo telefonu (seminarz.vercel.app) pro nahrávání.",
+      "piBrowserOnly": "Nahrávání je dostupné pouze v běžných prohlížečích (PC/mobil). Pi Browser nemůže ukládat nahrané soubory. Otevřete prosím stejný seminář v počítačovém nebo mobilním prohlížeči (seminarz.vercel.app) pro nahrávání.",
       "audioSuspended": "Nahrávání zvuku se na tomto zařízení nemuselo spustit. Může být nahráván pouze obraz.",
       "notifyFailed": "Nahrávání se nespustilo, protože účastníci nemohli být upozorněni. Zkuste to prosím znovu za chvíli.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Zavřít znovu uložit"
       },
       "toast": {
-        "started": "Nahrávání spuštěno – všichni to vidí",
+        "started": "Nahrávání bylo spuštěno. Toto se zobrazí všem účastníkům.",
         "saved": "Nahrávka uložena. Zkontrolujte složku stažených souborů. Pokud se nic neuložilo, klepněte na [Uložit znovu] v horní části obrazovky.",
         "autoStopped": "Nahrávání bylo ukončeno, protože ho prohlížeč zastavil nebo byl dosažen limit velikosti. Vše do té doby bylo uloženo. Pro pokračování spusťte nahrávání znovu.",
         "empty": "Nic nebylo nahráno, takže nebyl vytvořen žádný soubor.",
@@ -656,10 +656,10 @@
       "badge": "Poznámky AI zapnuty",
       "started": "Prezentující zapnul poznámky AI",
       "stopped": "Poznámky AI vypnuty",
-      "startedMine": "Poznámky AI zapnuty — zobrazeny všem",
-      "stoppedMine": "Poznámky AI vypnuty — vytváření poznámek",
+      "startedMine": "AI zápis z jednání byl spuštěn. Toto se zobrazí všem účastníkům.",
+      "stoppedMine": "AI zápis z jednání byl zastaven. Zápis z jednání se generuje.",
       "startFail": "Nepodařilo se spustit poznámky AI",
-      "gone": "Poznámky AI zastaveny — poznámky byly ukončeny nebo smazány jinde",
+      "gone": "Poznámky AI zastaveny : poznámky byly ukončeny nebo smazány jinde",
       "unsupported": "Poznámky AI zde nelze zapnout (nepodporuje nahrávání zvuku)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Klepněte na [Otevřít nastavení Kalendáře Google] níže.",
       "s2": "Vlevo pod 'Nastavení pro mé kalendáře' vyberte kalendář (např. vaše jméno).",
       "s3": "Přejděte na 'Integrace kalendáře' a zkopírujte 'Tajnou adresu ve formátu iCal'.",
-      "s4": "Vložte ji sem a klepněte na [Přidat] — názvy událostí se objeví v kalendáři. Stejným způsobem přidejte další kalendáře, až 5.",
+      "s4": "Vložte ji sem a klepněte na [Přidat] : názvy událostí se objeví v kalendáři. Stejným způsobem přidejte další kalendáře, až 5.",
       "open": "Otevřít nastavení Kalendáře Google",
-      "privacy": "Tato adresa je klíčem k vašemu kalendáři — nesdílejte ji. Je uložena pouze na tomto zařízení, nikdy na našem serveru."
+      "privacy": "Tato adresa je klíčem k vašemu kalendáři : nesdílejte ji. Je uložena pouze na tomto zařízení, nikdy na našem serveru."
     },
     "title": "Vytvořit seminář",
     "name": "Vydejme se na krásný ostrov!",
     "subTitle": "Podtitul (volitelné, až 60 znaků)",
     "startAt": "Čas zahájení",
-    "maxCnt": "Kapacita (1–100)",
+    "maxCnt": "Kapacita (1~100)",
     "submit": "Vytvořit",
     "submitting": "Vytváření…",
-    "invalid": "Zkontrolujte svůj vstup — datum do jednoho roku od nynějška, kapacita 1–100.",
+    "invalid": "Zkontrolujte vstupní hodnoty: datum do jednoho roku od nynějška a kapacitu 1~100.",
     "attendance": {
       "title": "Docházka",
       "back": "Zpět na seminář",
@@ -840,18 +840,18 @@
         "state": "Stav"
       },
       "durNote": "Doba účasti je od prvního připojení do posledního vidění, minus čas mimo (mezery delší než 2,5 minuty).",
-      "csvPiBrowser": "Stahování CSV funguje pouze v běžném prohlížeči (počítač nebo mobil). Pi Browser nemůže ukládat soubory — otevřete tento docházkový list v prohlížeči počítače nebo telefonu (seminarz.vercel.app)."
+      "csvPiBrowser": "Stahování CSV je dostupné pouze v běžných prohlížečích (PC/mobil). Pi Browser nemůže ukládat soubory. Otevřete prosím stejný prezenční list v počítačovém nebo mobilním prohlížeči (seminarz.vercel.app)."
     },
     "plan": "Plán",
-    "planFree": "Zdarma — {time} zbývá tento měsíc · bez AI",
-    "planPaid": "{name} {time} · {price} — platba při vytváření",
+    "planFree": "Zdarma: {time} zbývá tento měsíc · Bez AI",
+    "planPaid": "{name} {time} · {price} · Platba při vytvoření",
     "planHint": "Seminář otevřený na placeném plánu nejprve využije čas tohoto plánu, poté pokračuje na volném čase tohoto měsíce (bez AI ve volné části). Aktivní plán se otevře bez platby; Měsíční nebo Roční, které nemáte, se platí v Pi, když stisknete Vytvořit, poté se seminář otevře (Pi Browser). Připojení je pro účastníky vždy zdarma.",
-    "planOwned": "{name} — aktivní · {time} zbývá",
+    "planOwned": "{name}: Předplaceno · zbývá {time}",
     "planEnds": "Čas zahájení je po vypršení platnosti tohoto plánu. Posuňte začátek dříve nebo vyberte jiný plán.",
     "paidKept": "Váš placený průkaz je zachován. Opravte problém a stiskněte Vytvořit znovu (bez druhé platby)."
   },
   "privacy": {
-    "title": "Zásady ochrany osobních údajů — Hlasové a AI funkce",
+    "title": "Zásady ochrany osobních údajů: Hlasové a AI funkce",
     "effective": "Účinnost od {date}",
     "intro": "Tyto zásady vysvětlují osobní údaje, které zpracováváme, když používáte živé titulky, přeložené titulky, hlasový překlad, poznámky z jednání AI a osobní poznámky v semináři. Tyto funkce využívají externí službu AI, takže informace jsou přenášeny do zahraničí.",
     "whoTitle": "Čí informace jsou zpracovávány",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Příjemce",
-        "v": "Google LLC (Gemini API) — kontakt [TBD: Google privacy contact]"
+        "v": "Google LLC (Gemini API): Kontakt [Čeká se: Master, kanál pro dotazy na ochranu soukromí Google]"
       },
       {
         "k": "Země",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Účel",
-        "v": "Převod řeči na text, překlad, souhrny poznámek z jednání, syntetická řeč (standardní hlasy, žádné klonování hlasu), oddělení mluvčích pro osobní poznámky (hlasy jsou rozlišovány a označovány podle vnímaného pohlaví, jako Muž 1 / Žena 1 — nejsou odvozovány žádná jména ani identity)"
+        "v": "Převod hlasu na text, překlad, shrnutí zápisu z jednání, syntetický hlas (standardní hlas, bez klonování hlasu), oddělení mluvčích v osobních poznámkách (odděluje lidi podle hlasu a zobrazuje jako muž 1, žena 1 na základě vnímaného pohlaví, neidentifikuje jména ani identity)"
       },
       {
         "k": "Uchovávání",
-        "v": "Končí, jakmile je vrácen výsledek. Žádáme Google, aby neukládal požadavky (store=false). Protokoly pro monitorování zneužití mohou být stále uchovávány podle podmínek Google [TBD: retention period and paid-tier status]."
+        "v": "Končí okamžitě po obdržení zpracovaných výsledků. Požadujeme, aby Google neukládal požadavky (store=false). Nicméně záznamy monitorování zneužití podle podmínek Google mohou být uloženy [Čeká se: Master, doba uložení a aplikace placené úrovně]."
       },
       {
         "k": "Jak odmítnout a co se stane",
@@ -895,8 +895,8 @@
     "keep": [
       "Původní zvuk: pro titulky semináře a poznámky z jednání AI se neukládá; je zahozen ihned po převodu na text. Pro osobní poznámky je nahrávka uchovávána v soukromém úložišti, aby mohla být po schůzce znovu přesněji přepsána (s mluvčími), a je smazána při denním úklidu, jakmile uplyne 1 den od ukončení poznámky (okamžitě, pokud je poznámka smazána).",
       "Živé titulky: neukládají se.",
-      "Poznámky z jednání AI (když je prezentující zapne): mluvený obsah, snímky obrazovky a souhrn, uchovávány, dokud nejsou poznámky smazány [TBD: maximum retention].",
-      "Záznamy souhlasu: čas souhlasu a verze zásad, uchovávány jako důkaz [TBD: retention period].",
+      "AI zápis z jednání (pokud je povolen prezentujícím): Ukládá promluvy, snímky obrazovky a souhrny, dokud není zápis z jednání smazán [Čeká se: Master, maximální doba uložení].",
+      "Záznamy souhlasu: Ukládá datum souhlasu a verzi schválených zásad pro účely důkazu [Čeká se: Master, doba uložení].",
       "Využití: počty požadavků za minutu a doba zpracování, použité k vynucení nákladových limitů.",
       "Docházka: čas, kdy jste se připojili, čas, kdy jste byli naposledy připojeni, vaše zobrazované jméno a vaše uživatelské jméno Pi jsou uloženy a poskytnuty hostiteli jako seznam docházky (na obrazovce a ke stažení jako CSV). Uchováváno, dokud není seminář smazán.",
       "Q&A a ankety: text otázky a zobrazované jméno tazatele (nebo uživatelské jméno Pi, pokud žádné není) jsou viditelné pro každého účastníka. Hlasování pro ukazuje pouze počty, nikdy kdo hlasoval. Hlasy v anketách ukazují účastníkům pouze počty; organizátor a administrátoři vidí pro každou možnost zobrazované jméno (nebo uživatelské jméno Pi, pokud žádné není) každého hlasujícího. Uchováváno, včetně skrytých otázek, dokud není seminář smazán."
@@ -904,14 +904,14 @@
     "recTitle": "Nahrávání",
     "rec": "Nahrávky jsou uloženy pouze jako soubor na zařízení prezentujícího. Nejsou nahrávány na naše servery ani přenášeny do zahraničí. Během nahrávání nebo zapnutých poznámek AI vidí každý účastník indikátor.",
     "rightsTitle": "Vaše práva",
-    "rights": "Můžete požádat o přístup, opravu, smazání nebo zastavení zpracování vašich informací. Kontakt: [TBD: privacy officer name and contact]"
+    "rights": "Můžete požádat o přístup, opravu, smazání a pozastavení zpracování vašich informací. Kontakt: [Čeká se: Master, jméno a kontakt pověřence pro ochranu osobních údajů]"
   },
   "notes": {
     "title": "Poznámky",
     "back": "Zpět na seminář",
     "loading": "Načítání…",
     "meta": "Poznámky · {date} · {min} min",
-    "aiWarn": "Souhrn generovaný AI — může obsahovat chyby",
+    "aiWarn": "Souhrn generovaný AI : může obsahovat chyby",
     "points": "Klíčové body",
     "decisions": "Rozhodnutí",
     "todos": "Úkoly",
@@ -921,11 +921,11 @@
     "making": "Vytváření poznámek…",
     "makingLong": "Trvá to déle. Obnovte prosím později",
     "recording": "Stále nahrávám",
-    "failed": "Nepodařilo se vytvořit souhrn — úplný přepis je níže",
+    "failed": "Nepodařilo se vytvořit souhrn. Celý přepis je níže.",
     "retry": "Zkusit znovu",
     "finish": "Ukončit nahrávání a shrnout",
     "none": "Nic zde",
-    "blank": "Nic k shrnutí — nebyla nahrána žádná řeč nebo byla příliš krátká",
+    "blank": "Žádný obsah k shrnutí. Nebyla zaznamenána žádná řeč nebo byla příliš krátká.",
     "notFound": "Poznámky nenalezeny",
     "forbidden": "Nemáte přístup k těmto poznámkám",
     "shotAlt": "Snímek obrazovky v {at}",
@@ -938,7 +938,7 @@
     "delYes": "Smazat",
     "delNo": "Zrušit",
     "delFail": "Nepodařilo se smazat",
-    "dlFail": "Nepodařilo se stáhnout — zkuste to prosím znovu",
+    "dlFail": "Stahování se nezdařilo. Klepněte prosím znovu.",
     "recentNotes": "Nedávné poznámky",
     "empty": "Zatím žádné poznámky",
     "newNote": "Spustit osobní poznámky",
@@ -959,12 +959,12 @@
     "aiOff": "AI poznámky nejsou momentálně dostupné (vyžaduje nastavení serveru). Minulé poznámky jsou uvedeny níže",
     "reload": "Znovu načíst",
     "unsupported": "Nahrávání není na tomto zařízení dostupné",
-    "micDenied": "Nelze použít mikrofon – zkontrolujte oprávnění",
-    "limited": "Vyčerpal se časový limit zpracování – ukončete a vytvořte poznámky",
-    "noAgr": "Zastaveno: nebylo potvrzeno oznámení o nahrávání – ukončete a začněte znovu",
-    "micLost": "Mikrofon se odpojil a nahrávání se zastavilo – klepněte na Znovu připojit mikrofon nebo ukončete poznámku",
+    "micDenied": "Mikrofon není k dispozici. Zkontrolujte prosím oprávnění.",
+    "limited": "Dosažen limit doby zpracování. Ukončete a vygenerujte zápis z jednání.",
+    "noAgr": "Zastaveno z důvodu chybějícího záznamu potvrzení oznámení. Ukončete a restartujte.",
+    "micLost": "Ztraceno připojení mikrofonu, nahrávání zastaveno. Klepněte na [Znovu připojit mikrofon] nebo ukončete.",
     "micRetry": "Znovu připojit mikrofon",
-    "gone": "Tato poznámka byla ukončena nebo smazána jinde, takže nahrávání se zastavilo – použijte tlačítko níže k otevření poznámek",
+    "gone": "Tato poznámka byla ukončena nebo smazána na jiné obrazovce, takže nahrávání bylo zastaveno. Zkontrolujte prosím zápis z jednání pomocí tlačítka níže.",
     "finishing": "Ukládání posledních slov…",
     "st": {
       "RECORDING": "Nahrávání",
@@ -972,7 +972,7 @@
       "DONE": "Hotovo",
       "FAILED": "Selhalo"
     },
-    "downloadPiBrowser": "Stahování Markdown funguje pouze v běžném prohlížeči (počítač nebo mobil). Pi Browser nemůže ukládat soubory – otevřete tyto poznámky v prohlížeči na počítači nebo telefonu (seminarz.vercel.app)."
+    "downloadPiBrowser": "Stahování Markdown je dostupné pouze v běžných prohlížečích (PC/mobil). Pi Browser nemůže ukládat soubory. Otevřete prosím stejný zápis z jednání v počítačovém nebo mobilním prohlížeči (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Plány",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} připojeno",
     "producers": "{n} streamů",
     "end": "Končí {time}",
-    "stale": "Seminář skončil, ale místnost je stále otevřená na video serveru – vynuceně ji zavřete.",
+    "stale": "Seminář skončil, ale místnosti zůstávají na video serveru. Vynuceně je zavřete.",
     "close": "Vynuceně zavřít",
     "confirmSeminar": "Tím se ukončí seminář a zavře místnost. Všichni budou odpojeni.",
     "confirmRoom": "Tím se zavře místnost. Všichni budou odpojeni.",
@@ -1063,7 +1063,7 @@
     "cancel": "Zrušit",
     "saving": "Ukládání…",
     "done": "Použito. Zbývající čas {plan}: {time}",
-    "invalid": "Zadejte snížení mezi 1 minutou a 1000 hodinami (celé minuty 0–59).",
+    "invalid": "Zadejte snížení mezi 1 minutou a 1000 hodinami (celé minuty 0~59).",
     "history": "Nedávné úpravy",
     "noHistory": "Zatím žádné úpravy.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

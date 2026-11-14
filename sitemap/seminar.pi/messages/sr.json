@@ -6,7 +6,7 @@
   "home": {
     "description": "Hosts openen seminars, en deelnemers nemen deel aan live videosessies met Pi.",
     "badge": "Live seminars op prachtige eilanden",
-    "headline": "Kijk, luister en leer samen — live",
+    "headline": "Kijk, luister en leer samen : live",
     "ctaBrowse": "Seminars bekijken",
     "ctaPlan": "Bekijk abonnementen",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminars",
     "cal": {
       "title": "Seminarkalender",
-      "desc": "Van afgelopen seminars tot aankomende seminars — tik op een datum voor details.",
+      "desc": "Van afgelopen seminars tot aankomende seminars: tik op een datum voor details.",
       "legendSmn": "Seminars",
       "legendEnded": "Afgelopen seminars",
       "legendMine": "Mijn evenementen",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Live videoseminar",
-        "desc": "Onze eigen video-engine Galápagos — het doel is één presentator die streamt naar maximaal 30 deelnemers"
+        "desc": "Onze eigen video-engine Galápagos: Het doel is dat één presentator video naar maximaal 30 toehoorders stuurt."
       },
       "F02": {
         "name": "Een seminar aanmaken",
@@ -254,7 +254,7 @@
       "dubbing": "Synthetische stemweergave en verlaagd origineel geluid"
     },
     "refLabel": "Referentiemodel",
-    "uiRef": "UI-basislijn — scherm- en functiepatronen van een veelgebruikte web-videovergaderapp, aangepast voor seminar.pi"
+    "uiRef": "UI-standaarden: Toepassen van scherm- en functiepatronen van populaire webconferentie-apps op seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Publieksleden gebruiken geen camera of microfoon. Na deelname ziet en hoort u de presentator.",
     "preview": {
       "pending": "Camera en microfoon voorbereiden…",
-      "audioOnly": "Camera niet beschikbaar — alleen audio verzenden.",
+      "audioOnly": "Camera niet beschikbaar : alleen audio verzenden.",
       "none": "Camera en microfoon niet beschikbaar. Controleer machtigingen (u kunt nog steeds deelnemen zonder media).",
-      "videoOnly": "Microfoon niet beschikbaar — alleen video verzenden. Controleer microfoonmachtiging."
+      "videoOnly": "Microfoon niet beschikbaar : alleen video verzenden. Controleer microfoonmachtiging."
     },
     "mic": {
       "on": "Microfoon uitschakelen",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Uw toegangspas is verlopen.",
       "TICKET_EXPIRED": "Uw toegangspas is verlopen.",
       "ROOM_FULL": "Dit seminar is vol.",
-      "ROOM_CLOSED": "De kamer is gesloten — het seminar is beëindigd of de host is langer dan 5 minuten afwezig.",
+      "ROOM_CLOSED": "De kamer is gesloten. Het seminar is beëindigd of de host is langer dan 5 minuten afwezig geweest.",
       "DUPLICATE_SESSION": "U bent vanaf een ander apparaat ingelogd, dus dit scherm is verbroken.",
       "ROLE_FORBIDDEN": "U heeft geen toestemming om te presenteren.",
       "WS_FAILED": "Kon geen verbinding maken met de videoserver.",
@@ -488,7 +488,7 @@
     "toDetail": "Naar seminarpagina",
     "consent": {
       "title": "Voordat u uw microfoon inschakelt",
-      "body": "Als opname, ondertiteling of AI-vergadernotities zijn ingeschakeld in dit seminar, kan uw stem worden omgezet in tekst, opgeslagen en vertaald. Spraakverwerking wordt gedaan door een AI-service buiten uw land. Als u niet akkoord gaat, wordt uw microfoon nog steeds ingeschakeld — alleen uw stem wordt buiten de verwerking gelaten.",
+      "body": "Als opname, ondertiteling of AI-vergadernotities zijn ingeschakeld in dit seminar, kan uw stem worden omgezet in tekst, opgeslagen en vertaald. Spraakverwerking wordt gedaan door een AI-service buiten uw land. Als u niet akkoord gaat, wordt uw microfoon nog steeds ingeschakeld : alleen uw stem wordt buiten de verwerking gelaten.",
       "privacy": "Privacybeleid",
       "newTab": "(opent in een nieuw tabblad)",
       "decline": "Niet akkoord",
@@ -613,7 +613,7 @@
       "title": "Opnemen",
       "badge": "Opname",
       "unsupported": "Deze browser kan niet opnemen. Neem op via een reguliere browser op een computer.",
-      "piBrowserOnly": "Opnemen werkt alleen in een reguliere browser (computer of mobiel). Pi Browser kan geen opnamebestanden opslaan — open dit seminar in een computer- of telefoonbrowser (seminarz.vercel.app) om op te nemen.",
+      "piBrowserOnly": "Opnemen is alleen beschikbaar in reguliere browsers (PC/mobiel). Pi Browser kan opgenomen bestanden niet opslaan. Open hetzelfde seminar in een computer- of mobiele browser (seminarz.vercel.app) om op te nemen.",
       "audioSuspended": "Geluidopname is mogelijk niet gestart op dit apparaat. Alleen het beeld kan worden opgenomen.",
       "notifyFailed": "Opname is niet gestart omdat deelnemers niet konden worden geïnformeerd. Probeer het over een ogenblik opnieuw.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Opnieuw opslaan sluiten"
       },
       "toast": {
-        "started": "Opname gestart — iedereen kan het zien",
+        "started": "Opname is gestart. Dit wordt aan alle deelnemers getoond.",
         "saved": "Opname opgeslagen. Controleer uw downloadmap. Als er niets is opgeslagen, tik dan op [Opnieuw opslaan] bovenaan het scherm.",
         "autoStopped": "Opname beëindigd omdat de browser deze heeft gestopt of de groottelimiet is bereikt. Alles tot dat moment is opgeslagen. Start de opname opnieuw om door te gaan.",
         "empty": "Er is niets opgenomen, dus er is geen bestand gemaakt.",
@@ -656,10 +656,10 @@
       "badge": "AI-notities aan",
       "started": "De presentator heeft AI-notities ingeschakeld",
       "stopped": "AI-notities uitgeschakeld",
-      "startedMine": "AI-notities aan — getoond aan iedereen",
-      "stoppedMine": "AI-notities uit — notities worden gemaakt",
+      "startedMine": "AI-notulen zijn gestart. Dit wordt aan alle deelnemers getoond.",
+      "stoppedMine": "AI-notulen zijn gestopt. Notulen worden gegenereerd.",
       "startFail": "AI-notities konden niet worden gestart",
-      "gone": "AI-notities gestopt — de notities zijn elders beëindigd of verwijderd",
+      "gone": "AI-notities gestopt : de notities zijn elders beëindigd of verwijderd",
       "unsupported": "AI-notities kunnen hier niet worden ingeschakeld (geen ondersteuning voor audio-opname)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Tik hieronder op [Google Agenda-instellingen openen].",
       "s2": "Kies onder 'Instellingen voor mijn agenda's' aan de linkerkant een agenda (bijv. uw naam).",
       "s3": "Scroll naar 'Agenda integreren' en kopieer 'Geheim adres in iCal-indeling'.",
-      "s4": "Plak het hier en tik op [Toevoegen] — evenementtitels verschijnen op de agenda. Voeg andere agenda's op dezelfde manier toe, maximaal 5.",
+      "s4": "Plak het hier en tik op [Toevoegen] : evenementtitels verschijnen op de agenda. Voeg andere agenda's op dezelfde manier toe, maximaal 5.",
       "open": "Google Agenda-instellingen openen",
-      "privacy": "Dit adres is een sleutel tot uw agenda — deel het niet. Het wordt alleen op dit apparaat opgeslagen, nooit op onze server."
+      "privacy": "Dit adres is een sleutel tot uw agenda : deel het niet. Het wordt alleen op dit apparaat opgeslagen, nooit op onze server."
     },
     "title": "Maak een seminar",
     "name": "Laten we naar een prachtig eiland reizen!",
     "subTitle": "Ondertitel (optioneel, maximaal 60)",
     "startAt": "Starttijd",
-    "maxCnt": "Capaciteit (1–100)",
+    "maxCnt": "Capaciteit (1~100)",
     "submit": "Maken",
     "submitting": "Maken…",
-    "invalid": "Controleer uw invoer — een datum binnen één jaar vanaf nu, capaciteit 1–100.",
+    "invalid": "Controleer de invoerwaarden: een datum binnen één jaar vanaf nu, en een capaciteit van 1-100.",
     "attendance": {
       "title": "Aanwezigheid",
       "back": "Terug naar seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "De aanwezigheidstijd is van de eerste deelname tot de laatst geziene, minus de afwezigheidstijd (onderbrekingen langer dan 2,5 minuten).",
-      "csvPiBrowser": "CSV-download werkt alleen in een gewone browser (computer of mobiel). Pi Browser kan geen bestanden opslaan — open dit aanwezigheidsformulier in een computer- of telefoonbrowser (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV-download is alleen beschikbaar in reguliere browsers (PC/mobiel). Pi Browser kan geen bestanden opslaan. Open hetzelfde aanwezigheidsformulier in een computer- of mobiele browser (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Gratis — {time} over deze maand · geen AI",
-    "planPaid": "{name} {time} · {price} — betalen bij aanmaken",
+    "planFree": "Gratis: {time} resterend deze maand · Geen AI",
+    "planPaid": "{name} {time} · {price} · Betaling bij aanmaak",
     "planHint": "Een seminar dat is geopend met een betaald plan gebruikt eerst de tijd van dat plan, en gaat dan verder met de gratis tijd van deze maand (geen AI in het gratis gedeelte). Een actief plan opent zonder betaling; Maandelijks of Jaarlijks dat u niet heeft, wordt betaald in Pi wanneer u op 'Maken' drukt, waarna het seminar opent (Pi Browser). Deelname is altijd gratis voor deelnemers.",
-    "planOwned": "{name} — actief · {time} over",
+    "planOwned": "{name}: Geabonneerd · {time} resterend",
     "planEnds": "De starttijd is na het verlopen van de pas van dit plan. Verplaats de start eerder of kies een ander plan.",
     "paidKept": "Uw betaalde pas wordt behouden. Los het probleem op en druk opnieuw op 'Maken' (geen tweede betaling)."
   },
   "privacy": {
-    "title": "Privacybeleid — Stem- en AI-functies",
+    "title": "Privacybeleid: Stem- en AI-functies",
     "effective": "Ingangsdatum {date}",
     "intro": "Dit beleid legt de persoonlijke informatie uit die we verwerken wanneer u live ondertitels, vertaalde ondertitels, stemvertaling, AI-vergadernotities en persoonlijke notities in een seminar gebruikt. Deze functies maken gebruik van een externe AI-service, dus de informatie wordt naar het buitenland overgedragen.",
     "whoTitle": "Wiens informatie wordt verwerkt",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Ontvanger",
-        "v": "Google LLC (Gemini API) — contact [TBD: Google privacy contact]"
+        "v": "Google LLC (Gemini API): Contact [In afwachting: Master, Google Privacy Inquiry Channel]"
       },
       {
         "k": "Landen",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Doel",
-        "v": "Spraak naar tekst, vertaling, samenvattingen van vergadernotities, synthetische spraak (standaardstemmen, geen stemklonen), scheiding van sprekers voor persoonlijke notities (stemmen worden onderscheiden en gelabeld op waargenomen geslacht, zoals Man 1 / Vrouw 1 — geen namen of identiteiten worden afgeleid)"
+        "v": "Spraak naar tekst conversie, vertaling, samenvatting van notulen, synthetische stem (standaard stem, geen stemklonen), sprekerseparatie in persoonlijke notities (scheidt mensen op stem en toont als man 1, vrouw 1 op basis van waargenomen geslacht, identificeert geen namen of identiteiten)"
       },
       {
         "k": "Retentie",
-        "v": "Eindigt zodra het resultaat is geretourneerd. We vragen Google om verzoeken niet op te slaan (store=false). Logs voor misbruikmonitoring kunnen nog steeds worden bewaard onder de voorwaarden van Google [TBD: bewaartermijn en betaalde tier-status]."
+        "v": "Eindigt onmiddellijk na ontvangst van verwerkte resultaten. We verzoeken Google om verzoeken niet op te slaan (store=false). Echter, records van misbruikmonitoring volgens de voorwaarden van Google kunnen worden opgeslagen [In afwachting: Master, opslagperiode en toepassing van betaalde tier]."
       },
       {
         "k": "Hoe te weigeren, en wat er gebeurt",
@@ -895,8 +895,8 @@
     "keep": [
       "Originele audio: voor seminarondertitels en AI-vergadernotities wordt deze niet opgeslagen; deze wordt direct na conversie naar tekst verwijderd. Voor persoonlijke notities wordt de opname bewaard in privéopslag, zodat deze na de vergadering nauwkeuriger (met sprekers) kan worden getranscribeerd, en deze wordt verwijderd bij de dagelijkse opschoning zodra 1 dag is verstreken sinds de notitie is beëindigd (onmiddellijk als de notitie wordt verwijderd).",
       "Live ondertitels: niet opgeslagen.",
-      "AI-vergadernotities (wanneer de presentator ze inschakelt): gesproken inhoud, screenshots en de samenvatting, bewaard totdat de notities worden verwijderd [TBD: maximale retentie].",
-      "Toestemmingsrecords: het tijdstip van toestemming en de beleidsversie, bewaard als bewijs [TBD: bewaartermijn].",
+      "AI-notulen (indien ingeschakeld door presentator): Slaat uitspraken, screenshots en samenvattingen op totdat de notulen worden verwijderd [In afwachting: Master, maximale opslagperiode].",
+      "Toestemmingsrecords: Slaat toestemmingsdatum en versie van het goedgekeurde beleid op ter bewijs [In afwachting: Master, opslagperiode].",
       "Gebruik: per minuut aantal verzoeken en verwerkingstijd, gebruikt om kostenlimieten af te dwingen.",
       "Aanwezigheid: het tijdstip waarop u deelnam, het tijdstip waarop u voor het laatst verbonden was, uw weergavenaam en uw Pi-gebruikersnaam worden opgeslagen en aan de host gegeven als een aanwezigheidslijst (op het scherm en als een CSV-download). Bewaard totdat het seminar wordt verwijderd.",
       "Q&A en peilingen: de vraagtekst en de weergavenaam van de vragensteller (of Pi-gebruikersnaam indien geen) zijn zichtbaar voor elke deelnemer. Upvotes tonen alleen aantallen, nooit wie ze heeft uitgebracht. Peilingstemmen tonen alleen aantallen aan deelnemers; de organisator en beheerders zien, voor elke optie, de weergavenaam (of Pi-gebruikersnaam indien geen) van elke stemmer. Bewaard, inclusief verborgen vragen, totdat het seminar wordt verwijderd."
@@ -904,14 +904,14 @@
     "recTitle": "Opname",
     "rec": "Opnames worden alleen als bestand op het apparaat van de presentator opgeslagen. Ze worden niet geüpload naar onze servers of naar het buitenland overgedragen. Tijdens het opnemen of wanneer AI-notities zijn ingeschakeld, ziet elke deelnemer een indicator.",
     "rightsTitle": "Uw rechten",
-    "rights": "U kunt vragen om toegang tot, correctie, verwijdering of stopzetting van de verwerking van uw informatie. Contact: [TBD: naam en contactgegevens privacyfunctionaris]"
+    "rights": "U kunt toegang, correctie, verwijdering en opschorting van de verwerking van uw informatie aanvragen. Contact: [In afwachting: Master, Naam en contactpersoon van de privacyfunctionaris]"
   },
   "notes": {
     "title": "Notities",
     "back": "Terug naar seminar",
     "loading": "Laden…",
     "meta": "Notities · {date} · {min} min",
-    "aiWarn": "Door AI gegenereerde samenvatting — deze kan fouten bevatten",
+    "aiWarn": "Door AI gegenereerde samenvatting : deze kan fouten bevatten",
     "points": "Kernpunten",
     "decisions": "Beslissingen",
     "todos": "Actiepunten",
@@ -921,11 +921,11 @@
     "making": "Notities maken…",
     "makingLong": "Dit duurt even. Vernieuw later",
     "recording": "Nog steeds aan het opnemen",
-    "failed": "Kon de samenvatting niet maken — het volledige transcript staat hieronder",
+    "failed": "Samenvatting maken mislukt. Volledige transcriptie staat hieronder.",
     "retry": "Opnieuw proberen",
     "finish": "Opname beëindigen en samenvatten",
     "none": "Niets hier",
-    "blank": "Niets om samen te vatten — er is geen spraak opgenomen of het was te kort",
+    "blank": "Geen inhoud om samen te vatten. Er is geen spraak opgenomen of het was te kort.",
     "notFound": "Notities niet gevonden",
     "forbidden": "U heeft geen toegang tot deze notities",
     "shotAlt": "Schermafbeelding om {at}",
@@ -938,7 +938,7 @@
     "delYes": "Verwijderen",
     "delNo": "Annuleren",
     "delFail": "Kon niet verwijderen",
-    "dlFail": "Kon niet downloaden — probeer het opnieuw",
+    "dlFail": "Download mislukt. Tik opnieuw.",
     "recentNotes": "Recente notities",
     "empty": "Nog geen notities",
     "newNote": "Persoonlijke notities starten",
@@ -959,12 +959,12 @@
     "aiOff": "AI-notities zijn momenteel niet beschikbaar (serverinstelling nodig). Eerdere notities staan hieronder",
     "reload": "Opnieuw laden",
     "unsupported": "Opnemen is niet beschikbaar op dit apparaat",
-    "micDenied": "Kan de microfoon niet gebruiken — controleer de machtiging",
-    "limited": "De verwerkingstijdlimiet is opgebruikt — beëindig en maak de notities",
-    "noAgr": "Gestopt: geen kennisgevingbevestiging bij opname — beëindig en start opnieuw",
-    "micLost": "De microfoon is losgekoppeld en de opname is gestopt — tik op Microfoon opnieuw verbinden of beëindig de notitie",
+    "micDenied": "Microfoon is niet beschikbaar. Controleer de machtigingen.",
+    "limited": "Verwerkingstijdslimiet bereikt. Beëindig en genereer notulen.",
+    "noAgr": "Gestopt vanwege ontbrekende bevestiging van melding. Beëindig en start opnieuw.",
+    "micLost": "Microfoonverbinding verbroken, opname gestopt. Tik op [Microfoon opnieuw verbinden] of beëindig.",
     "micRetry": "Microfoon opnieuw verbinden",
-    "gone": "Deze notitie is elders beëindigd of verwijderd, dus de opname is gestopt — gebruik de onderstaande knop om de notities te openen",
+    "gone": "Deze notitie is beëindigd of verwijderd op een ander scherm, dus de opname is gestopt. Controleer de notulen met de onderstaande knop.",
     "finishing": "De laatste woorden opslaan…",
     "st": {
       "RECORDING": "Opnemen",
@@ -972,7 +972,7 @@
       "DONE": "Klaar",
       "FAILED": "Mislukt"
     },
-    "downloadPiBrowser": "Markdown downloaden werkt alleen in een gewone browser (computer of mobiel). Pi Browser kan geen bestanden opslaan — open deze notities in een computer- of telefoonbrowser (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdown-download is alleen beschikbaar in reguliere browsers (PC/mobiel). Pi Browser kan geen bestanden opslaan. Open dezelfde notulen in een computer- of mobiele browser (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Abonnementen",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} verbonden",
     "producers": "{n} streams",
     "end": "Eindigt {time}",
-    "stale": "Het seminar is beëindigd, maar de kamer is nog open op de videoserver — forceer de sluiting.",
+    "stale": "Het seminar is beëindigd, maar er zijn nog kamers op de videoserver. Sluit deze geforceerd.",
     "close": "Forceer sluiting",
     "confirmSeminar": "Dit beëindigt het seminar en sluit de kamer. Iedereen wordt losgekoppeld.",
     "confirmRoom": "Dit sluit de kamer. Iedereen wordt losgekoppeld.",
@@ -1063,7 +1063,7 @@
     "cancel": "Annuleren",
     "saving": "Opslaan…",
     "done": "Toegepast. {plan} resterende tijd: {time}",
-    "invalid": "Voer een reductie in tussen 1 minuut en 1000 uur (hele minuten 0–59).",
+    "invalid": "Voer een reductie in tussen 1 minuut en 1000 uur (hele minuten 0~59).",
     "history": "Recente aanpassingen",
     "noHistory": "Nog geen aanpassingen.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

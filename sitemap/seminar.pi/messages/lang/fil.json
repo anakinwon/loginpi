@@ -6,7 +6,7 @@
   "home": {
     "description": "Nagho-host ang mga tagapag-ayos ng mga bukas na seminar, at sumasali ang mga kalahok sa mga live na video session gamit ang Pi.",
     "badge": "Mga live na seminar sa magagandang isla",
-    "headline": "Manood, makinig, at matuto nang magkasama — live",
+    "headline": "Manood, makinig, at matuto nang magkasama : live",
     "ctaBrowse": "Mag-browse ng mga seminar",
     "ctaPlan": "Tingnan ang mga plano",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Mga Seminar",
     "cal": {
       "title": "Kalendaryo ng Seminar",
-      "desc": "Mula sa mga nakaraang seminar hanggang sa mga paparating — i-tap ang petsa para sa mga detalye.",
+      "desc": "Mula sa mga nakaraang seminar hanggang sa mga paparating: i-tap ang petsa para sa mga detalye.",
       "legendSmn": "Mga Seminar",
       "legendEnded": "Mga nakaraang seminar",
       "legendMine": "Aking mga kaganapan",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Live na video seminar",
-        "desc": "Ang aming sariling video engine na Galápagos — ang layunin ay isang presenter na nag-stream sa hanggang 30 kalahok"
+        "desc": "Ang sarili nating video engine na Galápagos: Ang layunin ay para sa isang presenter na magpadala ng video sa hanggang 30 miyembro ng audience."
       },
       "F02": {
         "name": "Gumawa ng seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Pag-playback ng synthetic voice at binabang orihinal na audio"
     },
     "refLabel": "Reference model",
-    "uiRef": "UI baseline — mga pattern ng screen at feature ng isang malawakang ginagamit na web video meeting app, inangkop para sa seminar.pi"
+    "uiRef": "Mga Pamantayan ng UI: Paglalapat ng mga pattern ng screen at feature ng mga sikat na web conferencing app sa seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Hindi gumagamit ng camera o mikropono ang mga miyembro ng audience. Pagkatapos sumali, makikita at maririnig mo ang presenter.",
     "preview": {
       "pending": "Inihahanda ang camera at mikropono…",
-      "audioOnly": "Hindi available ang camera — nagpapadala lang ng audio.",
+      "audioOnly": "Hindi available ang camera : nagpapadala lang ng audio.",
       "none": "Hindi available ang camera at mikropono. Suriin ang mga pahintulot (maaari ka pa ring sumali nang walang media).",
-      "videoOnly": "Hindi available ang mikropono — nagpapadala lang ng video. Suriin ang pahintulot sa mikropono."
+      "videoOnly": "Hindi available ang mikropono : nagpapadala lang ng video. Suriin ang pahintulot sa mikropono."
     },
     "mic": {
       "on": "I-off ang mikropono",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Nag-expire ang iyong entry pass.",
       "TICKET_EXPIRED": "Nag-expire ang iyong entry pass.",
       "ROOM_FULL": "Puno na ang seminar na ito.",
-      "ROOM_CLOSED": "Isinara ang room — natapos ang seminar o wala ang host nang higit sa 5 minuto.",
+      "ROOM_CLOSED": "Sarado ang silid. Nagtapos na ang seminar o wala ang host nang higit sa 5 minuto.",
       "DUPLICATE_SESSION": "Sumali ka mula sa ibang device, kaya na-disconnect ang screen na ito.",
       "ROLE_FORBIDDEN": "Wala kang pahintulot na mag-present.",
       "WS_FAILED": "Hindi makakonekta sa video server.",
@@ -488,7 +488,7 @@
     "toDetail": "Pumunta sa pahina ng seminar",
     "consent": {
       "title": "Bago mo i-on ang iyong mikropono",
-      "body": "Kung naka-on ang recording, captions o AI meeting notes sa seminar na ito, ang iyong boses ay maaaring ma-convert sa text, maiimbak at maisalin. Ang pagproseso ng boses ay ginagawa ng isang AI service sa labas ng iyong bansa. Kung hindi ka sumasang-ayon, bubukas pa rin ang iyong mic — ang iyong boses lang ang hindi isasama sa pagproseso.",
+      "body": "Kung naka-on ang recording, captions o AI meeting notes sa seminar na ito, ang iyong boses ay maaaring ma-convert sa text, maiimbak at maisalin. Ang pagproseso ng boses ay ginagawa ng isang AI service sa labas ng iyong bansa. Kung hindi ka sumasang-ayon, bubukas pa rin ang iyong mic : ang iyong boses lang ang hindi isasama sa pagproseso.",
       "privacy": "Patakaran sa privacy",
       "newTab": "(bubukas sa bagong tab)",
       "decline": "Hindi sumasang-ayon",
@@ -613,7 +613,7 @@
       "title": "I-record",
       "badge": "Nagre-record",
       "unsupported": "Hindi kayang mag-record ng browser na ito. Mangyaring mag-record mula sa isang regular na browser sa isang computer.",
-      "piBrowserOnly": "Gumagana lang ang recording sa isang regular na browser (computer o mobile). Hindi kayang mag-save ng Pi Browser ng mga recording file — buksan ang seminar na ito sa isang computer o phone browser (seminarz.vercel.app) para mag-record.",
+      "piBrowserOnly": "Available lang ang pagre-record sa mga regular na browser (PC/mobile). Hindi kayang i-save ng Pi Browser ang mga na-record na file. Mangyaring buksan ang parehong seminar sa isang computer o mobile browser (seminarz.vercel.app) para mag-record.",
       "audioSuspended": "Maaaring hindi nagsimula ang pag-record ng tunog sa device na ito. Ang larawan lang ang maaaring ma-record.",
       "notifyFailed": "Hindi nagsimula ang recording dahil hindi maabisuhan ang mga kalahok. Pakisubukang muli sa ilang sandali.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Isara ang i-save muli"
       },
       "toast": {
-        "started": "Nagsimula ang recording — makikita ito ng lahat",
+        "started": "Nagsimula na ang pagre-record. Ipapakita ito sa lahat ng kalahok.",
         "saved": "Nai-save ang recording. Suriin ang iyong downloads folder. Kung walang nai-save, i-tap ang [I-save muli] sa tuktok ng screen.",
         "autoStopped": "Natapos ang recording dahil pinahinto ito ng browser o naabot ang limitasyon sa laki. Nai-save ang lahat hanggang sa puntong iyon. Simulan muli ang recording para magpatuloy.",
         "empty": "Walang na-record, kaya walang nagawang file.",
@@ -656,10 +656,10 @@
       "badge": "Naka-on ang mga tala ng AI",
       "started": "Binuksan ng presenter ang mga tala ng AI",
       "stopped": "Naka-off ang mga tala ng AI",
-      "startedMine": "Naka-on ang mga tala ng AI — ipinapakita sa lahat",
-      "stoppedMine": "Naka-off ang mga tala ng AI — ginagawa ang mga tala",
+      "startedMine": "Nagsimula ang AI meeting minutes. Ipapakita ito sa lahat ng kalahok.",
+      "stoppedMine": "Huminto ang AI meeting minutes. Ginagawa ang meeting minutes.",
       "startFail": "Hindi masimulan ang mga tala ng AI",
-      "gone": "Huminto ang mga tala ng AI — tinapos o tinanggal ang mga tala sa ibang lugar",
+      "gone": "Huminto ang mga tala ng AI : tinapos o tinanggal ang mga tala sa ibang lugar",
       "unsupported": "Hindi mabubuksan ang mga tala ng AI dito (walang suporta sa pagre-record ng audio)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "I-tap ang [Buksan ang mga setting ng Google Calendar] sa ibaba.",
       "s2": "Sa ilalim ng 'Mga setting para sa aking mga kalendaryo' sa kaliwa, pumili ng kalendaryo (hal. ang iyong pangalan).",
       "s3": "Mag-scroll sa 'Isama ang kalendaryo' at kopyahin ang 'Secret address in iCal format'.",
-      "s4": "Idikit ito dito at i-tap ang [Idagdag] — lalabas ang mga pamagat ng event sa kalendaryo. Idagdag ang iba pang kalendaryo sa parehong paraan, hanggang 5.",
+      "s4": "Idikit ito dito at i-tap ang [Idagdag] : lalabas ang mga pamagat ng event sa kalendaryo. Idagdag ang iba pang kalendaryo sa parehong paraan, hanggang 5.",
       "open": "Buksan ang mga setting ng Google Calendar",
-      "privacy": "Ang address na ito ay isang susi sa iyong kalendaryo — huwag itong ibahagi. Ito ay nakaimbak sa device na ito lamang, hindi kailanman sa aming server."
+      "privacy": "Ang address na ito ay isang susi sa iyong kalendaryo : huwag itong ibahagi. Ito ay nakaimbak sa device na ito lamang, hindi kailanman sa aming server."
     },
     "title": "Gumawa ng seminar",
     "name": "Maglakbay tayo sa isang magandang isla!",
     "subTitle": "Subtitle (opsyonal, hanggang 60)",
     "startAt": "Oras ng pagsisimula",
-    "maxCnt": "Kapasidad (1–100)",
+    "maxCnt": "Kapasidad (1~100)",
     "submit": "Gumawa",
     "submitting": "Gumagawa…",
-    "invalid": "Suriin ang iyong input — isang petsa sa loob ng isang taon mula ngayon, kapasidad 1–100.",
+    "invalid": "Pakisuri ang mga input value: isang petsa sa loob ng isang taon mula ngayon, at kapasidad na 1-100.",
     "attendance": {
       "title": "Attendance",
       "back": "Bumalik sa seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Ang oras ng pagdalo ay mula sa unang sumali hanggang sa huling nakita, minus ang oras na wala (mga agwat na mas mahaba sa 2.5 minuto).",
-      "csvPiBrowser": "Gumagana lang ang pag-download ng CSV sa isang regular na browser (computer o mobile). Hindi makapag-save ng mga file ang Pi Browser — buksan ang attendance sheet na ito sa isang computer o phone browser (seminarz.vercel.app)."
+      "csvPiBrowser": "Available lang ang pag-download ng CSV sa mga regular na browser (PC/mobile). Hindi kayang i-save ng Pi Browser ang mga file. Mangyaring buksan ang parehong attendance sheet sa isang computer o mobile browser (seminarz.vercel.app)."
     },
     "plan": "Plano",
-    "planFree": "Libre — {time} natitira ngayong buwan · walang AI",
-    "planPaid": "{name} {time} · {price} — magbayad kapag gumagawa",
+    "planFree": "Libre: {time} natitira ngayong buwan · Walang AI",
+    "planPaid": "{name} {time} · {price} · Bayad sa paggawa",
     "planHint": "Ang isang seminar na binuksan sa isang bayad na plano ay gumagamit muna ng oras ng planong iyon, pagkatapos ay nagpapatuloy sa libreng oras ngayong buwan (walang AI sa libreng bahagi). Ang isang aktibong plano ay bubukas nang walang bayad; Ang Buwanan o Taunan na wala ka ay binabayaran sa Pi kapag pinindot mo ang Gumawa, pagkatapos ay bubukas ang seminar (Pi Browser). Ang pagsali ay palaging libre para sa mga kalahok.",
-    "planOwned": "{name} — aktibo · {time} natitira",
+    "planOwned": "{name}: Naka-subscribe · {time} natitira",
     "planEnds": "Ang oras ng pagsisimula ay pagkatapos ng pag-expire ng pass ng planong ito. Ilipat ang pagsisimula nang mas maaga o pumili ng ibang plano.",
     "paidKept": "Ang iyong bayad na pass ay pinananatili. Ayusin ang isyu at pindutin muli ang Gumawa (walang pangalawang bayad)."
   },
   "privacy": {
-    "title": "Patakaran sa Privacy — Mga Tampok ng Boses at AI",
+    "title": "Patakaran sa Privacy: Mga Feature ng Boses at AI",
     "effective": "Epektibo {date}",
     "intro": "Ipinaliliwanag ng patakarang ito ang personal na impormasyon na pinoproseso namin kapag ginagamit mo ang live na caption, isinaling caption, pagsasalin ng boses, mga tala ng pulong ng AI at mga personal na tala sa isang seminar. Gumagamit ang mga tampok na ito ng panlabas na serbisyo ng AI, kaya inililipat ang impormasyon sa ibang bansa.",
     "whoTitle": "Kaninong impormasyon ang pinoproseso",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Tumatanggap",
-        "v": "Google LLC (Gemini API) — contact [TBD: Google privacy contact]"
+        "v": "Google LLC (Gemini API): Contact [Nakabinbin: Master, Google Privacy Inquiry Channel]"
       },
       {
         "k": "Mga Bansa",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Layunin",
-        "v": "Speech to text, pagsasalin, mga buod ng tala ng pulong, sintetikong pagsasalita (standard na boses, walang voice cloning), paghihiwalay ng nagsasalita para sa mga personal na tala (ang mga boses ay pinaghihiwalay at nilalagyan ng label ayon sa nakikitang kasarian, tulad ng Lalaki 1 / Babae 1 — walang mga pangalan o pagkakakilanlan na ipinapalagay)"
+        "v": "Pag-convert ng boses sa text, pagsasalin, pagbubuod ng meeting minutes, synthetic voice (standard voice, walang voice cloning), paghihiwalay ng speaker sa in-person notes (inihihiwalay ang mga tao sa pamamagad ng boses at ipinapakita bilang lalaki 1, babae 1 batay sa nakikitang kasarian, hindi kinikilala ang mga pangalan o pagkakakilanlan)"
       },
       {
         "k": "Pagpapanatili",
-        "v": "Nagtatapos sa sandaling maibalik ang resulta. Hinihiling namin sa Google na huwag mag-imbak ng mga kahilingan (store=false). Maaaring panatilihin pa rin ang mga log ng pagsubaybay sa pang-aabuso sa ilalim ng mga tuntunin ng Google [TBD: retention period and paid-tier status]."
+        "v": "Nagtatapos kaagad sa pagtanggap ng mga naprosesong resulta. Hinihiling namin na huwag i-store ng Google ang mga kahilingan (store=false). Gayunpaman, maaaring i-store ang mga record ng pagsubaybay sa maling paggamit ayon sa mga tuntunin ng Google [Nakabinbin: Master, panahon ng pag-iimbak at paglalapat ng bayad na tier]."
       },
       {
         "k": "Paano tumanggi, at ano ang mangyayari",
@@ -895,8 +895,8 @@
     "keep": [
       "Orihinal na audio: para sa mga caption ng seminar at mga tala ng pulong ng AI hindi ito nakaimbak; ito ay itinatapon kaagad pagkatapos ng conversion sa teksto. Para sa mga personal na tala, ang recording ay pinananatili sa pribadong imbakan upang ito ay muling ma-transcribe nang mas tumpak (kasama ang mga nagsasalita) pagkatapos ng pulong, at ito ay tinatanggal sa pang-araw-araw na paglilinis kapag lumipas na ang 1 araw mula nang matapos ang tala (kaagad kung tinanggal ang tala).",
       "Mga live na caption: hindi nakaimbak.",
-      "Mga tala ng pulong ng AI (kapag binuksan ng presenter): sinasalitang nilalaman, mga screenshot at ang buod, pinananatili hanggang sa matanggal ang mga tala [TBD: maximum retention].",
-      "Mga tala ng pahintulot: ang oras ng pahintulot at ang bersyon ng patakaran, pinananatili bilang patunay [TBD: retention period].",
+      "AI Meeting Minutes (kung pinagana ng presenter): Iniimbak ang mga sinabi, screenshot, at buod hanggang sa matanggal ang meeting minutes [Nakabinbin: Master, maximum na panahon ng pag-iimbak].",
+      "Mga Record ng Pahintulot: Iniimbak ang petsa ng pahintulot at bersyon ng pinahintulutang patakaran para sa patunay [Nakabinbin: Master, panahon ng pag-iimbak].",
       "Paggamit: bawat minutong bilang ng kahilingan at oras ng pagproseso, ginagamit upang ipatupad ang mga limitasyon sa gastos.",
       "Attendance: ang oras na sumali ka, ang oras na huling nakakonekta ka, ang iyong pangalan ng display at ang iyong Pi username ay nakaimbak at ibinibigay sa host bilang isang listahan ng attendance (sa screen at bilang isang CSV download). Pinananatili hanggang sa matanggal ang seminar.",
       "Q&A at mga poll: ang teksto ng tanong at ang pangalan ng display ng nagtanong (o Pi username kung wala) ay nakikita ng bawat kalahok. Ang mga upvote ay nagpapakita lamang ng mga bilang, hindi kailanman kung sino ang nagbigay nito. Ang mga boto sa poll ay nagpapakita lamang ng mga bilang sa mga kalahok; nakikita ng organizer at mga admin, para sa bawat opsyon, ang pangalan ng display (o Pi username kung wala) ng bawat botante. Pinananatili, kasama ang mga nakatagong tanong, hanggang sa matanggal ang seminar."
@@ -904,14 +904,14 @@
     "recTitle": "Pagre-record",
     "rec": "Ang mga recording ay nai-save lamang bilang isang file sa device ng presenter. Hindi sila ina-upload sa aming mga server o inililipat sa ibang bansa. Habang naka-on ang recording o mga tala ng AI, nakikita ng bawat kalahok ang isang indicator.",
     "rightsTitle": "Ang iyong mga karapatan",
-    "rights": "Maaari kang humiling na i-access, itama, tanggalin o ihinto ang pagproseso ng iyong impormasyon. Makipag-ugnayan sa: [TBD: privacy officer name and contact]"
+    "rights": "Maaari kang humiling ng access, pagwawasto, pagtanggal, at pagsuspinde ng pagproseso ng iyong impormasyon. Contact: [Nakabinbin: Master, Pangalan at Contact ng Privacy Officer]"
   },
   "notes": {
     "title": "Mga Tala",
     "back": "Bumalik sa seminar",
     "loading": "Naglo-load…",
     "meta": "Mga Tala · {date} · {min} min",
-    "aiWarn": "Buod na binuo ng AI — maaaring may mga pagkakamali",
+    "aiWarn": "Buod na binuo ng AI : maaaring may mga pagkakamali",
     "points": "Mga pangunahing punto",
     "decisions": "Mga Desisyon",
     "todos": "Mga item ng aksyon",
@@ -921,11 +921,11 @@
     "making": "Ginagawa ang mga tala…",
     "makingLong": "Matagal ito. Mangyaring i-refresh mamaya",
     "recording": "Nagre-record pa rin",
-    "failed": "Hindi makagawa ng buod — ang buong transcript ay nasa ibaba",
+    "failed": "Nabigo ang paggawa ng buod. Nasa ibaba ang buong transcript.",
     "retry": "Subukang muli",
     "finish": "Tapusin ang pagre-record at buod",
     "none": "Walang laman dito",
-    "blank": "Walang maibubuod — walang boses na naitala o masyadong maikli",
+    "blank": "Walang nilalaman na bubuodin. Walang na-record na salita o masyadong maikli ito.",
     "notFound": "Hindi makita ang mga tala",
     "forbidden": "Wala kang access sa mga talang ito",
     "shotAlt": "Screen capture sa {at}",
@@ -938,7 +938,7 @@
     "delYes": "Tanggalin",
     "delNo": "Kanselahin",
     "delFail": "Hindi matanggal",
-    "dlFail": "Hindi ma-download — mangyaring subukang muli",
+    "dlFail": "Nabigo ang pag-download. Paki-tap muli.",
     "recentNotes": "Mga kamakailang tala",
     "empty": "Wala pang tala",
     "newNote": "Magsimula ng mga personal na tala",
@@ -959,12 +959,12 @@
     "aiOff": "Hindi available ang mga tala ng AI sa ngayon (kailangan ng server setup). Nakalista sa ibaba ang mga nakaraang tala",
     "reload": "I-reload",
     "unsupported": "Hindi available ang pagre-record sa device na ito",
-    "micDenied": "Hindi magamit ang mikropono — suriin ang pahintulot",
-    "limited": "Naubos ang limitasyon sa oras ng pagproseso — tapusin at gawin ang mga tala",
-    "noAgr": "Huminto: walang kumpirmasyon ng abiso sa record — tapusin at simulan muli",
-    "micLost": "Na-disconnect ang mikropono at huminto ang pagre-record — i-tap ang Ikonekta muli ang mikropono o tapusin ang tala",
+    "micDenied": "Hindi available ang mikropono. Pakisuri ang mga pahintulot.",
+    "limited": "Naabot na ang limitasyon sa oras ng pagproseso. Pakitapos at gumawa ng meeting minutes.",
+    "noAgr": "Huminto dahil sa nawawalang record ng kumpirmasyon ng abiso. Pakitapos at i-restart.",
+    "micLost": "Nawala ang koneksyon ng mikropono, huminto ang pagre-record. Paki-tap ang [Ikonekta muli ang Mikropono] o tapusin.",
     "micRetry": "Ikonekta muli ang mikropono",
-    "gone": "Ang tala na ito ay tinapos o tinanggal sa ibang lugar, kaya huminto ang pagre-record — gamitin ang button sa ibaba upang buksan ang mga tala",
+    "gone": "Ang note na ito ay tinapos o tinanggal sa ibang screen, kaya huminto ang pagre-record. Pakisuri ang meeting minutes gamit ang button sa ibaba.",
     "finishing": "Sinisave ang mga huling salita…",
     "st": {
       "RECORDING": "Nagre-record",
@@ -972,7 +972,7 @@
       "DONE": "Tapos na",
       "FAILED": "Nabigo"
     },
-    "downloadPiBrowser": "Gumagana lang ang pag-download ng Markdown sa isang regular na browser (computer o mobile). Hindi makapag-save ng mga file ang Pi Browser — buksan ang mga tala na ito sa isang computer o phone browser (seminarz.vercel.app)."
+    "downloadPiBrowser": "Available lang ang pag-download ng Markdown sa mga regular na browser (PC/mobile). Hindi kayang i-save ng Pi Browser ang mga file. Mangyaring buksan ang parehong meeting minutes sa isang computer o mobile browser (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Mga Plano",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} konektado",
     "producers": "{n} stream",
     "end": "Magtatapos {time}",
-    "stale": "Tapos na ang seminar ngunit bukas pa rin ang kwarto sa video server — piliting isara ito.",
+    "stale": "Nagtapos na ang seminar, ngunit nananatili ang mga silid sa video server. Piliting isara ang mga ito.",
     "close": "Piliting isara",
     "confirmSeminar": "Magtatapos ito sa seminar at isasara ang kwarto. Lahat ay madidiskonekta.",
     "confirmRoom": "Isasara nito ang kwarto. Lahat ay madidiskonekta.",
@@ -1063,7 +1063,7 @@
     "cancel": "Kanselahin",
     "saving": "Nagsa-save…",
     "done": "Na-apply. Natitirang oras ng {plan}: {time}",
-    "invalid": "Maglagay ng pagbawas sa pagitan ng 1 minuto at 1000 oras (buong minuto 0–59).",
+    "invalid": "Maglagay ng pagbawas sa pagitan ng 1 minuto at 1000 oras (buong minuto 0~59).",
     "history": "Mga kamakailang pagsasaayos",
     "noHistory": "Wala pang pagsasaayos.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

@@ -6,7 +6,7 @@
   "home": {
     "description": "Penyelenggara membuka seminar, dan peserta bergabung dalam sesi video langsung dengan Pi.",
     "badge": "Seminar langsung di pulau-pulau indah",
-    "headline": "Tonton, dengarkan, dan belajar bersama — langsung",
+    "headline": "Tonton, dengarkan, dan belajar bersama : langsung",
     "ctaBrowse": "Jelajahi seminar",
     "ctaPlan": "Lihat paket",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminar",
     "cal": {
       "title": "Kalender seminar",
-      "desc": "Dari seminar yang lalu hingga yang akan datang — ketuk tanggal untuk detail.",
+      "desc": "Dari seminar sebelumnya hingga seminar yang akan datang: ketuk tanggal untuk melihat detail.",
       "legendSmn": "Seminar",
       "legendEnded": "Seminar yang lalu",
       "legendMine": "Acara saya",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Seminar video langsung",
-        "desc": "Mesin video kami sendiri Galápagos — tujuannya adalah satu presenter streaming hingga 30 peserta"
+        "desc": "Mesin video Galápagos kami sendiri: tujuannya adalah agar 1 presenter dapat mengirim video ke hingga 30 audiens"
       },
       "F02": {
         "name": "Buat seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Pemutaran suara sintetis dan audio asli yang diturunkan"
     },
     "refLabel": "Model referensi",
-    "uiRef": "Dasar UI — pola layar dan fitur aplikasi rapat video web yang banyak digunakan, diadaptasi untuk seminar.pi"
+    "uiRef": "Standar UI: Menerapkan pola layar dan fungsi aplikasi konferensi video web yang umum digunakan ke seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Anggota audiens tidak menggunakan kamera atau mikrofon. Setelah bergabung, Anda akan melihat dan mendengar presenter.",
     "preview": {
       "pending": "Menyiapkan kamera dan mikrofon…",
-      "audioOnly": "Kamera tidak tersedia — hanya mengirim audio.",
+      "audioOnly": "Kamera tidak tersedia : hanya mengirim audio.",
       "none": "Kamera dan mikrofon tidak tersedia. Periksa izin (Anda masih bisa bergabung tanpa media).",
-      "videoOnly": "Mikrofon tidak tersedia — hanya mengirim video. Periksa izin mikrofon."
+      "videoOnly": "Mikrofon tidak tersedia : hanya mengirim video. Periksa izin mikrofon."
     },
     "mic": {
       "on": "Matikan mikrofon",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Tiket masuk Anda telah kedaluwarsa.",
       "TICKET_EXPIRED": "Tiket masuk Anda telah kedaluwarsa.",
       "ROOM_FULL": "Seminar ini penuh.",
-      "ROOM_CLOSED": "Ruangan ditutup — seminar berakhir atau host tidak ada selama lebih dari 5 menit.",
+      "ROOM_CLOSED": "Ruangan ditutup. Seminar telah berakhir atau penyelenggara telah pergi selama lebih dari 5 menit.",
       "DUPLICATE_SESSION": "Anda bergabung dari perangkat lain, jadi layar ini terputus.",
       "ROLE_FORBIDDEN": "Anda tidak memiliki izin untuk presentasi.",
       "WS_FAILED": "Tidak dapat terhubung ke server video.",
@@ -488,7 +488,7 @@
     "toDetail": "Buka halaman seminar",
     "consent": {
       "title": "Sebelum Anda menyalakan mikrofon Anda",
-      "body": "Jika perekaman, teks, atau catatan rapat AI diaktifkan di seminar ini, suara Anda dapat diubah menjadi teks, disimpan, dan diterjemahkan. Pemrosesan suara dilakukan oleh layanan AI di luar negara Anda. Jika Anda tidak setuju, mikrofon Anda tetap menyala — hanya suara Anda yang tidak diproses.",
+      "body": "Jika perekaman, teks, atau catatan rapat AI diaktifkan di seminar ini, suara Anda dapat diubah menjadi teks, disimpan, dan diterjemahkan. Pemrosesan suara dilakukan oleh layanan AI di luar negara Anda. Jika Anda tidak setuju, mikrofon Anda tetap menyala : hanya suara Anda yang tidak diproses.",
       "privacy": "Kebijakan privasi",
       "newTab": "(terbuka di tab baru)",
       "decline": "Tidak setuju",
@@ -613,7 +613,7 @@
       "title": "Rekam",
       "badge": "Merekam",
       "unsupported": "Browser ini tidak dapat merekam. Harap rekam dari browser biasa di komputer.",
-      "piBrowserOnly": "Perekaman hanya berfungsi di browser biasa (PC atau seluler). Pi Browser tidak dapat menyimpan file rekaman — buka seminar ini di browser komputer atau ponsel (seminarz.vercel.app) untuk merekam.",
+      "piBrowserOnly": "Perekaman hanya dapat dilakukan di browser biasa (PC/seluler). Pi Browser tidak dapat menyimpan file rekaman. Harap buka seminar yang sama di browser komputer atau ponsel (seminarz.vercel.app) dan rekam.",
       "audioSuspended": "Perekaman suara mungkin belum dimulai di perangkat ini. Hanya gambar yang mungkin direkam.",
       "notifyFailed": "Perekaman tidak dimulai karena peserta tidak dapat diberitahu. Silakan coba lagi sebentar lagi.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Tutup simpan lagi"
       },
       "toast": {
-        "started": "Perekaman dimulai — semua orang dapat melihatnya",
+        "started": "Perekaman telah dimulai. Ini akan ditampilkan kepada semua peserta.",
         "saved": "Perekaman disimpan. Periksa folder unduhan Anda. Jika tidak ada yang disimpan, ketuk [Simpan lagi] di bagian atas layar.",
         "autoStopped": "Perekaman berakhir karena browser menghentikannya atau batas ukuran tercapai. Semua yang sampai saat itu disimpan. Mulai merekam lagi untuk melanjutkan.",
         "empty": "Tidak ada yang direkam, jadi tidak ada file yang dibuat.",
@@ -656,10 +656,10 @@
       "badge": "Catatan AI aktif",
       "started": "Penyaji mengaktifkan catatan AI",
       "stopped": "Catatan AI dimatikan",
-      "startedMine": "Catatan AI aktif — ditampilkan kepada semua orang",
-      "stoppedMine": "Catatan AI mati — membuat catatan",
+      "startedMine": "Notulen rapat AI telah diaktifkan. Ini akan ditampilkan kepada semua peserta.",
+      "stoppedMine": "Notulen rapat AI telah dimatikan. Notulen rapat sedang dibuat.",
       "startFail": "Tidak dapat memulai catatan AI",
-      "gone": "Catatan AI berhenti — catatan diakhiri atau dihapus di tempat lain",
+      "gone": "Catatan AI berhenti : catatan diakhiri atau dihapus di tempat lain",
       "unsupported": "Catatan AI tidak dapat diaktifkan di sini (tidak ada dukungan perekaman audio)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Ketuk [Buka pengaturan Google Kalender] di bawah.",
       "s2": "Di bawah 'Pengaturan untuk kalender saya' di sebelah kiri, pilih kalender (misalnya nama Anda).",
       "s3": "Gulir ke 'Integrasikan kalender' dan salin 'Alamat rahasia dalam format iCal'.",
-      "s4": "Tempel di sini dan ketuk [Tambahkan] — judul acara muncul di kalender. Tambahkan kalender lain dengan cara yang sama, hingga 5.",
+      "s4": "Tempel di sini dan ketuk [Tambahkan] : judul acara muncul di kalender. Tambahkan kalender lain dengan cara yang sama, hingga 5.",
       "open": "Buka pengaturan Google Kalender",
-      "privacy": "Alamat ini adalah kunci ke kalender Anda — jangan bagikan. Ini hanya disimpan di perangkat ini, tidak pernah di server kami."
+      "privacy": "Alamat ini adalah kunci ke kalender Anda : jangan bagikan. Ini hanya disimpan di perangkat ini, tidak pernah di server kami."
     },
     "title": "Buat seminar",
     "name": "Mari bepergian ke pulau yang indah!",
     "subTitle": "Subjudul (opsional, hingga 60)",
     "startAt": "Waktu mulai",
-    "maxCnt": "Kapasitas (1–100)",
+    "maxCnt": "Kapasitas (1~100)",
     "submit": "Buat",
     "submitting": "Membuat…",
-    "invalid": "Periksa masukan Anda — tanggal dalam satu tahun dari sekarang, kapasitas 1–100.",
+    "invalid": "Periksa input: tanggal dan waktu dalam satu tahun dari sekarang, kapasitas 1-100.",
     "attendance": {
       "title": "Kehadiran",
       "back": "Kembali ke seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Waktu kehadiran adalah dari pertama bergabung hingga terakhir terlihat, dikurangi waktu tidak hadir (celah lebih dari 2,5 menit).",
-      "csvPiBrowser": "Unduhan CSV hanya berfungsi di browser biasa (komputer atau seluler). Pi Browser tidak dapat menyimpan file — buka lembar kehadiran ini di browser komputer atau ponsel (seminarz.vercel.app)."
+      "csvPiBrowser": "Pengunduhan CSV hanya dapat dilakukan di browser biasa (PC/seluler). Pi Browser tidak dapat menyimpan file. Harap buka daftar hadir yang sama di browser komputer atau ponsel (seminarz.vercel.app)."
     },
     "plan": "Paket",
-    "planFree": "Gratis — sisa {time} bulan ini · tanpa AI",
-    "planPaid": "{name} {time} · {price} — bayar saat membuat",
+    "planFree": "Gratis: Sisa waktu bulan ini {time} · Tanpa AI",
+    "planPaid": "{name} {time} · {price} · Pembayaran saat pembuatan",
     "planHint": "Seminar yang dibuka dengan paket berbayar menggunakan waktu paket tersebut terlebih dahulu, kemudian dilanjutkan dengan waktu gratis bulan ini (tanpa AI di bagian gratis). Paket aktif dibuka tanpa pembayaran; Bulanan atau Tahunan yang tidak Anda miliki dibayar dalam Pi saat Anda menekan Buat, kemudian seminar dibuka (Pi Browser). Bergabung selalu gratis untuk peserta.",
-    "planOwned": "{name} — aktif · sisa {time}",
+    "planOwned": "{name}: Berlangganan · Sisa waktu {time}",
     "planEnds": "Waktu mulai setelah masa berlaku paket ini berakhir. Pindahkan waktu mulai lebih awal atau pilih paket lain.",
     "paidKept": "Tiket berbayar Anda tetap disimpan. Perbaiki masalah dan tekan Buat lagi (tanpa pembayaran kedua)."
   },
   "privacy": {
-    "title": "Kebijakan Privasi — Fitur Suara dan AI",
+    "title": "Kebijakan Privasi: Fitur Suara · AI",
     "effective": "Berlaku {date}",
     "intro": "Kebijakan ini menjelaskan informasi pribadi yang kami proses saat Anda menggunakan teks langsung, teks terjemahan, terjemahan suara, catatan rapat AI, dan catatan tatap muka dalam seminar. Fitur-fitur ini menggunakan layanan AI eksternal, sehingga informasi ditransfer ke luar negeri.",
     "whoTitle": "Informasi siapa yang diproses",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Penerima",
-        "v": "Google LLC (Gemini API) — kontak [TBD: kontak privasi Google]"
+        "v": "Google LLC (Gemini API): Kontak [Sedang diverifikasi: Master, Saluran pertanyaan privasi Google]"
       },
       {
         "k": "Negara",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Tujuan",
-        "v": "Ucapan ke teks, terjemahan, ringkasan catatan rapat, ucapan sintetis (suara standar, tanpa kloning suara), pemisahan pembicara untuk catatan tatap muka (suara dibedakan dan diberi label berdasarkan jenis kelamin yang dirasakan, seperti Pria 1 / Wanita 1 — tidak ada nama atau identitas yang disimpulkan)"
+        "v": "Mengubah suara menjadi teks, terjemahan, ringkasan notulen rapat, suara sintetis (suara standar, tanpa kloning suara), pemisahan pembicara dalam catatan tatap muka (memisahkan orang berdasarkan suara dan menampilkan jenis kelamin yang terdengar seperti pria1/wanita1, tidak mengidentifikasi nama/identitas)"
       },
       {
         "k": "Retensi",
-        "v": "Berakhir segera setelah hasilnya dikembalikan. Kami meminta Google untuk tidak menyimpan permintaan (store=false). Log pemantauan penyalahgunaan mungkin masih disimpan berdasarkan persyaratan Google [TBD: periode retensi dan status tingkat berbayar]."
+        "v": "Berakhir segera setelah menerima hasil pemrosesan. Kami meminta Google untuk tidak menyimpan permintaan (store=false). Namun, catatan pemantauan penyalahgunaan sesuai dengan persyaratan Google dapat disimpan [Sedang diverifikasi: Master, Durasi penyimpanan · Penerapan tingkat berbayar]."
       },
       {
         "k": "Cara menolak, dan apa yang terjadi",
@@ -895,8 +895,8 @@
     "keep": [
       "Audio asli: untuk teks seminar dan catatan rapat AI tidak disimpan; dibuang segera setelah konversi ke teks. Untuk catatan tatap muka, rekaman disimpan dalam penyimpanan pribadi sehingga dapat ditranskripsi lagi dengan lebih akurat (dengan pembicara) setelah rapat, dan dihapus pada pembersihan harian setelah 1 hari berlalu sejak catatan berakhir (segera jika catatan dihapus).",
       "Teks langsung: tidak disimpan.",
-      "Catatan rapat AI (saat penyaji mengaktifkannya): konten lisan, tangkapan layar, dan ringkasan, disimpan hingga catatan dihapus [TBD: retensi maksimum].",
-      "Catatan persetujuan: waktu persetujuan dan versi kebijakan, disimpan sebagai bukti [TBD: periode retensi].",
+      "Notulen rapat AI (jika diaktifkan oleh presenter): Konten ucapan, tangkapan layar, dan ringkasan disimpan hingga notulen rapat dihapus [Sedang diverifikasi: Master, Batas durasi penyimpanan].",
+      "Catatan persetujuan: Tanggal dan waktu persetujuan serta versi kebijakan yang disetujui disimpan sebagai bukti [Sedang diverifikasi: Master, Durasi penyimpanan].",
       "Penggunaan: jumlah permintaan per menit dan waktu pemrosesan, digunakan untuk menegakkan batas biaya.",
       "Kehadiran: waktu Anda bergabung, waktu terakhir Anda terhubung, nama tampilan Anda, dan nama pengguna Pi Anda disimpan dan diberikan kepada host sebagai daftar kehadiran (di layar dan sebagai unduhan CSV). Disimpan hingga seminar dihapus.",
       "Tanya Jawab dan jajak pendapat: teks pertanyaan dan nama tampilan penanya (atau nama pengguna Pi jika tidak ada) terlihat oleh setiap peserta. Upvote hanya menunjukkan jumlah, tidak pernah siapa yang memberikan. Suara jajak pendapat hanya menunjukkan jumlah kepada peserta; penyelenggara dan admin melihat, untuk setiap opsi, nama tampilan (atau nama pengguna Pi jika tidak ada) dari setiap pemilih. Disimpan, termasuk pertanyaan tersembunyi, hingga seminar dihapus."
@@ -904,14 +904,14 @@
     "recTitle": "Perekaman",
     "rec": "Rekaman hanya disimpan sebagai file di perangkat penyaji. Mereka tidak diunggah ke server kami atau ditransfer ke luar negeri. Saat perekaman atau catatan AI aktif, setiap peserta melihat indikator.",
     "rightsTitle": "Hak Anda",
-    "rights": "Anda dapat meminta untuk mengakses, mengoreksi, menghapus, atau menghentikan pemrosesan informasi Anda. Kontak: [TBD: nama dan kontak petugas privasi]"
+    "rights": "Anda dapat meminta akses, koreksi, penghapusan, dan penghentian pemrosesan informasi saya. Kontak: [Sedang diverifikasi: Master, Nama dan kontak petugas perlindungan data pribadi]"
   },
   "notes": {
     "title": "Catatan",
     "back": "Kembali ke seminar",
     "loading": "Memuat…",
     "meta": "Catatan · {date} · {min} menit",
-    "aiWarn": "Ringkasan yang dihasilkan AI — mungkin mengandung kesalahan",
+    "aiWarn": "Ringkasan yang dihasilkan AI : mungkin mengandung kesalahan",
     "points": "Poin-poin penting",
     "decisions": "Keputusan",
     "todos": "Item tindakan",
@@ -921,11 +921,11 @@
     "making": "Membuat catatan…",
     "makingLong": "Ini memakan waktu cukup lama. Harap segarkan nanti",
     "recording": "Masih merekam",
-    "failed": "Tidak dapat membuat ringkasan — transkrip lengkap ada di bawah",
+    "failed": "Gagal membuat ringkasan. Catatan lengkap ada di bawah.",
     "retry": "Coba lagi",
     "finish": "Akhiri perekaman dan ringkas",
     "none": "Tidak ada di sini",
-    "blank": "Tidak ada yang bisa diringkas — tidak ada ucapan yang direkam atau terlalu singkat",
+    "blank": "Tidak ada konten untuk diringkas. Tidak ada ucapan yang direkam atau terlalu singkat.",
     "notFound": "Catatan tidak ditemukan",
     "forbidden": "Anda tidak memiliki akses ke catatan ini",
     "shotAlt": "Tangkapan layar pada {at}",
@@ -938,7 +938,7 @@
     "delYes": "Hapus",
     "delNo": "Batal",
     "delFail": "Tidak dapat menghapus",
-    "dlFail": "Tidak dapat mengunduh — harap coba lagi",
+    "dlFail": "Gagal mengunduh. Harap ketuk lagi.",
     "recentNotes": "Catatan terbaru",
     "empty": "Belum ada catatan",
     "newNote": "Mulai catatan tatap muka",
@@ -959,12 +959,12 @@
     "aiOff": "Catatan AI tidak tersedia saat ini (perlu pengaturan server). Catatan sebelumnya tercantum di bawah",
     "reload": "Muat ulang",
     "unsupported": "Perekaman tidak tersedia di perangkat ini",
-    "micDenied": "Tidak dapat menggunakan mikrofon — periksa izin",
-    "limited": "Batas waktu pemrosesan telah habis — akhiri dan buat catatan",
-    "noAgr": "Berhenti: tidak ada konfirmasi pemberitahuan pada rekaman — akhiri dan mulai lagi",
-    "micLost": "Mikrofon terputus dan perekaman berhenti — ketuk Sambungkan kembali mikrofon atau akhiri catatan",
+    "micDenied": "Mikrofon tidak dapat digunakan. Harap periksa izin.",
+    "limited": "Batas waktu pemrosesan telah habis. Harap akhiri dan buat notulen rapat.",
+    "noAgr": "Berhenti karena tidak ada catatan konfirmasi pemberitahuan. Harap akhiri dan mulai lagi.",
+    "micLost": "Perekaman berhenti karena koneksi mikrofon terputus. Harap ketuk [Sambungkan kembali mikrofon] atau akhiri.",
     "micRetry": "Sambungkan kembali mikrofon",
-    "gone": "Catatan ini diakhiri atau dihapus di tempat lain, jadi perekaman berhenti — gunakan tombol di bawah untuk membuka catatan",
+    "gone": "Catatan ini telah diakhiri atau dihapus di layar lain, sehingga perekaman berhenti. Harap periksa notulen rapat dengan tombol di bawah.",
     "finishing": "Menyimpan kata-kata terakhir…",
     "st": {
       "RECORDING": "Merekam",
@@ -972,7 +972,7 @@
       "DONE": "Selesai",
       "FAILED": "Gagal"
     },
-    "downloadPiBrowser": "Pengunduhan Markdown hanya berfungsi di browser biasa (komputer atau seluler). Pi Browser tidak dapat menyimpan file — buka catatan ini di browser komputer atau ponsel (seminarz.vercel.app)."
+    "downloadPiBrowser": "Pengunduhan Markdown hanya dapat dilakukan di browser biasa (PC/seluler). Pi Browser tidak dapat menyimpan file. Harap buka notulen rapat yang sama di browser komputer atau ponsel (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Paket",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} terhubung",
     "producers": "{n} aliran",
     "end": "Berakhir {time}",
-    "stale": "Seminar telah berakhir tetapi ruang masih terbuka di server video — paksa tutup.",
+    "stale": "Seminar telah berakhir, tetapi ruangan masih ada di server video. Harap paksa tutup.",
     "close": "Paksa tutup",
     "confirmSeminar": "Ini mengakhiri seminar dan menutup ruang. Semua orang akan terputus.",
     "confirmRoom": "Ini menutup ruang. Semua orang akan terputus.",
@@ -1063,7 +1063,7 @@
     "cancel": "Batal",
     "saving": "Menyimpan…",
     "done": "Diterapkan. Sisa waktu {plan}: {time}",
-    "invalid": "Masukkan pengurangan antara 1 menit dan 1000 jam (menit penuh 0–59).",
+    "invalid": "Masukkan pengurangan antara 1 menit dan 1000 jam (menit penuh 0~59).",
     "history": "Penyesuaian terbaru",
     "noHistory": "Belum ada penyesuaian.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

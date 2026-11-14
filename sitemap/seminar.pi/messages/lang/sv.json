@@ -6,7 +6,7 @@
   "home": {
     "description": "Värdar öppnar seminarier, och deltagare ansluter till livevideosessioner med Pi.",
     "badge": "Liveseminarier på vackra öar",
-    "headline": "Titta, lyssna och lär tillsammans — live",
+    "headline": "Titta, lyssna och lär tillsammans : live",
     "ctaBrowse": "Bläddra bland seminarier",
     "ctaPlan": "Se planer",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarier",
     "cal": {
       "title": "Seminarkalender",
-      "desc": "Från tidigare seminarier till kommande — tryck på ett datum för detaljer.",
+      "desc": "Från tidigare seminarier till kommande: tryck på ett datum för detaljer.",
       "legendSmn": "Seminarier",
       "legendEnded": "Tidigare seminarier",
       "legendMine": "Mina evenemang",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Live videoseminarium",
-        "desc": "Vår egen videomotor Galápagos — målet är en presentatör som streamar till upp till 30 deltagare"
+        "desc": "Vår egen video motor Galápagos: Målet är att en presentatör ska kunna skicka video till upp till 30 åhörare."
       },
       "F02": {
         "name": "Skapa ett seminarium",
@@ -254,7 +254,7 @@
       "dubbing": "Syntetisk röstuppspelning och sänkt originalljud"
     },
     "refLabel": "Referensmodell",
-    "uiRef": "UI-baslinje — skärm- och funktionsmönster för en allmänt använd webbvideomötesapp, anpassad för seminar.pi"
+    "uiRef": "UI-standarder: Tillämpar skärm- och funktionsmönster från populära webbkonferensappar till seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Publikmedlemmar använder inte kamera eller mikrofon. Efter att du har anslutit kommer du att se och höra presentatören.",
     "preview": {
       "pending": "Förbereder kamera och mikrofon…",
-      "audioOnly": "Kamera otillgänglig — skickar endast ljud.",
+      "audioOnly": "Kamera otillgänglig : skickar endast ljud.",
       "none": "Kamera och mikrofon otillgängliga. Kontrollera behörigheter (du kan fortfarande ansluta utan media).",
-      "videoOnly": "Mikrofon otillgänglig — skickar endast video. Kontrollera mikrofonbehörighet."
+      "videoOnly": "Mikrofon otillgänglig : skickar endast video. Kontrollera mikrofonbehörighet."
     },
     "mic": {
       "on": "Stäng av mikrofon",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Ditt inträdespass har gått ut.",
       "TICKET_EXPIRED": "Ditt inträdespass har gått ut.",
       "ROOM_FULL": "Detta seminarie är fullt.",
-      "ROOM_CLOSED": "Rummet stängdes – seminariet avslutades eller värden var borta i mer än 5 minuter.",
+      "ROOM_CLOSED": "Rummet är stängt. Seminariet har avslutats eller värden har varit frånvarande i mer än 5 minuter.",
       "DUPLICATE_SESSION": "Du anslöt från en annan enhet, så den här skärmen kopplades bort.",
       "ROLE_FORBIDDEN": "Du har inte behörighet att presentera.",
       "WS_FAILED": "Kunde inte ansluta till videoservern.",
@@ -488,7 +488,7 @@
     "toDetail": "Gå till seminariesidan",
     "consent": {
       "title": "Innan du slår på din mikrofon",
-      "body": "Om inspelning, undertexter eller AI-mötesanteckningar är påslagna i detta seminarie, kan din röst omvandlas till text, lagras och översättas. Röstbehandling utförs av en AI-tjänst utanför ditt land. Om du inte samtycker, slås din mikrofon fortfarande på – endast din röst utelämnas från behandlingen.",
+      "body": "Om inspelning, undertexter eller AI-mötesanteckningar är påslagna i detta seminarie, kan din röst omvandlas till text, lagras och översättas. Röstbehandling utförs av en AI-tjänst utanför ditt land. Om du inte samtycker, slås din mikrofon fortfarande på : endast din röst utelämnas från behandlingen.",
       "privacy": "Integritetspolicy",
       "newTab": "(öppnas i en ny flik)",
       "decline": "Samtycker inte",
@@ -613,7 +613,7 @@
       "title": "Spela in",
       "badge": "Spelar in",
       "unsupported": "Denna webbläsare kan inte spela in. Spela in från en vanlig webbläsare på en dator.",
-      "piBrowserOnly": "Inspelning fungerar endast i en vanlig webbläsare (dator eller mobil). Pi Browser kan inte spara inspelningsfiler – öppna detta seminarie i en dator- eller telefonwebbläsare (seminarz.vercel.app) för att spela in.",
+      "piBrowserOnly": "Inspelning är endast tillgängligt i vanliga webbläsare (PC/mobil). Pi Browser kan inte spara inspelade filer. Vänligen öppna samma seminarium i en dator- eller mobilwebbläsare (seminarz.vercel.app) för att spela in.",
       "audioSuspended": "Ljudinspelning kanske inte har startat på denna enhet. Endast bilden kan spelas in.",
       "notifyFailed": "Inspelningen startade inte eftersom deltagarna inte kunde meddelas. Försök igen snart.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Stäng spara igen"
       },
       "toast": {
-        "started": "Inspelning startade – alla kan se det.",
+        "started": "Inspelningen har startat. Detta kommer att visas för alla deltagare.",
         "saved": "Inspelning sparad. Kontrollera din nedladdningsmapp. Om inget sparades, tryck på [Spara igen] högst upp på skärmen.",
         "autoStopped": "Inspelningen avslutades eftersom webbläsaren stoppade den eller storleksgränsen nåddes. Allt fram till dess sparades. Starta inspelningen igen för att fortsätta.",
         "empty": "Inget spelades in, så ingen fil skapades.",
@@ -656,10 +656,10 @@
       "badge": "AI-anteckningar på",
       "started": "Presentatören slog på AI-anteckningar",
       "stopped": "AI-anteckningar avstängda",
-      "startedMine": "AI-anteckningar på — visas för alla",
-      "stoppedMine": "AI-anteckningar avstängda — skapar anteckningarna",
+      "startedMine": "AI-mötesanteckningar har startats. Detta kommer att visas för alla deltagare.",
+      "stoppedMine": "AI-mötesanteckningar har stoppats. Mötesanteckningar genereras.",
       "startFail": "Kunde inte starta AI-anteckningar",
-      "gone": "AI-anteckningar stoppades — anteckningarna avslutades eller raderades någon annanstans",
+      "gone": "AI-anteckningar stoppades : anteckningarna avslutades eller raderades någon annanstans",
       "unsupported": "AI-anteckningar kan inte slås på här (inget stöd för ljudinspelning)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Tryck på [Öppna Google Kalender-inställningar] nedan.",
       "s2": "Under 'Inställningar för mina kalendrar' till vänster, välj en kalender (t.ex. ditt namn).",
       "s3": "Scrolla till 'Integrera kalender' och kopiera 'Hemlig adress i iCal-format'.",
-      "s4": "Klistra in den här och tryck på [Lägg till] — händelsetitlar visas i kalendern. Lägg till andra kalendrar på samma sätt, upp till 5.",
+      "s4": "Klistra in den här och tryck på [Lägg till] : händelsetitlar visas i kalendern. Lägg till andra kalendrar på samma sätt, upp till 5.",
       "open": "Öppna Google Kalender-inställningar",
-      "privacy": "Denna adress är en nyckel till din kalender — dela den inte. Den lagras endast på denna enhet, aldrig på vår server."
+      "privacy": "Denna adress är en nyckel till din kalender : dela den inte. Den lagras endast på denna enhet, aldrig på vår server."
     },
     "title": "Skapa ett seminar",
     "name": "Låt oss resa till en vacker ö!",
     "subTitle": "Undertitel (valfritt, upp till 60)",
     "startAt": "Starttid",
-    "maxCnt": "Kapacitet (1–100)",
+    "maxCnt": "Kapacitet (1~100)",
     "submit": "Skapa",
     "submitting": "Skapar…",
-    "invalid": "Kontrollera din inmatning — ett datum inom ett år från nu, kapacitet 1–100.",
+    "invalid": "Vänligen kontrollera inmatningsvärdena: ett datum inom ett år från nu, och en kapacitet på 1-100.",
     "attendance": {
       "title": "Närvaro",
       "back": "Tillbaka till seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Tid närvarande är från första anslutning till senast sedd, minus tid borta (luckor längre än 2,5 minuter).",
-      "csvPiBrowser": "CSV-nedladdning fungerar endast i en vanlig webbläsare (dator eller mobil). Pi Browser kan inte spara filer — öppna detta närvaroblad i en dator- eller telefonwebbläsare (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV-nedladdning är endast tillgängligt i vanliga webbläsare (PC/mobil). Pi Browser kan inte spara filer. Vänligen öppna samma närvarolista i en dator- eller mobilwebbläsare (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Gratis — {time} kvar denna månad · ingen AI",
-    "planPaid": "{name} {time} · {price} — betala vid skapande",
+    "planFree": "Gratis: {time} återstår denna månad · Ingen AI",
+    "planPaid": "{name} {time} · {price} · Betalning vid skapande",
     "planHint": "Ett seminar som öppnas med en betald plan använder den planens tid först, fortsätter sedan med denna månads gratistid (ingen AI i gratisdelen). En aktiv plan öppnas utan betalning; Månadsvis eller Årsvis som du inte har betalas i Pi när du trycker på Skapa, sedan öppnas seminariet (Pi Browser). Att delta är alltid gratis för deltagare.",
-    "planOwned": "{name} — aktiv · {time} kvar",
+    "planOwned": "{name}: Prenumererad · {time} återstår",
     "planEnds": "Starttiden är efter att denna plans pass löper ut. Flytta starttiden tidigare eller välj en annan plan.",
     "paidKept": "Ditt betalda pass behålls. Åtgärda problemet och tryck på Skapa igen (ingen andra betalning)."
   },
   "privacy": {
-    "title": "Integritetspolicy — Röst- och AI-funktioner",
+    "title": "Integritetspolicy: Röst- och AI-funktioner",
     "effective": "Gäller från {date}",
     "intro": "Denna policy förklarar den personliga information vi behandlar när du använder live-undertexter, översatta undertexter, röstöversättning, AI-mötesanteckningar och personliga anteckningar i ett seminar. Dessa funktioner använder en extern AI-tjänst, så informationen överförs utomlands.",
     "whoTitle": "Vems information behandlas",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Mottagare",
-        "v": "Google LLC (Gemini API) — kontakt [TBD: Google privacy contact]"
+        "v": "Google LLC (Gemini API): Kontakt [Väntar: Master, Googles kanal för integritetsfrågor]"
       },
       {
         "k": "Länder",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Syfte",
-        "v": "Tal till text, översättning, mötesanteckningssammanfattningar, syntetiskt tal (standardröster, ingen röstkloning), högtalarseparation för personliga anteckningar (röster skiljs åt och märks med upplevt kön, såsom Man 1 / Kvinna 1 — inga namn eller identiteter härleds)"
+        "v": "Röst till text-konvertering, översättning, sammanfattning av mötesanteckningar, syntetisk röst (standardröst, ingen röstkloning), högtalarseparation i personliga anteckningar (separerar personer efter röst och visar som man 1, kvinna 1 baserat på upplevt kön, identifierar inte namn eller identiteter)"
       },
       {
         "k": "Lagring",
-        "v": "Avslutas så snart resultatet returneras. Vi ber Google att inte lagra förfrågningar (store=false). Loggar för missbruksövervakning kan fortfarande behållas enligt Googles villkor [TBD: retention period and paid-tier status]."
+        "v": "Avslutas omedelbart vid mottagande av bearbetade resultat. Vi begär att Google inte lagrar förfrågningar (store=false). Dock kan register över missbruksövervakning enligt Googles villkor lagras [Väntar: Master, lagringsperiod och tillämpning av betald nivå]."
       },
       {
         "k": "Hur man vägrar, och vad som händer",
@@ -895,8 +895,8 @@
     "keep": [
       "Original ljud: för seminarundertexter och AI-mötesanteckningar lagras det inte; det kasseras direkt efter konvertering till text. För personliga anteckningar behålls inspelningen i privat lagring så att den kan transkriberas igen mer noggrant (med högtalare) efter mötet, och den raderas vid den dagliga rensningen när 1 dag har gått sedan anteckningen avslutades (omedelbart om anteckningen raderas).",
       "Live-undertexter: lagras inte.",
-      "AI-mötesanteckningar (när presentatören slår på dem): talat innehåll, skärmdumpar och sammanfattningen, behålls tills anteckningarna raderas [TBD: maximum retention].",
-      "Samtyckesregister: tidpunkten för samtycke och policyversionen, behålls som bevis [TBD: retention period].",
+      "AI-mötesanteckningar (om aktiverade av presentatören): Lagrar yttranden, skärmdumpar och sammanfattningar tills mötesanteckningarna raderas [Väntar: Master, maximal lagringsperiod].",
+      "Samtyckesregister: Lagrar samtyckesdatum och version av godkänd policy som bevis [Väntar: Master, lagringsperiod].",
       "Användning: per-minut förfrågningsantal och behandlingstid, används för att upprätthålla kostnadsgränser.",
       "Närvaro: tiden du anslöt, tiden du senast var ansluten, ditt visningsnamn och ditt Pi-användarnamn lagras och ges till värden som en närvarolista (på skärmen och som en CSV-nedladdning). Behålls tills seminariet raderas.",
       "Frågor och svar och omröstningar: frågetexten och frågeställarens visningsnamn (eller Pi-användarnamn om inget) är synliga för varje deltagare. Uppröster visar endast antal, aldrig vem som röstade. Omröstningsröster visar endast antal för deltagare; arrangören och administratörerna ser, för varje alternativ, visningsnamnet (eller Pi-användarnamn om inget) för varje väljare. Behålls, inklusive dolda frågor, tills seminariet raderas."
@@ -904,14 +904,14 @@
     "recTitle": "Inspelning",
     "rec": "Inspelningar sparas endast som en fil på presentatörens enhet. De laddas inte upp till våra servrar eller överförs utomlands. Medan inspelning eller AI-anteckningar är på, ser varje deltagare en indikator.",
     "rightsTitle": "Dina rättigheter",
-    "rights": "Du kan begära att få tillgång till, korrigera, radera eller stoppa behandlingen av din information. Kontakt: [TBD: privacy officer name and contact]"
+    "rights": "Du kan begära åtkomst, korrigering, radering och upphörande av behandling av din information. Kontakt: [Väntar: Master, Namn och kontaktuppgifter för dataskyddsombud]"
   },
   "notes": {
     "title": "Anteckningar",
     "back": "Tillbaka till seminar",
     "loading": "Laddar…",
     "meta": "Anteckningar · {date} · {min} min",
-    "aiWarn": "AI-genererad sammanfattning — den kan innehålla fel",
+    "aiWarn": "AI-genererad sammanfattning : den kan innehålla fel",
     "points": "Nyckelpunkter",
     "decisions": "Beslut",
     "todos": "Åtgärdspunkter",
@@ -921,11 +921,11 @@
     "making": "Skapar anteckningarna…",
     "makingLong": "Detta tar ett tag. Vänligen uppdatera senare",
     "recording": "Spelar fortfarande in",
-    "failed": "Kunde inte skapa sammanfattningen — hela transkriptionen finns nedan",
+    "failed": "Kunde inte skapa sammanfattning. Fullständig transkription finns nedan.",
     "retry": "Försök igen",
     "finish": "Avsluta inspelning och sammanfatta",
     "none": "Inget här",
-    "blank": "Inget att sammanfatta — inget tal spelades in eller det var för kort",
+    "blank": "Inget innehåll att sammanfatta. Inget tal spelades in eller det var för kort.",
     "notFound": "Anteckningar hittades inte",
     "forbidden": "Du har inte åtkomst till dessa anteckningar",
     "shotAlt": "Skärmdump vid {at}",
@@ -938,7 +938,7 @@
     "delYes": "Radera",
     "delNo": "Avbryt",
     "delFail": "Kunde inte radera",
-    "dlFail": "Kunde inte ladda ner — försök igen",
+    "dlFail": "Nedladdning misslyckades. Vänligen tryck igen.",
     "recentNotes": "Senaste anteckningar",
     "empty": "Inga anteckningar ännu",
     "newNote": "Starta personliga anteckningar",
@@ -959,12 +959,12 @@
     "aiOff": "AI-anteckningar är inte tillgängliga just nu (serverinställning behövs). Tidigare anteckningar listas nedan",
     "reload": "Ladda om",
     "unsupported": "Inspelning är inte tillgänglig på den här enheten",
-    "micDenied": "Kan inte använda mikrofonen – kontrollera behörigheten",
-    "limited": "Tidsgränsen för bearbetning är förbrukad – avsluta och skapa anteckningarna",
-    "noAgr": "Stoppad: ingen bekräftelse på inspelning – avsluta och starta igen",
-    "micLost": "Mikrofonen kopplades bort och inspelningen stoppades – tryck på Återanslut mikrofon eller avsluta anteckningen",
+    "micDenied": "Mikrofonen är inte tillgänglig. Vänligen kontrollera behörigheter.",
+    "limited": "Bearbetningstidsgränsen har uppnåtts. Vänligen avsluta och generera mötesanteckningar.",
+    "noAgr": "Stoppades på grund av saknad bekräftelse av meddelande. Vänligen avsluta och starta om.",
+    "micLost": "Mikrofonanslutningen förlorades, inspelningen stoppades. Vänligen tryck på [Återanslut mikrofon] eller avsluta.",
     "micRetry": "Återanslut mikrofon",
-    "gone": "Denna anteckning avslutades eller raderades någon annanstans, så inspelningen stoppades – använd knappen nedan för att öppna anteckningarna",
+    "gone": "Denna anteckning avslutades eller raderades på en annan skärm, så inspelningen har stoppats. Vänligen kontrollera mötesanteckningarna med knappen nedan.",
     "finishing": "Sparar de sista orden…",
     "st": {
       "RECORDING": "Spelar in",
@@ -972,7 +972,7 @@
       "DONE": "Klar",
       "FAILED": "Misslyckades"
     },
-    "downloadPiBrowser": "Nedladdning av Markdown fungerar endast i en vanlig webbläsare (dator eller mobil). Pi Browser kan inte spara filer – öppna dessa anteckningar i en dator- eller telefonwebbläsare (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdown-nedladdning är endast tillgängligt i vanliga webbläsare (PC/mobil). Pi Browser kan inte spara filer. Vänligen öppna samma mötesanteckningar i en dator- eller mobilwebbläsare (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Planer",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} anslutna",
     "producers": "{n} strömmar",
     "end": "Slutar {time}",
-    "stale": "Seminariet har avslutats men rummet är fortfarande öppet på videoservern – tvinga stäng det.",
+    "stale": "Seminariet har avslutats, men rum finns kvar på videoservern. Tvinga stäng dem.",
     "close": "Tvinga stäng",
     "confirmSeminar": "Detta avslutar seminariet och stänger rummet. Alla kommer att kopplas bort.",
     "confirmRoom": "Detta stänger rummet. Alla kommer att kopplas bort.",
@@ -1063,7 +1063,7 @@
     "cancel": "Avbryt",
     "saving": "Sparar…",
     "done": "Tillämpat. {plan} återstående tid: {time}",
-    "invalid": "Ange en minskning mellan 1 minut och 1000 timmar (hela minuter 0–59).",
+    "invalid": "Ange en minskning mellan 1 minut och 1000 timmar (hela minuter 0~59).",
     "history": "Senaste justeringar",
     "noHistory": "Inga justeringar ännu.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

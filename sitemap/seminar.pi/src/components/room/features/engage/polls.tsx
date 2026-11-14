@@ -151,7 +151,7 @@ function PollCard({
               </div>
               {!!o.voters?.length && (
                 <p className="text-muted-foreground mt-0.5 text-xs break-words">
-                  {t('voters', { names: o.voters.map((v) => v || '—').join(', ') })}
+                  {t('voters', { names: o.voters.map((v) => v || '-').join(', ') })}
                 </p>
               )}
             </li>

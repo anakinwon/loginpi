@@ -6,7 +6,7 @@
   "home": {
     "description": "Hosts open seminars, and participants join live video sessions with Pi.",
     "badge": "Live seminars on beautiful islands",
-    "headline": "Watch, listen, and learn together — live",
+    "headline": "Watch, listen, and learn together : live",
     "ctaBrowse": "Browse seminars",
     "ctaPlan": "See plans",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminars",
     "cal": {
       "title": "Seminar calendar",
-      "desc": "From past seminars to upcoming ones — tap a date for details.",
+      "desc": "From past seminars to upcoming ones: tap a date for details.",
       "legendSmn": "Seminars",
       "legendEnded": "Past seminars",
       "legendMine": "My events",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Live video seminar",
-        "desc": "Our own video engine Galápagos — the goal is one presenter streaming to up to 30 attendees"
+        "desc": "Our own video engine Galápagos: The goal is for one presenter to send video to up to 30 audience members."
       },
       "F02": {
         "name": "Create a seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Synthetic voice playback and lowered original audio"
     },
     "refLabel": "Reference model",
-    "uiRef": "UI baseline — screen and feature patterns of a widely used web video meeting app, adapted for seminar.pi"
+    "uiRef": "UI Standards: Applying screen and feature patterns of popular web conferencing apps to seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Audience members don't use a camera or microphone. After joining you'll see and hear the presenter.",
     "preview": {
       "pending": "Preparing camera and microphone…",
-      "audioOnly": "Camera unavailable — sending audio only.",
+      "audioOnly": "Camera unavailable : sending audio only.",
       "none": "Camera and microphone unavailable. Check permissions (you can still join without media).",
-      "videoOnly": "Microphone unavailable — sending video only. Check microphone permission."
+      "videoOnly": "Microphone unavailable : sending video only. Check microphone permission."
     },
     "mic": {
       "on": "Turn off microphone",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Your entry pass has expired.",
       "TICKET_EXPIRED": "Your entry pass has expired.",
       "ROOM_FULL": "This seminar is full.",
-      "ROOM_CLOSED": "The room was closed — the seminar ended or the host was away for more than 5 minutes.",
+      "ROOM_CLOSED": "The room is closed. The seminar has ended or the host has been absent for more than 5 minutes.",
       "DUPLICATE_SESSION": "You joined from another device, so this screen was disconnected.",
       "ROLE_FORBIDDEN": "You don't have permission to present.",
       "WS_FAILED": "Couldn't connect to the video server.",
@@ -488,7 +488,7 @@
     "toDetail": "Go to seminar page",
     "consent": {
       "title": "Before you turn on your microphone",
-      "body": "If recording, captions or AI meeting notes are turned on in this seminar, your voice may be converted to text, stored and translated. Voice processing is done by an AI service outside your country. If you don’t agree, your mic still turns on — only your voice is left out of processing.",
+      "body": "If recording, captions or AI meeting notes are turned on in this seminar, your voice may be converted to text, stored and translated. Voice processing is done by an AI service outside your country. If you don’t agree, your mic still turns on : only your voice is left out of processing.",
       "privacy": "Privacy policy",
       "newTab": "(opens in a new tab)",
       "decline": "Don't agree",
@@ -613,7 +613,7 @@
       "title": "Record",
       "badge": "Recording",
       "unsupported": "This browser cannot record. Please record from a regular browser on a computer.",
-      "piBrowserOnly": "Recording works only in a regular browser (computer or mobile). Pi Browser cannot save recording files — open this seminar in a computer or phone browser (seminarz.vercel.app) to record.",
+      "piBrowserOnly": "Recording is only available in regular browsers (PC/mobile). Pi Browser cannot save recorded files. Please open the same seminar in a computer or mobile browser (seminarz.vercel.app) to record.",
       "audioSuspended": "Sound recording may not have started on this device. Only the picture may be recorded.",
       "notifyFailed": "Recording did not start because participants could not be notified. Please try again shortly.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Close save again"
       },
       "toast": {
-        "started": "Recording started — everyone can see it",
+        "started": "Recording has started. This will be displayed to all participants.",
         "saved": "Recording saved. Check your downloads folder. If nothing was saved, tap [Save again] at the top of the screen.",
         "autoStopped": "Recording ended because the browser stopped it or the size limit was reached. Everything up to that point was saved. Start recording again to continue.",
         "empty": "Nothing was recorded, so no file was created.",
@@ -656,10 +656,10 @@
       "badge": "AI notes on",
       "started": "The presenter turned on AI notes",
       "stopped": "AI notes turned off",
-      "startedMine": "AI notes on — shown to everyone",
-      "stoppedMine": "AI notes off — creating the notes",
+      "startedMine": "AI meeting minutes started. This will be displayed to all participants.",
+      "stoppedMine": "AI meeting minutes stopped. Meeting minutes are being generated.",
       "startFail": "Couldn't start AI notes",
-      "gone": "AI notes stopped — the notes were ended or deleted elsewhere",
+      "gone": "AI notes stopped : the notes were ended or deleted elsewhere",
       "unsupported": "AI notes can't be turned on here (no audio recording support)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Tap [Open Google Calendar settings] below.",
       "s2": "Under 'Settings for my calendars' on the left, pick a calendar (e.g. your name).",
       "s3": "Scroll to 'Integrate calendar' and copy 'Secret address in iCal format'.",
-      "s4": "Paste it here and tap [Add] — event titles appear on the calendar. Add other calendars the same way, up to 5.",
+      "s4": "Paste it here and tap [Add] : event titles appear on the calendar. Add other calendars the same way, up to 5.",
       "open": "Open Google Calendar settings",
-      "privacy": "This address is a key to your calendar — don't share it. It's stored on this device only, never on our server."
+      "privacy": "This address is a key to your calendar : don't share it. It's stored on this device only, never on our server."
     },
     "title": "Create a seminar",
     "name": "Let's travel to a beautiful island!",
     "subTitle": "Subtitle (optional, up to 60)",
     "startAt": "Start time",
-    "maxCnt": "Capacity (1–100)",
+    "maxCnt": "Capacity (1~100)",
     "submit": "Create",
     "submitting": "Creating…",
-    "invalid": "Check your input — a date within one year from now, capacity 1–100.",
+    "invalid": "Please check the input values: a date within one year from now, and a capacity of 1-100.",
     "attendance": {
       "title": "Attendance",
       "back": "Back to seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Time attended is from first joined to last seen, minus time away (gaps longer than 2.5 minutes).",
-      "csvPiBrowser": "CSV download works only in a regular browser (computer or mobile). Pi Browser cannot save files — open this attendance sheet in a computer or phone browser (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV download is only available in regular browsers (PC/mobile). Pi Browser cannot save files. Please open the same attendance sheet in a computer or mobile browser (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Free — {time} left this month · no AI",
-    "planPaid": "{name} {time} · {price} — pay when creating",
+    "planFree": "Free: {time} remaining this month · No AI",
+    "planPaid": "{name} {time} · {price} · Payment at creation",
     "planHint": "A seminar opened on a paid plan uses that plan's time first, then continues on this month's free time (no AI in the free part). An active plan opens without payment; Monthly or Yearly you don't have is paid in Pi when you press Create, then the seminar opens (Pi Browser). Joining is always free for participants.",
-    "planOwned": "{name} — active · {time} left",
+    "planOwned": "{name}: Subscribed · {time} remaining",
     "planEnds": "The start time is after this plan's pass expires. Move the start earlier or pick another plan.",
     "paidKept": "Your paid pass is kept. Fix the issue and press Create again (no second payment)."
   },
   "privacy": {
-    "title": "Privacy Policy — Voice and AI features",
+    "title": "Privacy Policy: Voice and AI Features",
     "effective": "Effective {date}",
     "intro": "This policy explains the personal information we process when you use live captions, translated captions, voice translation, AI meeting notes and in-person notes in a seminar. These features use an external AI service, so the information is transferred abroad.",
     "whoTitle": "Whose information is processed",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Recipient",
-        "v": "Google LLC (Gemini API) — contact [TBD: Google privacy contact]"
+        "v": "Google LLC (Gemini API): Contact [Pending: Master, Google Privacy Inquiry Channel]"
       },
       {
         "k": "Countries",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Purpose",
-        "v": "Speech to text, translation, meeting-note summaries, synthetic speech (standard voices, no voice cloning), speaker separation for in-person notes (voices are told apart and labelled by perceived gender, such as Male 1 / Female 1 — no names or identities are inferred)"
+        "v": "Voice to text conversion, translation, meeting minutes summarization, synthetic voice (standard voice, no voice cloning), speaker separation in in-person notes (separates people by voice and displays as male 1, female 1 based on perceived gender, does not identify names or identities)"
       },
       {
         "k": "Retention",
-        "v": "Ends as soon as the result is returned. We ask Google not to store requests (store=false). Abuse-monitoring logs may still be kept under Google’s terms [TBD: retention period and paid-tier status]."
+        "v": "Ends immediately upon receiving processed results. We request that Google does not store requests (store=false). However, records of misuse monitoring according to Google's terms may be stored [Pending: Master, storage period and application of paid tier]."
       },
       {
         "k": "How to refuse, and what happens",
@@ -895,8 +895,8 @@
     "keep": [
       "Original audio: for seminar captions and AI meeting notes it is not stored; it is discarded right after conversion to text. For in-person notes, the recording is kept in private storage so it can be transcribed again more accurately (with speakers) after the meeting, and it is deleted at the daily cleanup once 1 day has passed since the note ended (immediately if the note is deleted).",
       "Live captions: not stored.",
-      "AI meeting notes (when the presenter turns them on): spoken content, screenshots and the summary, kept until the notes are deleted [TBD: maximum retention].",
-      "Consent records: the time of consent and the policy version, kept as proof [TBD: retention period].",
+      "AI Meeting Minutes (if enabled by presenter): Stores utterances, screenshots, and summaries until the meeting minutes are deleted [Pending: Master, maximum storage period].",
+      "Consent Records: Stores consent date and version of consented policy for proof [Pending: Master, storage period].",
       "Usage: per-minute request counts and processing time, used to enforce cost limits.",
       "Attendance: the time you joined, the time you were last connected, your display name and your Pi username are stored and given to the host as an attendance list (on screen and as a CSV download). Kept until the seminar is deleted.",
       "Q&A and polls: the question text and the asker's display name (or Pi username if none) are visible to every participant. Upvotes show only counts, never who cast them. Poll votes show only counts to participants; the organizer and admins see, for each option, the display name (or Pi username if none) of each voter. Kept, including hidden questions, until the seminar is deleted."
@@ -904,14 +904,14 @@
     "recTitle": "Recording",
     "rec": "Recordings are saved only as a file on the presenter’s device. They are not uploaded to our servers or transferred abroad. While recording or AI notes are on, every participant sees an indicator.",
     "rightsTitle": "Your rights",
-    "rights": "You can ask to access, correct, delete or stop the processing of your information. Contact: [TBD: privacy officer name and contact]"
+    "rights": "You can request access, correction, deletion, and suspension of processing of your information. Contact: [Pending: Master, Privacy Officer Name and Contact]"
   },
   "notes": {
     "title": "Notes",
     "back": "Back to seminar",
     "loading": "Loading…",
     "meta": "Notes · {date} · {min} min",
-    "aiWarn": "AI-generated summary — it may contain mistakes",
+    "aiWarn": "AI-generated summary : it may contain mistakes",
     "points": "Key points",
     "decisions": "Decisions",
     "todos": "Action items",
@@ -921,11 +921,11 @@
     "making": "Creating the notes…",
     "makingLong": "This is taking a while. Please refresh later",
     "recording": "Still recording",
-    "failed": "Couldn't create the summary — the full transcript is below",
+    "failed": "Failed to create summary. Full transcript is below.",
     "retry": "Try again",
     "finish": "End recording and summarize",
     "none": "Nothing here",
-    "blank": "Nothing to summarize — no speech was recorded or it was too short",
+    "blank": "No content to summarize. No speech was recorded or it was too short.",
     "notFound": "Notes not found",
     "forbidden": "You don't have access to these notes",
     "shotAlt": "Screen capture at {at}",
@@ -938,7 +938,7 @@
     "delYes": "Delete",
     "delNo": "Cancel",
     "delFail": "Couldn't delete",
-    "dlFail": "Couldn't download — please try again",
+    "dlFail": "Download failed. Please tap again.",
     "recentNotes": "Recent notes",
     "empty": "No notes yet",
     "newNote": "Start in-person notes",
@@ -959,12 +959,12 @@
     "aiOff": "AI notes aren't available right now (server setup needed). Past notes are listed below",
     "reload": "Reload",
     "unsupported": "Recording is not available on this device",
-    "micDenied": "Can't use the microphone — check the permission",
-    "limited": "The processing time limit is used up — end and create the notes",
-    "noAgr": "Stopped: no notice confirmation on record — end and start again",
-    "micLost": "The microphone disconnected and recording stopped — tap Reconnect microphone or end the note",
+    "micDenied": "Microphone is unavailable. Please check permissions.",
+    "limited": "Processing time limit reached. Please end and generate meeting minutes.",
+    "noAgr": "Stopped due to missing notification confirmation record. Please end and restart.",
+    "micLost": "Microphone connection lost, recording stopped. Please tap [Reconnect Microphone] or end.",
     "micRetry": "Reconnect microphone",
-    "gone": "This note was ended or deleted elsewhere, so recording stopped — use the button below to open the notes",
+    "gone": "This note was ended or deleted on another screen, so recording has stopped. Please check the meeting minutes using the button below.",
     "finishing": "Saving the last words…",
     "st": {
       "RECORDING": "Recording",
@@ -972,7 +972,7 @@
       "DONE": "Done",
       "FAILED": "Failed"
     },
-    "downloadPiBrowser": "Download Markdown works only in a regular browser (computer or mobile). Pi Browser cannot save files — open these notes in a computer or phone browser (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdown download is only available in regular browsers (PC/mobile). Pi Browser cannot save files. Please open the same meeting minutes in a computer or mobile browser (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Plans",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} connected",
     "producers": "{n} streams",
     "end": "Ends {time}",
-    "stale": "The seminar has ended but the room is still open on the video server — force close it.",
+    "stale": "The seminar has ended, but rooms remain on the video server. Please force close them.",
     "close": "Force close",
     "confirmSeminar": "This ends the seminar and closes the room. Everyone will be disconnected.",
     "confirmRoom": "This closes the room. Everyone will be disconnected.",
@@ -1063,7 +1063,7 @@
     "cancel": "Cancel",
     "saving": "Saving…",
     "done": "Applied. {plan} time remaining: {time}",
-    "invalid": "Enter a reduction between 1 minute and 1000 hours (whole minutes 0–59).",
+    "invalid": "Enter a reduction between 1 minute and 1000 hours (whole minutes 0~59).",
     "history": "Recent adjustments",
     "noHistory": "No adjustments yet.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

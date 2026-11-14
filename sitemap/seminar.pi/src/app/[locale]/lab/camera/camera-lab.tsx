@@ -84,7 +84,7 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
       if (sender) await sender.replaceTrack(s.getVideoTracks()[0])
     } catch (e) {
       const err = e as Error
-      setCamInfo(`실패 : ${err.name} — ${err.message}`)
+      setCamInfo(`실패 : ${err.name}. ${err.message}`)
       add(`카메라 실패 ${err.name}`)
     }
   }
@@ -173,7 +173,7 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
   }
 
   function join() {
-    if (!signalUrl || !signalKey) return add('시그널링 env 미설정 — 기기 2대 연결 불가')
+    if (!signalUrl || !signalKey) return add('시그널링 env 미설정 : 기기 2대 연결 불가')
     if (!streamRef.current) return add('먼저 카메라를 켜세요')
     leave()
     const ch = createClient(signalUrl, signalKey).channel(`lab-camera:${room}`, {
@@ -249,7 +249,7 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
       await navigator.clipboard.writeText(report)
       add('결과 복사됨')
     } catch {
-      add('복사 실패 — 아래 결과 칸을 길게 눌러 복사하세요')
+      add('복사 실패 : 아래 결과 칸을 길게 눌러 복사하세요')
     }
   }
 
@@ -292,7 +292,7 @@ export function CameraLab({ signalUrl, signalKey }: { signalUrl?: string; signal
       <section className="space-y-2">
         <h2 className="text-sm font-semibold">③ 기기 2대 연결 (같은 방 코드, 같은 Wi-Fi 권장)</h2>
         {!signalUrl || !signalKey ? (
-          <p className="text-sm text-amber-400">시그널링 env(NEXT_PUBLIC_LAB_SUPABASE_*) 미설정 — 이 단계는 비활성</p>
+          <p className="text-sm text-amber-400">시그널링 env(NEXT_PUBLIC_LAB_SUPABASE_*) 미설정 : 이 단계는 비활성</p>
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
           <input

@@ -6,7 +6,7 @@
   "home": {
     "description": "Gestgjafar opna námskeið og þátttakendur taka þátt í lifandi myndbandsfundum með Pi.",
     "badge": "Lifandi námskeið á fallegum eyjum",
-    "headline": "Horfa, hlusta og læra saman — í beinni",
+    "headline": "Horfa, hlusta og læra saman : í beinni",
     "ctaBrowse": "Skoða námskeið",
     "ctaPlan": "Sjá áætlanir",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Námskeið",
     "cal": {
       "title": "Dagatal námskeiða",
-      "desc": "Frá fyrri námskeiðum til komandi — bankaðu á dagsetningu fyrir nánari upplýsingar.",
+      "desc": "Frá fyrri málstofum til þeirra sem eru framundan: pikkaðu á dagsetningu til að fá nánari upplýsingar.",
       "legendSmn": "Námskeið",
       "legendEnded": "Fyrri námskeið",
       "legendMine": "Mínir viðburðir",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Lifandi myndbandsnámskeið",
-        "desc": "Okkar eigin myndbandsvél Galápagos — markmiðið er einn kynnir sem streymir til allt að 30 þátttakenda"
+        "desc": "Okkar eigin myndbandsvél Galápagos: Markmiðið er að einn kynnir geti sent myndband til allt að 30 áhorfenda."
       },
       "F02": {
         "name": "Búa til námskeið",
@@ -254,7 +254,7 @@
       "dubbing": "Gerviraddspilun og lækkað upprunalegt hljóð"
     },
     "refLabel": "Viðmiðunarlíkan",
-    "uiRef": "Viðmótsgrunnur — skjá- og eiginleikamynstur víða notaðs vefmyndbandsfundarforrits, aðlagað fyrir seminar.pi"
+    "uiRef": "Viðmótsstaðlar: Að beita skjá- og eiginleikamynstrum vinsælla vefráðstefnuforrita á seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Áhorfendur nota ekki myndavél eða hljóðnema. Eftir að þú tekur þátt muntu sjá og heyra kynninn.",
     "preview": {
       "pending": "Undirbýr myndavél og hljóðnema…",
-      "audioOnly": "Myndavél ófáanleg — sendi aðeins hljóð.",
+      "audioOnly": "Myndavél ófáanleg : sendi aðeins hljóð.",
       "none": "Myndavél og hljóðnemi ófáanleg. Athugaðu heimildir (þú getur samt tekið þátt án miðla).",
-      "videoOnly": "Hljóðnemi ófáanlegur — sendi aðeins myndband. Athugaðu heimild fyrir hljóðnema."
+      "videoOnly": "Hljóðnemi ófáanlegur : sendi aðeins myndband. Athugaðu heimild fyrir hljóðnema."
     },
     "mic": {
       "on": "Slökkva á hljóðnema",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Aðgangspassinn þinn er útrunninn.",
       "TICKET_EXPIRED": "Aðgangspassinn þinn er útrunninn.",
       "ROOM_FULL": "Þessi seminar er full.",
-      "ROOM_CLOSED": "Herberginu var lokað — seminarinu lauk eða gestgjafinn var fjarverandi í meira en 5 mínútur.",
+      "ROOM_CLOSED": "Herbergið er lokað. Málstofunni er lokið eða gestgjafinn hefur verið fjarverandi í meira en 5 mínútur.",
       "DUPLICATE_SESSION": "Þú tókst þátt frá öðru tæki, svo þessi skjár var aftengdur.",
       "ROLE_FORBIDDEN": "Þú hefur ekki leyfi til að kynna.",
       "WS_FAILED": "Gat ekki tengst myndbandsþjóninum.",
@@ -488,7 +488,7 @@
     "toDetail": "Fara á seminarsíðu",
     "consent": {
       "title": "Áður en þú kveikir á hljóðnemanum þínum",
-      "body": "Ef upptaka, textar eða AI fundarskýrslur eru kveikt á í þessu seminari, getur rödd þín verið umbreytt í texta, vistuð og þýdd. Raddvinnsla er framkvæmd af AI þjónustu utan lands þíns. Ef þú samþykkir ekki, kveikir hljóðneminn þinn samt á — aðeins rödd þín er undanskilin vinnslu.",
+      "body": "Ef upptaka, textar eða AI fundarskýrslur eru kveikt á í þessu seminari, getur rödd þín verið umbreytt í texta, vistuð og þýdd. Raddvinnsla er framkvæmd af AI þjónustu utan lands þíns. Ef þú samþykkir ekki, kveikir hljóðneminn þinn samt á : aðeins rödd þín er undanskilin vinnslu.",
       "privacy": "Persónuverndarstefna",
       "newTab": "(opnast í nýjum flipa)",
       "decline": "Samþykki ekki",
@@ -613,7 +613,7 @@
       "title": "Upptaka",
       "badge": "Upptaka",
       "unsupported": "Þessi vafri getur ekki tekið upp. Vinsamlegast taktu upp úr venjulegum vafra á tölvu.",
-      "piBrowserOnly": "Upptaka virkar aðeins í venjulegum vafra (tölvu eða farsíma). Pi Browser getur ekki vistað upptökuskrár — opnaðu þetta seminar í tölvu- eða símafara (seminarz.vercel.app) til að taka upp.",
+      "piBrowserOnly": "Upptaka er aðeins í boði í venjulegum vöfrum (PC/farsíma). Pi Browser getur ekki vistað upptökuskrár. Vinsamlegast opnaðu sömu málstofu í tölvu- eða farsímavafra (seminarz.vercel.app) til að taka upp.",
       "audioSuspended": "Hljóðupptaka gæti ekki hafa byrjað á þessu tæki. Aðeins myndin gæti verið tekin upp.",
       "notifyFailed": "Upptaka byrjaði ekki vegna þess að ekki var hægt að tilkynna þátttakendum. Vinsamlegast reyndu aftur eftir smá stund.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Loka vista aftur"
       },
       "toast": {
-        "started": "Upptaka hafin — allir geta séð hana",
+        "started": "Upptaka er hafin. Þetta verður sýnt öllum þátttakendum.",
         "saved": "Upptaka vistuð. Athugaðu niðurhalsmöppuna þína. Ef ekkert var vistað, pikkaðu á [Vista aftur] efst á skjánum.",
         "autoStopped": "Upptöku lauk vegna þess að vafrinn stöðvaði hana eða stærðarmörkum var náð. Allt fram að þeim tímapunkti var vistað. Byrjaðu upptöku aftur til að halda áfram.",
         "empty": "Ekkert var tekið upp, svo engin skrá var búin til.",
@@ -656,10 +656,10 @@
       "badge": "AI minnispunktar á",
       "started": "Kynnir kveikti á AI minnispunktum",
       "stopped": "AI minnispunktar slökktir",
-      "startedMine": "AI minnispunktar á — sýndir öllum",
-      "stoppedMine": "AI minnispunktar slökktir — verið að búa til minnispunktana",
+      "startedMine": "AI fundargerðir hafnar. Þetta verður sýnt öllum þátttakendum.",
+      "stoppedMine": "AI fundargerðir stöðvaðar. Fundargerðir eru í vinnslu.",
       "startFail": "Gat ekki ræst AI minnispunkta",
-      "gone": "AI minnispunktar stöðvaðir — minnispunktunum var lokið eða þeim eytt annars staðar",
+      "gone": "AI minnispunktar stöðvaðir : minnispunktunum var lokið eða þeim eytt annars staðar",
       "unsupported": "Ekki hægt að kveikja á AI minnispunktum hér (engin hljóðupptökustuðningur)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Pikkaðu á [Opna Google dagatalsstillingar] hér að neðan.",
       "s2": "Undir 'Stillingar fyrir dagatölin mín' til vinstri, veldu dagatal (t.d. nafnið þitt).",
       "s3": "Skrunaðu að 'Samþætta dagatal' og afritaðu 'Leyndarmál heimilisfang á iCal sniði'.",
-      "s4": "Límdu það hér og pikkaðu á [Bæta við] — titlar viðburða birtast á dagatalinu. Bættu við öðrum dagatölum á sama hátt, allt að 5.",
+      "s4": "Límdu það hér og pikkaðu á [Bæta við] : titlar viðburða birtast á dagatalinu. Bættu við öðrum dagatölum á sama hátt, allt að 5.",
       "open": "Opna Google dagatalsstillingar",
-      "privacy": "Þetta heimilisfang er lykill að dagatalinu þínu — ekki deila því. Það er aðeins geymt á þessu tæki, aldrei á netþjóninum okkar."
+      "privacy": "Þetta heimilisfang er lykill að dagatalinu þínu : ekki deila því. Það er aðeins geymt á þessu tæki, aldrei á netþjóninum okkar."
     },
     "title": "Búa til seminar",
     "name": "Förum í ferðalag til fallegra eyja!",
     "subTitle": "Undirtitill (valfrjálst, allt að 60)",
     "startAt": "Upphafstími",
-    "maxCnt": "Fjöldi (1–100)",
+    "maxCnt": "Fjöldi (1~100)",
     "submit": "Búa til",
     "submitting": "Býr til…",
-    "invalid": "Athugaðu inntak þitt — dagsetning innan eins árs frá nú, fjöldi 1–100.",
+    "invalid": "Vinsamlegast athugaðu inntaksgildin: dagsetning innan eins árs frá nú, og getu 1-100.",
     "attendance": {
       "title": "Mæting",
       "back": "Til baka í seminar",
@@ -840,18 +840,18 @@
         "state": "Staða"
       },
       "durNote": "Tími mættur er frá fyrstu þátttöku til síðustu sýningar, mínus tími í burtu (bil lengri en 2,5 mínútur).",
-      "csvPiBrowser": "CSV niðurhal virkar aðeins í venjulegum vafra (tölvu eða farsíma). Pi Browser getur ekki vistað skrár — opnaðu þetta mætingarblað í tölvu- eða símafara (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV niðurhal er aðeins í boði í venjulegum vöfrum (PC/farsíma). Pi Browser getur ekki vistað skrár. Vinsamlegast opnaðu sömu mætingarlista í tölvu- eða farsímavafra (seminarz.vercel.app)."
     },
     "plan": "Áætlun",
-    "planFree": "Ókeypis — {time} eftir þennan mánuð · engin AI",
-    "planPaid": "{name} {time} · {price} — greiða við stofnun",
+    "planFree": "Ókeypis: {time} eftir þennan mánuð · Engin gervigreind",
+    "planPaid": "{name} {time} · {price} · Greiðsla við stofnun",
     "planHint": "Seminar opnað á greiddri áætlun notar tíma þeirrar áætlunar fyrst, heldur síðan áfram á ókeypis tíma þessa mánaðar (engin AI í ókeypis hlutanum). Virk áætlun opnast án greiðslu; Mánaðarleg eða Árleg sem þú hefur ekki er greidd í Pi þegar þú ýtir á Búa til, þá opnast seminarið (Pi Browser). Þátttaka er alltaf ókeypis fyrir þátttakendur.",
-    "planOwned": "{name} — virk · {time} eftir",
+    "planOwned": "{name}: Skráð · {time} eftir",
     "planEnds": "Upphafstíminn er eftir að þessi áætlun rennur út. Færðu upphafstímann fyrr eða veldu aðra áætlun.",
     "paidKept": "Greiddur aðgangur þinn er geymdur. Lagfærðu vandamálið og ýttu aftur á Búa til (engin önnur greiðsla)."
   },
   "privacy": {
-    "title": "Persónuverndarstefna — Radd- og AI-eiginleikar",
+    "title": "Persónuverndarstefna: Radd- og gervigreindareiginleikar",
     "effective": "Gildistími {date}",
     "intro": "Þessi stefna útskýrir persónuupplýsingarnar sem við vinnum þegar þú notar lifandi texta, þýdda texta, raddþýðingu, AI fundarminnispunkta og persónulega minnispunkta í seminari. Þessir eiginleikar nota ytri AI þjónustu, svo upplýsingarnar eru fluttar erlendis.",
     "whoTitle": "Hvers upplýsingar eru unnar",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Viðtakandi",
-        "v": "Google LLC (Gemini API) — hafðu samband [TBD: Google persónuverndarsamband]"
+        "v": "Google LLC (Gemini API): Tengiliður [Í bið: Master, Google Privacy Inquiry Channel]"
       },
       {
         "k": "Lönd",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Tilgangur",
-        "v": "Tal í texta, þýðing, samantektir fundarminnispunkta, gervital (staðlaðar raddir, engin raddklónun), aðskilnaður ræðumanna fyrir persónulega minnispunkta (raddir eru aðgreindar og merktar eftir skynjuðu kyni, svo sem Karl 1 / Kona 1 — engin nöfn eða auðkenni eru ályktuð)"
+        "v": "Umbreyting raddar í texta, þýðing, samantekt fundargerða, gervirödd (staðlað rödd, engin raddklónun), aðgreining ræðumanna í persónulegum athugasemdum (aðgreinir fólk eftir rödd og sýnir sem karl 1, kona 1 byggt á skynjuðu kyni, auðkennir ekki nöfn eða auðkenni)"
       },
       {
         "k": "Varðveisla",
-        "v": "Lýkur um leið og niðurstaðan er skilað. Við biðjum Google að geyma ekki beiðnir (store=false). Misnotkunarvöktunarskrár kunna samt að vera geymdar samkvæmt skilmálum Google [TBD: varðveislutími og staða greidds stigs]."
+        "v": "Lýkur strax við móttöku unninna niðurstaðna. Við biðjum Google um að geyma ekki beiðnir (store=false). Hins vegar geta skrár um misnotkunareftirlit samkvæmt skilmálum Google verið geymdar [Í bið: Master, geymslutími og beiting greidds stigs]."
       },
       {
         "k": "Hvernig á að neita, og hvað gerist",
@@ -895,8 +895,8 @@
     "keep": [
       "Upprunalegt hljóð: fyrir seminartitla og AI fundarminnispunkta er það ekki geymt; því er hent strax eftir umbreytingu í texta. Fyrir persónulega minnispunkta er upptakan geymd í einkageymslu svo hægt sé að umrita hana aftur nákvæmar (með ræðumönnum) eftir fundinn, og henni er eytt við daglega hreinsun þegar 1 dagur er liðinn frá því að minnispunkturinn lauk (strax ef minnispunkturinn er eytt).",
       "Lifandi textar: ekki geymdir.",
-      "AI fundarminnispunktar (þegar kynnir kveikir á þeim): talað efni, skjámyndir og samantektin, geymd þar til minnispunktunum er eytt [TBD: hámarks varðveisla].",
-      "Samþykkisskrár: tími samþykkis og útgáfa stefnunnar, geymd sem sönnun [TBD: varðveislutími].",
+      "AI fundargerðir (ef kveikt er á af kynni): Geymir framsögur, skjámyndir og samantektir þar til fundargerðum er eytt [Í bið: Master, hámarks geymslutími].",
+      "Samþykkisskrár: Geymir samþykkisdagsetningu og útgáfu samþykktrar stefnu til sönnunar [Í bið: Master, geymslutími].",
       "Notkun: fjöldi beiðna á mínútu og vinnslutími, notað til að framfylgja kostnaðartakmörkunum.",
       "Mæting: tíminn sem þú tókst þátt, tíminn sem þú varst síðast tengdur, birtingarnafn þitt og Pi notandanafn þitt eru geymd og gefin gestgjafanum sem mætingarlisti (á skjá og sem CSV niðurhal). Geymt þar til seminarið er eytt.",
       "Spurningar og svör og kannanir: spurningatextinn og birtingarnafn spyrjanda (eða Pi notandanafn ef ekkert) eru sýnileg öllum þátttakendum. Uppkosningar sýna aðeins fjölda, aldrei hverjir kusu. Kannanir sýna aðeins fjölda fyrir þátttakendur; skipuleggjandi og stjórnendur sjá, fyrir hvern valkost, birtingarnafn (eða Pi notandanafn ef ekkert) hvers kjósanda. Geymt, þar á meðal faldar spurningar, þar til seminarið er eytt."
@@ -904,14 +904,14 @@
     "recTitle": "Upptaka",
     "rec": "Upptökur eru aðeins vistaðar sem skrá á tæki kynnisins. Þær eru ekki hlaðnar upp á netþjóna okkar eða fluttar erlendis. Á meðan upptaka eða AI minnispunktar eru á, sér hver þátttakandi vísir.",
     "rightsTitle": "Réttindi þín",
-    "rights": "Þú getur beðið um að fá aðgang að, leiðrétta, eyða eða stöðva vinnslu upplýsinga þinna. Hafðu samband: [TBD: nafn og tengiliður persónuverndarfulltrúa]"
+    "rights": "Þú getur óskað eftir aðgangi, leiðréttingu, eyðingu og stöðvun vinnslu upplýsinga þinna. Tengiliður: [Í bið: Master, nafn og tengiliður persónuverndarfulltrúa]"
   },
   "notes": {
     "title": "Minnispunktar",
     "back": "Til baka í seminar",
     "loading": "Hleðst…",
     "meta": "Minnispunktar · {date} · {min} mín",
-    "aiWarn": "AI-mynduð samantekt — hún gæti innihaldið villur",
+    "aiWarn": "AI-mynduð samantekt : hún gæti innihaldið villur",
     "points": "Helstu atriði",
     "decisions": "Ákvarðanir",
     "todos": "Verkefni",
@@ -921,11 +921,11 @@
     "making": "Býr til minnispunktana…",
     "makingLong": "Þetta tekur smá tíma. Vinsamlegast endurnýjaðu síðar",
     "recording": "Enn að taka upp",
-    "failed": "Gat ekki búið til samantektina — öll umritunin er hér að neðan",
+    "failed": "Ekki tókst að búa til samantekt. Full afrit er hér fyrir neðan.",
     "retry": "Reyna aftur",
     "finish": "Loka upptöku og draga saman",
     "none": "Ekkert hér",
-    "blank": "Ekkert til að draga saman — engin ræða var tekin upp eða hún var of stutt",
+    "blank": "Ekkert efni til að draga saman. Engin ræða var tekin upp eða hún var of stutt.",
     "notFound": "Minnispunktar fundust ekki",
     "forbidden": "Þú hefur ekki aðgang að þessum minnispunktum",
     "shotAlt": "Skjámynd klukkan {at}",
@@ -938,7 +938,7 @@
     "delYes": "Eyða",
     "delNo": "Hætta við",
     "delFail": "Gat ekki eytt",
-    "dlFail": "Gat ekki hlaðið niður — vinsamlegast reyndu aftur",
+    "dlFail": "Niðurhal mistókst. Vinsamlegast pikkaðu aftur.",
     "recentNotes": "Nýlegir minnispunktar",
     "empty": "Engir minnispunktar ennþá",
     "newNote": "Byrja persónulega minnispunkta",
@@ -959,12 +959,12 @@
     "aiOff": "AI glósur eru ekki tiltækar núna (þarf að setja upp netþjón). Fyrri glósur eru taldar upp hér að neðan",
     "reload": "Endurhlaða",
     "unsupported": "Upptaka er ekki í boði á þessu tæki",
-    "micDenied": "Get ekki notað hljóðnemann — athugaðu heimildir",
-    "limited": "Vinnslutímatakmörkun er uppurin — ljúktu og búðu til glósurnar",
-    "noAgr": "Stöðvað: engin tilkynning staðfest við upptöku — ljúktu og byrjaðu aftur",
-    "micLost": "Hljóðneminn aftengdist og upptaka stöðvaðist — pikkaðu á Tengja hljóðnema aftur eða ljúktu glósunni",
+    "micDenied": "Hljóðnemi er ekki tiltækur. Vinsamlegast athugaðu heimildir.",
+    "limited": "Tímatakmörkun vinnslu náð. Vinsamlegast ljúktu og búðu til fundargerðir.",
+    "noAgr": "Stöðvað vegna skorts á staðfestingarskrá tilkynningar. Vinsamlegast ljúktu og endurræstu.",
+    "micLost": "Hljóðnematenging rofnaði, upptaka stöðvuð. Vinsamlegast pikkaðu á [Tengja hljóðnema aftur] eða ljúktu.",
     "micRetry": "Tengja hljóðnema aftur",
-    "gone": "Þessari glósu var lokið eða henni eytt annars staðar, svo upptaka stöðvaðist — notaðu hnappinn hér að neðan til að opna glósurnar",
+    "gone": "Þessari athugasemd var lokið eða henni eytt á öðrum skjá, svo upptaka hefur stöðvast. Vinsamlegast athugaðu fundargerðirnar með hnappinum hér fyrir neðan.",
     "finishing": "Vista síðustu orðin…",
     "st": {
       "RECORDING": "Tek upp",
@@ -972,7 +972,7 @@
       "DONE": "Lokið",
       "FAILED": "Mistókst"
     },
-    "downloadPiBrowser": "Niðurhal á Markdown virkar aðeins í venjulegum vafra (tölvu eða farsíma). Pi Browser getur ekki vistað skrár — opnaðu þessar glósur í tölvu- eða símafara (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdown niðurhal er aðeins í boði í venjulegum vöfrum (PC/farsíma). Pi Browser getur ekki vistað skrár. Vinsamlegast opnaðu sömu fundargerðir í tölvu- eða farsímavafra (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Áætlanir",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} tengdir",
     "producers": "{n} straumar",
     "end": "Lýkur {time}",
-    "stale": "Námskeiðinu er lokið en herbergið er enn opið á myndbandsþjóninum — lokaðu því með valdi.",
+    "stale": "Málstofunni er lokið, en herbergi eru eftir á myndbandsþjóninum. Vinsamlegast lokaðu þeim með valdi.",
     "close": "Loka með valdi",
     "confirmSeminar": "Þetta lýkur námskeiðinu og lokar herberginu. Allir verða aftengdir.",
     "confirmRoom": "Þetta lokar herberginu. Allir verða aftengdir.",
@@ -1063,7 +1063,7 @@
     "cancel": "Hætta við",
     "saving": "Vista…",
     "done": "Beitt. {plan} tími eftir: {time}",
-    "invalid": "Sláðu inn minnkun á milli 1 mínútu og 1000 klukkustunda (heilar mínútur 0–59).",
+    "invalid": "Sláðu inn minnkun á milli 1 mínútu og 1000 klukkustunda (heilar mínútur 0~59).",
     "history": "Nýlegar aðlaganir",
     "noHistory": "Engar aðlaganir ennþá.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

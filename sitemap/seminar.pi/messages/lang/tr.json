@@ -6,7 +6,7 @@
   "home": {
     "description": "Ev sahipleri seminerler düzenler ve katılımcılar Pi ile canlı video oturumlarına katılır.",
     "badge": "Güzel adalarda canlı seminerler",
-    "headline": "İzleyin, dinleyin ve birlikte öğrenin — canlı",
+    "headline": "İzleyin, dinleyin ve birlikte öğrenin : canlı",
     "ctaBrowse": "Seminerlere göz at",
     "ctaPlan": "Planları gör",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminerler",
     "cal": {
       "title": "Seminer takvimi",
-      "desc": "Geçmiş seminerlerden gelecektekilere — ayrıntılar için bir tarihe dokunun.",
+      "desc": "Geçmiş seminerlerden gelecek seminerlere: Ayrıntılar için bir tarihe dokunun.",
       "legendSmn": "Seminerler",
       "legendEnded": "Geçmiş seminerler",
       "legendMine": "Etkinliklerim",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Canlı video semineri",
-        "desc": "Kendi video motorumuz Galápagos — hedef, bir sunucunun 30 katılımcıya kadar yayın yapmasıdır"
+        "desc": "Kendi video motorumuz Galápagos: Bir sunucunun en fazla 30 izleyiciye video göndermesi hedefleniyor."
       },
       "F02": {
         "name": "Seminer oluştur",
@@ -254,7 +254,7 @@
       "dubbing": "Sentetik ses çalma ve kısılmış orijinal ses"
     },
     "refLabel": "Referans model",
-    "uiRef": "UI temel çizgisi — yaygın olarak kullanılan bir web video toplantı uygulamasının ekran ve özellik desenleri, seminar.pi için uyarlanmıştır"
+    "uiRef": "Kullanıcı Arayüzü Standartları: Popüler web konferans uygulamalarının ekran ve özellik kalıplarını seminar.pi'ye uyguluyoruz."
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "İzleyiciler kamera veya mikrofon kullanmaz. Katıldıktan sonra sunucuyu görecek ve duyacaksınız.",
     "preview": {
       "pending": "Kamera ve mikrofon hazırlanıyor…",
-      "audioOnly": "Kamera kullanılamıyor — sadece ses gönderiliyor.",
+      "audioOnly": "Kamera kullanılamıyor : sadece ses gönderiliyor.",
       "none": "Kamera ve mikrofon kullanılamıyor. İzinleri kontrol edin (medya olmadan da katılabilirsiniz).",
-      "videoOnly": "Mikrofon kullanılamıyor — sadece video gönderiliyor. Mikrofon iznini kontrol edin."
+      "videoOnly": "Mikrofon kullanılamıyor : sadece video gönderiliyor. Mikrofon iznini kontrol edin."
     },
     "mic": {
       "on": "Mikrofonu kapat",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Giriş geçişinizin süresi doldu.",
       "TICKET_EXPIRED": "Giriş geçişinizin süresi doldu.",
       "ROOM_FULL": "Bu seminer dolu.",
-      "ROOM_CLOSED": "Oda kapatıldı — seminer sona erdi veya sunucu 5 dakikadan fazla uzaktaydı.",
+      "ROOM_CLOSED": "Oda kapalı. Seminer sona ermiş veya sunucu 5 dakikadan uzun süredir odada değil.",
       "DUPLICATE_SESSION": "Başka bir cihazdan katıldığınız için bu ekranın bağlantısı kesildi.",
       "ROLE_FORBIDDEN": "Sunum yapma izniniz yok.",
       "WS_FAILED": "Video sunucusuna bağlanılamadı.",
@@ -488,7 +488,7 @@
     "toDetail": "Seminer sayfasına git",
     "consent": {
       "title": "Mikrofonunuzu açmadan önce",
-      "body": "Bu seminerde kayıt, altyazı veya yapay zeka toplantı notları açıksa, sesiniz metne dönüştürülebilir, saklanabilir ve çevrilebilir. Ses işleme, ülkeniz dışındaki bir yapay zeka hizmeti tarafından yapılır. Kabul etmezseniz, mikrofonunuz yine de açılır — sadece sesiniz işleme dahil edilmez.",
+      "body": "Bu seminerde kayıt, altyazı veya yapay zeka toplantı notları açıksa, sesiniz metne dönüştürülebilir, saklanabilir ve çevrilebilir. Ses işleme, ülkeniz dışındaki bir yapay zeka hizmeti tarafından yapılır. Kabul etmezseniz, mikrofonunuz yine de açılır : sadece sesiniz işleme dahil edilmez.",
       "privacy": "Gizlilik politikası",
       "newTab": "(yeni sekmede açılır)",
       "decline": "Kabul etmiyorum",
@@ -613,7 +613,7 @@
       "title": "Kaydet",
       "badge": "Kaydediliyor",
       "unsupported": "Bu tarayıcı kayıt yapamaz. Lütfen bir bilgisayardaki normal bir tarayıcıdan kayıt yapın.",
-      "piBrowserOnly": "Kayıt yalnızca normal bir tarayıcıda (bilgisayar veya mobil) çalışır. Pi Browser kayıt dosyalarını kaydedemez — kayıt yapmak için bu semineri bir bilgisayar veya telefon tarayıcısında (seminarz.vercel.app) açın.",
+      "piBrowserOnly": "Kaydetme yalnızca normal tarayıcılarda (PC/mobil) kullanılabilir. Pi Browser kaydedilen dosyaları kaydedemez. Kaydetmek için lütfen aynı semineri bir bilgisayar veya mobil tarayıcıda (seminarz.vercel.app) açın.",
       "audioSuspended": "Bu cihazda ses kaydı başlamamış olabilir. Yalnızca görüntü kaydedilebilir.",
       "notifyFailed": "Katılımcılar bilgilendirilemediği için kayıt başlamadı. Lütfen kısa süre sonra tekrar deneyin.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Tekrar kaydetmeyi kapat"
       },
       "toast": {
-        "started": "Kayıt başladı — herkes görebilir",
+        "started": "Kaydetme başladı. Bu, tüm katılımcılara gösterilecektir.",
         "saved": "Kayıt kaydedildi. İndirme klasörünüzü kontrol edin. Hiçbir şey kaydedilmediyse, ekranın üstündeki [Tekrar kaydet] düğmesine dokunun.",
         "autoStopped": "Tarayıcı kaydı durdurduğu veya boyut limitine ulaşıldığı için kayıt sona erdi. O ana kadar her şey kaydedildi. Devam etmek için kaydı tekrar başlatın.",
         "empty": "Hiçbir şey kaydedilmediği için dosya oluşturulmadı.",
@@ -656,10 +656,10 @@
       "badge": "AI notları açık",
       "started": "Sunucu AI notlarını açtı",
       "stopped": "AI notları kapatıldı",
-      "startedMine": "AI notları açık — herkese gösteriliyor",
-      "stoppedMine": "AI notları kapalı — notlar oluşturuluyor",
+      "startedMine": "AI toplantı tutanakları başlatıldı. Bu, tüm katılımcılara gösterilecektir.",
+      "stoppedMine": "AI toplantı tutanakları durduruldu. Toplantı tutanakları oluşturuluyor.",
       "startFail": "AI notları başlatılamadı",
-      "gone": "AI notları durduruldu — notlar başka bir yerde sonlandırıldı veya silindi",
+      "gone": "AI notları durduruldu : notlar başka bir yerde sonlandırıldı veya silindi",
       "unsupported": "AI notları burada açılamaz (ses kaydı desteği yok)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Aşağıdaki [Google Takvim ayarlarını aç] düğmesine dokunun.",
       "s2": "Soldaki 'Takvimlerim için ayarlar' altında bir takvim seçin (örn. adınız).",
       "s3": "'Takvimi entegre et' bölümüne ilerleyin ve 'iCal biçimindeki gizli adres'i kopyalayın.",
-      "s4": "Buraya yapıştırın ve [Ekle] düğmesine dokunun — etkinlik başlıkları takvimde görünür. Diğer takvimleri de aynı şekilde, en fazla 5 tane ekleyebilirsiniz.",
+      "s4": "Buraya yapıştırın ve [Ekle] düğmesine dokunun : etkinlik başlıkları takvimde görünür. Diğer takvimleri de aynı şekilde, en fazla 5 tane ekleyebilirsiniz.",
       "open": "Google Takvim ayarlarını aç",
-      "privacy": "Bu adres takviminizin anahtarıdır — kimseyle paylaşmayın. Yalnızca bu cihazda saklanır, sunucumuzda asla saklanmaz."
+      "privacy": "Bu adres takviminizin anahtarıdır : kimseyle paylaşmayın. Yalnızca bu cihazda saklanır, sunucumuzda asla saklanmaz."
     },
     "title": "Seminer oluştur",
     "name": "Güzel bir adaya seyahat edelim!",
     "subTitle": "Alt başlık (isteğe bağlı, 60 karaktere kadar)",
     "startAt": "Başlangıç zamanı",
-    "maxCnt": "Kapasite (1–100)",
+    "maxCnt": "Kapasite (1~100)",
     "submit": "Oluştur",
     "submitting": "Oluşturuluyor…",
-    "invalid": "Girişinizi kontrol edin — bugünden itibaren bir yıl içinde bir tarih, kapasite 1–100.",
+    "invalid": "Lütfen giriş değerlerini kontrol edin: şimdiden itibaren bir yıl içindeki bir tarih ve 1-100 kişilik bir kapasite.",
     "attendance": {
       "title": "Katılım",
       "back": "Seminere geri dön",
@@ -840,18 +840,18 @@
         "state": "Durum"
       },
       "durNote": "Katılım süresi, ilk katılımdan son görülmeye kadar olan süredir, uzakta geçirilen süre (2,5 dakikadan uzun boşluklar) çıkarılmıştır.",
-      "csvPiBrowser": "CSV indirme yalnızca normal bir tarayıcıda (bilgisayar veya mobil) çalışır. Pi Browser dosyaları kaydedemez — bu katılım sayfasını bir bilgisayar veya telefon tarayıcısında (seminarz.vercel.app) açın."
+      "csvPiBrowser": "CSV indirme yalnızca normal tarayıcılarda (PC/mobil) kullanılabilir. Pi Browser dosyaları kaydedemez. Lütfen aynı katılım listesini bir bilgisayar veya mobil tarayıcıda (seminarz.vercel.app) açın."
     },
     "plan": "Plan",
-    "planFree": "Ücretsiz — bu ay {time} kaldı · AI yok",
-    "planPaid": "{name} {time} · {price} — oluştururken öde",
+    "planFree": "Ücretsiz: Bu ay {time} kaldı · AI yok",
+    "planPaid": "{name} {time} · {price} · Oluşturma sırasında ödeme",
     "planHint": "Ücretli bir planla açılan bir seminer, önce o planın süresini kullanır, ardından bu ayın ücretsiz süresiyle devam eder (ücretsiz kısımda AI yok). Aktif bir plan ödeme yapmadan açılır; sahip olmadığınız Aylık veya Yıllık plan, Oluştur'a bastığınızda Pi ile ödenir, ardından seminer açılır (Pi Browser). Katılımcılar için katılım her zaman ücretsizdir.",
-    "planOwned": "{name} — aktif · {time} kaldı",
+    "planOwned": "{name}: Abone olundu · Kalan süre {time}",
     "planEnds": "Başlangıç zamanı bu planın süresi dolduktan sonradır. Başlangıcı daha erkene alın veya başka bir plan seçin.",
     "paidKept": "Ücretli geçişiniz saklanır. Sorunu düzeltin ve tekrar Oluştur'a basın (ikinci ödeme yok)."
   },
   "privacy": {
-    "title": "Gizlilik Politikası — Ses ve AI özellikleri",
+    "title": "Gizlilik Politikası: Ses ve AI Özellikleri",
     "effective": "Yürürlük tarihi {date}",
     "intro": "Bu politika, bir seminerde canlı altyazılar, çevrilmiş altyazılar, sesli çeviri, AI toplantı notları ve yüz yüze notlar kullandığınızda işlediğimiz kişisel bilgileri açıklar. Bu özellikler harici bir AI hizmeti kullandığından, bilgiler yurt dışına aktarılır.",
     "whoTitle": "Kimlerin bilgileri işlenir",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Alıcı",
-        "v": "Google LLC (Gemini API) — iletişim [TBD: Google gizlilik iletişim]"
+        "v": "Google LLC (Gemini API): İletişim [Beklemede: Master, Google Gizlilik Sorgulama Kanalı]"
       },
       {
         "k": "Ülkeler",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Amaç",
-        "v": "Konuşmayı metne dönüştürme, çeviri, toplantı notu özetleri, sentetik konuşma (standart sesler, ses klonlama yok), yüz yüze notlar için konuşmacı ayrımı (sesler birbirinden ayrılır ve algılanan cinsiyete göre etiketlenir, örneğin Erkek 1 / Kadın 1 — isimler veya kimlikler çıkarılmaz)"
+        "v": "Sesi metne dönüştürme, çeviri, toplantı tutanaklarını özetleme, sentetik ses (standart ses, ses klonlama yok), yüz yüze notlarda konuşmacı ayırma (kişileri sese göre ayırır ve algılanan cinsiyete göre erkek 1, kadın 1 olarak gösterir, isimleri veya kimlikleri tanımlamaz)"
       },
       {
         "k": "Saklama",
-        "v": "Sonuç döndürülür dönmez sona erer. Google'dan istekleri saklamamasını isteriz (store=false). Kötüye kullanım izleme günlükleri Google'ın şartları altında saklanabilir [TBD: saklama süresi ve ücretli katman durumu]."
+        "v": "İşlenmiş sonuçlar alındığında hemen sona erer. Google'dan istekleri saklamamasını talep ediyoruz (store=false). Ancak, Google'ın şartlarına göre kötüye kullanım izleme kayıtları saklanabilir [Beklemede: Master, saklama süresi ve ücretli katman uygulaması]."
       },
       {
         "k": "Reddetme ve sonuçları",
@@ -895,8 +895,8 @@
     "keep": [
       "Orijinal ses: seminer altyazıları ve AI toplantı notları için saklanmaz; metne dönüştürüldükten hemen sonra atılır. Yüz yüze notlar için, kayıt özel depolamada saklanır, böylece toplantıdan sonra daha doğru bir şekilde (konuşmacılarla birlikte) tekrar yazıya dökülebilir ve not sona erdikten 1 gün sonra günlük temizlikte silinir (not silinirse hemen).",
       "Canlı altyazılar: saklanmaz.",
-      "AI toplantı notları (sunucu açtığında): konuşulan içerik, ekran görüntüleri ve özet, notlar silinene kadar saklanır [TBD: maksimum saklama süresi].",
-      "Onay kayıtları: onay zamanı ve politika sürümü, kanıt olarak saklanır [TBD: saklama süresi].",
+      "AI Toplantı Tutanakları (sunucu tarafından etkinleştirilirse): Konuşmaları, ekran görüntülerini ve özetleri toplantı tutanakları silinene kadar saklar [Beklemede: Master, maksimum saklama süresi].",
+      "Onay Kayıtları: Onay tarihini ve onaylanan politikanın sürümünü kanıt için saklar [Beklemede: Master, saklama süresi].",
       "Kullanım: dakika başına istek sayıları ve işlem süresi, maliyet limitlerini uygulamak için kullanılır.",
       "Katılım: katıldığınız zaman, son bağlandığınız zaman, görünen adınız ve Pi kullanıcı adınız saklanır ve ev sahibine katılım listesi olarak verilir (ekranda ve CSV indirme olarak). Seminer silinene kadar saklanır.",
       "Soru-Cevap ve anketler: soru metni ve soranın görünen adı (veya yoksa Pi kullanıcı adı) tüm katılımcılara görünür. Beğeniler yalnızca sayıları gösterir, kimin oy verdiğini asla göstermez. Anket oyları katılımcılara yalnızca sayıları gösterir; düzenleyici ve yöneticiler, her seçenek için her seçmenin görünen adını (veya yoksa Pi kullanıcı adını) görür. Gizli sorular dahil olmak üzere seminer silinene kadar saklanır."
@@ -904,14 +904,14 @@
     "recTitle": "Kayıt",
     "rec": "Kayıtlar yalnızca sunucunun cihazında bir dosya olarak kaydedilir. Sunucularımıza yüklenmez veya yurt dışına aktarılmaz. Kayıt veya AI notları açıkken, her katılımcı bir gösterge görür.",
     "rightsTitle": "Haklarınız",
-    "rights": "Bilgilerinizin erişimini, düzeltilmesini, silinmesini veya işlenmesinin durdurulmasını talep edebilirsiniz. İletişim: [TBD: gizlilik görevlisi adı ve iletişim]"
+    "rights": "Bilgilerinize erişim, düzeltme, silme ve işleme durdurma talebinde bulunabilirsiniz. İletişim: [Beklemede: Master, Gizlilik Sorumlusu Adı ve İletişim Bilgileri]"
   },
   "notes": {
     "title": "Notlar",
     "back": "Seminere geri dön",
     "loading": "Yükleniyor…",
     "meta": "Notlar · {date} · {min} dak",
-    "aiWarn": "AI tarafından oluşturulan özet — hatalar içerebilir",
+    "aiWarn": "AI tarafından oluşturulan özet : hatalar içerebilir",
     "points": "Ana noktalar",
     "decisions": "Kararlar",
     "todos": "Yapılacaklar",
@@ -921,11 +921,11 @@
     "making": "Notlar oluşturuluyor…",
     "makingLong": "Bu biraz zaman alıyor. Lütfen daha sonra yenileyin",
     "recording": "Hala kaydediliyor",
-    "failed": "Özet oluşturulamadı — tam transkript aşağıdadır",
+    "failed": "Özet oluşturulamadı. Tam döküm aşağıdadır.",
     "retry": "Tekrar dene",
     "finish": "Kaydı bitir ve özetle",
     "none": "Burada hiçbir şey yok",
-    "blank": "Özetlenecek bir şey yok — konuşma kaydedilmedi veya çok kısaydı",
+    "blank": "Özetlenecek içerik yok. Konuşma kaydedilmedi veya çok kısaydı.",
     "notFound": "Notlar bulunamadı",
     "forbidden": "Bu notlara erişim izniniz yok",
     "shotAlt": "{at} ekran görüntüsü",
@@ -938,7 +938,7 @@
     "delYes": "Sil",
     "delNo": "İptal",
     "delFail": "Silinemedi",
-    "dlFail": "İndirilemedi — lütfen tekrar deneyin",
+    "dlFail": "İndirme başarısız oldu. Lütfen tekrar dokunun.",
     "recentNotes": "Son notlar",
     "empty": "Henüz not yok",
     "newNote": "Yüz yüze notları başlat",
@@ -959,12 +959,12 @@
     "aiOff": "AI notları şu anda kullanılamıyor (sunucu kurulumu gerekli). Geçmiş notlar aşağıda listelenmiştir",
     "reload": "Yeniden yükle",
     "unsupported": "Bu cihazda kayıt yapılamıyor",
-    "micDenied": "Mikrofon kullanılamıyor — izni kontrol edin",
-    "limited": "İşlem süresi sınırı doldu — bitir ve notları oluştur",
-    "noAgr": "Durduruldu: kayıtta bildirim onayı yok — bitir ve tekrar başlat",
-    "micLost": "Mikrofon bağlantısı kesildi ve kayıt durdu — Mikrofonu yeniden bağla'ya dokunun veya notu bitirin",
+    "micDenied": "Mikrofon kullanılamıyor. Lütfen izinleri kontrol edin.",
+    "limited": "İşlem süresi sınırına ulaşıldı. Lütfen sonlandırın ve toplantı tutanaklarını oluşturun.",
+    "noAgr": "Bildirim onay kaydı eksik olduğu için durduruldu. Lütfen sonlandırın ve yeniden başlatın.",
+    "micLost": "Mikrofon bağlantısı kesildi, kayıt durduruldu. Lütfen [Mikrofonu Yeniden Bağla] öğesine dokunun veya sonlandırın.",
     "micRetry": "Mikrofonu yeniden bağla",
-    "gone": "Bu not başka bir yerde sonlandırıldı veya silindi, bu yüzden kayıt durdu — notları açmak için aşağıdaki düğmeyi kullanın",
+    "gone": "Bu not başka bir ekranda sonlandırıldı veya silindi, bu nedenle kayıt durduruldu. Lütfen aşağıdaki düğmeyi kullanarak toplantı tutanaklarını kontrol edin.",
     "finishing": "Son sözler kaydediliyor…",
     "st": {
       "RECORDING": "Kaydediliyor",
@@ -972,7 +972,7 @@
       "DONE": "Tamamlandı",
       "FAILED": "Başarısız"
     },
-    "downloadPiBrowser": "Markdown indirme işlemi yalnızca normal bir tarayıcıda (bilgisayar veya mobil) çalışır. Pi Browser dosyaları kaydedemez — bu notları bir bilgisayar veya telefon tarayıcısında (seminarz.vercel.app) açın."
+    "downloadPiBrowser": "Markdown indirme yalnızca normal tarayıcılarda (PC/mobil) kullanılabilir. Pi Browser dosyaları kaydedemez. Lütfen aynı toplantı tutanaklarını bir bilgisayar veya mobil tarayıcıda (seminarz.vercel.app) açın."
   },
   "plan": {
     "title": "Planlar",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} bağlı",
     "producers": "{n} akış",
     "end": "Bitiş {time}",
-    "stale": "Seminer sona erdi ancak oda video sunucusunda hala açık — zorla kapatın.",
+    "stale": "Seminer sona erdi, ancak odalar video sunucusunda kaldı. Lütfen bunları zorla kapatın.",
     "close": "Zorla kapat",
     "confirmSeminar": "Bu, semineri sonlandırır ve odayı kapatır. Herkesin bağlantısı kesilecektir.",
     "confirmRoom": "Bu, odayı kapatır. Herkesin bağlantısı kesilecektir.",
@@ -1063,7 +1063,7 @@
     "cancel": "İptal",
     "saving": "Kaydediliyor…",
     "done": "Uygulandı. {plan} kalan süre: {time}",
-    "invalid": "1 dakika ile 1000 saat arasında bir azaltma girin (tam dakikalar 0–59).",
+    "invalid": "1 dakika ile 1000 saat arasında bir azaltma girin (tam dakikalar 0~59).",
     "history": "Son ayarlamalar",
     "noHistory": "Henüz ayarlama yok.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

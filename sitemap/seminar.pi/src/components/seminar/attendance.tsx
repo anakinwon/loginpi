@@ -69,7 +69,7 @@ function Sheet({ id }: { id: string }) {
   }, [id, page, tick, t, errText])
 
   const when = (iso: string) => f.dateTime(new Date(iso), inViewerTz({ dateStyle: 'short', timeStyle: 'short' }))
-  const name = (r: Row) => r.name || r.piName || '—'
+  const name = (r: Row) => r.name || r.piName || '-'
 
   async function csv() {
     setBusy(true)

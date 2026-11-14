@@ -6,7 +6,7 @@
   "home": {
     "description": "Korraldajad avavad seminare ja osalejad liituvad reaalajas videoseanssidega Pi-ga.",
     "badge": "Reaalajas seminarid kaunitel saartel",
-    "headline": "Vaata, kuula ja õpi koos – otseülekandes",
+    "headline": "Vaata, kuula ja õpi koos : otseülekandes",
     "ctaBrowse": "Sirvi seminare",
     "ctaPlan": "Vaata pakette",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarid",
     "cal": {
       "title": "Seminari kalender",
-      "desc": "Alates möödunud seminaridest kuni tulevasteni – üksikasjade nägemiseks puuduta kuupäeva.",
+      "desc": "Alates varasematest seminaridest kuni tulevasteni: puudutage kuupäeva üksikasjade nägemiseks.",
       "legendSmn": "Seminarid",
       "legendEnded": "Möödunud seminarid",
       "legendMine": "Minu sündmused",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Reaalajas videoseminar",
-        "desc": "Meie oma video mootor Galápagos — eesmärk on üks esineja, kes edastab kuni 30 osalejale"
+        "desc": "Meie oma video mootor Galápagos: Eesmärk on, et üks esineja saadaks videot kuni 30-le publiku liikmele."
       },
       "F02": {
         "name": "Loo seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Sünteetilise hääle taasesitus ja algse heli vaigistamine"
     },
     "refLabel": "Viitemudel",
-    "uiRef": "Kasutajaliidese baasjoon — laialdaselt kasutatava veebivideokoosoleku rakenduse ekraani- ja funktsioonimustrid, kohandatud seminar.pi jaoks"
+    "uiRef": "Kasutajaliidese standardid: Populaarsete veebikonverentsirakenduste ekraani- ja funktsioonimustrite rakendamine seminar.pi-le"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Publiku liikmed ei kasuta kaamerat ega mikrofoni. Pärast liitumist näed ja kuuled esinejat.",
     "preview": {
       "pending": "Kaamera ja mikrofoni ettevalmistamine…",
-      "audioOnly": "Kaamera pole saadaval – saadan ainult heli.",
+      "audioOnly": "Kaamera pole saadaval : saadan ainult heli.",
       "none": "Kaamera ja mikrofon pole saadaval. Kontrolli õigusi (saad siiski liituda ilma meediata).",
-      "videoOnly": "Mikrofon pole saadaval – saadan ainult videot. Kontrolli mikrofoni õigust."
+      "videoOnly": "Mikrofon pole saadaval : saadan ainult videot. Kontrolli mikrofoni õigust."
     },
     "mic": {
       "on": "Lülita mikrofon välja",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Sinu sisenemispääse on aegunud.",
       "TICKET_EXPIRED": "Sinu sisenemispääse on aegunud.",
       "ROOM_FULL": "See seminar on täis.",
-      "ROOM_CLOSED": "Ruum suleti — seminar lõppes või korraldaja oli eemal üle 5 minuti.",
+      "ROOM_CLOSED": "Ruum on suletud. Seminar on lõppenud või host on olnud eemal üle 5 minuti.",
       "DUPLICATE_SESSION": "Liitusite teisest seadmest, seega see ekraan ühendati lahti.",
       "ROLE_FORBIDDEN": "Teil pole esitamiseks luba.",
       "WS_FAILED": "Videoserveriga ei õnnestunud ühendust luua.",
@@ -488,7 +488,7 @@
     "toDetail": "Mine seminari lehele",
     "consent": {
       "title": "Enne mikrofoni sisselülitamist",
-      "body": "Kui selles seminaris on sisse lülitatud salvestamine, subtiitrid või AI koosoleku märkmed, võidakse teie hääl tekstiks teisendada, salvestada ja tõlkida. Hääletöötlust teostab AI teenus väljaspool teie riiki. Kui te ei nõustu, lülitub teie mikrofon siiski sisse – ainult teie häält ei töödelda.",
+      "body": "Kui selles seminaris on sisse lülitatud salvestamine, subtiitrid või AI koosoleku märkmed, võidakse teie hääl tekstiks teisendada, salvestada ja tõlkida. Hääletöötlust teostab AI teenus väljaspool teie riiki. Kui te ei nõustu, lülitub teie mikrofon siiski sisse : ainult teie häält ei töödelda.",
       "privacy": "Privaatsuspoliitika",
       "newTab": "(avaneb uuel vahelehel)",
       "decline": "Ei nõustu",
@@ -613,7 +613,7 @@
       "title": "Salvesta",
       "badge": "Salvestamine",
       "unsupported": "See brauser ei toeta salvestamist. Palun salvestage tavalise brauseriga arvutis.",
-      "piBrowserOnly": "Salvestamine töötab ainult tavalises brauseris (PC või mobiil). Pi Browser ei saa salvestusfaile salvestada – avage see seminar arvuti või telefoni brauseris (seminarz.vercel.app), et salvestada.",
+      "piBrowserOnly": "Salvestamine on saadaval ainult tavalistes brauserites (PC/mobiil). Pi Browser ei saa salvestatud faile salvestada. Palun avage sama seminar arvuti- või mobiilibrauseris (seminarz.vercel.app) salvestamiseks.",
       "audioSuspended": "Helisalvestus ei pruugi sellel seadmel alata. Salvestada võidakse ainult pilti.",
       "notifyFailed": "Salvestamine ei alanud, kuna osalejaid ei saanud teavitada. Palun proovige varsti uuesti.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Sulge salvesta uuesti"
       },
       "toast": {
-        "started": "Salvestamine algas – kõik näevad seda.",
+        "started": "Salvestamine on alanud. See kuvatakse kõigile osalejatele.",
         "saved": "Salvestus salvestatud. Kontrollige oma allalaadimiste kausta. Kui midagi ei salvestatud, puudutage ekraani ülaosas [Salvesta uuesti].",
         "autoStopped": "Salvestamine lõppes, kuna brauser peatas selle või saavutati suuruse piirang. Kõik kuni selle hetkeni salvestati. Jätkamiseks alustage salvestamist uuesti.",
         "empty": "Midagi ei salvestatud, seega faili ei loodud.",
@@ -656,10 +656,10 @@
       "badge": "AI märkmed sees",
       "started": "Esineja lülitas AI märkmed sisse",
       "stopped": "AI märkmed välja lülitatud",
-      "startedMine": "AI märkmed sees — näidatakse kõigile",
-      "stoppedMine": "AI märkmed välja lülitatud — märkmete loomine",
+      "startedMine": "AI koosoleku protokollid on käivitatud. See kuvatakse kõigile osalejatele.",
+      "stoppedMine": "AI koosoleku protokollid on peatatud. Koosoleku protokolle genereeritakse.",
       "startFail": "AI märkmeid ei saanud käivitada",
-      "gone": "AI märkmed peatati — märkmed lõpetati või kustutati mujal",
+      "gone": "AI märkmed peatati : märkmed lõpetati või kustutati mujal",
       "unsupported": "AI märkmeid ei saa siin sisse lülitada (heli salvestamise tugi puudub)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Puudutage allpool [Ava Google'i kalendri seaded].",
       "s2": "Vasakul jaotises „Minu kalendrite seaded” valige kalender (nt teie nimi).",
       "s3": "Kerige jaotiseni „Integreeri kalender” ja kopeerige „Salajane aadress iCal-vormingus”.",
-      "s4": "Kleepige see siia ja puudutage [Lisa] — sündmuste pealkirjad ilmuvad kalendrisse. Lisage samamoodi teisi kalendreid, kuni 5.",
+      "s4": "Kleepige see siia ja puudutage [Lisa] : sündmuste pealkirjad ilmuvad kalendrisse. Lisage samamoodi teisi kalendreid, kuni 5.",
       "open": "Ava Google'i kalendri seaded",
-      "privacy": "See aadress on teie kalendri võti – ärge jagage seda. See salvestatakse ainult sellesse seadmesse, mitte kunagi meie serverisse."
+      "privacy": "See aadress on teie kalendri võti : ärge jagage seda. See salvestatakse ainult sellesse seadmesse, mitte kunagi meie serverisse."
     },
     "title": "Loo seminar",
     "name": "Reisime kaunile saarele!",
     "subTitle": "Subtiiter (valikuline, kuni 60)",
     "startAt": "Algusaeg",
-    "maxCnt": "Mahutavus (1–100)",
+    "maxCnt": "Mahutavus (1~100)",
     "submit": "Loo",
     "submitting": "Loomine…",
-    "invalid": "Kontrollige oma sisestust – kuupäev ühe aasta jooksul alates tänasest, mahutavus 1–100.",
+    "invalid": "Palun kontrollige sisestatud väärtusi: kuupäev ühe aasta jooksul alates praegusest ja mahutavus 1-100.",
     "attendance": {
       "title": "Kohalolek",
       "back": "Tagasi seminari juurde",
@@ -840,18 +840,18 @@
         "state": "Olek"
       },
       "durNote": "Osavõtu aeg on esimesest liitumisest viimase nägemiseni, miinus eemaloleku aeg (üle 2,5 minuti pikkused lüngad).",
-      "csvPiBrowser": "CSV allalaadimine töötab ainult tavalises brauseris (arvuti või mobiil). Pi Browser ei saa faile salvestada – avage see kohalolekuleht arvuti või telefoni brauseris (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV allalaadimine on saadaval ainult tavalistes brauserites (PC/mobiil). Pi Browser ei saa faile salvestada. Palun avage sama osalejate nimekiri arvuti- või mobiilibrauseris (seminarz.vercel.app)."
     },
     "plan": "Plaan",
-    "planFree": "Tasuta — {time} jäänud sel kuul · AI puudub",
-    "planPaid": "{name} {time} · {price} — maksa loomisel",
+    "planFree": "Tasuta: {time} jäänud sel kuul · AI puudub",
+    "planPaid": "{name} {time} · {price} · Makse loomisel",
     "planHint": "Tasulise plaaniga avatud seminar kasutab esmalt selle plaani aega, seejärel jätkab selle kuu tasuta ajaga (tasuta osas AI puudub). Aktiivne plaan avaneb ilma makseta; Kuu- või Aastaplaan, mida teil pole, makstakse Pi-ga, kui vajutate Loo, seejärel avaneb seminar (Pi Browser). Osalejatele on liitumine alati tasuta.",
-    "planOwned": "{name} — aktiivne · {time} jäänud",
+    "planOwned": "{name}: Tellitud · {time} jäänud",
     "planEnds": "Algusaeg on pärast selle plaani kehtivuse lõppemist. Liigutage algusaega varasemaks või valige teine plaan.",
     "paidKept": "Teie tasuline pääse on alles. Parandage probleem ja vajutage uuesti Loo (teist makset pole)."
   },
   "privacy": {
-    "title": "Privaatsuspoliitika — Hääle- ja AI-funktsioonid",
+    "title": "Privaatsuspoliitika: Hääle- ja AI-funktsioonid",
     "effective": "Kehtiv alates {date}",
     "intro": "See poliitika selgitab isikuandmeid, mida me töötleme, kui kasutate seminaril reaalajas subtiitreid, tõlgitud subtiitreid, häältõlget, AI koosolekumärkmeid ja kohapealseid märkmeid. Need funktsioonid kasutavad välist AI-teenust, seega edastatakse teave välismaale.",
     "whoTitle": "Kelle teavet töödeldakse",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Saaja",
-        "v": "Google LLC (Gemini API) — kontakt [TBD: Google'i privaatsuskontakt]"
+        "v": "Google LLC (Gemini API): Kontakt [Ootel: Master, Google'i privaatsuspäringute kanal]"
       },
       {
         "k": "Riigid",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Eesmärk",
-        "v": "Kõne tekstiks muutmine, tõlkimine, koosolekumärkmete kokkuvõtted, sünteetiline kõne (standardhääled, hääle kloonimist pole), kõneleja eraldamine kohapealsete märkmete jaoks (hääled eristatakse ja märgistatakse tajutud soo järgi, näiteks Mees 1 / Naine 1 — nimesid ega identiteete ei tuletata)"
+        "v": "Hääle tekstiks teisendamine, tõlkimine, koosoleku protokollide kokkuvõtete tegemine, sünteetiline hääl (standardhääl, hääle kloonimist ei toimu), kõneleja eraldamine kohapealsetes märkmetes (eraldab inimesi hääle järgi ja kuvab tajutud soo alusel mees 1, naine 1, ei tuvasta nimesid ega identiteete)"
       },
       {
         "k": "Säilitamine",
-        "v": "Lõpeb kohe, kui tulemus tagastatakse. Palume Google'il päringuid mitte salvestada (store=false). Kuritarvituste jälgimise logisid võidakse siiski säilitada Google'i tingimuste kohaselt [TBD: säilitamisperiood ja tasulise taseme staatus]."
+        "v": "Lõpeb koheselt pärast töödeldud tulemuste saamist. Palume Google'il mitte salvestada päringuid (store=false). Kuid Google'i tingimuste kohaselt väärkasutuse jälgimise kirjeid võidakse salvestada [Ootel: Master, salvestusperiood ja tasulise taseme rakendamine]."
       },
       {
         "k": "Kuidas keelduda ja mis juhtub",
@@ -895,8 +895,8 @@
     "keep": [
       "Algne heli: seminari subtiitrite ja AI koosolekumärkmete jaoks seda ei salvestata; see visatakse ära kohe pärast tekstiks teisendamist. Kohapealsete märkmete puhul hoitakse salvestist privaatses salvestusruumis, et seda saaks pärast koosolekut täpsemalt (kõnelejatega) uuesti transkribeerida, ja see kustutatakse igapäevase puhastuse käigus, kui märkmest on möödunud 1 päev (kohe, kui märge kustutatakse).",
       "Reaalajas subtiitrid: ei salvestata.",
-      "AI koosolekumärkmed (kui esineja need sisse lülitab): räägitud sisu, ekraanipildid ja kokkuvõte, säilitatakse kuni märkmete kustutamiseni [TBD: maksimaalne säilitamine].",
-      "Nõusoleku andmed: nõusoleku aeg ja poliitika versioon, säilitatakse tõendina [TBD: säilitamisperiood].",
+      "AI koosoleku protokollid (kui esineja on lubanud): Salvestab lausungid, ekraanipildid ja kokkuvõtted kuni koosoleku protokollide kustutamiseni [Ootel: Master, maksimaalne salvestusperiood].",
+      "Nõusoleku kirjed: Salvestab nõusoleku kuupäeva ja nõusoleku poliitika versiooni tõenduseks [Ootel: Master, salvestusperiood].",
       "Kasutus: minuti kohta päringute arv ja töötlemisaeg, mida kasutatakse kululimiitide jõustamiseks.",
       "Kohalolek: teie liitumise aeg, viimase ühenduse aeg, teie kuvatav nimi ja teie Pi kasutajanimi salvestatakse ja antakse hostile kohaloleku nimekirjana (ekraanil ja CSV allalaadimisena). Säilitatakse kuni seminari kustutamiseni.",
       "Küsimused ja vastused ning küsitlused: küsimuse tekst ja küsija kuvatav nimi (või Pi kasutajanimi, kui seda pole) on nähtavad kõigile osalejatele. Hääletused näitavad ainult arvu, mitte kunagi seda, kes need andis. Küsitluse hääletused näitavad osalejatele ainult arvu; korraldaja ja administraatorid näevad iga valiku kohta iga hääletaja kuvatavat nime (või Pi kasutajanime, kui seda pole). Säilitatakse, sealhulgas peidetud küsimused, kuni seminari kustutamiseni."
@@ -904,14 +904,14 @@
     "recTitle": "Salvestamine",
     "rec": "Salvestised salvestatakse ainult failina esineja seadmesse. Neid ei laadita meie serveritesse ega edastata välismaale. Salvestamise või AI märkmete sisselülitamise ajal näeb iga osaleja indikaatorit.",
     "rightsTitle": "Teie õigused",
-    "rights": "Saate paluda oma teabele juurdepääsu, seda parandada, kustutada või selle töötlemise peatada. Kontakt: [TBD: privaatsusametniku nimi ja kontakt]"
+    "rights": "Saate taotleda oma teabe juurdepääsu, parandamist, kustutamist ja töötlemise peatamist. Kontakt: [Ootel: Master, privaatsusspetsialisti nimi ja kontakt]"
   },
   "notes": {
     "title": "Märkmed",
     "back": "Tagasi seminari juurde",
     "loading": "Laadimine…",
     "meta": "Märkmed · {date} · {min} min",
-    "aiWarn": "AI loodud kokkuvõte — see võib sisaldada vigu",
+    "aiWarn": "AI loodud kokkuvõte : see võib sisaldada vigu",
     "points": "Põhipunktid",
     "decisions": "Otsused",
     "todos": "Tegevused",
@@ -921,11 +921,11 @@
     "making": "Märkmete loomine…",
     "makingLong": "See võtab aega. Palun värskendage hiljem",
     "recording": "Ikka salvestab",
-    "failed": "Kokkuvõtet ei saanud luua — täielik transkriptsioon on allpool",
+    "failed": "Kokkuvõtte loomine ebaõnnestus. Täielik transkriptsioon on allpool.",
     "retry": "Proovi uuesti",
     "finish": "Lõpeta salvestamine ja tee kokkuvõte",
     "none": "Siin pole midagi",
-    "blank": "Midagi kokku võtta pole — kõnet ei salvestatud või see oli liiga lühike",
+    "blank": "Kokkuvõtteks pole sisu. Kõnet ei salvestatud või see oli liiga lühike.",
     "notFound": "Märkmeid ei leitud",
     "forbidden": "Teil pole nendele märkmetele juurdepääsu",
     "shotAlt": "Ekraanipilt kell {at}",
@@ -938,7 +938,7 @@
     "delYes": "Kustuta",
     "delNo": "Tühista",
     "delFail": "Ei saanud kustutada",
-    "dlFail": "Ei saanud alla laadida — palun proovige uuesti",
+    "dlFail": "Allalaadimine ebaõnnestus. Palun puudutage uuesti.",
     "recentNotes": "Hiljutised märkmed",
     "empty": "Märkmeid pole veel",
     "newNote": "Alusta kohapealseid märkmeid",
@@ -959,12 +959,12 @@
     "aiOff": "AI märkmed pole praegu saadaval (vajalik serveri seadistamine). Varasemad märkmed on loetletud allpool",
     "reload": "Laadi uuesti",
     "unsupported": "Salvestamine pole selles seadmes saadaval",
-    "micDenied": "Mikrofoni ei saa kasutada – kontrolli luba",
-    "limited": "Töötlusaja piirang on täis – lõpeta ja loo märkmed",
-    "noAgr": "Peatatud: salvestamisel pole teavitust kinnitatud – lõpeta ja alusta uuesti",
-    "micLost": "Mikrofon ühendati lahti ja salvestamine peatus – puuduta „Ühenda mikrofon uuesti” või lõpeta märge",
+    "micDenied": "Mikrofon pole saadaval. Palun kontrollige õigusi.",
+    "limited": "Töötlemise ajapiirang on saavutatud. Palun lõpetage ja genereerige koosoleku protokollid.",
+    "noAgr": "Peatatud teavituse kinnituse kirje puudumise tõttu. Palun lõpetage ja taaskäivitage.",
+    "micLost": "Mikrofoni ühendus katkes, salvestamine peatati. Palun puudutage [Ühenda mikrofon uuesti] või lõpetage.",
     "micRetry": "Ühenda mikrofon uuesti",
-    "gone": "See märge lõpetati või kustutati mujal, seega salvestamine peatus – kasuta allolevat nuppu märkmete avamiseks",
+    "gone": "See märkus lõpetati või kustutati teisel ekraanil, seega salvestamine on peatatud. Palun kontrollige koosoleku protokolle alloleva nupu abil.",
     "finishing": "Viimaste sõnade salvestamine…",
     "st": {
       "RECORDING": "Salvestamine",
@@ -972,7 +972,7 @@
       "DONE": "Valmis",
       "FAILED": "Ebaõnnestus"
     },
-    "downloadPiBrowser": "Märkmefaili allalaadimine töötab ainult tavalises brauseris (arvutis või mobiilis). Pi Browser ei saa faile salvestada – ava need märkmed arvuti või telefoni brauseris (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdowni allalaadimine on saadaval ainult tavalistes brauserites (PC/mobiil). Pi Browser ei saa faile salvestada. Palun avage sama koosoleku protokoll arvuti- või mobiilibrauseris (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Paketid",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} ühendatud",
     "producers": "{n} voogu",
     "end": "Lõpeb {time}",
-    "stale": "Seminar on lõppenud, kuid ruum on videoververis endiselt avatud – sulge see jõuga.",
+    "stale": "Seminar on lõppenud, kuid ruumid on videoserveris alles. Palun sulgege need sunniviisiliselt.",
     "close": "Sulge jõuga",
     "confirmSeminar": "See lõpetab seminari ja sulgeb ruumi. Kõik ühendatakse lahti.",
     "confirmRoom": "See sulgeb ruumi. Kõik ühendatakse lahti.",
@@ -1063,7 +1063,7 @@
     "cancel": "Tühista",
     "saving": "Salvestamine…",
     "done": "Rakendatud. {plan} aega jäänud: {time}",
-    "invalid": "Sisesta vähendus vahemikus 1 minut kuni 1000 tundi (täisminutid 0–59).",
+    "invalid": "Sisesta vähendus vahemikus 1 minut kuni 1000 tundi (täisminutid 0~59).",
     "history": "Hiljutised kohandused",
     "noHistory": "Kohandusi pole veel tehtud.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

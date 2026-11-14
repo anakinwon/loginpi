@@ -529,7 +529,7 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
     const [tk, turn] = await Promise.all([fetchTicket(room, ticketRole), fetchTurn()])
     if (stale()) return // 발급 대기 중 나가기·재입장
     if (!tk.ticket && !devName) return fail(`TICKET_${tk.why}`)
-    log(tk.ticket ? '입장권 발급됨' : `입장권 없음(${tk.why}) — 개발용 입장 시도(운영 엔진은 거부)`)
+    log(tk.ticket ? '입장권 발급됨' : `입장권 없음(${tk.why}) : 개발용 입장 시도(운영 엔진은 거부)`)
     log(`TURN ${turn.length ? '발급됨' : '없음(STUN 만)'}`)
     setState('connecting')
     const ws = new WebSocket(wsUrl)
@@ -610,7 +610,7 @@ export function useRoom({ wsUrl, onLog, appProbe = false }: { wsUrl?: string; on
 
   // 입장 직후 발표자 발행 — 대기실 스트림(없으면 여기서 카메라 요청 — 실험실)
   async function publish(local: MediaStream | null | undefined, my: number) {
-    if (local === null) return log('미디어 없이 입장 — 발행 안 함')
+    if (local === null) return log('미디어 없이 입장 : 발행 안 함')
     const s = local ?? (await navigator.mediaDevices.getUserMedia({ video: VIDEO, audio: true }))
     if (seqRef.current !== my) return s.getTracks().forEach((t) => t.stop())
     localRef.current = s

@@ -6,7 +6,7 @@
   "home": {
     "description": "Mezbonlar seminarlar ochadi, ishtirokchilar Pi orqali jonli video sessiyalarga qoʻshiladi.",
     "badge": "Goʻzal orollarda jonli seminarlar",
-    "headline": "Birgalikda tomosha qiling, tinglang va oʻrganing — jonli efirda",
+    "headline": "Birgalikda tomosha qiling, tinglang va oʻrganing : jonli efirda",
     "ctaBrowse": "Seminarlarni koʻrish",
     "ctaPlan": "Rejalarni koʻrish",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarlar",
     "cal": {
       "title": "Seminar taqvimi",
-      "desc": "Oʻtgan seminarlardan tortib kelgusi seminarlargacha — tafsilotlar uchun sanani bosing.",
+      "desc": "Oʻtgan seminarlardan tortib kelgusi seminarlargacha: tafsilotlar uchun sanani bosing.",
       "legendSmn": "Seminarlar",
       "legendEnded": "Oʻtgan seminarlar",
       "legendMine": "Mening tadbirlarim",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Jonli video seminar",
-        "desc": "Oʻzimizning Galápagos video dvigateli — maqsad bitta taqdimotchi 30 tagacha ishtirokchiga translyatsiya qilish"
+        "desc": "Oʻzimizning Galápagos video dvigateli: Maqsad : bitta taqdimotchi 30 tagacha tinglovchiga video yuborishi."
       },
       "F02": {
         "name": "Seminar yaratish",
@@ -254,7 +254,7 @@
       "dubbing": "Sintetik ovoz ijrosi va asl audioni pasaytirish"
     },
     "refLabel": "Maʼlumot modeli",
-    "uiRef": "UI bazasi — seminar.pi uchun moslashtirilgan keng qoʻllaniladigan veb-video uchrashuv ilovasining ekran va funksiya namunalari"
+    "uiRef": "UI standartlari: seminar.pi uchun mashhur veb-konferensiya ilovalarining ekran va funksiya namunalarini qoʻllash"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Tomoshabinlar kamera yoki mikrofon ishlatmaydi. Qoʻshilganingizdan soʻng taqdimotchini koʻrasiz va eshitasiz.",
     "preview": {
       "pending": "Kamera va mikrofon tayyorlanmoqda…",
-      "audioOnly": "Kamera mavjud emas — faqat audio yuborilmoqda.",
+      "audioOnly": "Kamera mavjud emas : faqat audio yuborilmoqda.",
       "none": "Kamera va mikrofon mavjud emas. Ruxsatlarni tekshiring (media vositalarisiz ham qoʻshilishingiz mumkin).",
-      "videoOnly": "Mikrofon mavjud emas — faqat video yuborilmoqda. Mikrofon ruxsatini tekshiring."
+      "videoOnly": "Mikrofon mavjud emas : faqat video yuborilmoqda. Mikrofon ruxsatini tekshiring."
     },
     "mic": {
       "on": "Mikrofonni oʻchirish",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Kirish ruxsatnomangiz muddati tugadi.",
       "TICKET_EXPIRED": "Kirish ruxsatnomangiz muddati tugadi.",
       "ROOM_FULL": "Bu seminar toʻla.",
-      "ROOM_CLOSED": "Xona yopildi — seminar tugadi yoki mezbon 5 daqiqadan koʻproq vaqt davomida yoʻq edi.",
+      "ROOM_CLOSED": "Xona yopildi. Seminar tugagan yoki mezbon 5 daqiqadan ortiq vaqt davomida yoʻq boʻlgan.",
       "DUPLICATE_SESSION": "Boshqa qurilmadan qoʻshilganingiz sababli, bu ekran uzildi.",
       "ROLE_FORBIDDEN": "Sizda taqdimot qilish uchun ruxsat yoʻq.",
       "WS_FAILED": "Video serverga ulanib boʻlmadi.",
@@ -488,7 +488,7 @@
     "toDetail": "Seminar sahifasiga oʻtish",
     "consent": {
       "title": "Mikrofoningizni yoqishdan oldin",
-      "body": "Agar ushbu seminarda yozib olish, subtitrlar yoki AI yigʻilish eslatmalari yoqilgan boʻlsa, ovozingiz matnga aylantirilishi, saqlanishi va tarjima qilinishi mumkin. Ovozni qayta ishlash mamlakatingizdan tashqaridagi AI xizmati tomonidan amalga oshiriladi. Agar rozi boʻlmasangiz, mikrofoningiz baribir yoqiladi — faqat ovozingiz qayta ishlanmaydi.",
+      "body": "Agar ushbu seminarda yozib olish, subtitrlar yoki AI yigʻilish eslatmalari yoqilgan boʻlsa, ovozingiz matnga aylantirilishi, saqlanishi va tarjima qilinishi mumkin. Ovozni qayta ishlash mamlakatingizdan tashqaridagi AI xizmati tomonidan amalga oshiriladi. Agar rozi boʻlmasangiz, mikrofoningiz baribir yoqiladi : faqat ovozingiz qayta ishlanmaydi.",
       "privacy": "Maxfiylik siyosati",
       "newTab": "(yangi tabda ochiladi)",
       "decline": "Rozi emasman",
@@ -613,7 +613,7 @@
       "title": "Yozib olish",
       "badge": "Yozib olinmoqda",
       "unsupported": "Bu brauzer yozib olishni qoʻllab-quvvatlamaydi. Iltimos, kompyuterdagi oddiy brauzerdan yozib oling.",
-      "piBrowserOnly": "Yozib olish faqat oddiy brauzerda (kompyuter yoki mobil) ishlaydi. Pi Browser yozib olish fayllarini saqlay olmaydi — yozib olish uchun ushbu seminarni kompyuter yoki telefon brauzerida (seminarz.vercel.app) oching.",
+      "piBrowserOnly": "Yozib olish faqat oddiy brauzerlarda (kompyuter/mobil) mavjud. Pi Browser yozilgan fayllarni saqlay olmaydi. Iltimos, yozib olish uchun xuddi shu seminarni kompyuter yoki mobil brauzerda (seminarz.vercel.app) oching.",
       "audioSuspended": "Bu qurilmada ovoz yozish boshlanmagan boʻlishi mumkin. Faqat rasm yozib olinishi mumkin.",
       "notifyFailed": "Ishtirokchilarga xabar berilmagani uchun yozib olish boshlanmadi. Iltimos, birozdan keyin qayta urinib koʻring.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Qayta saqlashni yopish"
       },
       "toast": {
-        "started": "Yozib olish boshlandi — hamma koʻrishi mumkin",
+        "started": "Yozib olish boshlandi. Bu barcha ishtirokchilarga koʻrsatiladi.",
         "saved": "Yozib olish saqlandi. Yuklab olish papkangizni tekshiring. Agar hech narsa saqlanmagan boʻlsa, ekran yuqorisidagi [Qayta saqlash] tugmasini bosing.",
         "autoStopped": "Brauzer uni toʻxtatgani yoki hajmi chegarasiga yetilgani sababli yozib olish tugadi. Shu paytgacha boʻlgan hamma narsa saqlandi. Davom etish uchun yozib olishni qayta boshlang.",
         "empty": "Hech narsa yozib olinmadi, shuning uchun fayl yaratilmadi.",
@@ -656,8 +656,8 @@
       "badge": "AI qaydlari yoqilgan",
       "started": "Taqdimotchi AI qaydlarini yoqdi",
       "stopped": "AI qaydlari oʻchirildi",
-      "startedMine": "AI qaydlari yoqilgan — hammaga koʻrsatiladi",
-      "stoppedMine": "AI qaydlari oʻchirilgan — qaydlar yaratilmoqda",
+      "startedMine": "AI yigʻilish bayonnomasi boshlandi. Bu barcha ishtirokchilarga koʻrsatiladi.",
+      "stoppedMine": "AI yigʻilish bayonnomasi toʻxtatildi. Yigʻilish bayonnomasi yaratilmoqda.",
       "startFail": "AI qaydlarini boshlab boʻlmadi",
       "gone": "Qaydlar boshqa joyda tugatilgan yoki oʻchirilganligi sababli AI yozuvi toʻxtatildi",
       "unsupported": "Bu yerda AI qaydlarini yoqib boʻlmaydi (audio yozuv qoʻllab-quvvatlanmaydi)"
@@ -808,18 +808,18 @@
       "s1": "Quyidagi [Google Taqvim sozlamalarini ochish] tugmasini bosing.",
       "s2": "Chapdagi 'Mening taqvimlarim uchun sozlamalar' ostida taqvimni tanlang (masalan, ismingiz).",
       "s3": "'Taqvimni integratsiya qilish' boʻlimiga oʻting va 'iCal formatidagi maxfiy manzil'ni nusxalang.",
-      "s4": "Uni bu yerga joylashtiring va [Qoʻshish] tugmasini bosing — tadbir sarlavhalari taqvimda paydo boʻladi. Boshqa taqvimlarni ham xuddi shu tarzda, 5 tagacha qoʻshishingiz mumkin.",
+      "s4": "Uni bu yerga joylashtiring va [Qoʻshish] tugmasini bosing : tadbir sarlavhalari taqvimda paydo boʻladi. Boshqa taqvimlarni ham xuddi shu tarzda, 5 tagacha qoʻshishingiz mumkin.",
       "open": "Google Taqvim sozlamalarini ochish",
-      "privacy": "Bu manzil taqvimingizga kalitdir — uni boshqalar bilan boʻlishmang. U faqat shu qurilmada saqlanadi, hech qachon serverimizda emas."
+      "privacy": "Bu manzil taqvimingizga kalitdir : uni boshqalar bilan boʻlishmang. U faqat shu qurilmada saqlanadi, hech qachon serverimizda emas."
     },
     "title": "Seminar yaratish",
     "name": "Keling, goʻzal orolga sayohat qilamiz!",
     "subTitle": "Taglavha (ixtiyoriy, 60 tagacha)",
     "startAt": "Boshlanish vaqti",
-    "maxCnt": "Sigʻim (1–100)",
+    "maxCnt": "Sigʻim (1~100)",
     "submit": "Yaratish",
     "submitting": "Yaratilmoqda…",
-    "invalid": "Kiritgan maʼlumotlaringizni tekshiring — hozirdan bir yil ichidagi sana, sigʻim 1–100.",
+    "invalid": "Kiritilgan qiymatlarni tekshiring: hozirdan boshlab bir yil ichidagi sana va 1-100 sigʻim.",
     "attendance": {
       "title": "Davomat",
       "back": "Seminarga qaytish",
@@ -840,18 +840,18 @@
         "state": "Holat"
       },
       "durNote": "Qatnashgan vaqt birinchi qoʻshilgan vaqtdan oxirgi koʻrilgan vaqtgacha, minus uzoqda boʻlgan vaqt (2,5 daqiqadan uzun boʻlgan uzilishlar).",
-      "csvPiBrowser": "CSV yuklab olish faqat oddiy brauzerda (kompyuter yoki mobil) ishlaydi. Pi Browser fayllarni saqlay olmaydi — bu davomat jadvalini kompyuter yoki telefon brauzerida oching (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV yuklab olish faqat oddiy brauzerlarda (kompyuter/mobil) mavjud. Pi Browser fayllarni saqlay olmaydi. Iltimos, xuddi shu davomat varagʻini kompyuter yoki mobil brauzerda (seminarz.vercel.app) oching."
     },
     "plan": "Reja",
-    "planFree": "Bepul — bu oyda {time} qoldi · AI yoʻq",
-    "planPaid": "{name} {time} · {price} — yaratishda toʻlang",
+    "planFree": "Bepul: Bu oyda qolgan vaqt {time} · AI yoʻq",
+    "planPaid": "{name} {time} · {price} · Yaratishda toʻlov",
     "planHint": "Pullik reja boʻyicha ochilgan seminar avval shu rejaning vaqtini ishlatadi, soʻngra bu oyning bepul vaqtida davom etadi (bepul qismida AI yoʻq). Faol reja toʻlovsiz ochiladi; sizda mavjud boʻlmagan Oylik yoki Yillik reja Yaratish tugmasini bosganingizda Pi bilan toʻlanadi, soʻngra seminar ochiladi (Pi Browser). Ishtirokchilar uchun qoʻshilish har doim bepul.",
-    "planOwned": "{name} — faol · {time} qoldi",
+    "planOwned": "{name}: Obuna boʻlingan · Qolgan vaqt {time}",
     "planEnds": "Boshlanish vaqti bu rejaning muddati tugagandan keyin. Boshlanish vaqtini oldinroqqa suring yoki boshqa rejani tanlang.",
     "paidKept": "Pullik oʻtishingiz saqlanadi. Muammoni tuzating va Yaratish tugmasini qayta bosing (ikkinchi toʻlovsiz)."
   },
   "privacy": {
-    "title": "Maxfiylik siyosati — Ovoz va AI funksiyalari",
+    "title": "Maxfiylik siyosati: Ovoz va AI funksiyalari",
     "effective": "Amal qilish sanasi {date}",
     "intro": "Ushbu siyosat seminarda jonli subtitrlar, tarjima qilingan subtitrlar, ovozli tarjima, AI yigʻilish qaydlari va shaxsiy qaydlar funksiyalaridan foydalanganingizda biz qayta ishlaydigan shaxsiy maʼlumotlarni tushuntiradi. Bu funksiyalar tashqi AI xizmatidan foydalanadi, shuning uchun maʼlumotlar chet elga uzatiladi.",
     "whoTitle": "Kimning maʼlumotlari qayta ishlanadi",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Qabul qiluvchi",
-        "v": "Google LLC (Gemini API) — aloqa [TBD: Google maxfiylik aloqasi]"
+        "v": "Google LLC (Gemini API): Aloqa [Kutilmoqda: Master, Google Maxfiylik soʻrov kanali]"
       },
       {
         "k": "Mamlakatlar",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Maqsad",
-        "v": "Nutqni matnga aylantirish, tarjima, yigʻilish qaydlari xulosalari, sintetik nutq (standart ovozlar, ovoz klonlash yoʻq), shaxsiy qaydlar uchun soʻzlovchini ajratish (ovozlar ajratiladi va idrok etilgan jins boʻyicha belgilanadi, masalan, Erkak 1 / Ayol 1 — ismlar yoki shaxslar aniqlanmaydi)"
+        "v": "Ovozni matnga aylantirish, tarjima, yigʻilish bayonnomalarini umumlashtirish, sintetik ovoz (standart ovoz, ovoz klonlash yoʻq), shaxsiy eslatmalarda soʻzlovchini ajratish (odamlarni ovoz boʻyicha ajratadi va qabul qilingan jinsga qarab erkak 1, ayol 1 sifatida koʻrsatadi, ismlar yoki shaxslarni aniqlamaydi)"
       },
       {
         "k": "Saqlash",
-        "v": "Natija qaytarilishi bilanoq tugaydi. Google'dan soʻrovlarni saqlamaslikni soʻraymiz (store=false). Suiisteʼmolni kuzatish jurnallari Google shartlariga muvofiq saqlanishi mumkin [TBD: saqlash muddati va pullik daraja holati]."
+        "v": "Qayta ishlangan natijalar olingandan soʻng darhol tugaydi. Googleʼdan soʻrovlarni saqlamaslikni soʻraymiz (store=false). Biroq, Google shartlariga muvofiq suiisteʼmol monitoringi yozuvlari saqlanishi mumkin [Kutilmoqda: Master, saqlash muddati va pullik darajani qoʻllash]."
       },
       {
         "k": "Rad etish usuli va oqibatlari",
@@ -895,8 +895,8 @@
     "keep": [
       "Asl audio: seminar subtitrlari va AI yigʻilish qaydlari uchun saqlanmaydi; matnga aylantirilgandan soʻng darhol tashlab yuboriladi. Shaxsiy qaydlar uchun yozuv shaxsiy saqlash joyida saqlanadi, shunda yigʻilishdan keyin uni aniqroq (soʻzlovchilar bilan) transkripsiya qilish mumkin, va qayd tugagandan soʻng 1 kun oʻtgach (agar qayd oʻchirilgan boʻlsa darhol) kundalik tozalashda oʻchiriladi.",
       "Jonli subtitrlar: saqlanmaydi.",
-      "AI yigʻilish qaydlari (taqdimotchi yoqqanida): gapirilgan kontent, skrinshotlar va xulosa, qaydlar oʻchirilguncha saqlanadi [TBD: maksimal saqlash muddati].",
-      "Rozilik yozuvlari: rozilik vaqti va siyosat versiyasi, dalil sifatida saqlanadi [TBD: saqlash muddati].",
+      "AI yigʻilish bayonnomalari (taqdimotchi tomonidan yoqilgan boʻlsa): Yigʻilish bayonnomalari oʻchirilguncha nutqlar, skrinshotlar va xulosalarni saqlaydi [Kutilmoqda: Master, maksimal saqlash muddati].",
+      "Rozilik yozuvlari: Rozilik sanasi va rozilik berilgan siyosat versiyasini dalil sifatida saqlaydi [Kutilmoqda: Master, saqlash muddati].",
       "Foydalanish: daqiqalik soʻrovlar soni va qayta ishlash vaqti, xarajat limitlarini qoʻllash uchun ishlatiladi.",
       "Davomat: siz qoʻshilgan vaqt, oxirgi ulanish vaqti, displey nomingiz va Pi foydalanuvchi nomingiz saqlanadi va mezbonga davomat roʻyxati sifatida beriladi (ekranda va CSV yuklab olish sifatida). Seminar oʻchirilguncha saqlanadi.",
       "Savol-javob va soʻrovnomalar: savol matni va soʻrovchining displey nomi (yoki agar yoʻq boʻlsa Pi foydalanuvchi nomi) har bir ishtirokchiga koʻrinadi. Ovozlar faqat sonlarni koʻrsatadi, kim ovoz berganini hech qachon koʻrsatmaydi. Soʻrovnomadagi ovozlar ishtirokchilarga faqat sonlarni koʻrsatadi; tashkilotchi va administratorlar har bir variant uchun har bir ovoz beruvchining displey nomini (yoki agar yoʻq boʻlsa Pi foydalanuvchi nomi) koʻradi. Yashirin savollarni ham oʻz ichiga olgan holda, seminar oʻchirilguncha saqlanadi."
@@ -904,14 +904,14 @@
     "recTitle": "Yozish",
     "rec": "Yozuvlar faqat taqdimotchining qurilmasida fayl sifatida saqlanadi. Ular serverlarimizga yuklanmaydi yoki chet elga uzatilmaydi. Yozish yoki AI qaydlari yoqilgan vaqtda har bir ishtirokchi indikatorni koʻradi.",
     "rightsTitle": "Sizning huquqlaringiz",
-    "rights": "Siz oʻz maʼlumotlaringizga kirish, ularni tuzatish, oʻchirish yoki qayta ishlashni toʻxtatishni soʻrashingiz mumkin. Aloqa: [TBD: maxfiylik boʻyicha masʼul shaxsning ismi va aloqa maʼlumotlari]"
+    "rights": "Siz oʻz maʼlumotlaringizga kirish, ularni tuzatish, oʻchirish va qayta ishlashni toʻxtatishni soʻrashingiz mumkin. Aloqa: [Kutilmoqda: Master, Maxfiylik boʻyicha masʼul shaxsning ismi va aloqa maʼlumotlari]"
   },
   "notes": {
     "title": "Qaydlar",
     "back": "Seminarga qaytish",
     "loading": "Yuklanmoqda…",
     "meta": "Qaydlar · {date} · {min} daq",
-    "aiWarn": "AI tomonidan yaratilgan xulosa — xatolar boʻlishi mumkin",
+    "aiWarn": "AI tomonidan yaratilgan xulosa : xatolar boʻlishi mumkin",
     "points": "Asosiy fikrlar",
     "decisions": "Qarorlar",
     "todos": "Harakatlar",
@@ -921,11 +921,11 @@
     "making": "Qaydlar yaratilmoqda…",
     "makingLong": "Bu biroz vaqt olmoqda. Iltimos, keyinroq yangilang",
     "recording": "Hali ham yozilmoqda",
-    "failed": "Xulosani yaratib boʻlmadi — toʻliq transkript quyida",
+    "failed": "Xulosa yaratib boʻlmadi. Toʻliq transkript quyida.",
     "retry": "Qayta urinish",
     "finish": "Yozishni tugatish va xulosa qilish",
     "none": "Hech narsa yoʻq",
-    "blank": "Xulosa qilish uchun hech narsa yoʻq — nutq yozib olinmagan yoki juda qisqa boʻlgan",
+    "blank": "Xulosa qilish uchun hech qanday kontent yoʻq. Nutq yozilmagan yoki juda qisqa boʻlgan.",
     "notFound": "Qaydlar topilmadi",
     "forbidden": "Bu qaydlarga kirish huquqingiz yoʻq",
     "shotAlt": "{at} da ekran tasviri",
@@ -938,7 +938,7 @@
     "delYes": "Oʻchirish",
     "delNo": "Bekor qilish",
     "delFail": "Oʻchirib boʻlmadi",
-    "dlFail": "Yuklab boʻlmadi — iltimos, qayta urinib koʻring",
+    "dlFail": "Yuklab olish muvaffaqiyatsiz tugadi. Iltimos, qayta bosing.",
     "recentNotes": "Soʻnggi qaydlar",
     "empty": "Hali qaydlar yoʻq",
     "newNote": "Shaxsiy qaydlarni boshlash",
@@ -959,12 +959,12 @@
     "aiOff": "AI eslatmalari hozircha mavjud emas (server sozlamalari kerak). Oldingi eslatmalar quyida keltirilgan",
     "reload": "Qayta yuklash",
     "unsupported": "Bu qurilmada yozish mavjud emas",
-    "micDenied": "Mikrofondan foydalanish mumkin emas — ruxsatni tekshiring",
-    "limited": "Ishlov berish vaqti chegarasi tugadi — tugallang va eslatmalar yarating",
-    "noAgr": "Toʻxtatildi: yozishda bildirishnoma tasdiqlanmadi — tugallang va qayta boshlang",
-    "micLost": "Mikrofon uzildi va yozish toʻxtadi — Mikrofonni qayta ulash tugmasini bosing yoki eslatmani tugallang",
+    "micDenied": "Mikrofon mavjud emas. Iltimos, ruxsatlarni tekshiring.",
+    "limited": "Qayta ishlash vaqti chegarasiga yetildi. Iltimos, tugating va yigʻilish bayonnomasini yarating.",
+    "noAgr": "Bildirishnomani tasdiqlash yozuvi yoʻqligi sababli toʻxtatildi. Iltimos, tugating va qayta boshlang.",
+    "micLost": "Mikrofon ulanishi uzildi, yozib olish toʻxtatildi. Iltimos, [Mikrofonni qayta ulash] tugmasini bosing yoki tugating.",
     "micRetry": "Mikrofonni qayta ulash",
-    "gone": "Bu eslatma boshqa joyda tugatilgan yoki oʻchirilgan, shuning uchun yozish toʻxtatildi — eslatmalarni ochish uchun quyidagi tugmadan foydalaning",
+    "gone": "Bu eslatma boshqa ekranda tugatilgan yoki oʻchirilgan, shuning uchun yozib olish toʻxtatildi. Iltimos, quyidagi tugma yordamida yigʻilish bayonnomasini tekshiring.",
     "finishing": "Oxirgi soʻzlarni saqlash…",
     "st": {
       "RECORDING": "Yozilmoqda",
@@ -972,7 +972,7 @@
       "DONE": "Bajarildi",
       "FAILED": "Muvaffaqiyatsiz"
     },
-    "downloadPiBrowser": "Markdownni yuklab olish faqat oddiy brauzerda (kompyuter yoki mobil) ishlaydi. Pi Browser fayllarni saqlay olmaydi — ushbu eslatmalarni kompyuter yoki telefon brauzerida (seminarz.vercel.app) oching."
+    "downloadPiBrowser": "Markdown yuklab olish faqat oddiy brauzerlarda (kompyuter/mobil) mavjud. Pi Browser fayllarni saqlay olmaydi. Iltimos, xuddi shu yigʻilish bayonnomasini kompyuter yoki mobil brauzerda (seminarz.vercel.app) oching."
   },
   "plan": {
     "title": "Rejalar",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} ulangan",
     "producers": "{n} ta oqim",
     "end": "{time} da tugaydi",
-    "stale": "Seminar tugadi, ammo xona video serverda hali ham ochiq — uni majburan yoping.",
+    "stale": "Seminar tugadi, ammo video serverda xonalar qoldi. Ularni majburan yoping.",
     "close": "Majburan yopish",
     "confirmSeminar": "Bu seminarni tugatadi va xonani yopadi. Hamma uziladi.",
     "confirmRoom": "Bu xonani yopadi. Hamma uziladi.",
@@ -1063,7 +1063,7 @@
     "cancel": "Bekor qilish",
     "saving": "Saqlanmoqda…",
     "done": "Qoʻllanildi. {plan} qolgan vaqt: {time}",
-    "invalid": "Kamaytirishni 1 daqiqadan 1000 soatgacha (butun daqiqalar 0–59) kiriting.",
+    "invalid": "Kamaytirishni 1 daqiqadan 1000 soatgacha (butun daqiqalar 0~59) kiriting.",
     "history": "Soʻnggi oʻzgarishlar",
     "noHistory": "Hali oʻzgarishlar yoʻq.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

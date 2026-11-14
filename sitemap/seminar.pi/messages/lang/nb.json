@@ -6,7 +6,7 @@
   "home": {
     "description": "Vertene åpner seminarer, og deltakerne blir med på live videoøkter med Pi.",
     "badge": "Live seminarer på vakre øyer",
-    "headline": "Se, lytt og lær sammen – live",
+    "headline": "Se, lytt og lær sammen : live",
     "ctaBrowse": "Bla gjennom seminarer",
     "ctaPlan": "Se planer",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarer",
     "cal": {
       "title": "Seminarkalender",
-      "desc": "Fra tidligere seminarer til kommende – trykk på en dato for detaljer.",
+      "desc": "Fra tidligere seminarer til kommende: trykk på en dato for detaljer.",
       "legendSmn": "Seminarer",
       "legendEnded": "Tidligere seminarer",
       "legendMine": "Mine arrangementer",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Live videoseminar",
-        "desc": "Vår egen videomotor Galápagos – målet er én presentatør som strømmer til opptil 30 deltakere"
+        "desc": "Vår egen video-motor Galápagos: Målet er at én presentatør skal sende video til opptil 30 publikummere."
       },
       "F02": {
         "name": "Opprett et seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Syntetisk stemmeavspilling og senket original lyd"
     },
     "refLabel": "Referansemodell",
-    "uiRef": "UI-grunnlinje – skjerm- og funksjonsmønstre fra en mye brukt nettbasert videomøteapp, tilpasset seminar.pi"
+    "uiRef": "UI-standarder: Bruker skjerm- og funksjonsmønstre fra populære nettkonferanseapper til seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Publikum bruker ikke kamera eller mikrofon. Etter å ha blitt med vil du se og høre presentatøren.",
     "preview": {
       "pending": "Forbereder kamera og mikrofon…",
-      "audioOnly": "Kamera utilgjengelig – sender kun lyd.",
+      "audioOnly": "Kamera utilgjengelig : sender kun lyd.",
       "none": "Kamera og mikrofon utilgjengelig. Sjekk tillatelser (du kan fortsatt bli med uten medier).",
-      "videoOnly": "Mikrofon utilgjengelig – sender kun video. Sjekk mikrofontillatelse."
+      "videoOnly": "Mikrofon utilgjengelig : sender kun video. Sjekk mikrofontillatelse."
     },
     "mic": {
       "on": "Slå av mikrofon",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Inngangspasset ditt er utløpt.",
       "TICKET_EXPIRED": "Inngangspasset ditt er utløpt.",
       "ROOM_FULL": "Dette seminaret er fullt.",
-      "ROOM_CLOSED": "Rommet ble stengt – seminaret er avsluttet eller verten har vært borte i mer enn 5 minutter.",
+      "ROOM_CLOSED": "Rommet er stengt. Seminaret er avsluttet, eller verten har vært fraværende i mer enn 5 minutter.",
       "DUPLICATE_SESSION": "Du ble koblet fra denne skjermen fordi du logget på fra en annen enhet.",
       "ROLE_FORBIDDEN": "Du har ikke tillatelse til å presentere.",
       "WS_FAILED": "Kunne ikke koble til videoserveren.",
@@ -488,7 +488,7 @@
     "toDetail": "Gå til seminarsiden",
     "consent": {
       "title": "Før du slår på mikrofonen",
-      "body": "Hvis opptak, teksting eller AI-møtenotater er slått på i dette seminaret, kan stemmen din bli konvertert til tekst, lagret og oversatt. Stemmebehandling utføres av en AI-tjeneste utenfor landet ditt. Hvis du ikke samtykker, slås mikrofonen din fortsatt på – bare stemmen din utelates fra behandlingen.",
+      "body": "Hvis opptak, teksting eller AI-møtenotater er slått på i dette seminaret, kan stemmen din bli konvertert til tekst, lagret og oversatt. Stemmebehandling utføres av en AI-tjeneste utenfor landet ditt. Hvis du ikke samtykker, slås mikrofonen din fortsatt på : bare stemmen din utelates fra behandlingen.",
       "privacy": "Personvernerklæring",
       "newTab": "(åpnes i ny fane)",
       "decline": "Ikke enig",
@@ -613,7 +613,7 @@
       "title": "Opptak",
       "badge": "Tar opp",
       "unsupported": "Denne nettleseren kan ikke ta opp. Vennligst ta opp fra en vanlig nettleser på en datamaskin.",
-      "piBrowserOnly": "Opptak fungerer kun i en vanlig nettleser (PC eller mobil). Pi Browser kan ikke lagre opptaksfiler – åpne dette seminaret i en datamaskin- eller telefonnettleser (seminarz.vercel.app) for å ta opp.",
+      "piBrowserOnly": "Opptak er kun tilgjengelig i vanlige nettlesere (PC/mobil). Pi Browser kan ikke lagre innspilte filer. Vennligst åpne det samme seminaret i en datamaskin- eller mobilnettleser (seminarz.vercel.app) for å ta opp.",
       "audioSuspended": "Lydopptak har kanskje ikke startet på denne enheten. Kun bildet kan bli tatt opp.",
       "notifyFailed": "Opptaket startet ikke fordi deltakerne ikke kunne varsles. Prøv igjen om kort tid.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Lukk lagre igjen"
       },
       "toast": {
-        "started": "Opptak startet – alle kan se det",
+        "started": "Opptaket har startet. Dette vil vises for alle deltakere.",
         "saved": "Opptak lagret. Sjekk nedlastingsmappen din. Hvis ingenting ble lagret, trykk [Lagre igjen] øverst på skjermen.",
         "autoStopped": "Opptaket ble avsluttet fordi nettleseren stoppet det eller størrelsesgrensen ble nådd. Alt frem til det punktet ble lagret. Start opptaket igjen for å fortsette.",
         "empty": "Ingenting ble tatt opp, så ingen fil ble opprettet.",
@@ -656,10 +656,10 @@
       "badge": "AI-notater på",
       "started": "Presentatøren slo på AI-notater",
       "stopped": "AI-notater slått av",
-      "startedMine": "AI-notater på — vises for alle",
-      "stoppedMine": "AI-notater av — notatene blir opprettet",
+      "startedMine": "AI-møtereferat er slått på. Dette vil vises for alle deltakere.",
+      "stoppedMine": "AI-møtereferat er slått av. Møtereferat genereres.",
       "startFail": "Kunne ikke starte AI-notater",
-      "gone": "AI-notater stoppet — notatene ble avsluttet eller slettet et annet sted",
+      "gone": "AI-notater stoppet : notatene ble avsluttet eller slettet et annet sted",
       "unsupported": "AI-notater kan ikke slås på her (ingen støtte for lydopptak)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Trykk på [Åpne Google Kalender-innstillinger] nedenfor.",
       "s2": "Under 'Innstillinger for mine kalendere' til venstre, velg en kalender (f.eks. navnet ditt).",
       "s3": "Rull til 'Integrer kalender' og kopier 'Hemmelig adresse i iCal-format'.",
-      "s4": "Lim den inn her og trykk [Legg til] — hendelsestitler vises i kalenderen. Legg til andre kalendere på samme måte, opptil 5.",
+      "s4": "Lim den inn her og trykk [Legg til] : hendelsestitler vises i kalenderen. Legg til andre kalendere på samme måte, opptil 5.",
       "open": "Åpne Google Kalender-innstillinger",
-      "privacy": "Denne adressen er en nøkkel til kalenderen din — ikke del den. Den lagres kun på denne enheten, aldri på serveren vår."
+      "privacy": "Denne adressen er en nøkkel til kalenderen din : ikke del den. Den lagres kun på denne enheten, aldri på serveren vår."
     },
     "title": "Opprett et seminar",
     "name": "La oss reise til en vakker øy!",
     "subTitle": "Undertittel (valgfritt, opptil 60)",
     "startAt": "Starttidspunkt",
-    "maxCnt": "Kapasitet (1–100)",
+    "maxCnt": "Kapasitet (1~100)",
     "submit": "Opprett",
     "submitting": "Oppretter…",
-    "invalid": "Sjekk inndataene dine — en dato innen ett år fra nå, kapasitet 1–100.",
+    "invalid": "Vennligst sjekk inndataverdiene: en dato innen ett år fra nå, og en kapasitet på 1-100.",
     "attendance": {
       "title": "Oppmøte",
       "back": "Tilbake til seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Tid deltatt er fra første gang man ble med til sist sett, minus tid borte (hull lengre enn 2,5 minutter).",
-      "csvPiBrowser": "CSV-nedlasting fungerer kun i en vanlig nettleser (datamaskin eller mobil). Pi Browser kan ikke lagre filer — åpne dette oppmøteskjemaet i en datamaskin- eller telefonnettleser (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV-nedlasting er kun tilgjengelig i vanlige nettlesere (PC/mobil). Pi Browser kan ikke lagre filer. Vennligst åpne samme oppmøteliste i en datamaskin- eller mobilnettleser (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Gratis — {time} igjen denne måneden · ingen AI",
-    "planPaid": "{name} {time} · {price} — betal ved opprettelse",
+    "planFree": "Gratis: {time} gjenstår denne måneden · Ingen AI",
+    "planPaid": "{name} {time} · {price} · Betaling ved opprettelse",
     "planHint": "Et seminar åpnet på en betalt plan bruker den planens tid først, og fortsetter deretter på denne månedens gratis tid (ingen AI i den gratis delen). En aktiv plan åpnes uten betaling; Månedlig eller Årlig du ikke har, betales i Pi når du trykker Opprett, deretter åpnes seminaret (Pi Browser). Å bli med er alltid gratis for deltakere.",
-    "planOwned": "{name} — aktiv · {time} igjen",
+    "planOwned": "{name}: Abonnert · {time} gjenstår",
     "planEnds": "Starttidspunktet er etter at denne planens pass utløper. Flytt starten tidligere eller velg en annen plan.",
     "paidKept": "Ditt betalte pass beholdes. Fiks problemet og trykk Opprett igjen (ingen andre betaling)."
   },
   "privacy": {
-    "title": "Personvernregler — Stemme- og AI-funksjoner",
+    "title": "Personvernerklæring: Stemme- og AI-funksjoner",
     "effective": "Gjeldende fra {date}",
     "intro": "Denne policyen forklarer personopplysningene vi behandler når du bruker live-teksting, oversatt teksting, stemmeoversettelse, AI-møtenotater og personlige notater i et seminar. Disse funksjonene bruker en ekstern AI-tjeneste, så informasjonen overføres til utlandet.",
     "whoTitle": "Hvem sin informasjon behandles",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Mottaker",
-        "v": "Google LLC (Gemini API) — kontakt [TBD: Google personvernkontakt]"
+        "v": "Google LLC (Gemini API): Kontakt [Venter: Master, Google personvernforespørselkanal]"
       },
       {
         "k": "Land",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Formål",
-        "v": "Tale til tekst, oversettelse, møtenotatsammendrag, syntetisk tale (standardstemmer, ingen stemmekloning), høyttalerseparasjon for personlige notater (stemmer skilles og merkes med oppfattet kjønn, for eksempel Mann 1 / Kvinne 1 — ingen navn eller identiteter utledes)"
+        "v": "Konvertering av stemme til tekst, oversettelse, oppsummering av møtereferater, syntetisk stemme (standard stemme, ingen stemmekloning), høyttalerseparasjon i personlige notater (skiller personer etter stemme og viser som mann 1, kvinne 1 basert på oppfattet kjønn, identifiserer ikke navn eller identiteter)"
       },
       {
         "k": "Oppbevaring",
-        "v": "Avsluttes så snart resultatet er returnert. Vi ber Google om ikke å lagre forespørsler (store=false). Logger for misbruksovervåking kan fortsatt beholdes under Googles vilkår [TBD: oppbevaringsperiode og betalt nivåstatus]."
+        "v": "Avsluttes umiddelbart etter mottak av behandlede resultater. Vi ber om at Google ikke lagrer forespørsler (store=false). Imidlertid kan poster for misbruksovervåking i henhold til Googles vilkår lagres [Venter: Master, lagringsperiode og anvendelse av betalt nivå]."
       },
       {
         "k": "Hvordan nekte, og hva som skjer",
@@ -895,8 +895,8 @@
     "keep": [
       "Original lyd: for seminarteksting og AI-møtenotater lagres den ikke; den kastes rett etter konvertering til tekst. For personlige notater lagres opptaket i privat lagring slik at det kan transkriberes mer nøyaktig (med høyttalere) etter møtet, og det slettes ved daglig opprydding når 1 dag har gått siden notatet ble avsluttet (umiddelbart hvis notatet slettes).",
       "Live-teksting: lagres ikke.",
-      "AI-møtenotater (når presentatøren slår dem på): talt innhold, skjermbilder og sammendraget, beholdes til notatene slettes [TBD: maksimal oppbevaring].",
-      "Samtykkeregistreringer: tidspunkt for samtykke og policyversjon, beholdes som bevis [TBD: oppbevaringsperiode].",
+      "AI-møtereferater (hvis aktivert av presentatøren): Lagrer ytringer, skjermbilder og sammendrag til møtereferatet slettes [Venter: Master, maksimal lagringsperiode].",
+      "Samtykkeposter: Lagrer samtykkedato og versjon av samtykket policy som bevis [Venter: Master, lagringsperiode].",
       "Bruk: antall forespørsler per minutt og behandlingstid, brukes til å håndheve kostnadsgrenser.",
       "Oppmøte: tidspunktet du ble med, tidspunktet du sist var tilkoblet, visningsnavnet ditt og Pi-brukernavnet ditt lagres og gis til verten som en oppmøteliste (på skjermen og som en CSV-nedlasting). Beholdes til seminaret slettes.",
       "Spørsmål og svar og avstemninger: spørsmålsteksten og spørgerens visningsnavn (eller Pi-brukernavn hvis ingen) er synlig for alle deltakere. Oppstemmer viser kun antall, aldri hvem som stemte. Avstemningsstemmer viser kun antall til deltakere; arrangøren og administratorer ser, for hvert alternativ, visningsnavnet (eller Pi-brukernavnet hvis ingen) til hver velger. Beholdes, inkludert skjulte spørsmål, til seminaret slettes."
@@ -904,14 +904,14 @@
     "recTitle": "Opptak",
     "rec": "Opptak lagres kun som en fil på presentatørens enhet. De lastes ikke opp til serverne våre eller overføres til utlandet. Mens opptak eller AI-notater er på, ser hver deltaker en indikator.",
     "rightsTitle": "Dine rettigheter",
-    "rights": "Du kan be om å få tilgang til, korrigere, slette eller stoppe behandlingen av informasjonen din. Kontakt: [TBD: personvernansvarlig navn og kontakt]"
+    "rights": "Du kan be om tilgang, korrigering, sletting og stans av behandling av informasjonen din. Kontakt: [Venter: Master, personvernombudets navn og kontaktinformasjon]"
   },
   "notes": {
     "title": "Notater",
     "back": "Tilbake til seminar",
     "loading": "Laster inn…",
     "meta": "Notater · {date} · {min} min",
-    "aiWarn": "AI-generert sammendrag — det kan inneholde feil",
+    "aiWarn": "AI-generert sammendrag : det kan inneholde feil",
     "points": "Nøkkelpunkter",
     "decisions": "Beslutninger",
     "todos": "Handlingselementer",
@@ -921,11 +921,11 @@
     "making": "Oppretter notatene…",
     "makingLong": "Dette tar litt tid. Vennligst oppdater senere",
     "recording": "Tar fortsatt opp",
-    "failed": "Kunne ikke opprette sammendraget — hele transkripsjonen er nedenfor",
+    "failed": "Kunne ikke opprette sammendrag. Fullstendig transkripsjon er nedenfor.",
     "retry": "Prøv igjen",
     "finish": "Avslutt opptak og oppsummer",
     "none": "Ingenting her",
-    "blank": "Ingenting å oppsummere — ingen tale ble tatt opp eller den var for kort",
+    "blank": "Ingen innhold å oppsummere. Ingen tale ble spilt inn, eller den var for kort.",
     "notFound": "Notater ikke funnet",
     "forbidden": "Du har ikke tilgang til disse notatene",
     "shotAlt": "Skjermbilde kl. {at}",
@@ -938,7 +938,7 @@
     "delYes": "Slett",
     "delNo": "Avbryt",
     "delFail": "Kunne ikke slette",
-    "dlFail": "Kunne ikke laste ned — vennligst prøv igjen",
+    "dlFail": "Nedlasting mislyktes. Vennligst trykk igjen.",
     "recentNotes": "Nylige notater",
     "empty": "Ingen notater ennå",
     "newNote": "Start personlige notater",
@@ -959,12 +959,12 @@
     "aiOff": "AI-notater er ikke tilgjengelige akkurat nå (serveroppsett nødvendig). Tidligere notater er listet nedenfor",
     "reload": "Last inn på nytt",
     "unsupported": "Opptak er ikke tilgjengelig på denne enheten",
-    "micDenied": "Kan ikke bruke mikrofonen – sjekk tillatelsen",
-    "limited": "Tidsgrensen for behandling er brukt opp – avslutt og opprett notatene",
-    "noAgr": "Stoppet: ingen bekreftelse på opptak – avslutt og start på nytt",
-    "micLost": "Mikrofonen ble koblet fra og opptaket stoppet – trykk på Koble til mikrofon på nytt eller avslutt notatet",
+    "micDenied": "Mikrofonen er utilgjengelig. Vennligst sjekk tillatelser.",
+    "limited": "Behandlingstidsgrensen er nådd. Vennligst avslutt og generer møtereferat.",
+    "noAgr": "Stoppet på grunn av manglende bekreftelse av varsel. Vennligst avslutt og start på nytt.",
+    "micLost": "Mikrofontilkoblingen mistet, opptaket stoppet. Vennligst trykk [Koble til mikrofon på nytt] eller avslutt.",
     "micRetry": "Koble til mikrofon på nytt",
-    "gone": "Dette notatet ble avsluttet eller slettet et annet sted, så opptaket stoppet – bruk knappen nedenfor for å åpne notatene",
+    "gone": "Dette notatet ble avsluttet eller slettet på en annen skjerm, så opptaket har stoppet. Vennligst sjekk møtereferatet ved hjelp av knappen nedenfor.",
     "finishing": "Lagrer de siste ordene…",
     "st": {
       "RECORDING": "Tar opp",
@@ -972,7 +972,7 @@
       "DONE": "Ferdig",
       "FAILED": "Mislyktes"
     },
-    "downloadPiBrowser": "Nedlasting av Markdown fungerer kun i en vanlig nettleser (datamaskin eller mobil). Pi Browser kan ikke lagre filer – åpne disse notatene i en datamaskin- eller telefonleser (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdown-nedlasting er kun tilgjengelig i vanlige nettlesere (PC/mobil). Pi Browser kan ikke lagre filer. Vennligst åpne det samme møtereferatet i en datamaskin- eller mobilnettleser (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Abonnementer",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} tilkoblet",
     "producers": "{n} strømmer",
     "end": "Avsluttes {time}",
-    "stale": "Seminaret er avsluttet, men rommet er fortsatt åpent på videoserveren – tvangslukk det.",
+    "stale": "Seminaret er avsluttet, men rommene er fortsatt på videoserveren. Vennligst tvangsavslutt dem.",
     "close": "Tvangslukk",
     "confirmSeminar": "Dette avslutter seminaret og lukker rommet. Alle vil bli koblet fra.",
     "confirmRoom": "Dette lukker rommet. Alle vil bli koblet fra.",
@@ -1063,7 +1063,7 @@
     "cancel": "Avbryt",
     "saving": "Lagrer…",
     "done": "Anvendt. {plan} gjenstående tid: {time}",
-    "invalid": "Angi en reduksjon mellom 1 minutt og 1000 timer (hele minutter 0–59).",
+    "invalid": "Angi en reduksjon mellom 1 minutt og 1000 timer (hele minutter 0~59).",
     "history": "Nylige justeringer",
     "noHistory": "Ingen justeringer ennå.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

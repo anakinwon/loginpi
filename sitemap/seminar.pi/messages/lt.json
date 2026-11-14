@@ -6,7 +6,7 @@
   "home": {
     "description": "Vedėjai rengia seminarus, o dalyviai prisijungia prie tiesioginių vaizdo sesijų su Pi.",
     "badge": "Tiesioginiai seminarai gražiose salose",
-    "headline": "Žiūrėkite, klausykitės ir mokykitės kartu – tiesiogiai",
+    "headline": "Žiūrėkite, klausykitės ir mokykitės kartu : tiesiogiai",
     "ctaBrowse": "Naršyti seminarus",
     "ctaPlan": "Žiūrėti planus",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarai",
     "cal": {
       "title": "Seminarų kalendorius",
-      "desc": "Nuo praėjusių iki būsimų seminarų – bakstelėkite datą, kad gautumėte išsamią informaciją.",
+      "desc": "Nuo praėjusių seminarų iki būsimų: bakstelėkite datą, kad pamatytumėte išsamią informaciją.",
       "legendSmn": "Seminarai",
       "legendEnded": "Praėję seminarai",
       "legendMine": "Mano renginiai",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Tiesioginis vaizdo seminaras",
-        "desc": "Mūsų pačių vaizdo variklis Galápagos — tikslas yra vienas pranešėjas, transliuojantis iki 30 dalyvių"
+        "desc": "Mūsų pačių vaizdo variklis Galápagos: tikslas yra, kad vienas pranešėjas siųstų vaizdo įrašą iki 30 auditorijos narių."
       },
       "F02": {
         "name": "Sukurti seminarą",
@@ -254,7 +254,7 @@
       "dubbing": "Sintetinio balso atkūrimas ir sumažintas originalus garsas"
     },
     "refLabel": "Nuorodos modelis",
-    "uiRef": "UI bazinė linija — plačiai naudojamos žiniatinklio vaizdo susitikimų programos ekrano ir funkcijų modeliai, pritaikyti seminar.pi"
+    "uiRef": "UI standartai: populiarių žiniatinklio vaizdo konferencijų programų ekrano ir funkcijų šablonų taikymas seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Auditorijos nariai nenaudoja kameros ar mikrofono. Prisijungę matysite ir girdėsite pranešėją.",
     "preview": {
       "pending": "Ruošiama kamera ir mikrofonas…",
-      "audioOnly": "Kamera nepasiekiama – siunčiamas tik garsas.",
+      "audioOnly": "Kamera nepasiekiama : siunčiamas tik garsas.",
       "none": "Kamera ir mikrofonas nepasiekiami. Patikrinkite leidimus (vis tiek galite prisijungti be medijos).",
-      "videoOnly": "Mikrofonas nepasiekiamas – siunčiamas tik vaizdas. Patikrinkite mikrofono leidimą."
+      "videoOnly": "Mikrofonas nepasiekiamas : siunčiamas tik vaizdas. Patikrinkite mikrofono leidimą."
     },
     "mic": {
       "on": "Išjungti mikrofoną",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Jūsų įėjimo leidimas baigėsi.",
       "TICKET_EXPIRED": "Jūsų įėjimo leidimas baigėsi.",
       "ROOM_FULL": "Vietų nebėra.",
-      "ROOM_CLOSED": "Kambarys uždarytas – seminaras baigėsi arba vedėjas išėjo ilgiau nei 5 minutėms.",
+      "ROOM_CLOSED": "Kambarys uždarytas. Seminaras baigėsi arba vedėjas nedalyvavo ilgiau nei 5 minutes.",
       "DUPLICATE_SESSION": "Prisijungėte iš kito įrenginio, todėl šis ekranas buvo atjungtas.",
       "ROLE_FORBIDDEN": "Neturite leidimo pristatyti.",
       "WS_FAILED": "Nepavyko prisijungti prie vaizdo serverio.",
@@ -488,7 +488,7 @@
     "toDetail": "Eiti į seminaro puslapį",
     "consent": {
       "title": "Prieš įjungdami mikrofoną",
-      "body": "Jei šiame seminare įjungtas įrašymas, subtitrai ar AI susitikimo užrašai, jūsų balsas gali būti konvertuojamas į tekstą, saugomas ir verčiamas. Balso apdorojimą atlieka AI paslauga už jūsų šalies ribų. Jei nesutinkate, jūsų mikrofonas vis tiek įsijungs – tik jūsų balsas nebus apdorojamas.",
+      "body": "Jei šiame seminare įjungtas įrašymas, subtitrai ar AI susitikimo užrašai, jūsų balsas gali būti konvertuojamas į tekstą, saugomas ir verčiamas. Balso apdorojimą atlieka AI paslauga už jūsų šalies ribų. Jei nesutinkate, jūsų mikrofonas vis tiek įsijungs : tik jūsų balsas nebus apdorojamas.",
       "privacy": "Privatumo politika",
       "newTab": "(atidaroma naujame skirtuke)",
       "decline": "Nesutinku",
@@ -613,7 +613,7 @@
       "title": "Įrašyti",
       "badge": "Įrašoma",
       "unsupported": "Ši naršyklė nepalaiko įrašymo. Įrašykite naudodami įprastą naršyklę kompiuteryje.",
-      "piBrowserOnly": "Įrašymas veikia tik įprastoje naršyklėje (kompiuteryje ar mobiliajame telefone). Pi Browser negali išsaugoti įrašymo failų – atidarykite šį seminarą kompiuterio ar telefono naršyklėje (seminarz.vercel.app), kad įrašytumėte.",
+      "piBrowserOnly": "Įrašymas galimas tik įprastose naršyklėse (PC/mobiliajame telefone). Pi Browser negali išsaugoti įrašytų failų. Norėdami įrašyti, atidarykite tą patį seminarą kompiuterio ar mobiliojo telefono naršyklėje (seminarz.vercel.app).",
       "audioSuspended": "Garso įrašymas šiame įrenginyje galėjo neprasidėti. Gali būti įrašomas tik vaizdas.",
       "notifyFailed": "Įrašymas neprasidėjo, nes nepavyko pranešti dalyviams. Bandykite dar kartą po kurio laiko.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Uždaryti išsaugojimą dar kartą"
       },
       "toast": {
-        "started": "Įrašymas pradėtas – visi gali tai matyti",
+        "started": "Įrašymas pradėtas. Tai bus rodoma visiems dalyviams.",
         "saved": "Įrašas išsaugotas. Patikrinkite atsisiuntimų aplanką. Jei nieko nebuvo išsaugota, bakstelėkite [Išsaugoti dar kartą] ekrano viršuje.",
         "autoStopped": "Įrašymas baigėsi, nes naršyklė jį sustabdė arba buvo pasiekta dydžio riba. Viskas iki to momento buvo išsaugota. Norėdami tęsti, pradėkite įrašymą iš naujo.",
         "empty": "Nieko nebuvo įrašyta, todėl failas nebuvo sukurtas.",
@@ -656,10 +656,10 @@
       "badge": "AI užrašai įjungti",
       "started": "Pranešėjas įjungė AI užrašus",
       "stopped": "AI užrašai išjungti",
-      "startedMine": "AI užrašai įjungti – rodomi visiems",
-      "stoppedMine": "AI užrašai išjungti – kuriami užrašai",
+      "startedMine": "AI susitikimo protokolas pradėtas. Tai bus rodoma visiems dalyviams.",
+      "stoppedMine": "AI susitikimo protokolas sustabdytas. Susitikimo protokolas generuojamas.",
       "startFail": "Nepavyko paleisti AI užrašų",
-      "gone": "AI užrašai sustabdyti – užrašai buvo baigti arba ištrinti kitur",
+      "gone": "AI užrašai sustabdyti : užrašai buvo baigti arba ištrinti kitur",
       "unsupported": "AI užrašų čia negalima įjungti (nepalaikomas garso įrašymas)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Bakstelėkite [Atidaryti Google kalendoriaus nustatymus] žemiau.",
       "s2": "Kairėje esančiame sąraše „Mano kalendorių nustatymai“ pasirinkite kalendorių (pvz., savo vardą).",
       "s3": "Slinkite žemyn iki „Integruoti kalendorių“ ir nukopijuokite „Slaptą adresą iCal formatu“.",
-      "s4": "Įklijuokite jį čia ir bakstelėkite [Pridėti] – kalendoriaus datose pasirodys įvykių pavadinimai. Taip pat galite pridėti iki 5 kitų kalendorių.",
+      "s4": "Įklijuokite jį čia ir bakstelėkite [Pridėti] : kalendoriaus datose pasirodys įvykių pavadinimai. Taip pat galite pridėti iki 5 kitų kalendorių.",
       "open": "Atidaryti Google kalendoriaus nustatymus",
-      "privacy": "Šis adresas yra jūsų kalendoriaus raktas – nesidalinkite juo. Jis saugomas tik šiame įrenginyje, niekada mūsų serveryje."
+      "privacy": "Šis adresas yra jūsų kalendoriaus raktas : nesidalinkite juo. Jis saugomas tik šiame įrenginyje, niekada mūsų serveryje."
     },
     "title": "Sukurti seminarą",
     "name": "Keliaukime į gražią salą!",
     "subTitle": "Paantraštė (neprivaloma, iki 60 simbolių)",
     "startAt": "Pradžios laikas",
-    "maxCnt": "Vietų skaičius (1–100)",
+    "maxCnt": "Vietų skaičius (1~100)",
     "submit": "Sukurti",
     "submitting": "Kuriama…",
-    "invalid": "Patikrinkite įvestį – data per vienerius metus nuo dabar, vietų skaičius 1–100.",
+    "invalid": "Patikrinkite įvesties vertes: data per vienerius metus nuo dabar ir talpa 1-100.",
     "attendance": {
       "title": "Dalyvavimas",
       "back": "Grįžti į seminarą",
@@ -840,18 +840,18 @@
         "state": "Būsena"
       },
       "durNote": "Dalyvavimo laikas skaičiuojamas nuo pirmo prisijungimo iki paskutinio matymo, atėmus laiką, praleistą neprisijungus (pertraukos ilgesnės nei 2,5 minutės).",
-      "csvPiBrowser": "CSV atsisiuntimas veikia tik įprastoje naršyklėje (kompiuteryje ar mobiliajame telefone). Pi Browser negali išsaugoti failų – atidarykite šį dalyvavimo lapą kompiuterio ar telefono naršyklėje (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV atsisiuntimas galimas tik įprastose naršyklėse (PC/mobiliajame telefone). Pi Browser negali išsaugoti failų. Atidarykite tą patį lankomumo lapą kompiuterio ar mobiliojo telefono naršyklėje (seminarz.vercel.app)."
     },
     "plan": "Planas",
-    "planFree": "Nemokamai – {time} liko šį mėnesį · be AI",
-    "planPaid": "{name} {time} · {price} – mokėti kuriant",
+    "planFree": "Nemokamai: {time} liko šį mėnesį · Be AI",
+    "planPaid": "{name} {time} · {price} · Apmokėjimas sukūrimo metu",
     "planHint": "Seminaras, atidarytas su mokamu planu, pirmiausia naudoja to plano laiką, tada tęsiasi su šio mėnesio nemokamu laiku (nemokamoje dalyje AI išjungtas). Aktyvus planas atidaromas be mokėjimo; mėnesinis ar metinis, kurio neturite, apmokamas Pi, kai paspaudžiate „Sukurti“, tada seminaras atidaromas (Pi Browser). Dalyviams prisijungimas visada nemokamas.",
-    "planOwned": "{name} – aktyvus · liko {time}",
+    "planOwned": "{name}: Prenumeruota · Liko {time}",
     "planEnds": "Pradžios laikas yra po šio plano galiojimo pabaigos. Perkelkite pradžią anksčiau arba pasirinkite kitą planą.",
     "paidKept": "Jūsų mokamas abonementas išsaugotas. Ištaisykite problemą ir vėl paspauskite „Sukurti“ (antras mokėjimas nereikalingas)."
   },
   "privacy": {
-    "title": "Privatumo politika – balso ir AI funkcijos",
+    "title": "Privatumo politika: balso ir AI funkcijos",
     "effective": "Galioja nuo {date}",
     "intro": "Ši politika paaiškina asmeninę informaciją, kurią apdorojame, kai naudojate tiesioginius subtitrus, išverstus subtitrus, balso vertimą, AI susitikimų užrašus ir asmeninius užrašus seminare. Šios funkcijos naudoja išorinę AI paslaugą, todėl informacija perduodama į užsienį.",
     "whoTitle": "Kieno informacija apdorojama",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Gavėjas",
-        "v": "Google LLC (Gemini API) – kontaktas [TBD: Google privatumo kontaktas]"
+        "v": "Google LLC (Gemini API): kontaktas [Laukiama: Master, Google privatumo užklausų kanalas]"
       },
       {
         "k": "Šalys",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Tikslas",
-        "v": "Kalbos į tekstą konvertavimas, vertimas, susitikimų užrašų santraukos, sintetinė kalba (standartiniai balsai, be balso klonavimo), kalbėtojų atskyrimas asmeniniams užrašams (balsai atskiriami ir žymimi pagal suvokiamą lytį, pvz., Vyras 1 / Moteris 1 – vardai ar tapatybės nenustatomos)"
+        "v": "Balso konvertavimas į tekstą, vertimas, susitikimo protokolo apibendrinimas, sintetinė kalba (standartinis balsas, be balso klonavimo), kalbėtojo atskyrimas asmeniniuose užrašuose (atskiria žmones pagal balsą ir rodo kaip vyras 1, moteris 1 pagal suvokiamą lytį, neatpažįsta vardų ar tapatybių)"
       },
       {
         "k": "Saugojimas",
-        "v": "Baigiasi, kai tik grąžinamas rezultatas. Prašome Google nesaugoti užklausų (store=false). Piktnaudžiavimo stebėjimo žurnalai vis dar gali būti saugomi pagal Google sąlygas [TBD: saugojimo laikotarpis ir mokamo lygio statusas]."
+        "v": "Baigiasi iškart gavus apdorotus rezultatus. Prašome, kad Google nesaugotų užklausų (store=false). Tačiau piktnaudžiavimo stebėjimo įrašai pagal Google sąlygas gali būti saugomi [Laukiama: Master, saugojimo laikotarpis ir mokamos pakopos taikymas]."
       },
       {
         "k": "Kaip atsisakyti ir kas atsitiks",
@@ -895,8 +895,8 @@
     "keep": [
       "Originalus garsas: seminaro subtitrams ir AI susitikimų užrašams jis nesaugomas; jis išmetamas iškart po konvertavimo į tekstą. Asmeniniams užrašams įrašas saugomas privačioje saugykloje, kad po susitikimo jį būtų galima tiksliau transkribuoti (su kalbėtojais), ir jis ištrinamas kasdienio valymo metu, praėjus 1 dienai po užrašo pabaigos (iškart, jei užrašas ištrinamas).",
       "Tiesioginiai subtitrai: nesaugomi.",
-      "AI susitikimų užrašai (kai pranešėjas juos įjungia): kalbamas turinys, ekrano nuotraukos ir santrauka, saugomi, kol užrašai ištrinami [TBD: maksimalus saugojimo laikotarpis].",
-      "Sutikimo įrašai: sutikimo laikas ir politikos versija, saugomi kaip įrodymas [TBD: saugojimo laikotarpis].",
+      "AI susitikimo protokolas (jei įjungtas pranešėjo): saugo pasisakymus, ekrano kopijas ir santraukas, kol susitikimo protokolas bus ištrintas [Laukiama: Master, maksimalus saugojimo laikotarpis].",
+      "Sutikimo įrašai: saugo sutikimo datą ir sutiktos politikos versiją įrodymams [Laukiama: Master, saugojimo laikotarpis].",
       "Naudojimas: užklausų skaičius per minutę ir apdorojimo laikas, naudojami išlaidų limitams vykdyti.",
       "Dalyvavimas: jūsų prisijungimo laikas, paskutinio prisijungimo laikas, rodomas vardas ir Pi vartotojo vardas yra saugomi ir pateikiami vedėjui kaip dalyvių sąrašas (ekrane ir kaip CSV atsisiuntimas). Saugojami, kol seminaras ištrinamas.",
       "Klausimai ir atsakymai bei apklausos: klausimo tekstas ir klausėjo rodomas vardas (arba Pi vartotojo vardas, jei nėra) matomi kiekvienam dalyviui. Balsai „už“ rodo tik skaičius, niekada kas juos atidavė. Apklausos balsai dalyviams rodo tik skaičius; organizatorius ir administratoriai mato, kiekvienai parinkčiai, kiekvieno balsavusiojo rodomą vardą (arba Pi vartotojo vardą, jei nėra). Saugojami, įskaitant paslėptus klausimus, kol seminaras ištrinamas."
@@ -904,14 +904,14 @@
     "recTitle": "Įrašymas",
     "rec": "Įrašai saugomi tik kaip failas pranešėjo įrenginyje. Jie neįkeliami į mūsų serverius ir neperduodami į užsienį. Kol vyksta įrašymas arba įjungti AI užrašai, kiekvienas dalyvis mato indikatorių.",
     "rightsTitle": "Jūsų teisės",
-    "rights": "Galite prašyti prieigos, taisyti, ištrinti arba sustabdyti savo informacijos apdorojimą. Kontaktas: [TBD: privatumo pareigūno vardas ir kontaktas]"
+    "rights": "Galite prašyti prieigos, taisymo, ištrynimo ir jūsų informacijos apdorojimo sustabdymo. Kontaktas: [Laukiama: Master, privatumo pareigūno vardas ir kontaktas]"
   },
   "notes": {
     "title": "Užrašai",
     "back": "Grįžti į seminarą",
     "loading": "Įkeliama…",
     "meta": "Užrašai · {date} · {min} min",
-    "aiWarn": "AI sugeneruota santrauka – gali būti klaidų",
+    "aiWarn": "AI sugeneruota santrauka : gali būti klaidų",
     "points": "Pagrindiniai punktai",
     "decisions": "Sprendimai",
     "todos": "Veiksmų elementai",
@@ -921,11 +921,11 @@
     "making": "Kuriama užrašai…",
     "makingLong": "Tai užtrunka. Prašome atnaujinti vėliau",
     "recording": "Vis dar įrašoma",
-    "failed": "Nepavyko sukurti santraukos – visas transkriptas yra žemiau",
+    "failed": "Nepavyko sukurti santraukos. Visas stenogramas yra žemiau.",
     "retry": "Bandyti dar kartą",
     "finish": "Baigti įrašymą ir apibendrinti",
     "none": "Nieko nėra",
-    "blank": "Nieko apibendrinti – nebuvo įrašyta kalbos arba ji buvo per trumpa",
+    "blank": "Nėra turinio, kurį būtų galima apibendrinti. Nebuvo įrašyta kalbos arba ji buvo per trumpa.",
     "notFound": "Užrašai nerasti",
     "forbidden": "Neturite prieigos prie šių užrašų",
     "shotAlt": "Ekrano nuotrauka {at}",
@@ -938,7 +938,7 @@
     "delYes": "Ištrinti",
     "delNo": "Atšaukti",
     "delFail": "Nepavyko ištrinti",
-    "dlFail": "Nepavyko atsisiųsti – prašome bandyti dar kartą",
+    "dlFail": "Atsisiuntimas nepavyko. Bakstelėkite dar kartą.",
     "recentNotes": "Naujausi užrašai",
     "empty": "Dar nėra užrašų",
     "newNote": "Pradėti asmeninius užrašus",
@@ -959,12 +959,12 @@
     "aiOff": "AI užrašai šiuo metu nepasiekiami (reikia serverio nustatymų). Ankstesni užrašai pateikiami žemiau",
     "reload": "Įkelti iš naujo",
     "unsupported": "Įrašymas šiame įrenginyje nepasiekiamas",
-    "micDenied": "Negalima naudoti mikrofono – patikrinkite leidimą",
-    "limited": "Išnaudotas apdorojimo laiko limitas – baigti ir sukurti užrašus",
-    "noAgr": "Sustabdyta: nepatvirtintas pranešimas apie įrašymą – baigti ir pradėti iš naujo",
-    "micLost": "Mikrofonas atsijungė ir įrašymas sustojo – bakstelėkite „Iš naujo prijungti mikrofoną“ arba baigti užrašą",
+    "micDenied": "Mikrofonas nepasiekiamas. Patikrinkite leidimus.",
+    "limited": "Pasiektas apdorojimo laiko limitas. Prašome baigti ir sugeneruoti susitikimo protokolą.",
+    "noAgr": "Sustabdyta dėl trūkstamo pranešimo patvirtinimo įrašo. Prašome baigti ir paleisti iš naujo.",
+    "micLost": "Mikrofono ryšys nutrūko, įrašymas sustabdytas. Bakstelėkite [Iš naujo prijungti mikrofoną] arba baigti.",
     "micRetry": "Iš naujo prijungti mikrofoną",
-    "gone": "Šis užrašas buvo baigtas arba ištrintas kitur, todėl įrašymas sustojo – naudokite žemiau esantį mygtuką, kad atidarytumėte užrašus",
+    "gone": "Šis užrašas buvo baigtas arba ištrintas kitame ekrane, todėl įrašymas sustabdytas. Patikrinkite susitikimo protokolą naudodami žemiau esantį mygtuką.",
     "finishing": "Paskutinių žodžių išsaugojimas…",
     "st": {
       "RECORDING": "Įrašoma",
@@ -972,7 +972,7 @@
       "DONE": "Atlikta",
       "FAILED": "Nepavyko"
     },
-    "downloadPiBrowser": "Markdown atsisiuntimas veikia tik įprastoje naršyklėje (kompiuteryje ar mobiliajame telefone). Pi Browser negali išsaugoti failų – atidarykite šiuos užrašus kompiuterio ar telefono naršyklėje (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdown atsisiuntimas galimas tik įprastose naršyklėse (PC/mobiliajame telefone). Pi Browser negali išsaugoti failų. Atidarykite tą patį susitikimo protokolą kompiuterio ar mobiliojo telefono naršyklėje (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Planai",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} prisijungę",
     "producers": "{n} srautai",
     "end": "Baigiasi {time}",
-    "stale": "Seminaras baigėsi, bet kambarys vis dar atidarytas vaizdo serveryje – priverstinai uždarykite.",
+    "stale": "Seminaras baigėsi, bet kambariai liko vaizdo serveryje. Priverskite juos uždaryti.",
     "close": "Priverstinai uždaryti",
     "confirmSeminar": "Tai baigia seminarą ir uždaro kambarį. Visi bus atjungti.",
     "confirmRoom": "Tai uždaro kambarį. Visi bus atjungti.",
@@ -1063,7 +1063,7 @@
     "cancel": "Atšaukti",
     "saving": "Išsaugoma…",
     "done": "Pritaityta. {plan} likęs laikas: {time}",
-    "invalid": "Įveskite sumažinimą nuo 1 minutės iki 1000 valandų (visos minutės 0–59).",
+    "invalid": "Įveskite sumažinimą nuo 1 minutės iki 1000 valandų (visos minutės 0~59).",
     "history": "Naujausi koregavimai",
     "noHistory": "Dar nėra koregavimų.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

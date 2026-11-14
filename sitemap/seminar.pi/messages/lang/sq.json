@@ -6,7 +6,7 @@
   "home": {
     "description": "Hostët hapin seminare, dhe pjesëmarrësit bashkohen në sesione video live me Pi.",
     "badge": "Seminare live në ishuj të bukur",
-    "headline": "Shikoni, dëgjoni dhe mësoni së bashku — live",
+    "headline": "Shikoni, dëgjoni dhe mësoni së bashku : live",
     "ctaBrowse": "Shfleto seminaret",
     "ctaPlan": "Shiko planet",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminare",
     "cal": {
       "title": "Kalendari i seminareve",
-      "desc": "Nga seminaret e kaluara te ato të ardhshme — prekni një datë për detaje.",
+      "desc": "Nga seminaret e kaluara te ato të ardhshmet: prekni një datë për detaje.",
       "legendSmn": "Seminare",
       "legendEnded": "Seminare të kaluara",
       "legendMine": "Ngjarjet e mia",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Seminar video live",
-        "desc": "Motori ynë i videos Galápagos — qëllimi është një prezantues që transmeton deri në 30 pjesëmarrës"
+        "desc": "Motori ynë i videos Galápagos: Qëllimi është që një prezantues të dërgojë video deri në 30 anëtarë të audiencës."
       },
       "F02": {
         "name": "Krijo një seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Luajtja e zërit sintetik dhe audio origjinale e ulur"
     },
     "refLabel": "Modeli i referencës",
-    "uiRef": "Baza e UI — modelet e ekranit dhe funksioneve të një aplikacioni të përdorur gjerësisht për takime video në ueb, të përshtatura për seminar.pi"
+    "uiRef": "Standardet e UI: Aplikimi i modeleve të ekranit dhe funksioneve të aplikacioneve të njohura të konferencave në seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Anëtarët e audiencës nuk përdorin kamera ose mikrofon. Pas bashkimit do të shihni dhe dëgjoni prezantuesin.",
     "preview": {
       "pending": "Duke përgatitur kamerën dhe mikrofonin…",
-      "audioOnly": "Kamera e padisponueshme — duke dërguar vetëm audio.",
+      "audioOnly": "Kamera e padisponueshme : duke dërguar vetëm audio.",
       "none": "Kamera dhe mikrofoni të padisponueshme. Kontrolloni lejet (mund të bashkoheni ende pa media).",
-      "videoOnly": "Mikrofoni i padisponueshëm — duke dërguar vetëm video. Kontrolloni lejen e mikrofonit."
+      "videoOnly": "Mikrofoni i padisponueshëm : duke dërguar vetëm video. Kontrolloni lejen e mikrofonit."
     },
     "mic": {
       "on": "Fik mikrofonin",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Karta juaj e hyrjes ka skaduar.",
       "TICKET_EXPIRED": "Karta juaj e hyrjes ka skaduar.",
       "ROOM_FULL": "Ky seminar është plot.",
-      "ROOM_CLOSED": "Dhoma u mbyll — seminari përfundoi ose prezantuesi mungoi për më shumë se 5 minuta.",
+      "ROOM_CLOSED": "Dhoma është mbyllur. Seminari ka përfunduar ose hosti ka munguar për më shumë se 5 minuta.",
       "DUPLICATE_SESSION": "U bashkuat nga një pajisje tjetër, kështu që ky ekran u shkëput.",
       "ROLE_FORBIDDEN": "Nuk keni leje për të prezantuar.",
       "WS_FAILED": "Nuk mund të lidhej me serverin e videos.",
@@ -488,7 +488,7 @@
     "toDetail": "Shko te faqja e seminarit",
     "consent": {
       "title": "Para se të ndizni mikrofonin tuaj",
-      "body": "Nëse regjistrimi, titrat ose shënimet e takimit me AI janë të ndezura në këtë seminar, zëri juaj mund të konvertohet në tekst, të ruhet dhe të përkthehet. Përpunimi i zërit bëhet nga një shërbim AI jashtë vendit tuaj. Nëse nuk jeni dakord, mikrofoni juaj do të ndizet – vetëm zëri juaj nuk do të përpunohet.",
+      "body": "Nëse regjistrimi, titrat ose shënimet e takimit me AI janë të ndezura në këtë seminar, zëri juaj mund të konvertohet në tekst, të ruhet dhe të përkthehet. Përpunimi i zërit bëhet nga një shërbim AI jashtë vendit tuaj. Nëse nuk jeni dakord, mikrofoni juaj do të ndizet : vetëm zëri juaj nuk do të përpunohet.",
       "privacy": "Politika e privatësisë",
       "newTab": "(hapet në një skedë të re)",
       "decline": "Nuk jam dakord",
@@ -613,7 +613,7 @@
       "title": "Regjistro",
       "badge": "Duke regjistruar",
       "unsupported": "Ky shfletues nuk mund të regjistrojë. Ju lutemi regjistroni nga një shfletues i rregullt në një kompjuter.",
-      "piBrowserOnly": "Regjistrimi funksionon vetëm në një shfletues të rregullt (PC ose celular). Pi Browser nuk mund të ruajë skedarët e regjistrimit — hapeni këtë seminar në një shfletues kompjuteri ose telefoni (seminarz.vercel.app) për të regjistruar.",
+      "piBrowserOnly": "Regjistrimi është i disponueshëm vetëm në shfletuesit e rregullt (PC/celular). Pi Browser nuk mund të ruajë skedarët e regjistruar. Ju lutemi hapni të njëjtin seminar në një kompjuter ose shfletues celular (seminarz.vercel.app) për të regjistruar.",
       "audioSuspended": "Regjistrimi i zërit mund të mos ketë filluar në këtë pajisje. Mund të regjistrohet vetëm pamja.",
       "notifyFailed": "Regjistrimi nuk filloi sepse pjesëmarrësit nuk mund të njoftoheshin. Ju lutemi provoni përsëri pas pak.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Mbyll ruaj përsëri"
       },
       "toast": {
-        "started": "Regjistrimi filloi — të gjithë mund ta shohin",
+        "started": "Regjistrimi ka filluar. Kjo do t'u shfaqet të gjithë pjesëmarrësve.",
         "saved": "Regjistrimi u ruajt. Kontrolloni dosjen tuaj të shkarkimeve. Nëse asgjë nuk u ruajt, prekni [Ruaj përsëri] në krye të ekranit.",
         "autoStopped": "Regjistrimi përfundoi sepse shfletuesi e ndaloi ose u arrit kufiri i madhësisë. Gjithçka deri në atë pikë u ruajt. Fillo regjistrimin përsëri për të vazhduar.",
         "empty": "Asgjë nuk u regjistrua, kështu që nuk u krijua asnjë skedar.",
@@ -656,10 +656,10 @@
       "badge": "Shënime AI aktive",
       "started": "Prezantuesi aktivizoi shënimet AI",
       "stopped": "Shënimet AI u çaktivizuan",
-      "startedMine": "Shënimet AI aktive — shfaqen për të gjithë",
-      "stoppedMine": "Shënimet AI joaktive — po krijohen shënimet",
+      "startedMine": "Minutat e takimit me AI kanë filluar. Kjo do t'u shfaqet të gjithë pjesëmarrësve.",
+      "stoppedMine": "Minutat e takimit me AI janë ndalur. Minutat e takimit po gjenerohen.",
       "startFail": "Nuk mund të fillonin shënimet AI",
-      "gone": "Shënimet AI u ndaluan — shënimet u mbyllën ose u fshinë diku tjetër",
+      "gone": "Shënimet AI u ndaluan : shënimet u mbyllën ose u fshinë diku tjetër",
       "unsupported": "Shënimet AI nuk mund të aktivizohen këtu (nuk mbështetet regjistrimi audio)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Prekni [Hap cilësimet e Google Calendar] më poshtë.",
       "s2": "Nën 'Cilësimet për kalendarët e mi' në të majtë, zgjidhni një kalendar (p.sh. emrin tuaj).",
       "s3": "Lëvizni poshtë te 'Integroni kalendarin' dhe kopjoni 'Adresën sekrete në formatin iCal'.",
-      "s4": "Ngjisni këtu dhe prekni [Shto] — titujt e ngjarjeve shfaqen në kalendar. Shtoni kalendarë të tjerë në të njëjtën mënyrë, deri në 5.",
+      "s4": "Ngjisni këtu dhe prekni [Shto] : titujt e ngjarjeve shfaqen në kalendar. Shtoni kalendarë të tjerë në të njëjtën mënyrë, deri në 5.",
       "open": "Hap cilësimet e Google Calendar",
-      "privacy": "Kjo adresë është një çelës për kalendarin tuaj — mos e ndani. Ajo ruhet vetëm në këtë pajisje, kurrë në serverin tonë."
+      "privacy": "Kjo adresë është një çelës për kalendarin tuaj : mos e ndani. Ajo ruhet vetëm në këtë pajisje, kurrë në serverin tonë."
     },
     "title": "Krijo një seminar",
     "name": "Le të udhëtojmë në një ishull të bukur!",
     "subTitle": "Nëntitulli (opsional, deri në 60 karaktere)",
     "startAt": "Koha e fillimit",
-    "maxCnt": "Kapaciteti (1–100)",
+    "maxCnt": "Kapaciteti (1~100)",
     "submit": "Krijo",
     "submitting": "Po krijohet…",
-    "invalid": "Kontrolloni të dhënat tuaja — një datë brenda një viti nga tani, kapaciteti 1–100.",
+    "invalid": "Ju lutemi kontrolloni vlerat e hyrjes: një datë brenda një viti nga tani, dhe një kapacitet prej 1-100.",
     "attendance": {
       "title": "Pjesëmarrja",
       "back": "Kthehu te seminari",
@@ -840,18 +840,18 @@
         "state": "Statusi"
       },
       "durNote": "Koha e pjesëmarrjes është nga bashkimi i parë deri në shikimin e fundit, minus kohën jashtë (boshllëqe më të gjata se 2.5 minuta).",
-      "csvPiBrowser": "Shkarkimi i CSV funksionon vetëm në një shfletues të rregullt (kompjuter ose celular). Pi Browser nuk mund të ruajë skedarë — hapni këtë fletë pjesëmarrjeje në një shfletues kompjuteri ose telefoni (seminarz.vercel.app)."
+      "csvPiBrowser": "Shkarkimi i CSV është i disponueshëm vetëm në shfletuesit e rregullt (PC/celular). Pi Browser nuk mund të ruajë skedarët. Ju lutemi hapni të njëjtën fletë-prezencë në një kompjuter ose shfletues celular (seminarz.vercel.app)."
     },
     "plan": "Plani",
-    "planFree": "Falas — {time} mbetur këtë muaj · pa AI",
-    "planPaid": "{name} {time} · {price} — paguaj gjatë krijimit",
+    "planFree": "Falas: {time} të mbetura këtë muaj · Pa AI",
+    "planPaid": "{name} {time} · {price} · Pagesa në krijim",
     "planHint": "Një seminar i hapur me një plan me pagesë përdor kohën e atij plani së pari, pastaj vazhdon me kohën falas të këtij muaji (pa AI në pjesën falas). Një plan aktiv hapet pa pagesë; Mujor ose Vjetor që nuk keni paguhet në Pi kur shtypni Krijo, pastaj seminari hapet (Pi Browser). Bashkimi është gjithmonë falas për pjesëmarrësit.",
-    "planOwned": "{name} — aktiv · {time} mbetur",
+    "planOwned": "{name}: Abonuar · {time} të mbetura",
     "planEnds": "Koha e fillimit është pas skadimit të këtij plani. Lëvizni fillimin më herët ose zgjidhni një plan tjetër.",
     "paidKept": "Abonimi juaj me pagesë ruhet. Rregulloni problemin dhe shtypni Krijo përsëri (pa pagesë të dytë)."
   },
   "privacy": {
-    "title": "Politika e Privatësisë — Funksionet e Zërit dhe AI",
+    "title": "Politika e Privatësisë: Funksionet e Zërit dhe AI",
     "effective": "Në fuqi më {date}",
     "intro": "Kjo politikë shpjegon informacionin personal që ne përpunojmë kur përdorni titrat live, titrat e përkthyer, përkthimin zanor, shënimet e takimeve me AI dhe shënimet personale në një seminar. Këto funksione përdorin një shërbim të jashtëm AI, prandaj informacioni transferohet jashtë vendit.",
     "whoTitle": "Informacioni i kujt përpunohet",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Marrësi",
-        "v": "Google LLC (Gemini API) — kontaktoni [TBD: kontakti i privatësisë së Google]"
+        "v": "Google LLC (Gemini API): Kontakt [Në pritje: Master, Kanali i Kërkesave të Privatësisë së Google]"
       },
       {
         "k": "Vendet",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Qëllimi",
-        "v": "Fjalë në tekst, përkthim, përmbledhje të shënimeve të takimit, fjalim sintetik (zëra standardë, pa klonim zëri), ndarje e folësve për shënimet personale (zërat dallohen dhe etiketohen sipas gjinisë së perceptuar, si Mashkull 1 / Femër 1 — nuk nxirren emra ose identitete)"
+        "v": "Konvertimi i zërit në tekst, përkthimi, përmbledhja e minutave të takimit, zëri sintetik (zëri standard, pa klonim zëri), ndarja e folësve në shënimet në person (ndarja e njerëzve sipas zërit dhe shfaqja si mashkull 1, femër 1 bazuar në gjininë e perceptuar, nuk identifikon emra ose identitete)"
       },
       {
         "k": "Ruajtja",
-        "v": "Përfundon sapo rezultati të kthehet. Ne i kërkojmë Google të mos ruajë kërkesat (store=false). Regjistrat e monitorimit të abuzimit mund të ruhen ende sipas kushteve të Google [TBD: periudha e ruajtjes dhe statusi i nivelit me pagesë]."
+        "v": "Përfundon menjëherë pas marrjes së rezultateve të përpunuara. Kërkojmë që Google të mos ruajë kërkesat (store=false). Megjithatë, regjistrimet e monitorimit të keqpërdorimit sipas kushteve të Google mund të ruhen [Në pritje: Master, periudha e ruajtjes dhe aplikimi i nivelit me pagesë]."
       },
       {
         "k": "Si të refuzoni, dhe çfarë ndodh",
@@ -895,8 +895,8 @@
     "keep": [
       "Audio origjinale: për titrat e seminarit dhe shënimet e takimeve me AI nuk ruhet; ajo hidhet menjëherë pas konvertimit në tekst. Për shënimet personale, regjistrimi ruhet në ruajtje private në mënyrë që të transkriptohet përsëri më saktë (me folës) pas takimit, dhe fshihet gjatë pastrimit ditor pasi të ketë kaluar 1 ditë nga përfundimi i shënimit (menjëherë nëse shënimi fshihet).",
       "Titrat live: nuk ruhen.",
-      "Shënimet e takimeve me AI (kur prezantuesi i aktivizon): përmbajtja e folur, pamjet e ekranit dhe përmbledhja, ruhen derisa shënimet të fshihen [TBD: ruajtja maksimale].",
-      "Regjistrat e pëlqimit: koha e pëlqimit dhe versioni i politikës, ruhen si provë [TBD: periudha e ruajtjes].",
+      "Minutat e Takimit me AI (nëse aktivizohet nga prezantuesi): Ruhen deklaratat, pamjet e ekranit dhe përmbledhjet derisa të fshihen minutat e takimit [Në pritje: Master, periudha maksimale e ruajtjes].",
+      "Regjistrimet e Pëlqimit: Ruhen data e pëlqimit dhe versioni i politikës së pëlqyer për dëshmi [Në pritje: Master, periudha e ruajtjes].",
       "Përdorimi: numri i kërkesave për minutë dhe koha e përpunimit, përdoren për të zbatuar kufizimet e kostos.",
       "Pjesëmarrja: koha kur jeni bashkuar, koha kur jeni lidhur për herë të fundit, emri juaj i shfaqur dhe emri juaj i përdoruesit Pi ruhen dhe i jepen hostit si një listë pjesëmarrjeje (në ekran dhe si shkarkim CSV). Ruhet derisa seminari të fshihet.",
       "Pyetje dhe përgjigje dhe sondazhe: teksti i pyetjes dhe emri i shfaqur i pyetësit (ose emri i përdoruesit Pi nëse nuk ka) janë të dukshme për çdo pjesëmarrës. Votat pozitive shfaqin vetëm numrin, kurrë kush i ka dhënë. Votat e sondazheve shfaqin vetëm numrin për pjesëmarrësit; organizatori dhe administratorët shohin, për çdo opsion, emrin e shfaqur (ose emrin e përdoruesit Pi nëse nuk ka) të çdo votuesi. Ruhet, duke përfshirë pyetjet e fshehura, derisa seminari të fshihet."
@@ -904,14 +904,14 @@
     "recTitle": "Regjistrimi",
     "rec": "Regjistrimet ruhen vetëm si skedar në pajisjen e prezantuesit. Ato nuk ngarkohen në serverët tanë ose nuk transferohen jashtë vendit. Ndërsa regjistrimi ose shënimet AI janë aktive, çdo pjesëmarrës sheh një tregues.",
     "rightsTitle": "Të drejtat tuaja",
-    "rights": "Mund të kërkoni të aksesoni, korrigjoni, fshini ose ndaloni përpunimin e informacionit tuaj. Kontakt: [TBD: emri dhe kontakti i oficerit të privatësisë]"
+    "rights": "Ju mund të kërkoni qasje, korrigjim, fshirje dhe pezullim të përpunimit të informacionit tuaj. Kontakt: [Në pritje: Master, Emri dhe Kontakti i Oficerit të Privatësisë]"
   },
   "notes": {
     "title": "Shënime",
     "back": "Kthehu te seminari",
     "loading": "Po ngarkohet…",
     "meta": "Shënime · {date} · {min} min",
-    "aiWarn": "Përmbledhje e gjeneruar nga AI — mund të përmbajë gabime",
+    "aiWarn": "Përmbledhje e gjeneruar nga AI : mund të përmbajë gabime",
     "points": "Pikat kryesore",
     "decisions": "Vendimet",
     "todos": "Artikujt e veprimit",
@@ -921,11 +921,11 @@
     "making": "Po krijohen shënimet…",
     "makingLong": "Kjo po zgjat pak. Ju lutemi rifreskoni më vonë",
     "recording": "Ende po regjistrohet",
-    "failed": "Nuk mund të krijohej përmbledhja — transkripti i plotë është më poshtë",
+    "failed": "Dështoi të krijohej përmbledhja. Transkripti i plotë është më poshtë.",
     "retry": "Provo përsëri",
     "finish": "Përfundo regjistrimin dhe përmblidh",
     "none": "Asgjë këtu",
-    "blank": "Asgjë për të përmbledhur — nuk u regjistrua asnjë fjalim ose ishte shumë i shkurtër",
+    "blank": "Nuk ka përmbajtje për të përmbledhur. Nuk u regjistrua asnjë fjalim ose ishte shumë i shkurtër.",
     "notFound": "Shënimet nuk u gjetën",
     "forbidden": "Nuk keni akses në këto shënime",
     "shotAlt": "Kapje ekrani në {at}",
@@ -938,7 +938,7 @@
     "delYes": "Fshi",
     "delNo": "Anulo",
     "delFail": "Nuk mund të fshihej",
-    "dlFail": "Nuk mund të shkarkohej — ju lutemi provoni përsëri",
+    "dlFail": "Shkarkimi dështoi. Ju lutemi prekni përsëri.",
     "recentNotes": "Shënimet e fundit",
     "empty": "Ende nuk ka shënime",
     "newNote": "Fillo shënimet personale",
@@ -959,12 +959,12 @@
     "aiOff": "Shënimet AI nuk janë të disponueshme tani (nevojitet konfigurimi i serverit). Shënimet e kaluara janë renditur më poshtë",
     "reload": "Rifresko",
     "unsupported": "Regjistrimi nuk është i disponueshëm në këtë pajisje",
-    "micDenied": "Nuk mund të përdoret mikrofoni — kontrolloni lejen",
-    "limited": "Kufiri i kohës së përpunimit është shpenzuar — përfundo dhe krijo shënimet",
-    "noAgr": "Ndaloi: nuk ka konfirmim njoftimi në regjistrim — përfundo dhe fillo përsëri",
-    "micLost": "Mikrofoni u shkëput dhe regjistrimi u ndal — prek Rikonekt mikrofoni ose përfundo shënimin",
+    "micDenied": "Mikrofoni nuk është i disponueshëm. Ju lutemi kontrolloni lejet.",
+    "limited": "Koha e përpunimit ka arritur limitin. Ju lutemi përfundoni dhe gjeneroni minutat e takimit.",
+    "noAgr": "U ndalua për shkak të mungesës së regjistrimit të konfirmimit të njoftimit. Ju lutemi përfundoni dhe rifilloni.",
+    "micLost": "Lidhja e mikrofonit u humb, regjistrimi u ndal. Ju lutemi prekni [Rilidh Mikrofonin] ose përfundoni.",
     "micRetry": "Rikonekt mikrofoni",
-    "gone": "Ky shënim u përfundua ose u fshi diku tjetër, kështu që regjistrimi u ndal — përdor butonin më poshtë për të hapur shënimet",
+    "gone": "Ky shënim u përfundua ose u fshi në një ekran tjetër, kështu që regjistrimi është ndalur. Ju lutemi kontrolloni minutat e takimit duke përdorur butonin më poshtë.",
     "finishing": "Duke ruajtur fjalët e fundit…",
     "st": {
       "RECORDING": "Duke regjistruar",
@@ -972,7 +972,7 @@
       "DONE": "U krye",
       "FAILED": "Dështoi"
     },
-    "downloadPiBrowser": "Shkarkimi i Markdown funksionon vetëm në një shfletues të rregullt (kompjuter ose celular). Pi Browser nuk mund të ruajë skedarë — hapni këto shënime në një shfletues kompjuteri ose telefoni (seminarz.vercel.app)."
+    "downloadPiBrowser": "Shkarkimi i Markdown është i disponueshëm vetëm në shfletuesit e rregullt (PC/celular). Pi Browser nuk mund të ruajë skedarët. Ju lutemi hapni të njëjtat minuta takimi në një kompjuter ose shfletues celular (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Plane",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} të lidhur",
     "producers": "{n} transmetime",
     "end": "Mbaron {time}",
-    "stale": "Seminari ka përfunduar, por dhoma është ende e hapur në serverin e videos — mbylleni me forcë.",
+    "stale": "Seminari ka përfunduar, por dhomat mbeten në serverin e videos. Ju lutemi mbyllini me forcë.",
     "close": "Mbyll me forcë",
     "confirmSeminar": "Kjo përfundon seminarin dhe mbyll dhomën. Të gjithë do të shkëputen.",
     "confirmRoom": "Kjo mbyll dhomën. Të gjithë do të shkëputen.",
@@ -1063,7 +1063,7 @@
     "cancel": "Anulo",
     "saving": "Duke ruajtur…",
     "done": "U aplikua. Koha e mbetur e {plan}: {time}",
-    "invalid": "Futni një reduktim midis 1 minute dhe 1000 orëve (minuta të plota 0–59).",
+    "invalid": "Futni një reduktim midis 1 minute dhe 1000 orëve (minuta të plota 0~59).",
     "history": "Rregullimet e fundit",
     "noHistory": "Nuk ka rregullime ende.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

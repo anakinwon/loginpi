@@ -103,7 +103,7 @@ export function SeminarDetail({ id }: { id: string }) {
         <dt className="text-muted-foreground">{t('startAt')}</dt>
         <dd>{start(d.startAt)}</dd>
         <dt className="text-muted-foreground">{t('host')}</dt>
-        <dd>{d.host || '—'}</dd>
+        <dd>{d.host || '-'}</dd>
         <dt className="text-muted-foreground">{t('seats')}</dt>
         <dd>{t('seatsValue', { left: d.seatsLeft, max: d.maxCnt })}</dd>
         {/* 요금제(sql/018) — 참가자 입장은 언제나 무료. 예전 유료 입장 세미나만 입장료 줄 */}

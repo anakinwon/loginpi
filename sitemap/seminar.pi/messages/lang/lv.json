@@ -6,7 +6,7 @@
   "home": {
     "description": "Rīkotāji atver seminārus, un dalībnieki pievienojas tiešraides video sesijām ar Pi.",
     "badge": "Tiešraides semināri skaistās salās",
-    "headline": "Skatieties, klausieties un mācieties kopā — tiešraidē",
+    "headline": "Skatieties, klausieties un mācieties kopā : tiešraidē",
     "ctaBrowse": "Pārlūkot seminārus",
     "ctaPlan": "Skatīt plānus",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Semināri",
     "cal": {
       "title": "Semināru kalendārs",
-      "desc": "No pagātnes semināriem līdz gaidāmajiem — pieskarieties datumam, lai iegūtu sīkāku informāciju.",
+      "desc": "No iepriekšējiem semināriem līdz gaidāmajiem: pieskarieties datumam, lai iegūtu sīkāku informāciju.",
       "legendSmn": "Semināri",
       "legendEnded": "Pagājušie semināri",
       "legendMine": "Mani pasākumi",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Tiešraides video seminārs",
-        "desc": "Mūsu pašu video dzinējs Galápagos — mērķis ir viens prezentētājs, kas straumē līdz 30 dalībniekiem"
+        "desc": "Mūsu pašu video dzinējs Galápagos: Mērķis ir, lai viens prezentētājs nosūtītu video līdz 30 auditorijas dalībniekiem."
       },
       "F02": {
         "name": "Izveidot semināru",
@@ -254,7 +254,7 @@
       "dubbing": "Sintētiskās balss atskaņošana un samazināts oriģinālais audio"
     },
     "refLabel": "Atsauces modelis",
-    "uiRef": "UI bāzes līnija — plaši izmantotas tīmekļa video sanāksmju lietotnes ekrāna un funkciju modeļi, pielāgoti seminar.pi"
+    "uiRef": "UI standarti: Populāru tīmekļa videokonferenču lietotņu ekrāna un funkciju modeļu pielietošana seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Auditorijas dalībnieki neizmanto kameru vai mikrofonu. Pēc pievienošanās jūs redzēsiet un dzirdēsiet prezentētāju.",
     "preview": {
       "pending": "Notiek kameras un mikrofona sagatavošana…",
-      "audioOnly": "Kamera nav pieejama — tiek sūtīts tikai audio.",
+      "audioOnly": "Kamera nav pieejama : tiek sūtīts tikai audio.",
       "none": "Kamera un mikrofons nav pieejami. Pārbaudiet atļaujas (joprojām varat pievienoties bez multivides).",
-      "videoOnly": "Mikrofons nav pieejams — tiek sūtīts tikai video. Pārbaudiet mikrofona atļauju."
+      "videoOnly": "Mikrofons nav pieejams : tiek sūtīts tikai video. Pārbaudiet mikrofona atļauju."
     },
     "mic": {
       "on": "Izslēgt mikrofonu",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Jūsu ieejas caurlaides termiņš ir beidzies.",
       "TICKET_EXPIRED": "Jūsu ieejas caurlaides termiņš ir beidzies.",
       "ROOM_FULL": "Šis seminārs ir pilns.",
-      "ROOM_CLOSED": "Telpa tika slēgta — seminārs beidzās vai vadītājs bija prom ilgāk par 5 minūtēm.",
+      "ROOM_CLOSED": "Telpa ir slēgta. Seminārs ir beidzies vai vadītājs ir prombūtnē ilgāk par 5 minūtēm.",
       "DUPLICATE_SESSION": "Jūs pievienojāties no citas ierīces, tāpēc šis ekrāns tika atvienots.",
       "ROLE_FORBIDDEN": "Jums nav atļaujas prezentēt.",
       "WS_FAILED": "Nevarēja izveidot savienojumu ar video serveri.",
@@ -390,8 +390,8 @@
           "video": "Tiek zaudēti {pct}% video datu."
         },
         "rate": {
-          "audio": "Audio augšupielādes ātrums ir zems — {kbps} kbps.",
-          "video": "Video augšupielādes ātrums ir zems — {kbps} kbps. Kvalitāte var pasliktināties."
+          "audio": "Audio augšupielādes ātrums ir zems : {kbps} kbps.",
+          "video": "Video augšupielādes ātrums ir zems : {kbps} kbps. Kvalitāte var pasliktināties."
         }
       }
     },
@@ -488,7 +488,7 @@
     "toDetail": "Doties uz semināra lapu",
     "consent": {
       "title": "Pirms ieslēdzat mikrofonu",
-      "body": "Ja šajā seminārā ir ieslēgta ierakstīšana, subtitri vai AI sanāksmju piezīmes, jūsu balss var tikt pārveidota tekstā, saglabāta un tulkota. Balss apstrādi veic AI pakalpojums ārpus jūsu valsts. Ja nepiekrītat, jūsu mikrofons joprojām ieslēdzas — tikai jūsu balss netiek apstrādāta.",
+      "body": "Ja šajā seminārā ir ieslēgta ierakstīšana, subtitri vai AI sanāksmju piezīmes, jūsu balss var tikt pārveidota tekstā, saglabāta un tulkota. Balss apstrādi veic AI pakalpojums ārpus jūsu valsts. Ja nepiekrītat, jūsu mikrofons joprojām ieslēdzas : tikai jūsu balss netiek apstrādāta.",
       "privacy": "Privātuma politika",
       "newTab": "(atveras jaunā cilnē)",
       "decline": "Nepiekrītu",
@@ -613,7 +613,7 @@
       "title": "Ierakstīt",
       "badge": "Ieraksta",
       "unsupported": "Šī pārlūkprogramma neatbalsta ierakstīšanu. Lūdzu, ierakstiet no parastas pārlūkprogrammas datorā.",
-      "piBrowserOnly": "Ierakstīšana darbojas tikai parastā pārlūkprogrammā (datorā vai mobilajā ierīcē). Pi Browser nevar saglabāt ierakstu failus — atveriet šo semināru datora vai tālruņa pārlūkprogrammā (seminarz.vercel.app), lai ierakstītu.",
+      "piBrowserOnly": "Ierakstīšana ir pieejama tikai parastajās pārlūkprogrammās (PC/mobilajā). Pi Browser nevar saglabāt ierakstītos failus. Lūdzu, atveriet to pašu semināru datorā vai mobilajā pārlūkprogrammā (seminarz.vercel.app), lai ierakstītu.",
       "audioSuspended": "Iespējams, ka šajā ierīcē nav sākta skaņas ierakstīšana. Var tikt ierakstīts tikai attēls.",
       "notifyFailed": "Ierakstīšana netika sākta, jo dalībniekus nevarēja paziņot. Lūdzu, mēģiniet vēlreiz pēc brīža.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Aizvērt saglabāšanu vēlreiz"
       },
       "toast": {
-        "started": "Ierakstīšana sākta — visi to redz",
+        "started": "Ierakstīšana ir sākta. Tas tiks parādīts visiem dalībniekiem.",
         "saved": "Ieraksts saglabāts. Pārbaudiet savu lejupielāžu mapi. Ja nekas netika saglabāts, pieskarieties [Saglabāt vēlreiz] ekrāna augšdaļā.",
         "autoStopped": "Ierakstīšana beidzās, jo pārlūkprogramma to apturēja vai tika sasniegts izmēra ierobežojums. Viss līdz tam brīdim tika saglabāts. Sāciet ierakstīšanu vēlreiz, lai turpinātu.",
         "empty": "Nekas netika ierakstīts, tāpēc fails netika izveidots.",
@@ -656,10 +656,10 @@
       "badge": "AI piezīmes ieslēgtas",
       "started": "Prezentētājs ieslēdza AI piezīmes",
       "stopped": "AI piezīmes izslēgtas",
-      "startedMine": "AI piezīmes ieslēgtas — redzamas visiem",
-      "stoppedMine": "AI piezīmes izslēgtas — tiek veidotas piezīmes",
+      "startedMine": "AI sanāksmes protokols ir sākts. Tas tiks parādīts visiem dalībniekiem.",
+      "stoppedMine": "AI sanāksmes protokols ir apturēts. Sanāksmes protokols tiek ģenerēts.",
       "startFail": "Neizdevās ieslēgt AI piezīmes",
-      "gone": "AI piezīmes apturētas — piezīmes tika beigtas vai dzēstas citur",
+      "gone": "AI piezīmes apturētas : piezīmes tika beigtas vai dzēstas citur",
       "unsupported": "AI piezīmes šeit nevar ieslēgt (nav audio ierakstīšanas atbalsta)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Pieskarieties [Atvērt Google kalendāra iestatījumus] zemāk.",
       "s2": "Kreisajā pusē sadaļā 'Mani kalendāra iestatījumi' izvēlieties kalendāru (piemēram, jūsu vārdu).",
       "s3": "Ritiniet līdz 'Integrēt kalendāru' un nokopējiet 'Slepeno adresi iCal formātā'.",
-      "s4": "Ielīmējiet to šeit un pieskarieties [Pievienot] — notikumu nosaukumi parādīsies kalendārā. Pievienojiet citus kalendārus tādā pašā veidā, līdz 5.",
+      "s4": "Ielīmējiet to šeit un pieskarieties [Pievienot] : notikumu nosaukumi parādīsies kalendārā. Pievienojiet citus kalendārus tādā pašā veidā, līdz 5.",
       "open": "Atvērt Google kalendāra iestatījumus",
-      "privacy": "Šī adrese ir jūsu kalendāra atslēga — nedalieties ar to. Tā tiek glabāta tikai šajā ierīcē, nekad mūsu serverī."
+      "privacy": "Šī adrese ir jūsu kalendāra atslēga : nedalieties ar to. Tā tiek glabāta tikai šajā ierīcē, nekad mūsu serverī."
     },
     "title": "Izveidot semināru",
     "name": "Ceļosim uz skaistu salu!",
     "subTitle": "Apakšvirsraksts (pēc izvēles, līdz 60)",
     "startAt": "Sākuma laiks",
-    "maxCnt": "Ietilpība (1–100)",
+    "maxCnt": "Ietilpība (1~100)",
     "submit": "Izveidot",
     "submitting": "Veido…",
-    "invalid": "Pārbaudiet ievadi — datums viena gada laikā no šodienas, ietilpība 1–100.",
+    "invalid": "Lūdzu, pārbaudiet ievadītās vērtības: datums viena gada laikā no šodienas un ietilpība 1-100.",
     "attendance": {
       "title": "Apmeklējums",
       "back": "Atpakaļ uz semināru",
@@ -840,18 +840,18 @@
         "state": "Statuss"
       },
       "durNote": "Apmeklētais laiks ir no pirmās pievienošanās līdz pēdējai redzēšanai, mīnus prombūtnes laiks (pārtraukumi, kas ilgāki par 2,5 minūtēm).",
-      "csvPiBrowser": "CSV lejupielāde darbojas tikai parastā pārlūkprogrammā (datorā vai mobilajā ierīcē). Pi Browser nevar saglabāt failus — atveriet šo apmeklējumu lapu datora vai tālruņa pārlūkprogrammā (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV lejupielāde ir pieejama tikai parastajās pārlūkprogrammās (PC/mobilajā). Pi Browser nevar saglabāt failus. Lūdzu, atveriet to pašu apmeklējumu sarakstu datorā vai mobilajā pārlūkprogrammā (seminarz.vercel.app)."
     },
     "plan": "Plāns",
-    "planFree": "Bezmaksas — {time} atlicis šomēnes · bez AI",
-    "planPaid": "{name} {time} · {price} — maksāt, veidojot",
+    "planFree": "Bezmaksas: šomēnes atlikušais laiks {time} · Nav AI",
+    "planPaid": "{name} {time} · {price} · Maksājums izveides brīdī",
     "planHint": "Seminārs, kas atvērts ar maksas plānu, vispirms izmanto šī plāna laiku, pēc tam turpina ar šī mēneša bezmaksas laiku (bez AI bezmaksas daļā). Aktīvs plāns tiek atvērts bez maksājuma; Mēneša vai Gada plāns, kas jums nav, tiek apmaksāts ar Pi, nospiežot Izveidot, pēc tam seminārs tiek atvērts (Pi Browser). Dalībniekiem pievienošanās vienmēr ir bez maksas.",
-    "planOwned": "{name} — aktīvs · atlicis {time}",
+    "planOwned": "{name}: Abonēts · Atlikušais laiks {time}",
     "planEnds": "Sākuma laiks ir pēc šī plāna derīguma termiņa beigām. Pārvietojiet sākumu agrāk vai izvēlieties citu plānu.",
     "paidKept": "Jūsu apmaksātā caurlaide tiek saglabāta. Novērsiet problēmu un vēlreiz nospiediet Izveidot (bez otrā maksājuma)."
   },
   "privacy": {
-    "title": "Privātuma politika — Balss un AI funkcijas",
+    "title": "Privātuma politika: Balss un AI funkcijas",
     "effective": "Spēkā no {date}",
     "intro": "Šī politika izskaidro personas informāciju, ko mēs apstrādājam, kad jūs izmantojat tiešraides subtitrus, tulkotos subtitrus, balss tulkošanu, AI sanāksmju piezīmes un klātienes piezīmes seminārā. Šīs funkcijas izmanto ārēju AI pakalpojumu, tāpēc informācija tiek pārsūtīta uz ārzemēm.",
     "whoTitle": "Kuras personas informācija tiek apstrādāta",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Saņēmējs",
-        "v": "Google LLC (Gemini API) — kontakts [TBD: Google privātuma kontakts]"
+        "v": "Google LLC (Gemini API): Kontaktpersona [Gaida: Master, Google privātuma pieprasījumu kanāls]"
       },
       {
         "k": "Valstis",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Mērķis",
-        "v": "Runas pārvēršana tekstā, tulkošana, sanāksmju piezīmju kopsavilkumi, sintētiskā runa (standarta balsis, bez balss klonēšanas), runātāju atdalīšana klātienes piezīmēm (balsis tiek atšķirtas un marķētas pēc uztvertā dzimuma, piemēram, Vīrietis 1 / Sieviete 1 — netiek secināti vārdi vai identitātes)"
+        "v": "Balss pārvēršana tekstā, tulkošana, sanāksmes protokola kopsavilkums, sintētiskā balss (standarta balss, bez balss klonēšanas), runātāju atdalīšana klātienes piezīmēs (atdala cilvēkus pēc balss un parāda kā vīrietis 1, sieviete 1, pamatojoties uz uztverto dzimumu, neidentificē vārdus vai identitātes)"
       },
       {
         "k": "Saglabāšana",
-        "v": "Beidzas, tiklīdz tiek atgriezts rezultāts. Mēs lūdzam Google neglabāt pieprasījumus (store=false). Tomēr ļaunprātīgas izmantošanas uzraudzības žurnāli var tikt saglabāti saskaņā ar Google noteikumiem [TBD: saglabāšanas periods un maksas līmeņa statuss]."
+        "v": "Beidzas nekavējoties pēc apstrādāto rezultātu saņemšanas. Mēs pieprasām, lai Google neuzglabātu pieprasījumus (store=false). Tomēr var tikt uzglabāti ļaunprātīgas izmantošanas uzraudzības ieraksti saskaņā ar Google noteikumiem [Gaida: Master, uzglabāšanas periods un maksas līmeņa piemērošana]."
       },
       {
         "k": "Kā atteikties un kas notiek",
@@ -895,8 +895,8 @@
     "keep": [
       "Oriģinālais audio: semināra subtitriem un AI sanāksmju piezīmēm tas netiek glabāts; tas tiek izmests tūlīt pēc pārvēršanas tekstā. Klātienes piezīmēm ieraksts tiek glabāts privātā krātuvē, lai to varētu precīzāk pārrakstīt (ar runātājiem) pēc sanāksmes, un tas tiek dzēsts ikdienas tīrīšanas laikā, kad ir pagājusi 1 diena kopš piezīmes beigām (nekavējoties, ja piezīme tiek dzēsta).",
       "Tiešraides subtitri: netiek glabāti.",
-      "AI sanāksmju piezīmes (kad prezentētājs tās ieslēdz): runātais saturs, ekrānuzņēmumi un kopsavilkums, tiek glabāti, līdz piezīmes tiek dzēstas [TBD: maksimālais saglabāšanas laiks].",
-      "Piekrišanas ieraksti: piekrišanas laiks un politikas versija, tiek glabāti kā pierādījums [TBD: saglabāšanas periods].",
+      "AI sanāksmes protokols (ja to iespējo prezentētājs): Uzglabā izteikumus, ekrānuzņēmumus un kopsavilkumus, līdz sanāksmes protokols tiek dzēsts [Gaida: Master, maksimālais uzglabāšanas periods].",
+      "Piekrišanas ieraksti: Uzglabā piekrišanas datumu un piekrišanas politikas versiju pierādījumiem [Gaida: Master, uzglabāšanas periods].",
       "Lietojums: pieprasījumu skaits minūtē un apstrādes laiks, ko izmanto izmaksu ierobežojumu ievērošanai.",
       "Apmeklējums: jūsu pievienošanās laiks, pēdējā savienojuma laiks, jūsu displeja vārds un jūsu Pi lietotājvārds tiek glabāti un nodoti vadītājam kā apmeklējumu saraksts (ekrānā un kā CSV lejupielāde). Glabāts, līdz seminārs tiek dzēsts.",
       "Jautājumi un atbildes un aptaujas: jautājuma teksts un jautātāja displeja vārds (vai Pi lietotājvārds, ja nav) ir redzami katram dalībniekam. Atbalsta balsis rāda tikai skaitu, nekad to, kurš tās nodeva. Aptaujas balsis dalībniekiem rāda tikai skaitu; organizators un administratori katrai opcijai redz katra vēlētāja displeja vārdu (vai Pi lietotājvārdu, ja nav). Glabāts, ieskaitot slēptos jautājumus, līdz seminārs tiek dzēsts."
@@ -904,14 +904,14 @@
     "recTitle": "Ierakstīšana",
     "rec": "Ieraksti tiek saglabāti tikai kā fails prezentētāja ierīcē. Tie netiek augšupielādēti mūsu serveros vai pārsūtīti uz ārzemēm. Kamēr ierakstīšana vai AI piezīmes ir ieslēgtas, katrs dalībnieks redz indikatoru.",
     "rightsTitle": "Jūsu tiesības",
-    "rights": "Jūs varat lūgt piekļūt, labot, dzēst vai apturēt jūsu informācijas apstrādi. Kontakts: [TBD: privātuma amatpersonas vārds un kontakts]"
+    "rights": "Jūs varat pieprasīt piekļuvi, labošanu, dzēšanu un jūsu informācijas apstrādes apturēšanu. Kontaktpersona: [Gaida: Master, privātuma amatpersonas vārds un kontaktinformācija]"
   },
   "notes": {
     "title": "Piezīmes",
     "back": "Atpakaļ uz semināru",
     "loading": "Ielādē…",
     "meta": "Piezīmes · {date} · {min} min",
-    "aiWarn": "AI ģenerēts kopsavilkums — tas var saturēt kļūdas",
+    "aiWarn": "AI ģenerēts kopsavilkums : tas var saturēt kļūdas",
     "points": "Galvenie punkti",
     "decisions": "Lēmumi",
     "todos": "Darbības vienumi",
@@ -921,11 +921,11 @@
     "making": "Veido piezīmes…",
     "makingLong": "Tas aizņem laiku. Lūdzu, atsvaidziniet vēlāk",
     "recording": "Joprojām ieraksta",
-    "failed": "Neizdevās izveidot kopsavilkumu — pilns transkripts ir zemāk",
+    "failed": "Neizdevās izveidot kopsavilkumu. Pilns atšifrējums ir zemāk.",
     "retry": "Mēģināt vēlreiz",
     "finish": "Beigt ierakstīšanu un apkopot",
     "none": "Nekas šeit",
-    "blank": "Nav ko apkopot — netika ierakstīta runa vai tā bija pārāk īsa",
+    "blank": "Nav satura, ko apkopot. Netika ierakstīta runa vai tā bija pārāk īsa.",
     "notFound": "Piezīmes nav atrastas",
     "forbidden": "Jums nav piekļuves šīm piezīmēm",
     "shotAlt": "Ekrāna tveršana plkst. {at}",
@@ -938,7 +938,7 @@
     "delYes": "Dzēst",
     "delNo": "Atcelt",
     "delFail": "Neizdevās dzēst",
-    "dlFail": "Neizdevās lejupielādēt — lūdzu, mēģiniet vēlreiz",
+    "dlFail": "Lejupielāde neizdevās. Lūdzu, pieskarieties vēlreiz.",
     "recentNotes": "Jaunākās piezīmes",
     "empty": "Vēl nav piezīmju",
     "newNote": "Sākt klātienes piezīmes",
@@ -959,12 +959,12 @@
     "aiOff": "AI piezīmes pašlaik nav pieejamas (nepieciešama servera iestatīšana). Iepriekšējās piezīmes ir uzskaitītas zemāk",
     "reload": "Pārlādēt",
     "unsupported": "Ierakstīšana šajā ierīcē nav pieejama",
-    "micDenied": "Nevar izmantot mikrofonu — pārbaudiet atļauju",
-    "limited": "Apstrādes laika ierobežojums ir izmantots — beidziet un izveidojiet piezīmes",
-    "noAgr": "Apturēts: nav paziņojuma apstiprinājuma ierakstā — beidziet un sāciet no jauna",
-    "micLost": "Mikrofons atvienojās un ierakstīšana apstājās — pieskarieties pievienot mikrofonu vai beidziet piezīmi",
+    "micDenied": "Mikrofons nav pieejams. Lūdzu, pārbaudiet atļaujas.",
+    "limited": "Apstrādes laika ierobežojums ir sasniegts. Lūdzu, beidziet un ģenerējiet sanāksmes protokolu.",
+    "noAgr": "Apturēts, jo trūkst paziņojuma apstiprinājuma ieraksta. Lūdzu, beidziet un restartējiet.",
+    "micLost": "Mikrofona savienojums zaudēts, ierakstīšana apturēta. Lūdzu, pieskarieties [Atkārtoti pievienot mikrofonu] vai beidziet.",
     "micRetry": "Atkārtoti pievienot mikrofonu",
-    "gone": "Šī piezīme tika beigta vai dzēsta citur, tāpēc ierakstīšana apstājās — izmantojiet zemāk esošo pogu, lai atvērtu piezīmes",
+    "gone": "Šī piezīme tika beigta vai dzēsta citā ekrānā, tāpēc ierakstīšana ir apturēta. Lūdzu, pārbaudiet sanāksmes protokolu, izmantojot zemāk esošo pogu.",
     "finishing": "Saglabā pēdējos vārdus…",
     "st": {
       "RECORDING": "Ierakstīšana",
@@ -972,7 +972,7 @@
       "DONE": "Pabeigts",
       "FAILED": "Neizdevās"
     },
-    "downloadPiBrowser": "Markdown lejupielāde darbojas tikai parastā pārlūkprogrammā (datorā vai mobilajā ierīcē). Pi Browser nevar saglabāt failus — atveriet šīs piezīmes datora vai tālruņa pārlūkprogrammā (seminarz.vercel.app)."
+    "downloadPiBrowser": "Markdown lejupielāde ir pieejama tikai parastajās pārlūkprogrammās (PC/mobilajā). Pi Browser nevar saglabāt failus. Lūdzu, atveriet to pašu sanāksmes protokolu datorā vai mobilajā pārlūkprogrammā (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Plāni",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} savienoti",
     "producers": "{n} straumes",
     "end": "Beidzas {time}",
-    "stale": "Seminārs ir beidzies, bet telpa joprojām ir atvērta video serverī — piespiedu kārtā aizveriet to.",
+    "stale": "Seminārs ir beidzies, bet telpas joprojām atrodas video serverī. Lūdzu, piespiedu kārtā tās aizveriet.",
     "close": "Piespiedu aizvēršana",
     "confirmSeminar": "Tas beidz semināru un aizver telpu. Visi tiks atvienoti.",
     "confirmRoom": "Tas aizver telpu. Visi tiks atvienoti.",
@@ -1063,7 +1063,7 @@
     "cancel": "Atcelt",
     "saving": "Saglabā…",
     "done": "Piemērots. {plan} atlicis laiks: {time}",
-    "invalid": "Ievadiet samazinājumu no 1 minūtes līdz 1000 stundām (veselas minūtes 0–59).",
+    "invalid": "Ievadiet samazinājumu no 1 minūtes līdz 1000 stundām (veselas minūtes 0~59).",
     "history": "Jaunākie pielāgojumi",
     "noHistory": "Vēl nav pielāgojumu.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

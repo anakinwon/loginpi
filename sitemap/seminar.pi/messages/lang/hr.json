@@ -6,7 +6,7 @@
   "home": {
     "description": "Domaćini otvaraju seminare, a sudionici se pridružuju video sesijama uživo s Pi.",
     "badge": "Seminari uživo na prekrasnim otocima",
-    "headline": "Gledajte, slušajte i učite zajedno — uživo",
+    "headline": "Gledajte, slušajte i učite zajedno : uživo",
     "ctaBrowse": "Pregledaj seminare",
     "ctaPlan": "Pogledaj planove",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminari",
     "cal": {
       "title": "Kalendar seminara",
-      "desc": "Od prošlih do nadolazećih seminara — dodirnite datum za detalje.",
+      "desc": "Od prošlih do nadolazećih seminara: dodirnite datum za detalje.",
       "legendSmn": "Seminari",
       "legendEnded": "Prošli seminari",
       "legendMine": "Moji događaji",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Video seminar uživo",
-        "desc": "Naš vlastiti video motor Galápagos — cilj je jedan prezenter koji streamuje do 30 sudionika"
+        "desc": "Naš vlastiti video mehanizam Galápagos: Cilj je da jedan prezenter šalje video do 30 članova publike."
       },
       "F02": {
         "name": "Kreiraj seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Reprodukcija sintetičkog glasa i smanjen izvorni zvuk"
     },
     "refLabel": "Referentni model",
-    "uiRef": "UI osnova — obrasci zaslona i značajki široko korištene web aplikacije za video sastanke, prilagođeni za seminar.pi"
+    "uiRef": "UI standardi: Primjena uzoraka zaslona i značajki popularnih aplikacija za web konferencije na seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Članovi publike ne koriste kameru ni mikrofon. Nakon pridruživanja vidjet ćete i čuti prezentera.",
     "preview": {
       "pending": "Priprema kamere i mikrofona…",
-      "audioOnly": "Kamera nedostupna — šalje se samo zvuk.",
+      "audioOnly": "Kamera nedostupna : šalje se samo zvuk.",
       "none": "Kamera i mikrofon nedostupni. Provjerite dopuštenja (još uvijek se možete pridružiti bez medija).",
-      "videoOnly": "Mikrofon nedostupan — šalje se samo video. Provjerite dopuštenje mikrofona."
+      "videoOnly": "Mikrofon nedostupan : šalje se samo video. Provjerite dopuštenje mikrofona."
     },
     "mic": {
       "on": "Isključi mikrofon",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Vaša ulazna propusnica je istekla.",
       "TICKET_EXPIRED": "Vaša ulazna propusnica je istekla.",
       "ROOM_FULL": "Ovaj seminar je pun.",
-      "ROOM_CLOSED": "Soba je zatvorena — seminar je završio ili je domaćin bio odsutan više od 5 minuta.",
+      "ROOM_CLOSED": "Soba je zatvorena. Seminar je završio ili je domaćin bio odsutan više od 5 minuta.",
       "DUPLICATE_SESSION": "Pridružili ste se s drugog uređaja, pa je ova veza prekinuta.",
       "ROLE_FORBIDDEN": "Nemate dopuštenje za prezentiranje.",
       "WS_FAILED": "Nije se moguće povezati s video poslužiteljem.",
@@ -488,7 +488,7 @@
     "toDetail": "Idi na stranicu seminara",
     "consent": {
       "title": "Prije nego što uključite mikrofon",
-      "body": "Ako su u ovom seminaru uključeni snimanje, titlovi ili AI bilješke sa sastanka, vaš glas može biti pretvoren u tekst, pohranjen i preveden. Obrada glasa obavlja se putem AI usluge izvan vaše zemlje. Ako se ne slažete, vaš mikrofon će se i dalje uključiti — samo vaš glas neće biti obrađen.",
+      "body": "Ako su u ovom seminaru uključeni snimanje, titlovi ili AI bilješke sa sastanka, vaš glas može biti pretvoren u tekst, pohranjen i preveden. Obrada glasa obavlja se putem AI usluge izvan vaše zemlje. Ako se ne slažete, vaš mikrofon će se i dalje uključiti : samo vaš glas neće biti obrađen.",
       "privacy": "Pravila privatnosti",
       "newTab": "(otvara se u novoj kartici)",
       "decline": "Ne slažem se",
@@ -613,7 +613,7 @@
       "title": "Snimanje",
       "badge": "Snimanje",
       "unsupported": "Ovaj preglednik ne može snimati. Molimo snimajte s uobičajenog preglednika na računalu.",
-      "piBrowserOnly": "Snimanje radi samo u uobičajenom pregledniku (računalo ili mobilni uređaj). Pi Browser ne može spremiti datoteke snimke — otvorite ovaj seminar u pregledniku računala ili telefona (seminarz.vercel.app) za snimanje.",
+      "piBrowserOnly": "Snimanje je dostupno samo u uobičajenim preglednicima (PC/mobilni). Pi Browser ne može spremati snimljene datoteke. Molimo otvorite isti seminar u pregledniku na računalu ili mobilnom uređaju (seminarz.vercel.app) za snimanje.",
       "audioSuspended": "Snimanje zvuka možda nije započelo na ovom uređaju. Možda će se snimati samo slika.",
       "notifyFailed": "Snimanje nije započelo jer sudionici nisu mogli biti obaviješteni. Pokušajte ponovno za kratko vrijeme.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Zatvori ponovno spremanje"
       },
       "toast": {
-        "started": "Snimanje je započelo — svi to mogu vidjeti",
+        "started": "Snimanje je počelo. Ovo će biti prikazano svim sudionicima.",
         "saved": "Snimka spremljena. Provjerite mapu za preuzimanja. Ako ništa nije spremljeno, dodirnite [Spremi ponovno] na vrhu zaslona.",
         "autoStopped": "Snimanje je završilo jer ga je preglednik zaustavio ili je dosegnuto ograničenje veličine. Sve do tog trenutka je spremljeno. Ponovno pokrenite snimanje za nastavak.",
         "empty": "Ništa nije snimljeno, pa datoteka nije stvorena.",
@@ -656,10 +656,10 @@
       "badge": "AI bilješke uključene",
       "started": "Prezenter je uključio AI bilješke",
       "stopped": "AI bilješke isključene",
-      "startedMine": "AI bilješke uključene — prikazuju se svima",
-      "stoppedMine": "AI bilješke isključene — stvaranje bilješki",
+      "startedMine": "AI zapisnik sastanka je pokrenut. Ovo će biti prikazano svim sudionicima.",
+      "stoppedMine": "AI zapisnik sastanka je zaustavljen. Zapisnik sastanka se generira.",
       "startFail": "Nije moguće pokrenuti AI bilješke",
-      "gone": "AI bilješke su zaustavljene — bilješke su završene ili izbrisane drugdje",
+      "gone": "AI bilješke su zaustavljene : bilješke su završene ili izbrisane drugdje",
       "unsupported": "AI bilješke se ovdje ne mogu uključiti (nema podrške za audio snimanje)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Dodirnite [Otvori postavke Google kalendara] ispod.",
       "s2": "Pod 'Postavke za moje kalendare' s lijeve strane, odaberite kalendar (npr. vaše ime).",
       "s3": "Pomaknite se do 'Integriraj kalendar' i kopirajte 'Tajnu adresu u iCal formatu'.",
-      "s4": "Zalijepite je ovdje i dodirnite [Dodaj] — naslovi događaja pojavit će se u kalendaru. Dodajte druge kalendare na isti način, do 5.",
+      "s4": "Zalijepite je ovdje i dodirnite [Dodaj] : naslovi događaja pojavit će se u kalendaru. Dodajte druge kalendare na isti način, do 5.",
       "open": "Otvori postavke Google kalendara",
-      "privacy": "Ova adresa je ključ vašeg kalendara — nemojte je dijeliti. Pohranjuje se samo na ovom uređaju, nikada na našem poslužitelju."
+      "privacy": "Ova adresa je ključ vašeg kalendara : nemojte je dijeliti. Pohranjuje se samo na ovom uređaju, nikada na našem poslužitelju."
     },
     "title": "Kreiraj seminar",
     "name": "Otputujmo na prekrasan otok!",
     "subTitle": "Podnaslov (opcionalno, do 60 znakova)",
     "startAt": "Vrijeme početka",
-    "maxCnt": "Kapacitet (1–100)",
+    "maxCnt": "Kapacitet (1~100)",
     "submit": "Kreiraj",
     "submitting": "Kreiranje…",
-    "invalid": "Provjerite svoj unos — datum unutar jedne godine od sada, kapacitet 1–100.",
+    "invalid": "Provjerite ulazne vrijednosti: datum unutar jedne godine od sada i kapacitet od 1 do 100.",
     "attendance": {
       "title": "Prisutnost",
       "back": "Natrag na seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Vrijeme prisutnosti je od prvog pridruživanja do zadnjeg viđenja, minus vrijeme odsutnosti (praznine duže od 2,5 minute).",
-      "csvPiBrowser": "Preuzimanje CSV-a radi samo u običnom pregledniku (računalo ili mobilni uređaj). Pi Browser ne može spremati datoteke — otvorite ovaj popis prisutnosti u pregledniku na računalu ili telefonu (seminarz.vercel.app)."
+      "csvPiBrowser": "Preuzimanje CSV-a dostupno je samo u uobičajenim preglednicima (PC/mobilni). Pi Browser ne može spremati datoteke. Molimo otvorite isti popis prisutnosti u pregledniku na računalu ili mobilnom uređaju (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Besplatno — {time} preostalo ovaj mjesec · bez AI",
-    "planPaid": "{name} {time} · {price} — plati prilikom kreiranja",
+    "planFree": "Besplatno: {time} preostalo ovaj mjesec · Nema AI",
+    "planPaid": "{name} {time} · {price} · Plaćanje prilikom kreiranja",
     "planHint": "Seminar otvoren s plaćenim planom prvo koristi vrijeme tog plana, a zatim nastavlja s besplatnim vremenom ovog mjeseca (AI je isključen u besplatnom dijelu). Aktivan plan otvara se bez plaćanja; mjesečni ili godišnji plan koji nemate plaća se u Pi-ju kada pritisnete Stvori, a zatim se seminar otvara (Pi Browser). Sudjelovanje je uvijek besplatno za sudionike.",
-    "planOwned": "{name} — aktivan · {time} preostalo",
+    "planOwned": "{name}: Pretplata · {time} preostalo",
     "planEnds": "Vrijeme početka je nakon isteka propusnice ovog plana. Pomaknite početak ranije ili odaberite drugi plan.",
     "paidKept": "Vaša plaćena propusnica je zadržana. Popravite problem i ponovno pritisnite Kreiraj (bez drugog plaćanja)."
   },
   "privacy": {
-    "title": "Pravila privatnosti — Glasovne i AI značajke",
+    "title": "Pravila privatnosti: Glasovne i AI značajke",
     "effective": "Na snazi od {date}",
     "intro": "Ova pravila objašnjavaju osobne podatke koje obrađujemo kada koristite titlove uživo, prevedene titlove, glasovni prijevod, AI bilješke sa sastanaka i bilješke uživo na seminaru. Ove značajke koriste vanjsku AI uslugu, pa se podaci prenose u inozemstvo.",
     "whoTitle": "Čiji se podaci obrađuju",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Primatelj",
-        "v": "Google LLC (Gemini API) — kontakt [TBD: Google kontakt za privatnost]"
+        "v": "Google LLC (Gemini API): Kontakt [Na čekanju: Master, Google kanal za upite o privatnosti]"
       },
       {
         "k": "Zemlje",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Svrha",
-        "v": "Govor u tekst, prijevod, sažeci bilješki sa sastanaka, sintetički govor (standardni glasovi, bez kloniranja glasa), razdvajanje govornika za bilješke uživo (glasovi se razlikuju i označavaju prema percipiranom spolu, kao što su Muški 1 / Ženski 1 — ne izvode se imena ili identiteti)"
+        "v": "Pretvaranje glasa u tekst, prijevod, sažimanje zapisnika sastanka, sintetički glas (standardni glas, bez kloniranja glasa), razdvajanje govornika u bilješkama uživo (razdvaja ljude po glasu i prikazuje kao muški 1, ženski 1 na temelju percipiranog spola, ne identificira imena ili identitete)"
       },
       {
         "k": "Zadržavanje",
-        "v": "Završava čim se vrati rezultat. Tražimo od Googlea da ne pohranjuje zahtjeve (store=false). Dnevnici praćenja zlouporabe i dalje se mogu čuvati prema Googleovim uvjetima [TBD: razdoblje zadržavanja i status plaćenog sloja]."
+        "v": "Završava odmah po primitku obrađenih rezultata. Zahtijevamo da Google ne pohranjuje zahtjeve (store=false). Međutim, zapisi praćenja zlouporabe prema Googleovim uvjetima mogu se pohraniti [Na čekanju: Master, razdoblje pohrane i primjena plaćenog sloja]."
       },
       {
         "k": "Kako odbiti i što se događa",
@@ -895,8 +895,8 @@
     "keep": [
       "Izvorni zvuk: za titlove seminara i AI bilješke sa sastanaka ne pohranjuje se; odbacuje se odmah nakon pretvorbe u tekst. Za bilješke uživo, snimka se čuva u privatnoj pohrani kako bi se mogla ponovno točnije transkribirati (s govornicima) nakon sastanka, a briše se pri dnevnom čišćenju nakon što prođe 1 dan od završetka bilješke (odmah ako se bilješka izbriše).",
       "Titlovi uživo: ne pohranjuju se.",
-      "AI bilješke sa sastanaka (kada ih prezenter uključi): izgovoreni sadržaj, snimke zaslona i sažetak, čuvaju se dok se bilješke ne izbrišu [TBD: maksimalno zadržavanje].",
-      "Zapisi o pristanku: vrijeme pristanka i verzija pravila, čuvaju se kao dokaz [TBD: razdoblje zadržavanja].",
+      "AI zapisnik sastanka (ako ga je omogućio prezenter): Pohranjuje izjave, snimke zaslona i sažetke dok se zapisnik sastanka ne izbriše [Na čekanju: Master, maksimalno razdoblje pohrane].",
+      "Zapisi o pristanku: Pohranjuje datum pristanka i verziju prihvaćenih pravila radi dokaza [Na čekanju: Master, razdoblje pohrane].",
       "Upotreba: brojevi zahtjeva po minuti i vrijeme obrade, koriste se za provođenje ograničenja troškova.",
       "Prisutnost: vrijeme kada ste se pridružili, vrijeme kada ste zadnji put bili povezani, vaše prikazno ime i vaše Pi korisničko ime pohranjuju se i daju domaćinu kao popis prisutnosti (na zaslonu i kao CSV preuzimanje). Čuva se dok se seminar ne izbriše.",
       "Pitanja i odgovori i ankete: tekst pitanja i prikazno ime (ili Pi korisničko ime ako ga nema) autora pitanja vidljivi su svakom sudioniku. Glasovi za pokazuju samo brojeve, nikada tko ih je dao. Glasovi ankete pokazuju samo brojeve sudionicima; organizator i administratori vide, za svaku opciju, prikazno ime (ili Pi korisničko ime ako ga nema) svakog glasača. Čuva se, uključujući skrivena pitanja, dok se seminar ne izbriše."
@@ -904,14 +904,14 @@
     "recTitle": "Snimanje",
     "rec": "Snimke se spremaju samo kao datoteka na uređaju prezentera. Ne prenose se na naše poslužitelje niti u inozemstvo. Dok je snimanje ili AI bilješke uključeno, svaki sudionik vidi indikator.",
     "rightsTitle": "Vaša prava",
-    "rights": "Možete zatražiti pristup, ispravak, brisanje ili zaustavljanje obrade vaših podataka. Kontakt: [TBD: ime i kontakt službenika za zaštitu privatnosti]"
+    "rights": "Možete zatražiti pristup, ispravak, brisanje i obustavu obrade vaših podataka. Kontakt: [Na čekanju: Master, Ime i kontakt službenika za zaštitu privatnosti]"
   },
   "notes": {
     "title": "Bilješke",
     "back": "Natrag na seminar",
     "loading": "Učitavanje…",
     "meta": "Bilješke · {date} · {min} min",
-    "aiWarn": "Sažetak generiran AI-jem — može sadržavati pogreške",
+    "aiWarn": "Sažetak generiran AI-jem : može sadržavati pogreške",
     "points": "Ključne točke",
     "decisions": "Odluke",
     "todos": "Stavke za rad",
@@ -921,11 +921,11 @@
     "making": "Stvaranje bilješki…",
     "makingLong": "Ovo traje neko vrijeme. Molimo osvježite kasnije",
     "recording": "Još uvijek snimam",
-    "failed": "Nije moguće stvoriti sažetak — cijeli transkript je ispod",
+    "failed": "Nije uspjelo stvaranje sažetka. Cijeli transkript je ispod.",
     "retry": "Pokušaj ponovno",
     "finish": "Završi snimanje i sažmi",
     "none": "Nema ničega ovdje",
-    "blank": "Nema ničega za sažeti — nije snimljen govor ili je bio prekratak",
+    "blank": "Nema sadržaja za sažimanje. Nije zabilježen govor ili je bio prekratak.",
     "notFound": "Bilješke nisu pronađene",
     "forbidden": "Nemate pristup ovim bilješkama",
     "shotAlt": "Snimka zaslona u {at}",
@@ -938,7 +938,7 @@
     "delYes": "Izbriši",
     "delNo": "Odustani",
     "delFail": "Nije moguće izbrisati",
-    "dlFail": "Nije moguće preuzeti — molimo pokušajte ponovno",
+    "dlFail": "Preuzimanje nije uspjelo. Molimo dodirnite ponovno.",
     "recentNotes": "Nedavne bilješke",
     "empty": "Još nema bilješki",
     "newNote": "Započni bilješke uživo",
@@ -959,12 +959,12 @@
     "aiOff": "AI bilješke trenutno nisu dostupne (potrebna je konfiguracija poslužitelja). Prethodne bilješke su navedene ispod",
     "reload": "Ponovo učitaj",
     "unsupported": "Snimanje nije dostupno na ovom uređaju",
-    "micDenied": "Ne mogu koristiti mikrofon — provjerite dopuštenje",
-    "limited": "Iskorišteno je ograničenje vremena obrade — završi i kreiraj bilješke",
-    "noAgr": "Zaustavljeno: nema potvrde obavijesti o snimanju — završi i počni ponovo",
-    "micLost": "Mikrofon je isključen i snimanje je zaustavljeno — dodirnite Ponovo poveži mikrofon ili završi bilješku",
+    "micDenied": "Mikrofon nije dostupan. Provjerite dozvole.",
+    "limited": "Dosegnuto je ograničenje vremena obrade. Molimo završite i generirajte zapisnik sastanka.",
+    "noAgr": "Zaustavljeno zbog nedostatka zapisa o potvrdi obavijesti. Molimo završite i ponovno pokrenite.",
+    "micLost": "Veza mikrofona je izgubljena, snimanje je zaustavljeno. Molimo dodirnite [Ponovno poveži mikrofon] ili završite.",
     "micRetry": "Ponovo poveži mikrofon",
-    "gone": "Ova bilješka je završena ili izbrisana drugdje, pa je snimanje zaustavljeno — koristite donji gumb za otvaranje bilješki",
+    "gone": "Ova bilješka je završena ili izbrisana na drugom zaslonu, pa je snimanje zaustavljeno. Molimo provjerite zapisnik sastanka pomoću gumba ispod.",
     "finishing": "Spremanje posljednjih riječi…",
     "st": {
       "RECORDING": "Snimanje",
@@ -972,7 +972,7 @@
       "DONE": "Gotovo",
       "FAILED": "Neuspješno"
     },
-    "downloadPiBrowser": "Preuzimanje Markdowna radi samo u običnom pregledniku (računalo ili mobilni uređaj). Pi Browser ne može spremati datoteke — otvorite ove bilješke u pregledniku na računalu ili telefonu (seminarz.vercel.app)."
+    "downloadPiBrowser": "Preuzimanje Markdowna dostupno je samo u uobičajenim preglednicima (PC/mobilni). Pi Browser ne može spremati datoteke. Molimo otvorite isti zapisnik sastanka u pregledniku na računalu ili mobilnom uređaju (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Planovi",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} povezano",
     "producers": "{n} streamova",
     "end": "Završava {time}",
-    "stale": "Seminar je završio, ali soba je još uvijek otvorena na video poslužitelju — prisilno je zatvorite.",
+    "stale": "Seminar je završio, ali sobe su ostale na video poslužitelju. Molimo ih prisilno zatvorite.",
     "close": "Prisilno zatvori",
     "confirmSeminar": "Ovo završava seminar i zatvara sobu. Svi će biti isključeni.",
     "confirmRoom": "Ovo zatvara sobu. Svi će biti isključeni.",
@@ -1063,7 +1063,7 @@
     "cancel": "Odustani",
     "saving": "Spremanje…",
     "done": "Primijenjeno. Preostalo {plan} vrijeme: {time}",
-    "invalid": "Unesite smanjenje između 1 minute i 1000 sati (cijele minute 0–59).",
+    "invalid": "Unesite smanjenje između 1 minute i 1000 sati (cijele minute 0~59).",
     "history": "Nedavne prilagodbe",
     "noHistory": "Još nema prilagodbi.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

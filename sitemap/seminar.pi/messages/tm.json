@@ -6,7 +6,7 @@
   "home": {
     "description": "Hostlar seminarlary açýarlar, gatnaşyjylar bolsa Pi bilen göni wideo sessiýalara gatnaşýarlar.",
     "badge": "Owadan adalarda göni seminarlar",
-    "headline": "Bilelikde tomaşa ediň, diňläň we öwreniň — göni ýaýlymda",
+    "headline": "Bilelikde tomaşa ediň, diňläň we öwreniň : göni ýaýlymda",
     "ctaBrowse": "Seminarlara göz aýla",
     "ctaPlan": "Meýilnamalary gör",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarlar",
     "cal": {
       "title": "Seminar senenamasy",
-      "desc": "Geçen seminarlardan geljekkilere çenli — jikme-jiklikler üçin senä basyň.",
+      "desc": "Öten seminarlardan geljeklerine çenli: jikme-jiklikler üçin senä basyň.",
       "legendSmn": "Seminarlar",
       "legendEnded": "Geçen seminarlar",
       "legendMine": "Meniň çärelerim",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Göni wideo seminar",
-        "desc": "Biziň öz wideo motorymyz Galápagos — maksat bir prezentatoryň 30 gatnaşyja çenli ýaýlym etmegi"
+        "desc": "Öz wideo hereketlendirijimiz Galápagos: Maksat, bir alypbaryjynyň 30-a çenli diňleýjä wideo ibermegidir."
       },
       "F02": {
         "name": "Seminar döretmek",
@@ -254,7 +254,7 @@
       "dubbing": "Sintetik ses oýnatmak we peseldilen asyl ses"
     },
     "refLabel": "Salgy modeli",
-    "uiRef": "UI esasy — giňden ulanylýan web wideo duşuşyk programmasynyň ekran we aýratynlyk nusgalary, seminar.pi üçin uýgunlaşdyrylan"
+    "uiRef": "UI standartlary: Meşhur web wideo konferensiýa programmalarynyň ekran we funksiýa nusgalaryny seminar.pi-e ulanmak"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Diňleýjiler kamera ýa-da mikrofon ulanmaýarlar. Goşulanyňyzdan soň prezentatory görersiňiz we eşidersiňiz.",
     "preview": {
       "pending": "Kamera we mikrofon taýýarlanylýar…",
-      "audioOnly": "Kamera elýeterli däl — diňe ses iberilýär.",
+      "audioOnly": "Kamera elýeterli däl : diňe ses iberilýär.",
       "none": "Kamera we mikrofon elýeterli däl. Rugsatlary barlaň (media bolmazdan hem goşulyp bilersiňiz).",
-      "videoOnly": "Mikrofon elýeterli däl — diňe wideo iberilýär. Mikrofon rugsadyny barlaň."
+      "videoOnly": "Mikrofon elýeterli däl : diňe wideo iberilýär. Mikrofon rugsadyny barlaň."
     },
     "mic": {
       "on": "Mikrofony öçür",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Giriş geçişiňiziň möhleti gutardy.",
       "TICKET_EXPIRED": "Giriş geçişiňiziň möhleti gutardy.",
       "ROOM_FULL": "Bu seminar doly.",
-      "ROOM_CLOSED": "Otag ýapyldy — seminar gutardy ýa-da alypbaryjy 5 minutdan köp wagt bäri ýokdy.",
+      "ROOM_CLOSED": "Otag ýapyk. Seminar tamamlandy ýa-da alypbaryjy 5 minutdan gowrak wagt bäri ýok.",
       "DUPLICATE_SESSION": "Başga enjamdan goşulanyňyz üçin bu ekran baglanyşygy kesildi.",
       "ROLE_FORBIDDEN": "Siziň çykyş etmäge ygtyýaryňyz ýok.",
       "WS_FAILED": "Wideo serwerine birikmek başartmady.",
@@ -488,7 +488,7 @@
     "toDetail": "Seminar sahypasyna git",
     "consent": {
       "title": "Mikrofonyňyzy açmazdan öň",
-      "body": "Eger bu seminarda ýazgy, ýazgylar ýa-da AI duşuşyk bellikleri açyk bolsa, sesiňiz tekste öwrülip, saklanyp we terjime edilip bilner. Ses gaýtadan işlenişi ýurduňyzdan daşardaky AI hyzmaty tarapyndan amala aşyrylýar. Eger ylalaşmasaňyz, mikrofonyňyz açyk bolar — diňe sesiňiz gaýtadan işlenişden daşda galar.",
+      "body": "Eger bu seminarda ýazgy, ýazgylar ýa-da AI duşuşyk bellikleri açyk bolsa, sesiňiz tekste öwrülip, saklanyp we terjime edilip bilner. Ses gaýtadan işlenişi ýurduňyzdan daşardaky AI hyzmaty tarapyndan amala aşyrylýar. Eger ylalaşmasaňyz, mikrofonyňyz açyk bolar : diňe sesiňiz gaýtadan işlenişden daşda galar.",
       "privacy": "Gizlinlik syýasaty",
       "newTab": "(täze goýmada açylýar)",
       "decline": "Ylalaşmaýaryn",
@@ -613,7 +613,7 @@
       "title": "Ýazgy",
       "badge": "Ýazgy edilýär",
       "unsupported": "Bu brauzer ýazgy etmegi goldanmaýar. Kompýuterde adaty brauzerden ýazgy ediň.",
-      "piBrowserOnly": "Ýazgy diňe adaty brauzerde (PC ýa-da mobil) işleýär. Pi Browser ýazgy faýllaryny saklap bilmeýär — bu seminara kompýuter ýa-da telefon brauzeri (seminarz.vercel.app) arkaly girip ýazgy ediň.",
+      "piBrowserOnly": "Ýazgy diňe adaty brauzerlerde (PC/mobil) elýeterlidir. Pi Browser ýazylan faýllary saklap bilmeýär. Ýazgy üçin şol bir seminara kompýuter ýa-da mobil brauzer (seminarz.vercel.app) arkaly giriň.",
       "audioSuspended": "Bu enjamda ses ýazgysy başlamadyk bolmagy mümkin. Diňe surat ýazga alnyp bilner.",
       "notifyFailed": "Gatnaşyjylara habar berilmedigi üçin ýazgy başlamady. Biraz wagtdan soň gaýtadan synanyşyň.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Täzeden saklamagy ýap"
       },
       "toast": {
-        "started": "Ýazgy başlandy — ähli adamlara görünýär",
+        "started": "Ýazgy başlandy. Bu ähli gatnaşyjylara görkeziler.",
         "saved": "Ýazgy saklandy. Ýüklemeler bukjanyňyzy barlaň. Eger hiç zat saklanmadyk bolsa, ekranyň ýokarsyndaky [Täzeden sakla] düwmesine basyň.",
         "autoStopped": "Brauzer ony duruzdy ýa-da ölçeg çägi ýetildi, şonuň üçin ýazgy gutardy. Şol pursata çenli ähli zat saklandy. Dowam etmek üçin ýazgy etmegi täzeden başlaň.",
         "empty": "Hiç zat ýazga alynmady, şonuň üçin faýl döredilmedi.",
@@ -656,10 +656,10 @@
       "badge": "AI bellikler açyk",
       "started": "Prezenter AI bellikleri açdy",
       "stopped": "AI bellikler ýapyldy",
-      "startedMine": "AI bellikler açyk — hemmelere görkezilýär",
-      "stoppedMine": "AI bellikler ýapyk — bellikler döredilýär",
+      "startedMine": "AI maslahat protokollary işe girizildi. Bu ähli gatnaşyjylara görkeziler.",
+      "stoppedMine": "AI maslahat protokollary togtadyldy. Maslahat protokollary döredilýär.",
       "startFail": "AI bellikleri başlap bilmedi",
-      "gone": "AI bellikler bes edildi — bellikler başga ýerde gutardy ýa-da pozuldy",
+      "gone": "AI bellikler bes edildi : bellikler başga ýerde gutardy ýa-da pozuldy",
       "unsupported": "AI bellikler bu ýerde açylyp bilinmez (ses ýazgysy goldanok)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Aşakdaky [Google Kalendar sazlamalaryny aç] düwmesine basyň.",
       "s2": "Çepdäki 'Meniň kalendarlarym üçin sazlamalar' bölüminde bir kalendar saýlaň (mysal üçin adyňyz).",
       "s3": "'Kalendary birleşdir' bölümine aşak süýşüriň we 'iCal formatyndaky gizlin salgyny' kopiýalaň.",
-      "s4": "Ony bu ýere goýuň we [Goş] düwmesine basyň — waka atlary kalendarda peýda bolar. Beýleki kalendarlary hem şol bir usul bilen, 5-e çenli goşup bilersiňiz.",
+      "s4": "Ony bu ýere goýuň we [Goş] düwmesine basyň : waka atlary kalendarda peýda bolar. Beýleki kalendarlary hem şol bir usul bilen, 5-e çenli goşup bilersiňiz.",
       "open": "Google Kalendar sazlamalaryny aç",
-      "privacy": "Bu salgy siziň kalendaryňyzyň açarydyr — ony paýlaşmaň. Ol diňe bu enjamda saklanýar, biziň serwerimizde hiç haçan saklanmaýar."
+      "privacy": "Bu salgy siziň kalendaryňyzyň açarydyr : ony paýlaşmaň. Ol diňe bu enjamda saklanýar, biziň serwerimizde hiç haçan saklanmaýar."
     },
     "title": "Seminar döret",
     "name": "Geliň, owadan ada syýahat edeliň!",
     "subTitle": "Kiçi at (meýletin, 60 simwola çenli)",
     "startAt": "Başlangyç wagt",
-    "maxCnt": "Sygyjylyk (1–100)",
+    "maxCnt": "Sygyjylyk (1~100)",
     "submit": "Döret",
     "submitting": "Döredilýär…",
-    "invalid": "Girişiňizi barlaň — häzirden bir ýylyň içinde sene, sygyjylyk 1–100.",
+    "invalid": "Giriş bahalaryny barlaň: şu günden bir ýyl içinde sene we 1-100 aralygynda sygym.",
     "attendance": {
       "title": "Gatnaşyk",
       "back": "Seminara gaýtmak",
@@ -840,18 +840,18 @@
         "state": "Ýagdaý"
       },
       "durNote": "Gatnaşan wagt ilkinji goşulandan soňky görülene çenli, daşda bolan wagt (2.5 minutdan uzyn boşluklar) çykarylan.",
-      "csvPiBrowser": "CSV göçürip almak diňe adaty brauzerde (kompyuter ýa-da mobil) işleýär. Pi Browser faýllary saklap bilmeýär — bu gatnaşyk sahypasyny kompyuter ýa-da telefon brauzerinde açyň (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV göçürip almak diňe adaty brauzerlerde (PC/mobil) elýeterlidir. Pi Browser faýllary saklap bilmeýär. Şol bir gatnaşyk sanawyny kompýuter ýa-da mobil brauzer (seminarz.vercel.app) arkaly açyň."
     },
     "plan": "Meýilnama",
-    "planFree": "Mugt — bu aý {time} galdy · AI ýok",
-    "planPaid": "{name} {time} · {price} — döredilende töle",
+    "planFree": "Mugt: Bu aýda galan {time} · AI ýok",
+    "planPaid": "{name} {time} · {price} · Döredilende töleg",
     "planHint": "Tölegli meýilnama bilen açylan seminar ilki şol meýilnamanyň wagtyny ulanýar, soňra bu aýyň mugt wagty bilen dowam edýär (mugt böleginde AI ýok). Işjeň meýilnama tölegsiz açylýar; Aýlyk ýa-da Ýyllyk meýilnamanyz ýok bolsa, Döret düwmesine basanyňyzda Pi bilen tölenýär, soňra seminar açylýar (Pi Browser). Gatnaşyjylar üçin goşulmak hemişe mugt.",
-    "planOwned": "{name} — işjeň · {time} galdy",
+    "planOwned": "{name}: Abunalykda · Galan wagt {time}",
     "planEnds": "Başlangyç wagt bu meýilnamanyň möhleti gutarandan soň. Başlangyç wagty öňe süýşüriň ýa-da başga meýilnama saýlaň.",
     "paidKept": "Siziň tölegli geçelgäňiz saklanýar. Meseläni düzeltmek we gaýtadan Döret düwmesine basmak (ikinji töleg ýok)."
   },
   "privacy": {
-    "title": "Gizlinlik syýasaty — Ses we AI aýratynlyklary",
+    "title": "Gizlinlik syýasaty: Ses we AI funksiýalary",
     "effective": "Güýje girýän senesi {date}",
     "intro": "Bu syýasat, seminarda janly ýazgylary, terjime edilen ýazgylary, ses terjimesini, AI duşuşyk belliklerini we şahsy bellikleri ulananyňyzda işlenýän şahsy maglumatlary düşündirýär. Bu aýratynlyklar daşarky AI hyzmatyny ulanýar, şonuň üçin maglumatlar daşary ýurtlara geçirilýär.",
     "whoTitle": "Kimiň maglumatlary işlenýär",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Kabul ediji",
-        "v": "Google LLC (Gemini API) — habarlaşmak [TBD: Google gizlinlik habarlaşma]"
+        "v": "Google LLC (Gemini API): Aragatnaşyk [Garaşylýar: Master, Google Gizlinlik sorag kanaly]"
       },
       {
         "k": "Ýurtlar",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Maksat",
-        "v": "Sesi tekste öwürmek, terjime, duşuşyk bellikleriniň jemlemesi, sintetiki ses (standart sesler, ses klonlamasy ýok), şahsy bellikler üçin gürleýjini aýyrmak (sesler aýratynlaşdyrylýar we duýulan jynsa görä bellik edilýär, mysal üçin Erkek 1 / Zenan 1 — atlar ýa-da şahsyýetler kesgitlenilmeýär)"
+        "v": "Sesi tekste öwürmek, terjime, maslahat protokollaryny jemlemek, sintetiki ses (standart ses, ses klonlamasy ýok), ýüzbe-ýüz belliklerde gürleýjini tapawutlandyrmak (ses arkaly adamlary tapawutlandyrýar we duýulýan jynsa görä erkek 1, aýal 1 hökmünde görkezýär, atlary ýa-da şahsyýetleri kesgitlemeýär)"
       },
       {
         "k": "Saklama",
-        "v": "Netije gaýtarylandan soň derrew gutarýar. Google-dan soraglary saklamazlygy soraýarys (store=false). Hyýanatçylygy gözegçilik etmek üçin ýazgylar Google-yň şertlerine laýyklykda saklanyp bilner [TBD: saklama möhleti we tölegli dereje ýagdaýy]."
+        "v": "Gaýtadan işlenen netijeleri alandan soň derrew gutarýar. Google-dan soraglary saklamazlygyny haýyş edýäris (store=false). Emma Google-yň şertlerine laýyklykda nädogry ulanmagy gözegçilik etmek ýazgylary saklanyp bilner [Garaşylýar: Master, saklama möhleti we tölegli derejäniň ulanylyşy]."
       },
       {
         "k": "Nähili ret etmeli we näme bolýar",
@@ -895,8 +895,8 @@
     "keep": [
       "Asyl ses: seminar ýazgylary we AI duşuşyk bellikleri üçin saklanmaýar; tekste öwrülenden soň derrew aýrylýar. Şahsy bellikler üçin, ýazgy şahsy saklama ýerinde saklanýar, şonuň üçin duşuşykdan soň has takyk (gürleýjiler bilen) gaýtadan transkripsiýa edilip bilner we bellik gutarandan 1 gün geçenden soň gündelik arassalaýyşda pozulýar (bellik pozulsa derrew).",
       "Janly ýazgylar: saklanmaýar.",
-      "AI duşuşyk bellikleri (prezenter açanda): gürlenen mazmun, skrinşotlar we jemleme, bellikler pozulýança saklanýar [TBD: iň ýokary saklama möhleti].",
-      "Razylyk ýazgylary: razylyk wagty we syýasat wersiýasy, subutnama hökmünde saklanýar [TBD: saklama möhleti].",
+      "AI maslahat protokollary (alypbaryjy tarapyndan işjeňleşdirilen bolsa): Gürrüňleri, skrinshotlary we jemlemeleri maslahat protokollary pozulýança saklaýar [Garaşylýar: Master, iň ýokary saklama möhleti].",
+      "Razylyk ýazgylary: Razylyk senesini we razylyk berlen syýasatyň wersiýasyny subutnama üçin saklaýar [Garaşylýar: Master, saklama möhleti].",
       "Ulanyş: minutlyk sorag sany we gaýtadan işleme wagty, çykdajy çäklerini berjaý etmek üçin ulanylýar.",
       "Gatnaşyk: goşulan wagtyňyz, soňky birikdirilen wagtyňyz, görkezme adyňyz we Pi ulanyjy adyňyz saklanýar we hosta gatnaşyk sanawy (ekranda we CSV göçürip almak hökmünde) hökmünde berilýär. Seminar pozulýança saklanýar.",
       "Sorag-jogap we ses berişler: sorag teksti we sorag berijiniň görkezme ady (ýok bolsa Pi ulanyjy ady) her bir gatnaşyja görünýär. Sesler diňe sanlary görkezýär, kim ses berendigini hiç haçan görkezmeýär. Ses berişler gatnaşyjylara diňe sanlary görkezýär; gurnaýjy we adminler, her bir opsiýa üçin, her bir ses berijiniň görkezme adyny (ýok bolsa Pi ulanyjy ady) görýärler. Gizlin soraglar bilen birlikde, seminar pozulýança saklanýar."
@@ -904,14 +904,14 @@
     "recTitle": "Ýazgy",
     "rec": "Ýazgylar diňe prezenteryň enjamynda faýl hökmünde saklanýar. Olar biziň serwerlerimize ýüklenilmeýär ýa-da daşary ýurtlara geçirilmeýär. Ýazgy ýa-da AI bellikler açyk wagtynda, her bir gatnaşyja bir görkeziji görünýär.",
     "rightsTitle": "Siziň hukuklaryňyz",
-    "rights": "Siz maglumatlaryňyza girmek, düzetmek, pozmak ýa-da gaýtadan işlemegi bes etmek üçin haýyş edip bilersiňiz. Habarlaşmak: [TBD: gizlinlik işgäriň ady we habarlaşma]"
+    "rights": "Siz öz maglumatlaryňyza girmek, düzediş girizmek, pozmak we gaýtadan işlemegi togtatmak üçin haýyş edip bilersiňiz. Aragatnaşyk: [Garaşylýar: Master, Gizlinlik boýunça jogapkär adamyň ady we aragatnaşyk maglumatlary]"
   },
   "notes": {
     "title": "Bellikler",
     "back": "Seminara gaýtmak",
     "loading": "Ýüklenýär…",
     "meta": "Bellikler · {date} · {min} min",
-    "aiWarn": "AI tarapyndan döredilen jemleme — ýalňyşlyklar bolup biler",
+    "aiWarn": "AI tarapyndan döredilen jemleme : ýalňyşlyklar bolup biler",
     "points": "Esasy nokatlar",
     "decisions": "Kararlar",
     "todos": "Hereket maddalary",
@@ -921,11 +921,11 @@
     "making": "Bellikler döredilýär…",
     "makingLong": "Bu biraz wagt alýar. Biraz wagtdan soň täzeläň",
     "recording": "Henizem ýazga alynýar",
-    "failed": "Jemlemäni döredip bilmedi — doly transkripsiýa aşakda",
+    "failed": "Jemleme döredip bolmady. Doly transkript aşakda.",
     "retry": "Gaýtadan synanyş",
     "finish": "Ýazgyny bes et we jemle",
     "none": "Hiç zat ýok",
-    "blank": "Jemlemek üçin hiç zat ýok — ses ýazga alynmady ýa-da gaty gysgady",
+    "blank": "Jemlemek üçin hiç hili mazmun ýok. Hiç hili gürrüň ýazylmady ýa-da gaty gysga boldy.",
     "notFound": "Bellikler tapylmady",
     "forbidden": "Bu belliklere girmek hukugyňyz ýok",
     "shotAlt": "{at} ekran suraty",
@@ -938,7 +938,7 @@
     "delYes": "Poz",
     "delNo": "Ýatyr",
     "delFail": "Pozup bilmedi",
-    "dlFail": "Göçürip alyp bilmedi — gaýtadan synanyşyň",
+    "dlFail": "Göçürip almak başa barmady. Gaýtadan basyň.",
     "recentNotes": "Soňky bellikler",
     "empty": "Heniz bellik ýok",
     "newNote": "Şahsy bellikleri başla",
@@ -959,12 +959,12 @@
     "aiOff": "AI bellikleri häzir elýeterli däl (serwer sazlamasy gerek). Öňki bellikler aşakda görkezilýär",
     "reload": "Täzeden ýükle",
     "unsupported": "Bu enjamda ýazgy elýeterli däl",
-    "micDenied": "Mikrofony ulanyp bolmaýar — rugsatlary barlaň",
-    "limited": "Gaýtadan işleme wagty çägi doly ulanyldy — tamamla we bellikleri döret",
-    "noAgr": "Durdy: ýazgyda bildiriş tassyklamasy ýok — tamamla we täzeden başla",
-    "micLost": "Mikrofon baglanyşygy kesildi we ýazgy durdy — Mikrofony täzeden birikdir ýa-da bellikleri tamamla düwmesine bas",
+    "micDenied": "Mikrofon elýeterli däl. Rugsatlary barlaň.",
+    "limited": "Gaýtadan işleme wagty çägi doly ulanyldy. Gutaryň we maslahat protokollaryny dörediň.",
+    "noAgr": "Bildiriş tassyklama ýazgysy ýokdugy sebäpli togtadyldy. Gutaryň we gaýtadan başlaň.",
+    "micLost": "Mikrofon birikmesi ýitirildi, ýazgy togtadyldy. [Mikrofony gaýtadan birikdir] düwmesine basyň ýa-da gutaryň.",
     "micRetry": "Mikrofony täzeden birikdir",
-    "gone": "Bu bellik başga ýerde tamamlandy ýa-da pozuldy, şonuň üçin ýazgy durdy — bellikleri açmak üçin aşakdaky düwmäni ulanyň",
+    "gone": "Bu bellik başga ekranda gutaryldy ýa-da pozuldy, şonuň üçin ýazgy togtadyldy. Aşakdaky düwme arkaly maslahat protokollaryny barlaň.",
     "finishing": "Soňky sözleri ýazýar…",
     "st": {
       "RECORDING": "Ýazgy edilýär",
@@ -972,7 +972,7 @@
       "DONE": "Doly",
       "FAILED": "Şowsuz"
     },
-    "downloadPiBrowser": "Markdown göçürip almak diňe adaty brauzerde (kompýuter ýa-da mobil) işleýär. Pi Browser faýllary saklap bilmeýär — bu bellikleri kompýuter ýa-da telefon brauzerinde (seminarz.vercel.app) açyň."
+    "downloadPiBrowser": "Markdown göçürip almak diňe adaty brauzerlerde (PC/mobil) elýeterlidir. Pi Browser faýllary saklap bilmeýär. Şol bir maslahat protokollaryny kompýuter ýa-da mobil brauzer (seminarz.vercel.app) arkaly açyň."
   },
   "plan": {
     "title": "Meýilnamalar",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} birikdirilen",
     "producers": "{n} akym",
     "end": "{time} gutarýar",
-    "stale": "Seminar gutardy, ýöne otag wideo serwerinde henizem açyk — ony mejbury ýapyň.",
+    "stale": "Seminar tamamlandy, ýöne wideo serwerinde otaglar galdy. Olary mejbury ýapyň.",
     "close": "Mejbury ýap",
     "confirmSeminar": "Bu seminara gutarýar we otagy ýapýar. Hemmeler baglanyşygy kesiler.",
     "confirmRoom": "Bu otagy ýapýar. Hemmeler baglanyşygy kesiler.",
@@ -1063,7 +1063,7 @@
     "cancel": "Ýatyr",
     "saving": "Saklanýar…",
     "done": "Uguldy. {plan} galan wagt: {time}",
-    "invalid": "Azaltma wagtyny 1 minut bilen 1000 sagadyň arasynda giriziň (doly minutlar 0–59).",
+    "invalid": "Azaltma wagtyny 1 minut bilen 1000 sagadyň arasynda giriziň (doly minutlar 0~59).",
     "history": "Soňky sazlamalar",
     "noHistory": "Heniz sazlamalar ýok.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

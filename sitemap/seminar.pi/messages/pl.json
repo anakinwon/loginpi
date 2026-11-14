@@ -6,7 +6,7 @@
   "home": {
     "description": "Organizatorzy otwierają seminaria, a uczestnicy dołączają do sesji wideo na żywo z Pi.",
     "badge": "Seminaria na żywo na pięknych wyspach",
-    "headline": "Oglądaj, słuchaj i ucz się razem — na żywo",
+    "headline": "Oglądaj, słuchaj i ucz się razem : na żywo",
     "ctaBrowse": "Przeglądaj seminaria",
     "ctaPlan": "Zobacz plany",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminaria",
     "cal": {
       "title": "Kalendarz seminariów",
-      "desc": "Od przeszłych do nadchodzących seminariów — dotknij daty, aby uzyskać szczegóły.",
+      "desc": "Od przeszłych do nadchodzących seminariów: dotknij daty, aby uzyskać szczegóły.",
       "legendSmn": "Seminaria",
       "legendEnded": "Poprzednie seminaria",
       "legendMine": "Moje wydarzenia",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Seminarium wideo na żywo",
-        "desc": "Nasz własny silnik wideo Galápagos — celem jest jeden prezenter streamujący do 30 uczestników"
+        "desc": "Nasz własny silnik wideo Galápagos: Celem jest, aby jeden prezenter wysyłał wideo do maksymalnie 30 odbiorców."
       },
       "F02": {
         "name": "Utwórz seminarium",
@@ -254,7 +254,7 @@
       "dubbing": "Odtwarzanie syntetycznego głosu i obniżony oryginalny dźwięk"
     },
     "refLabel": "Model referencyjny",
-    "uiRef": "Podstawa interfejsu użytkownika — wzorce ekranów i funkcji powszechnie używanej aplikacji do spotkań wideo w sieci, dostosowane do seminar.pi"
+    "uiRef": "Standardy interfejsu użytkownika: Stosowanie wzorców ekranu i funkcji popularnych aplikacji do wideokonferencji internetowych do seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Członkowie widowni nie używają kamery ani mikrofonu. Po dołączeniu zobaczysz i usłyszysz prezentera.",
     "preview": {
       "pending": "Przygotowywanie kamery i mikrofonu…",
-      "audioOnly": "Kamera niedostępna — wysyłanie tylko dźwięku.",
+      "audioOnly": "Kamera niedostępna : wysyłanie tylko dźwięku.",
       "none": "Kamera i mikrofon niedostępne. Sprawdź uprawnienia (nadal możesz dołączyć bez mediów).",
-      "videoOnly": "Mikrofon niedostępny — wysyłanie tylko wideo. Sprawdź uprawnienia mikrofonu."
+      "videoOnly": "Mikrofon niedostępny : wysyłanie tylko wideo. Sprawdź uprawnienia mikrofonu."
     },
     "mic": {
       "on": "Wyłącz mikrofon",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Twój bilet wstępu wygasł.",
       "TICKET_EXPIRED": "Twój bilet wstępu wygasł.",
       "ROOM_FULL": "Ten seminar jest pełny.",
-      "ROOM_CLOSED": "Pokój został zamknięty — seminar zakończył się lub gospodarz był nieobecny przez ponad 5 minut.",
+      "ROOM_CLOSED": "Pokój jest zamknięty. Seminarium zakończyło się lub gospodarz był nieobecny przez ponad 5 minut.",
       "DUPLICATE_SESSION": "Dołączyłeś z innego urządzenia, więc ten ekran został rozłączony.",
       "ROLE_FORBIDDEN": "Nie masz uprawnień do prezentowania.",
       "WS_FAILED": "Nie udało się połączyć z serwerem wideo.",
@@ -488,7 +488,7 @@
     "toDetail": "Przejdź do strony seminaru",
     "consent": {
       "title": "Zanim włączysz mikrofon",
-      "body": "Jeśli w tym seminarze włączone są nagrywanie, napisy lub notatki ze spotkania AI, Twój głos może zostać przekonwertowany na tekst, zapisany i przetłumaczony. Przetwarzanie głosu odbywa się za pośrednictwem usługi AI poza Twoim krajem. Jeśli się nie zgadzasz, Twój mikrofon nadal się włączy — tylko Twój głos zostanie wyłączony z przetwarzania.",
+      "body": "Jeśli w tym seminarze włączone są nagrywanie, napisy lub notatki ze spotkania AI, Twój głos może zostać przekonwertowany na tekst, zapisany i przetłumaczony. Przetwarzanie głosu odbywa się za pośrednictwem usługi AI poza Twoim krajem. Jeśli się nie zgadzasz, Twój mikrofon nadal się włączy : tylko Twój głos zostanie wyłączony z przetwarzania.",
       "privacy": "Polityka prywatności",
       "newTab": "(otwiera się w nowej karcie)",
       "decline": "Nie zgadzam się",
@@ -613,7 +613,7 @@
       "title": "Nagrywaj",
       "badge": "Nagrywanie",
       "unsupported": "Ta przeglądarka nie może nagrywać. Nagrywaj z normalnej przeglądarki na komputerze.",
-      "piBrowserOnly": "Nagrywanie działa tylko w zwykłej przeglądarce (PC lub mobilnej). Pi Browser nie może zapisywać plików nagrań — otwórz ten seminar w przeglądarce komputera lub telefonu (seminarz.vercel.app), aby nagrywać.",
+      "piBrowserOnly": "Nagrywanie jest dostępne tylko w zwykłych przeglądarkach (PC/mobilne). Pi Browser nie może zapisywać nagranych plików. Otwórz to samo seminarium w przeglądarce komputerowej lub mobilnej (seminarz.vercel.app), aby nagrywać.",
       "audioSuspended": "Nagrywanie dźwięku mogło nie rozpocząć się na tym urządzeniu. Może być nagrywany tylko obraz.",
       "notifyFailed": "Nagrywanie nie rozpoczęło się, ponieważ uczestnicy nie mogli zostać powiadomieni. Spróbuj ponownie za chwilę.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Zamknij zapisz ponownie"
       },
       "toast": {
-        "started": "Nagrywanie rozpoczęte — wszyscy to widzą",
+        "started": "Rozpoczęto nagrywanie. Zostanie to wyświetlone wszystkim uczestnikom.",
         "saved": "Nagranie zapisane. Sprawdź folder pobierania. Jeśli nic nie zostało zapisane, dotknij [Zapisz ponownie] u góry ekranu.",
         "autoStopped": "Nagrywanie zakończyło się, ponieważ przeglądarka je zatrzymała lub osiągnięto limit rozmiaru. Wszystko do tego momentu zostało zapisane. Rozpocznij nagrywanie ponownie, aby kontynuować.",
         "empty": "Nic nie zostało nagrane, więc plik nie został utworzony.",
@@ -656,10 +656,10 @@
       "badge": "Notatki AI włączone",
       "started": "Prezenter włączył notatki AI",
       "stopped": "Notatki AI wyłączone",
-      "startedMine": "Notatki AI włączone — widoczne dla wszystkich",
-      "stoppedMine": "Notatki AI wyłączone — tworzenie notatek",
+      "startedMine": "Rozpoczęto protokołowanie AI. Zostanie to wyświetlone wszystkim uczestnikom.",
+      "stoppedMine": "Zatrzymano protokołowanie AI. Protokoły spotkania są generowane.",
       "startFail": "Nie udało się uruchomić notatek AI",
-      "gone": "Notatki AI zatrzymane — notatki zostały zakończone lub usunięte gdzie indziej",
+      "gone": "Notatki AI zatrzymane : notatki zostały zakończone lub usunięte gdzie indziej",
       "unsupported": "Notatki AI nie mogą być włączone tutaj (brak obsługi nagrywania dźwięku)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Dotknij [Otwórz ustawienia Kalendarza Google] poniżej.",
       "s2": "W sekcji „Ustawienia moich kalendarzy” po lewej stronie wybierz kalendarz (np. Twoje imię).",
       "s3": "Przewiń do „Zintegruj kalendarz” i skopiuj „Prywatny adres w formacie iCal”.",
-      "s4": "Wklej go tutaj i dotknij [Dodaj] — tytuły wydarzeń pojawią się w kalendarzu. Dodaj inne kalendarze w ten sam sposób, do 5.",
+      "s4": "Wklej go tutaj i dotknij [Dodaj] : tytuły wydarzeń pojawią się w kalendarzu. Dodaj inne kalendarze w ten sam sposób, do 5.",
       "open": "Otwórz ustawienia Kalendarza Google",
-      "privacy": "Ten adres jest kluczem do Twojego kalendarza — nie udostępniaj go. Jest przechowywany tylko na tym urządzeniu, nigdy na naszym serwerze."
+      "privacy": "Ten adres jest kluczem do Twojego kalendarza : nie udostępniaj go. Jest przechowywany tylko na tym urządzeniu, nigdy na naszym serwerze."
     },
     "title": "Utwórz seminarium",
     "name": "Wyruszmy w podróż na piękną wyspę!",
     "subTitle": "Podtytuł (opcjonalnie, do 60 znaków)",
     "startAt": "Godzina rozpoczęcia",
-    "maxCnt": "Pojemność (1–100)",
+    "maxCnt": "Pojemność (1~100)",
     "submit": "Utwórz",
     "submitting": "Tworzenie…",
-    "invalid": "Sprawdź swoje dane wejściowe — data w ciągu jednego roku od teraz, pojemność 1–100.",
+    "invalid": "Sprawdź wartości wejściowe: data w ciągu jednego roku od teraz i pojemność 1-100.",
     "attendance": {
       "title": "Obecność",
       "back": "Wróć do seminarium",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Czas obecności to czas od pierwszego dołączenia do ostatniego widzenia, minus czas nieobecności (przerwy dłuższe niż 2,5 minuty).",
-      "csvPiBrowser": "Pobieranie CSV działa tylko w zwykłej przeglądarce (komputer lub telefon). Pi Browser nie może zapisywać plików — otwórz ten arkusz obecności w przeglądarce komputerowej lub telefonicznej (seminarz.vercel.app)."
+      "csvPiBrowser": "Pobieranie CSV jest dostępne tylko w zwykłych przeglądarkach (PC/mobilne). Pi Browser nie może zapisywać plików. Otwórz tę samą listę obecności w przeglądarce komputerowej lub mobilnej (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Bezpłatne — pozostało {time} w tym miesiącu · brak AI",
-    "planPaid": "{name} {time} · {price} — zapłać podczas tworzenia",
+    "planFree": "Darmowy: pozostało {time} w tym miesiącu · Brak AI",
+    "planPaid": "{name} {time} · {price} · Płatność przy tworzeniu",
     "planHint": "Seminarium otwarte w ramach płatnego planu najpierw wykorzystuje czas tego planu, a następnie kontynuuje na bezpłatnym czasie w tym miesiącu (brak AI w części bezpłatnej). Aktywny plan otwiera się bez płatności; Miesięczny lub Roczny, którego nie masz, jest opłacany w Pi po naciśnięciu Utwórz, a następnie seminarium otwiera się (Pi Browser). Dołączanie jest zawsze bezpłatne dla uczestników.",
-    "planOwned": "{name} — aktywny · pozostało {time}",
+    "planOwned": "{name}: Subskrybowano · pozostało {time}",
     "planEnds": "Godzina rozpoczęcia jest po wygaśnięciu karnetu tego planu. Przesuń początek wcześniej lub wybierz inny plan.",
     "paidKept": "Twój płatny karnet jest zachowany. Napraw problem i naciśnij Utwórz ponownie (bez drugiej płatności)."
   },
   "privacy": {
-    "title": "Polityka prywatności — Funkcje głosowe i AI",
+    "title": "Polityka prywatności: Funkcje głosowe i AI",
     "effective": "Obowiązuje od {date}",
     "intro": "Niniejsza polityka wyjaśnia, jakie dane osobowe przetwarzamy, gdy korzystasz z napisów na żywo, przetłumaczonych napisów, tłumaczenia głosowego, notatek ze spotkań AI i notatek osobistych podczas seminarium. Te funkcje korzystają z zewnętrznej usługi AI, więc informacje są przesyłane za granicę.",
     "whoTitle": "Czyje informacje są przetwarzane",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Odbiorca",
-        "v": "Google LLC (Gemini API) — kontakt [TBD: kontakt prywatności Google]"
+        "v": "Google LLC (Gemini API): Kontakt [Oczekujące: Master, kanał zapytań o prywatność Google]"
       },
       {
         "k": "Kraje",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Cel",
-        "v": "Mowa na tekst, tłumaczenie, podsumowania notatek ze spotkań, mowa syntetyczna (standardowe głosy, bez klonowania głosu), separacja mówców dla notatek osobistych (głosy są rozróżniane i oznaczane według postrzeganej płci, np. Mężczyzna 1 / Kobieta 1 — nie są wywnioskowywane żadne imiona ani tożsamości)"
+        "v": "Konwersja głosu na tekst, tłumaczenie, podsumowywanie protokołów spotkań, głos syntetyczny (standardowy głos, bez klonowania głosu), separacja mówców w notatkach osobistych (rozdziela osoby według głosu i wyświetla jako mężczyzna 1, kobieta 1 na podstawie postrzeganej płci, nie identyfikuje imion ani tożsamości)"
       },
       {
         "k": "Retencja",
-        "v": "Kończy się natychmiast po zwróceniu wyniku. Prosimy Google o nieprzechowywanie żądań (store=false). Dzienniki monitorowania nadużyć mogą być nadal przechowywane zgodnie z warunkami Google [TBD: okres przechowywania i status płatnej warstwy]."
+        "v": "Kończy się natychmiast po otrzymaniu przetworzonych wyników. Prosimy, aby Google nie przechowywał żądań (store=false). Jednakże, zgodnie z warunkami Google, mogą być przechowywane zapisy monitorowania nadużyć [Oczekujące: Master, okres przechowywania i zastosowanie płatnego poziomu]."
       },
       {
         "k": "Jak odmówić i co się dzieje",
@@ -895,8 +895,8 @@
     "keep": [
       "Oryginalny dźwięk: dla napisów seminarium i notatek ze spotkań AI nie jest przechowywany; jest odrzucany natychmiast po konwersji na tekst. W przypadku notatek osobistych, nagranie jest przechowywane w prywatnym magazynie, aby można je było ponownie dokładniej transkrybować (z mówcami) po spotkaniu, i jest usuwane podczas codziennego czyszczenia po upływie 1 dnia od zakończenia notatki (natychmiast, jeśli notatka zostanie usunięta).",
       "Napisy na żywo: nie są przechowywane.",
-      "Notatki ze spotkań AI (gdy prezenter je włączy): treść wypowiedzi, zrzuty ekranu i podsumowanie, przechowywane do momentu usunięcia notatek [TBD: maksymalny okres przechowywania].",
-      "Zapisy zgody: czas zgody i wersja polityki, przechowywane jako dowód [TBD: okres przechowywania].",
+      "Protokoły spotkań AI (jeśli włączone przez prezentera): Przechowuje wypowiedzi, zrzuty ekranu i podsumowania do momentu usunięcia protokołów spotkań [Oczekujące: Master, maksymalny okres przechowywania].",
+      "Zapisy zgody: Przechowuje datę zgody i wersję zaakceptowanej polityki w celu dowodu [Oczekujące: Master, okres przechowywania].",
       "Użycie: liczba żądań na minutę i czas przetwarzania, używane do egzekwowania limitów kosztów.",
       "Obecność: czas dołączenia, czas ostatniego połączenia, nazwa wyświetlana i nazwa użytkownika Pi są przechowywane i udostępniane gospodarzowi jako lista obecności (na ekranie i jako plik CSV do pobrania). Przechowywane do momentu usunięcia seminarium.",
       "Pytania i odpowiedzi oraz ankiety: tekst pytania i nazwa wyświetlana pytającego (lub nazwa użytkownika Pi, jeśli brak) są widoczne dla każdego uczestnika. Głosy w górę pokazują tylko liczbę, nigdy kto je oddał. Głosy w ankietach pokazują tylko liczbę uczestnikom; organizator i administratorzy widzą, dla każdej opcji, nazwę wyświetlaną (lub nazwę użytkownika Pi, jeśli brak) każdego głosującego. Przechowywane, w tym ukryte pytania, do momentu usunięcia seminarium."
@@ -904,14 +904,14 @@
     "recTitle": "Nagrywanie",
     "rec": "Nagrania są zapisywane tylko jako plik na urządzeniu prezentera. Nie są przesyłane na nasze serwery ani przekazywane za granicę. Podczas nagrywania lub gdy notatki AI są włączone, każdy uczestnik widzi wskaźnik.",
     "rightsTitle": "Twoje prawa",
-    "rights": "Możesz poprosić o dostęp, poprawienie, usunięcie lub zaprzestanie przetwarzania Twoich informacji. Kontakt: [TBD: imię i nazwisko oraz kontakt inspektora ochrony danych]"
+    "rights": "Możesz zażądać dostępu, korekty, usunięcia i zawieszenia przetwarzania swoich informacji. Kontakt: [Oczekujące: Master, Imię i nazwisko oraz dane kontaktowe Inspektora Ochrony Danych]"
   },
   "notes": {
     "title": "Notatki",
     "back": "Wróć do seminarium",
     "loading": "Ładowanie…",
     "meta": "Notatki · {date} · {min} min",
-    "aiWarn": "Podsumowanie wygenerowane przez AI — może zawierać błędy",
+    "aiWarn": "Podsumowanie wygenerowane przez AI : może zawierać błędy",
     "points": "Kluczowe punkty",
     "decisions": "Decyzje",
     "todos": "Elementy do wykonania",
@@ -921,11 +921,11 @@
     "making": "Tworzenie notatek…",
     "makingLong": "To trwa trochę dłużej. Odśwież później",
     "recording": "Nadal nagrywam",
-    "failed": "Nie udało się utworzyć podsumowania — pełna transkrypcja znajduje się poniżej",
+    "failed": "Nie udało się utworzyć podsumowania. Pełny transkrypt znajduje się poniżej.",
     "retry": "Spróbuj ponownie",
     "finish": "Zakończ nagrywanie i podsumuj",
     "none": "Brak treści",
-    "blank": "Brak treści do podsumowania — nie nagrano żadnej mowy lub była zbyt krótka",
+    "blank": "Brak treści do podsumowania. Nie zarejestrowano mowy lub była zbyt krótka.",
     "notFound": "Nie znaleziono notatek",
     "forbidden": "Nie masz dostępu do tych notatek",
     "shotAlt": "Zrzut ekranu o {at}",
@@ -938,7 +938,7 @@
     "delYes": "Usuń",
     "delNo": "Anuluj",
     "delFail": "Nie udało się usunąć",
-    "dlFail": "Nie udało się pobrać — spróbuj ponownie",
+    "dlFail": "Pobieranie nie powiodło się. Dotknij ponownie.",
     "recentNotes": "Ostatnie notatki",
     "empty": "Brak notatek",
     "newNote": "Rozpocznij notatki osobiste",
@@ -959,12 +959,12 @@
     "aiOff": "Notatki AI są obecnie niedostępne (wymagana konfiguracja serwera). Poprzednie notatki są wymienione poniżej",
     "reload": "Przeładuj",
     "unsupported": "Nagrywanie jest niedostępne na tym urządzeniu",
-    "micDenied": "Nie można użyć mikrofonu — sprawdź uprawnienia",
-    "limited": "Limit czasu przetwarzania został wykorzystany — zakończ i utwórz notatki",
-    "noAgr": "Zatrzymano: brak potwierdzenia powiadomienia o nagrywaniu — zakończ i zacznij ponownie",
-    "micLost": "Mikrofon został odłączony i nagrywanie zostało zatrzymane — dotknij Połącz mikrofon ponownie lub zakończ notatkę",
+    "micDenied": "Mikrofon jest niedostępny. Sprawdź uprawnienia.",
+    "limited": "Osiągnięto limit czasu przetwarzania. Zakończ i wygeneruj protokoły spotkania.",
+    "noAgr": "Zatrzymano z powodu braku zapisu potwierdzenia powiadomienia. Zakończ i uruchom ponownie.",
+    "micLost": "Utracono połączenie z mikrofonem, nagrywanie zostało zatrzymane. Dotknij [Połącz mikrofon ponownie] lub zakończ.",
     "micRetry": "Połącz mikrofon ponownie",
-    "gone": "Ta notatka została zakończona lub usunięta gdzie indziej, więc nagrywanie zostało zatrzymane — użyj przycisku poniżej, aby otworzyć notatki",
+    "gone": "Ta notatka została zakończona lub usunięta na innym ekranie, więc nagrywanie zostało zatrzymane. Sprawdź protokoły spotkania za pomocą przycisku poniżej.",
     "finishing": "Zapisywanie ostatnich słów…",
     "st": {
       "RECORDING": "Nagrywanie",
@@ -972,7 +972,7 @@
       "DONE": "Gotowe",
       "FAILED": "Niepowodzenie"
     },
-    "downloadPiBrowser": "Pobieranie Markdown działa tylko w zwykłej przeglądarce (komputer lub mobilna). Pi Browser nie może zapisywać plików — otwórz te notatki w przeglądarce na komputerze lub telefonie (seminarz.vercel.app)."
+    "downloadPiBrowser": "Pobieranie Markdown jest dostępne tylko w zwykłych przeglądarkach (PC/mobilne). Pi Browser nie może zapisywać plików. Otwórz te same protokoły spotkania w przeglądarce komputerowej lub mobilnej (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Plany",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} połączonych",
     "producers": "{n} strumieni",
     "end": "Kończy się {time}",
-    "stale": "Seminarium zakończyło się, ale pokój jest nadal otwarty na serwerze wideo — wymuś jego zamknięcie.",
+    "stale": "Seminarium zakończyło się, ale pokoje pozostały na serwerze wideo. Wymuś ich zamknięcie.",
     "close": "Wymuś zamknięcie",
     "confirmSeminar": "Spowoduje to zakończenie seminarium i zamknięcie pokoju. Wszyscy zostaną rozłączeni.",
     "confirmRoom": "Spowoduje to zamknięcie pokoju. Wszyscy zostaną rozłączeni.",
@@ -1063,7 +1063,7 @@
     "cancel": "Anuluj",
     "saving": "Zapisywanie…",
     "done": "Zastosowano. Pozostały czas {plan}: {time}",
-    "invalid": "Wprowadź redukcję od 1 minuty do 1000 godzin (pełne minuty 0–59).",
+    "invalid": "Wprowadź redukcję od 1 minuty do 1000 godzin (pełne minuty 0~59).",
     "history": "Ostatnie korekty",
     "noHistory": "Brak korekt.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

@@ -22,7 +22,7 @@ export function SfuLab({ wsUrl: envWsUrl }: { wsUrl?: string }) {
   const sound = useRemoteAudio(audioRef, r.remoteAudio)
 
   function join() {
-    if (!wsUrl) return add('엔진 주소 없음 — ws:// 또는 wss:// 로 시작하는 주소를 입력하세요')
+    if (!wsUrl) return add('엔진 주소 없음 : ws:// 또는 wss:// 로 시작하는 주소를 입력하세요')
     // 입장 탭 안에서 소리 요소 재생 — 자동재생 허용 확보
     const el = audioRef.current
     if (el) {

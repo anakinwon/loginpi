@@ -6,7 +6,7 @@
   "home": {
     "description": "A házigazdák nyílt szemináriumokat tartanak, a résztvevők pedig Pi-vel csatlakoznak élő videós foglalkozásokhoz.",
     "badge": "Élő szemináriumok gyönyörű szigeteken",
-    "headline": "Nézz, hallgass és tanulj együtt — élőben",
+    "headline": "Nézz, hallgass és tanulj együtt : élőben",
     "ctaBrowse": "Szemináriumok böngészése",
     "ctaPlan": "Csomagok megtekintése",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Szemináriumok",
     "cal": {
       "title": "Szeminárium naptár",
-      "desc": "A múltbeli szemináriumoktól a közelgőekig — koppints egy dátumra a részletekért.",
+      "desc": "A múltbeli szemináriumoktól a közelgő eseményekig: koppintson egy dátumra a részletekért.",
       "legendSmn": "Szemináriumok",
       "legendEnded": "Múltbeli szemináriumok",
       "legendMine": "Saját eseményeim",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Élő videós szeminárium",
-        "desc": "Saját videómotorunk, a Galápagos — a cél egy előadó streamelése akár 30 résztvevőnek"
+        "desc": "Saját videómotorunk, a Galápagos: A cél, hogy egy előadó akár 30 fős közönségnek is küldhessen videót."
       },
       "F02": {
         "name": "Szeminárium létrehozása",
@@ -254,7 +254,7 @@
       "dubbing": "Szintetikus hang lejátszása és csökkentett eredeti hang"
     },
     "refLabel": "Referencia modell",
-    "uiRef": "UI alapvonal — egy széles körben használt webes videókonferencia alkalmazás képernyő- és funkció mintái, a seminar.pi-hez igazítva"
+    "uiRef": "Felhasználói felület szabványok: A népszerű webkonferencia-alkalmazások képernyő- és funkció mintáinak alkalmazása a seminar.pi-re"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "A közönség tagjai nem használnak kamerát vagy mikrofont. Csatlakozás után látni és hallani fogod az előadót.",
     "preview": {
       "pending": "Kamera és mikrofon előkészítése…",
-      "audioOnly": "Kamera nem elérhető — csak hang küldése.",
+      "audioOnly": "Kamera nem elérhető : csak hang küldése.",
       "none": "Kamera és mikrofon nem elérhető. Ellenőrizd az engedélyeket (még média nélkül is csatlakozhatsz).",
-      "videoOnly": "Mikrofon nem elérhető — csak videó küldése. Ellenőrizd a mikrofon engedélyét."
+      "videoOnly": "Mikrofon nem elérhető : csak videó küldése. Ellenőrizd a mikrofon engedélyét."
     },
     "mic": {
       "on": "Mikrofon kikapcsolása",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "A belépési jegyed lejárt.",
       "TICKET_EXPIRED": "A belépési jegyed lejárt.",
       "ROOM_FULL": "Ez a szeminárium megtelt.",
-      "ROOM_CLOSED": "A szoba bezárult – a szeminárium véget ért, vagy a házigazda több mint 5 perce távol volt.",
+      "ROOM_CLOSED": "A szoba zárva van. A szeminárium befejeződött, vagy a házigazda több mint 5 perce távol van.",
       "DUPLICATE_SESSION": "Másik eszközről csatlakozott, ezért ez a képernyő lekapcsolódott.",
       "ROLE_FORBIDDEN": "Nincs jogosultsága a prezentáláshoz.",
       "WS_FAILED": "Nem sikerült csatlakozni a videószerverhez.",
@@ -488,7 +488,7 @@
     "toDetail": "Ugrás a szeminárium oldalára",
     "consent": {
       "title": "Mielőtt bekapcsolja a mikrofonját",
-      "body": "Ha a felvétel, feliratok vagy AI jegyzetek be vannak kapcsolva ebben a szemináriumban, a hangja szöveggé alakulhat, tárolódhat és lefordítható. A hangfeldolgozást az Ön országán kívüli AI szolgáltatás végzi. Ha nem ért egyet, a mikrofonja akkor is bekapcsol – csak a hangja marad ki a feldolgozásból.",
+      "body": "Ha a felvétel, feliratok vagy AI jegyzetek be vannak kapcsolva ebben a szemináriumban, a hangja szöveggé alakulhat, tárolódhat és lefordítható. A hangfeldolgozást az Ön országán kívüli AI szolgáltatás végzi. Ha nem ért egyet, a mikrofonja akkor is bekapcsol : csak a hangja marad ki a feldolgozásból.",
       "privacy": "Adatvédelmi irányelvek",
       "newTab": "(új lapon nyílik meg)",
       "decline": "Nem értek egyet",
@@ -613,7 +613,7 @@
       "title": "Felvétel",
       "badge": "Felvétel",
       "unsupported": "Ez a böngésző nem támogatja a felvételt. Kérjük, rögzítsen egy normál böngészőből számítógépen.",
-      "piBrowserOnly": "A felvétel csak normál böngészőben (PC vagy mobil) működik. A Pi Browser nem tudja menteni a felvételi fájlokat – nyissa meg ezt a szemináriumot számítógépes vagy telefonos böngészőben (seminarz.vercel.app) a felvételhez.",
+      "piBrowserOnly": "A felvétel csak hagyományos böngészőkben (PC/mobil) érhető el. A Pi Browser nem tudja menteni a felvett fájlokat. Kérjük, nyissa meg ugyanazt a szemináriumot számítógépes vagy mobil böngészőben (seminarz.vercel.app) a felvételhez.",
       "audioSuspended": "Lehet, hogy ezen az eszközön nem indult el a hangfelvétel. Csak a kép rögzülhet.",
       "notifyFailed": "A felvétel nem indult el, mert a résztvevőket nem lehetett értesíteni. Kérjük, próbálja újra rövidesen.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Mentés újra bezárása"
       },
       "toast": {
-        "started": "A felvétel elindult – mindenki láthatja.",
+        "started": "A felvétel elindult. Ez minden résztvevő számára megjelenik.",
         "saved": "Felvétel mentve. Ellenőrizze a letöltési mappáját. Ha semmi sem mentődött, koppintson a képernyő tetején található [Mentés újra] gombra.",
         "autoStopped": "A felvétel leállt, mert a böngésző leállította, vagy elérte a méretkorlátot. Addig minden mentve lett. Folytatáshoz indítsa újra a felvételt.",
         "empty": "Semmi sem rögzült, ezért nem jött létre fájl.",
@@ -656,10 +656,10 @@
       "badge": "AI jegyzetek bekapcsolva",
       "started": "Az előadó bekapcsolta az AI jegyzeteket",
       "stopped": "Az AI jegyzetek kikapcsolva",
-      "startedMine": "AI jegyzetek bekapcsolva — mindenki számára látható",
-      "stoppedMine": "AI jegyzetek kikapcsolva — jegyzetek készítése folyamatban",
+      "startedMine": "Az AI jegyzetkészítés elindult. Ez minden résztvevő számára megjelenik.",
+      "stoppedMine": "Az AI jegyzetkészítés leállt. A jegyzetek generálása folyamatban van.",
       "startFail": "Nem sikerült elindítani az AI jegyzeteket",
-      "gone": "Az AI jegyzetek leálltak — a jegyzetek máshol lettek befejezve vagy törölve",
+      "gone": "Az AI jegyzetek leálltak : a jegyzetek máshol lettek befejezve vagy törölve",
       "unsupported": "Az AI jegyzetek itt nem kapcsolhatók be (nincs hangfelvétel támogatás)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Érintse meg az alábbi [Google Naptár beállítások megnyitása] gombot.",
       "s2": "A bal oldali 'Saját naptárak beállításai' alatt válasszon ki egy naptárat (pl. a nevét).",
       "s3": "Görgessen az 'Naptár integrálása' részhez, és másolja ki az 'iCal formátumú titkos címet'.",
-      "s4": "Illessze be ide, és érintse meg a [Hozzáadás] gombot — az események címei megjelennek a naptárban. Más naptárakat is hozzáadhat ugyanígy, legfeljebb 5-öt.",
+      "s4": "Illessze be ide, és érintse meg a [Hozzáadás] gombot : az események címei megjelennek a naptárban. Más naptárakat is hozzáadhat ugyanígy, legfeljebb 5-öt.",
       "open": "Google Naptár beállítások megnyitása",
-      "privacy": "Ez a cím a naptárához való kulcs – ne ossza meg. Csak ezen az eszközön tárolódik, soha nem a szerverünkön."
+      "privacy": "Ez a cím a naptárához való kulcs : ne ossza meg. Csak ezen az eszközön tárolódik, soha nem a szerverünkön."
     },
     "title": "Seminar létrehozása",
     "name": "Utazzunk el egy gyönyörű szigetre!",
     "subTitle": "Alcím (opcionális, legfeljebb 60 karakter)",
     "startAt": "Kezdési idő",
-    "maxCnt": "Kapacitás (1–100)",
+    "maxCnt": "Kapacitás (1~100)",
     "submit": "Létrehozás",
     "submitting": "Létrehozás…",
-    "invalid": "Ellenőrizze a bemenetet – egy éven belüli dátum, kapacitás 1–100.",
+    "invalid": "Kérjük, ellenőrizze a bemeneti értékeket: egy évre előre dátum, és 1-100 fős kapacitás.",
     "attendance": {
       "title": "Jelenlét",
       "back": "Vissza a seminarhoz",
@@ -840,18 +840,18 @@
         "state": "Állapot"
       },
       "durNote": "A részvételi idő az első csatlakozástól az utolsó látottig tart, mínusz a távollét ideje (2,5 percnél hosszabb szünetek).",
-      "csvPiBrowser": "A CSV letöltés csak normál böngészőben (számítógép vagy mobil) működik. A Pi Browser nem tud fájlokat menteni – nyissa meg ezt a jelenléti ívet számítógépes vagy telefonos böngészőben (seminarz.vercel.app)."
+      "csvPiBrowser": "A CSV letöltés csak hagyományos böngészőkben (PC/mobil) érhető el. A Pi Browser nem tudja menteni a fájlokat. Kérjük, nyissa meg ugyanazt a jelenléti ívet számítógépes vagy mobil böngészőben (seminarz.vercel.app)."
     },
     "plan": "Terv",
-    "planFree": "Ingyenes – {time} maradt ebben a hónapban · nincs AI",
-    "planPaid": "{name} {time} · {price} – fizetés létrehozáskor",
+    "planFree": "Ingyenes: {time} maradt ebben a hónapban · Nincs AI",
+    "planPaid": "{name} {time} · {price} · Fizetés létrehozáskor",
     "planHint": "A fizetős tervvel megnyitott seminar először a terv idejét használja, majd folytatódik az adott hónap ingyenes idejével (az ingyenes részben nincs AI). Az aktív terv fizetés nélkül nyílik meg; a havi vagy éves terv, amivel nem rendelkezik, Pi-ben fizetendő a Létrehozás gomb megnyomásakor, majd a seminar megnyílik (Pi Browser). A résztvevők számára a csatlakozás mindig ingyenes.",
-    "planOwned": "{name} – aktív · {time} maradt",
+    "planOwned": "{name}: Előfizetve · {time} maradt",
     "planEnds": "A kezdési időpont a terv lejáratát követi. Helyezze előbbre a kezdési időpontot, vagy válasszon másik tervet.",
     "paidKept": "A fizetett bérlete megmarad. Javítsa ki a problémát, és nyomja meg újra a Létrehozás gombot (nincs második fizetés)."
   },
   "privacy": {
-    "title": "Adatvédelmi irányelvek – Hang- és AI-funkciók",
+    "title": "Adatvédelmi irányelvek: Hang- és AI-funkciók",
     "effective": "Hatályos: {date}",
     "intro": "Ez az irányelv ismerteti azokat a személyes adatokat, amelyeket a valós idejű feliratok, fordított feliratok, hangfordítás, AI értekezletjegyzetek és személyes jegyzetek használatakor dolgozunk fel egy seminarban. Ezek a funkciók külső AI szolgáltatást használnak, ezért az információk külföldre kerülnek.",
     "whoTitle": "Kinek az adatai kerülnek feldolgozásra",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Címzett",
-        "v": "Google LLC (Gemini API) – kapcsolat [TBD: Google adatvédelmi kapcsolattartó]"
+        "v": "Google LLC (Gemini API): Kapcsolat [Függőben: Mester, Google adatvédelmi lekérdezési csatorna]"
       },
       {
         "k": "Országok",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Cél",
-        "v": "Beszéd szöveggé alakítása, fordítás, értekezletjegyzet-összefoglalók, szintetikus beszéd (standard hangok, hangklónozás nélkül), előadó szétválasztása személyes jegyzetekhez (a hangokat megkülönböztetik és észlelt nemük szerint címkézik, például Férfi 1 / Nő 1 – nevek vagy identitások nem kerülnek kikövetkeztetésre)"
+        "v": "Hang szöveggé alakítása, fordítás, jegyzetek összefoglalása, szintetikus hang (standard hang, nincs hangklónozás), beszélő szétválasztása személyes jegyzetekben (hang alapján választja szét az embereket, és észlelt nem alapján férfi 1, nő 1 formában jeleníti meg, nem azonosítja a neveket vagy identitásokat)"
       },
       {
         "k": "Megőrzés",
-        "v": "Azonnal megszűnik, amint az eredmény visszatér. Kérjük a Google-t, hogy ne tárolja a kéréseket (store=false). A visszaélés-figyelő naplók azonban a Google feltételei szerint továbbra is megőrizhetők [TBD: megőrzési időszak és fizetős szint státusza]."
+        "v": "A feldolgozott eredmények kézhezvételekor azonnal véget ér. Kérjük, hogy a Google ne tárolja a kéréseket (store=false). Azonban a Google feltételei szerinti visszaélés-ellenőrzési rekordok tárolhatók [Függőben: Mester, tárolási időszak és fizetős szint alkalmazása]."
       },
       {
         "k": "Hogyan lehet megtagadni, és mi történik",
@@ -895,8 +895,8 @@
     "keep": [
       "Eredeti hang: a seminar feliratok és az AI értekezletjegyzetek esetében nem tárolódik; a szöveggé alakítás után azonnal törlődik. Személyes jegyzetek esetében a felvétel privát tárhelyen tárolódik, hogy az értekezlet után pontosabban (előadókkal együtt) átírható legyen, és a napi takarítás során törlődik, amint a jegyzet befejezése után 1 nap eltelt (azonnal, ha a jegyzet törlésre kerül).",
       "Élő feliratok: nem tárolódnak.",
-      "AI értekezletjegyzetek (amikor az előadó bekapcsolja őket): beszélt tartalom, képernyőképek és az összefoglaló, a jegyzetek törléséig megőrizve [TBD: maximális megőrzési idő].",
-      "Hozzájárulási nyilvántartások: a hozzájárulás időpontja és az irányelv verziója, bizonyítékként megőrizve [TBD: megőrzési időszak].",
+      "AI jegyzetek (ha az előadó engedélyezi): Tárolja a beszédeket, képernyőképeket és összefoglalókat, amíg a jegyzetek törlésre nem kerülnek [Függőben: Mester, maximális tárolási időszak].",
+      "Hozzájárulási rekordok: Tárolja a hozzájárulás dátumát és a hozzájárult irányelv verzióját bizonyítékként [Függőben: Mester, tárolási időszak].",
       "Használat: percenkénti kérésszámok és feldolgozási idő, a költségkorlátok betartatására használva.",
       "Jelenlét: a csatlakozás időpontja, az utolsó csatlakozás időpontja, a megjelenítési neve és a Pi felhasználóneve tárolódik, és a házigazdának átadásra kerül jelenléti listaként (képernyőn és CSV letöltésként). A seminar törléséig megőrizve.",
       "Kérdések és válaszok, valamint szavazások: a kérdés szövege és a kérdező megjelenítési neve (vagy Pi felhasználóneve, ha nincs) minden résztvevő számára látható. A felvote-ok csak számokat mutatnak, soha nem azt, hogy ki adta le őket. A szavazások csak számokat mutatnak a résztvevőknek; a szervező és az adminisztrátorok minden opcióhoz látják az egyes szavazók megjelenítési nevét (vagy Pi felhasználónevét, ha nincs). Megőrizve, beleértve a rejtett kérdéseket is, amíg a seminar törlésre nem kerül."
@@ -904,14 +904,14 @@
     "recTitle": "Felvétel",
     "rec": "A felvételek csak fájlként kerülnek mentésre az előadó eszközén. Nem kerülnek feltöltésre szervereinkre, és nem továbbítódnak külföldre. Felvétel vagy AI jegyzetek bekapcsolása esetén minden résztvevő lát egy jelzőt.",
     "rightsTitle": "Az Ön jogai",
-    "rights": "Kérheti adataihoz való hozzáférést, azok helyesbítését, törlését vagy feldolgozásának leállítását. Kapcsolat: [TBD: adatvédelmi tisztviselő neve és elérhetősége]"
+    "rights": "Kérheti információihoz való hozzáférést, azok helyesbítését, törlését és feldolgozásának felfüggesztését. Kapcsolat: [Függőben: Mester, Adatvédelmi tisztviselő neve és elérhetősége]"
   },
   "notes": {
     "title": "Jegyzetek",
     "back": "Vissza a seminarhoz",
     "loading": "Betöltés…",
     "meta": "Jegyzetek · {date} · {min} perc",
-    "aiWarn": "AI által generált összefoglaló – hibákat tartalmazhat",
+    "aiWarn": "AI által generált összefoglaló : hibákat tartalmazhat",
     "points": "Főbb pontok",
     "decisions": "Döntések",
     "todos": "Feladatok",
@@ -921,11 +921,11 @@
     "making": "Jegyzetek készítése…",
     "makingLong": "Ez eltart egy ideig. Kérjük, frissítse később",
     "recording": "Még mindig felvétel",
-    "failed": "Nem sikerült elkészíteni az összefoglalót – a teljes átirat alább található",
+    "failed": "Nem sikerült összefoglalót készíteni. A teljes átirat alább található.",
     "retry": "Újrapróbálkozás",
     "finish": "Felvétel befejezése és összefoglalás",
     "none": "Nincs itt semmi",
-    "blank": "Nincs összefoglalható tartalom – nem rögzítettek beszédet, vagy túl rövid volt",
+    "blank": "Nincs összefoglalható tartalom. Nem történt hangfelvétel, vagy túl rövid volt.",
     "notFound": "Jegyzetek nem találhatók",
     "forbidden": "Nincs hozzáférése ezekhez a jegyzetekhez",
     "shotAlt": "Képernyőfelvétel ekkor: {at}",
@@ -938,7 +938,7 @@
     "delYes": "Törlés",
     "delNo": "Mégse",
     "delFail": "Nem sikerült törölni",
-    "dlFail": "Nem sikerült letölteni – próbálja újra",
+    "dlFail": "A letöltés sikertelen. Kérjük, koppintson újra.",
     "recentNotes": "Legutóbbi jegyzetek",
     "empty": "Még nincsenek jegyzetek",
     "newNote": "Személyes jegyzetek indítása",
@@ -959,12 +959,12 @@
     "aiOff": "Az AI jegyzetek jelenleg nem érhetők el (szerverbeállítás szükséges). A korábbi jegyzetek alább láthatók",
     "reload": "Újratöltés",
     "unsupported": "A felvétel nem érhető el ezen az eszközön",
-    "micDenied": "Nem használható a mikrofon — ellenőrizze az engedélyt",
-    "limited": "A feldolgozási időkeret kimerült — fejezze be és készítse el a jegyzeteket",
-    "noAgr": "Leállítva: nincs értesítési megerősítés a felvételhez — fejezze be és indítsa újra",
-    "micLost": "A mikrofon leválasztódott, és a felvétel leállt — koppintson a Mikrofon újracsatlakoztatása gombra, vagy fejezze be a jegyzetet",
+    "micDenied": "A mikrofon nem érhető el. Kérjük, ellenőrizze az engedélyeket.",
+    "limited": "Elérte a feldolgozási időkorlátot. Kérjük, fejezze be és generálja a jegyzeteket.",
+    "noAgr": "Leállt az értesítési megerősítési rekord hiánya miatt. Kérjük, fejezze be és indítsa újra.",
+    "micLost": "A mikrofonkapcsolat megszakadt, a felvétel leállt. Kérjük, koppintson a [Mikrofon újracsatlakoztatása] gombra, vagy fejezze be.",
     "micRetry": "Mikrofon újracsatlakoztatása",
-    "gone": "Ez a jegyzet máshol befejeződött vagy törlődött, ezért a felvétel leállt — használja az alábbi gombot a jegyzetek megnyitásához",
+    "gone": "Ez a jegyzet egy másik képernyőn befejeződött vagy törlődött, ezért a felvétel leállt. Kérjük, ellenőrizze a jegyzeteket az alábbi gombbal.",
     "finishing": "Az utolsó szavak mentése…",
     "st": {
       "RECORDING": "Felvétel",
@@ -972,7 +972,7 @@
       "DONE": "Kész",
       "FAILED": "Sikertelen"
     },
-    "downloadPiBrowser": "A Markdown letöltése csak normál böngészőben (számítógépen vagy mobilon) működik. A Pi Browser nem tud fájlokat menteni — nyissa meg ezeket a jegyzeteket számítógépes vagy telefonos böngészőben (seminarz.vercel.app)."
+    "downloadPiBrowser": "A Markdown letöltés csak hagyományos böngészőkben (PC/mobil) érhető el. A Pi Browser nem tudja menteni a fájlokat. Kérjük, nyissa meg ugyanazt a jegyzetet számítógépes vagy mobil böngészőben (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Csomagok",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} csatlakoztatva",
     "producers": "{n} stream",
     "end": "Vége {time}",
-    "stale": "A szeminárium véget ért, de a szoba még nyitva van a videószerveren — kényszerített bezárás.",
+    "stale": "A szeminárium befejeződött, de a szobák a videószerveren maradtak. Kérjük, kényszerítse a bezárásukat.",
     "close": "Kényszerített bezárás",
     "confirmSeminar": "Ez befejezi a szemináriumot és bezárja a szobát. Mindenki le lesz választva.",
     "confirmRoom": "Ez bezárja a szobát. Mindenki le lesz választva.",
@@ -1063,7 +1063,7 @@
     "cancel": "Mégse",
     "saving": "Mentés…",
     "done": "Alkalmazva. {plan} hátralévő idő: {time}",
-    "invalid": "Adjon meg egy csökkentést 1 perc és 1000 óra között (egész percek 0–59).",
+    "invalid": "Adjon meg egy csökkentést 1 perc és 1000 óra között (egész percek 0~59).",
     "history": "Legutóbbi módosítások",
     "noHistory": "Még nincsenek módosítások.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

@@ -6,7 +6,7 @@
   "home": {
     "description": "Təşkilatçılar seminarlar açır, iştirakçılar isə Pi ilə canlı video sessiyalara qoşulurlar.",
     "badge": "Gözəl adalarda canlı seminarlar",
-    "headline": "Birlikdə izləyin, dinləyin və öyrənin — canlı",
+    "headline": "Birlikdə izləyin, dinləyin və öyrənin : canlı",
     "ctaBrowse": "Seminarlara baxın",
     "ctaPlan": "Planlara baxın",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarlar",
     "cal": {
       "title": "Seminar təqvimi",
-      "desc": "Keçmiş seminarlardan gələcək seminarlara qədər — ətraflı məlumat üçün tarixə toxunun.",
+      "desc": "Keçmiş seminarlardan gələcək seminarlara qədər: təfərrüatlar üçün tarixə toxunun.",
       "legendSmn": "Seminarlar",
       "legendEnded": "Keçmiş seminarlar",
       "legendMine": "Mənim tədbirlərim",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Canlı video seminar",
-        "desc": "Öz video mühərrikimiz Galápagos — məqsəd bir təqdimatçının 30-a qədər iştirakçıya yayımlanmasıdır"
+        "desc": "Öz video mühərrikimiz Galápagos: Məqsəd bir təqdimatçının 30-a qədər auditoriya üzvünə video göndərməsidir."
       },
       "F02": {
         "name": "Seminar yarat",
@@ -254,7 +254,7 @@
       "dubbing": "Sintetik səs oxutma və azaldılmış orijinal səs"
     },
     "refLabel": "İstinad modeli",
-    "uiRef": "UI əsası — geniş istifadə olunan veb video iclas tətbiqinin ekran və funksiya nümunələri, seminar.pi üçün uyğunlaşdırılmışdır"
+    "uiRef": "İstifadəçi interfeysi standartları: Məşhur veb konfrans proqramlarının ekran və funksiya nümunələrini seminar.pi-yə tətbiq etmək"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "İştirakçılar kamera və ya mikrofondan istifadə etmirlər. Qoşulduqdan sonra təqdimatçını görəcək və eşidəcəksiniz.",
     "preview": {
       "pending": "Kamera və mikrofon hazırlanır…",
-      "audioOnly": "Kamera mövcud deyil — yalnız səs göndərilir.",
+      "audioOnly": "Kamera mövcud deyil : yalnız səs göndərilir.",
       "none": "Kamera və mikrofon mövcud deyil. İcazələri yoxlayın (mediasız da qoşula bilərsiniz).",
-      "videoOnly": "Mikrofon mövcud deyil — yalnız video göndərilir. Mikrofon icazəsini yoxlayın."
+      "videoOnly": "Mikrofon mövcud deyil : yalnız video göndərilir. Mikrofon icazəsini yoxlayın."
     },
     "mic": {
       "on": "Mikrofonu söndür",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Giriş icazənizin müddəti bitdi.",
       "TICKET_EXPIRED": "Giriş icazənizin müddəti bitdi.",
       "ROOM_FULL": "Bu seminar doludur.",
-      "ROOM_CLOSED": "Otaq bağlandı — seminar bitdi və ya aparıcı 5 dəqiqədən çox müddətə uzaqlaşdı.",
+      "ROOM_CLOSED": "Otaq bağlıdır. Seminar başa çatıb və ya ev sahibi 5 dəqiqədən çox müddətə yox olub.",
       "DUPLICATE_SESSION": "Başqa cihazdan qoşulduğunuz üçün bu ekranın bağlantısı kəsildi.",
       "ROLE_FORBIDDEN": "Təqdim etmək üçün icazəniz yoxdur.",
       "WS_FAILED": "Video serverə qoşulmaq mümkün olmadı.",
@@ -488,7 +488,7 @@
     "toDetail": "Seminar səhifəsinə keçin",
     "consent": {
       "title": "Mikrofonunuzu yandırmadan əvvəl",
-      "body": "Bu seminarda qeyd, başlıqlar və ya AI iclas qeydləri açıqdırsa, səsiniz mətnə çevrilə, saxlanıla və tərcümə edilə bilər. Səs emalı ölkənizdən kənarda bir AI xidməti tərəfindən həyata keçirilir. Razılaşmasanız belə, mikrofonunuz yenə də açılır — yalnız səsiniz emaldan kənarda qalır.",
+      "body": "Bu seminarda qeyd, başlıqlar və ya AI iclas qeydləri açıqdırsa, səsiniz mətnə çevrilə, saxlanıla və tərcümə edilə bilər. Səs emalı ölkənizdən kənarda bir AI xidməti tərəfindən həyata keçirilir. Razılaşmasanız belə, mikrofonunuz yenə də açılır : yalnız səsiniz emaldan kənarda qalır.",
       "privacy": "Məxfilik siyasəti",
       "newTab": "(yeni tabda açılır)",
       "decline": "Razılaşmıram",
@@ -613,7 +613,7 @@
       "title": "Qeyd et",
       "badge": "Qeyd edilir",
       "unsupported": "Bu brauzer qeydi dəstəkləmir. Zəhmət olmasa, kompüterdə adi brauzerdən qeyd edin.",
-      "piBrowserOnly": "Qeyd yalnız adi brauzerdə (PC və ya mobil) işləyir. Pi Browser qeyd fayllarını saxlaya bilməz — qeyd etmək üçün bu seminarı kompüter və ya telefon brauzerində (seminarz.vercel.app) açın.",
+      "piBrowserOnly": "Yazı yalnız adi brauzerlərdə (PC/mobil) mövcuddur. Pi Browser yazılmış faylları saxlaya bilməz. Yazmaq üçün eyni seminarı kompüter və ya mobil brauzerdə (seminarz.vercel.app) açın.",
       "audioSuspended": "Bu cihazda səs qeydi başlamamış ola bilər. Yalnız şəkil qeyd edilə bilər.",
       "notifyFailed": "İştirakçılara bildiriş göndərilə bilmədiyi üçün qeyd başlamadı. Zəhmət olmasa, bir azdan yenidən cəhd edin.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Yenidən saxlamağı bağla"
       },
       "toast": {
-        "started": "Qeyd başladı — hər kəs görə bilər",
+        "started": "Yazı başladı. Bu, bütün iştirakçılara göstəriləcək.",
         "saved": "Qeyd saxlanıldı. Yükləmələr qovluğunuzu yoxlayın. Heç nə saxlanılmayıbsa, ekranın yuxarısındakı [Yenidən saxla] düyməsinə toxunun.",
         "autoStopped": "Brauzer qeydi dayandırdığı və ya ölçü limiti çatdığı üçün qeyd bitdi. O ana qədər hər şey saxlanıldı. Davam etmək üçün qeydə yenidən başlayın.",
         "empty": "Heç nə qeyd edilmədiyi üçün fayl yaradılmadı.",
@@ -656,10 +656,10 @@
       "badge": "AI qeydləri aktivdir",
       "started": "Təqdimatçı AI qeydlərini aktivləşdirdi",
       "stopped": "AI qeydləri deaktiv edildi",
-      "startedMine": "AI qeydləri aktivdir — hamıya göstərilir",
-      "stoppedMine": "AI qeydləri deaktiv edildi — qeydlər yaradılır",
+      "startedMine": "AI iclas protokolu başladı. Bu, bütün iştirakçılara göstəriləcək.",
+      "stoppedMine": "AI iclas protokolu dayandırıldı. İclas protokolu yaradılır.",
       "startFail": "AI qeydlərini başlada bilmədi",
-      "gone": "AI qeydləri dayandırıldı — qeydlər başqa yerdə bitirildi və ya silindi",
+      "gone": "AI qeydləri dayandırıldı : qeydlər başqa yerdə bitirildi və ya silindi",
       "unsupported": "AI qeydləri burada aktivləşdirilə bilməz (səs yazma dəstəyi yoxdur)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Aşağıdakı [Google Təqvim parametrlərini aç] düyməsinə toxunun.",
       "s2": "Solda 'Təqvimlərim üçün parametrlər' altında bir təqvim seçin (məsələn, adınız).",
       "s3": "'Təqvimi inteqrasiya et' bölməsinə keçin və 'iCal formatında gizli ünvanı' kopyalayın.",
-      "s4": "Onu bura yapışdırın və [Əlavə et] düyməsinə toxunun — tədbir başlıqları təqvimdə görünəcək. Digər təqvimləri də eyni şəkildə, 5-ə qədər əlavə edin.",
+      "s4": "Onu bura yapışdırın və [Əlavə et] düyməsinə toxunun : tədbir başlıqları təqvimdə görünəcək. Digər təqvimləri də eyni şəkildə, 5-ə qədər əlavə edin.",
       "open": "Google Təqvim parametrlərini aç",
-      "privacy": "Bu ünvan təqviminizin açarıdır — onu paylaşmayın. O, yalnız bu cihazda saxlanılır, heç vaxt serverimizdə saxlanılmır."
+      "privacy": "Bu ünvan təqviminizin açarıdır : onu paylaşmayın. O, yalnız bu cihazda saxlanılır, heç vaxt serverimizdə saxlanılmır."
     },
     "title": "Seminar yarat",
     "name": "Gözəl bir adaya səyahət edək!",
     "subTitle": "Altyazı (isteğe bağlı, 60-a qədər)",
     "startAt": "Başlama vaxtı",
-    "maxCnt": "Tutumu (1–100)",
+    "maxCnt": "Tutumu (1~100)",
     "submit": "Yarat",
     "submitting": "Yaradılır…",
-    "invalid": "Girişinizi yoxlayın — indidən bir il ərzində bir tarix, tutum 1–100.",
+    "invalid": "Giriş dəyərlərini yoxlayın: indidən bir il ərzində bir tarix və 1-100 nəfərlik tutum.",
     "attendance": {
       "title": "İştirak",
       "back": "Seminara qayıt",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "İştirak müddəti ilk qoşulmadan son görünməyə qədərdir, uzaqda olma vaxtı (2.5 dəqiqədən uzun fasilələr) çıxarılır.",
-      "csvPiBrowser": "CSV yükləmə yalnız adi brauzerdə (kompüter və ya mobil) işləyir. Pi Browser faylları saxlaya bilməz — bu iştirak vərəqini kompüter və ya telefon brauzerində açın (seminarz.vercel.app)."
+      "csvPiBrowser": "CSV yükləmə yalnız adi brauzerlərdə (PC/mobil) mövcuddur. Pi Browser faylları saxlaya bilməz. Eyni iştirak vərəqini kompüter və ya mobil brauzerdə (seminarz.vercel.app) açın."
     },
     "plan": "Plan",
-    "planFree": "Pulsuz — bu ay {time} qalıb · AI yoxdur",
-    "planPaid": "{name} {time} · {price} — yaradarkən ödəyin",
+    "planFree": "Pulsuz: Bu ay {time} qalıb · AI yoxdur",
+    "planPaid": "{name} {time} · {price} · Yaradılarkən ödəniş",
     "planHint": "Ödənişli planla açılan seminar əvvəlcə həmin planın vaxtını istifadə edir, sonra bu ayın pulsuz vaxtı ilə davam edir (pulsuz hissədə AI yoxdur). Aktiv plan ödənişsiz açılır; Aylıq və ya İllik planınız yoxdursa, Yarat düyməsini basdığınız zaman Pi ilə ödənilir, sonra seminar açılır (Pi Browser). İştirakçılar üçün qoşulmaq həmişə pulsuzdur.",
-    "planOwned": "{name} — aktiv · {time} qalıb",
+    "planOwned": "{name}: Abunə olunub · {time} qalıb",
     "planEnds": "Başlama vaxtı bu planın müddəti bitdikdən sonradır. Başlama vaxtını daha erkən təyin edin və ya başqa plan seçin.",
     "paidKept": "Ödənişli keçidiniz saxlanılır. Problemi düzəldin və yenidən Yarat düyməsini basın (ikinci ödəniş yoxdur)."
   },
   "privacy": {
-    "title": "Məxfilik Siyasəti — Səs və AI xüsusiyyətləri",
+    "title": "Məxfilik Siyasəti: Səs və AI Xüsusiyyətləri",
     "effective": "Qüvvəyə minmə tarixi {date}",
     "intro": "Bu siyasət seminarda canlı altyazılar, tərcümə edilmiş altyazılar, səs tərcüməsi, AI iclas qeydləri və şəxsi qeydlər istifadə etdiyiniz zaman emal etdiyimiz şəxsi məlumatları izah edir. Bu xüsusiyyətlər xarici AI xidmətindən istifadə etdiyi üçün məlumatlar xaricə ötürülür.",
     "whoTitle": "Kimlərin məlumatları emal edilir",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Alıcı",
-        "v": "Google LLC (Gemini API) — əlaqə [TBD: Google məxfilik əlaqəsi]"
+        "v": "Google LLC (Gemini API): Əlaqə [Gözlənilir: Master, Google Məxfilik Sorğusu Kanalı]"
       },
       {
         "k": "Ölkələr",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Məqsəd",
-        "v": "Nitqdən mətnə çevirmə, tərcümə, iclas qeydlərinin xülasələri, sintetik nitq (standart səslər, səs klonlaması yoxdur), şəxsi qeydlər üçün spiker ayrılması (səslər fərqləndirilir və qəbul edilən cinsə görə etiketlənir, məsələn, Kişi 1 / Qadın 1 — adlar və ya şəxsiyyətlər müəyyən edilmir)"
+        "v": "Səsin mətnə çevrilməsi, tərcümə, iclas protokollarının xülasəsi, sintetik səs (standart səs, səs klonlaması yoxdur), şəxsi qeydlərdə danışanın ayrılması (insanları səsə görə ayırır və qəbul edilən cinsə əsasən kişi 1, qadın 1 kimi göstərir, adları və ya şəxsiyyətləri müəyyən etmir)"
       },
       {
         "k": "Saxlama",
-        "v": "Nəticə qaytarılan kimi başa çatır. Google-dan sorğuları saxlamamasını xahiş edirik (store=false). Sui-istifadəyə nəzarət jurnalları Google-un şərtlərinə əsasən saxlanıla bilər [TBD: saxlama müddəti və ödənişli səviyyə statusu]."
+        "v": "Emal edilmiş nəticələr alındıqdan dərhal sonra başa çatır. Google-dan sorğuları saxlamamasını xahiş edirik (store=false). Lakin Google-un şərtlərinə uyğun olaraq sui-istifadə monitorinqi qeydləri saxlanıla bilər [Gözlənilir: Master, saxlama müddəti və ödənişli səviyyənin tətbiqi]."
       },
       {
         "k": "İmtina etmək üsulu və nəticələri",
@@ -895,8 +895,8 @@
     "keep": [
       "Orijinal səs: seminar altyazıları və AI iclas qeydləri üçün saxlanılmır; mətnə çevrildikdən dərhal sonra atılır. Şəxsi qeydlər üçün, qeyd iclasdan sonra daha dəqiq (spikerlərlə) transkripsiya edilə bilməsi üçün şəxsi yaddaşda saxlanılır və qeyd bitdikdən 1 gün sonra gündəlik təmizləmə zamanı silinir (qeyd silinərsə dərhal).",
       "Canlı altyazılar: saxlanılmır.",
-      "AI iclas qeydləri (təqdimatçı onları aktivləşdirdikdə): danışıq məzmunu, skrinşotlar və xülasə, qeydlər silinənə qədər saxlanılır [TBD: maksimum saxlama müddəti].",
-      "Razılıq qeydləri: razılıq vaxtı və siyasət versiyası, sübut olaraq saxlanılır [TBD: saxlama müddəti].",
+      "AI İclas Protokolları (təqdimatçı tərəfindən aktivləşdirildiyi təqdirdə): İclas protokolları silinənə qədər danışıqları, ekran görüntülərini və xülasələri saxlayır [Gözlənilir: Master, maksimum saxlama müddəti].",
+      "Razılıq Qeydləri: Razılıq tarixini və razılaşdırılmış siyasətin versiyasını sübut üçün saxlayır [Gözlənilir: Master, saxlama müddəti].",
       "İstifadə: dəqiqəlik sorğu sayları və emal vaxtı, xərc limitlərini tətbiq etmək üçün istifadə olunur.",
       "İştirak: qoşulduğunuz vaxt, son qoşulduğunuz vaxt, göstərilən adınız və Pi istifadəçi adınız saxlanılır və ev sahibinə iştirak siyahısı (ekranda və CSV yükləmə kimi) olaraq verilir. Seminar silinənə qədər saxlanılır.",
       "Sual-cavab və sorğular: sual mətni və soruşanın göstərilən adı (yoxdursa Pi istifadəçi adı) hər bir iştirakçıya görünür. Bəyənmələr yalnız sayları göstərir, kimin bəyəndiyini heç vaxt göstərmir. Sorğu səsləri iştirakçılara yalnız sayları göstərir; təşkilatçı və administratorlar hər bir seçim üçün hər bir səs verənin göstərilən adını (yoxdursa Pi istifadəçi adı) görürlər. Gizli suallar daxil olmaqla, seminar silinənə qədər saxlanılır."
@@ -904,14 +904,14 @@
     "recTitle": "Yazma",
     "rec": "Yazmalar yalnız təqdimatçının cihazında fayl olaraq saxlanılır. Onlar serverlərimizə yüklənmir və ya xaricə ötürülmür. Yazma və ya AI qeydləri aktiv olduqda, hər bir iştirakçı bir göstərici görür.",
     "rightsTitle": "Hüquqlarınız",
-    "rights": "Məlumatlarınıza daxil olmaq, düzəltmək, silmək və ya emalını dayandırmaq üçün müraciət edə bilərsiniz. Əlaqə: [TBD: məxfilik məmurunun adı və əlaqə məlumatları]"
+    "rights": "Məlumatlarınıza daxil olmaq, düzəliş etmək, silmək və emalını dayandırmaq tələb edə bilərsiniz. Əlaqə: [Gözlənilir: Master, Məxfilik Mütəxəssisinin Adı və Əlaqə]"
   },
   "notes": {
     "title": "Qeydlər",
     "back": "Seminara qayıt",
     "loading": "Yüklənir…",
     "meta": "Qeydlər · {date} · {min} dəq",
-    "aiWarn": "AI tərəfindən yaradılmış xülasə — səhvlər ola bilər",
+    "aiWarn": "AI tərəfindən yaradılmış xülasə : səhvlər ola bilər",
     "points": "Əsas məqamlar",
     "decisions": "Qərarlar",
     "todos": "Fəaliyyət maddələri",
@@ -921,11 +921,11 @@
     "making": "Qeydlər yaradılır…",
     "makingLong": "Bu, bir az vaxt aparır. Zəhmət olmasa, daha sonra yeniləyin",
     "recording": "Hələ də yazılır",
-    "failed": "Xülasə yaratmaq mümkün olmadı — tam transkripsiya aşağıdadır",
+    "failed": "Xülasə yaratmaq mümkün olmadı. Tam transkript aşağıdadır.",
     "retry": "Yenidən cəhd edin",
     "finish": "Yazmanı bitir və xülasə et",
     "none": "Burada heç nə yoxdur",
-    "blank": "Xülasə etmək üçün heç nə yoxdur — heç bir nitq yazılmadı və ya çox qısa idi",
+    "blank": "Xülasə ediləcək məzmun yoxdur. Heç bir nitq qeydə alınmadı və ya çox qısa idi.",
     "notFound": "Qeydlər tapılmadı",
     "forbidden": "Bu qeydlərə giriş icazəniz yoxdur",
     "shotAlt": "{at} ekran çəkilişi",
@@ -938,7 +938,7 @@
     "delYes": "Sil",
     "delNo": "Ləğv et",
     "delFail": "Silmək mümkün olmadı",
-    "dlFail": "Yükləmək mümkün olmadı — zəhmət olmasa, yenidən cəhd edin",
+    "dlFail": "Yükləmə uğursuz oldu. Zəhmət olmasa, yenidən toxunun.",
     "recentNotes": "Son qeydlər",
     "empty": "Hələ heç bir qeyd yoxdur",
     "newNote": "Şəxsi qeydlərə başla",
@@ -959,12 +959,12 @@
     "aiOff": "AI qeydləri hazırda mövcud deyil (server quraşdırılması tələb olunur). Keçmiş qeydlər aşağıda sadalanır",
     "reload": "Yenidən yüklə",
     "unsupported": "Bu cihazda qeyd mövcud deyil",
-    "micDenied": "Mikrofondan istifadə etmək mümkün deyil — icazəni yoxlayın",
-    "limited": "Emal müddəti limiti bitdi — bitir və qeydləri yarat",
-    "noAgr": "Dayandırıldı: qeyddə bildiriş təsdiqi yoxdur — bitir və yenidən başla",
-    "micLost": "Mikrofon bağlantısı kəsildi və qeyd dayandı — Mikrofonu yenidən qoş düyməsinə toxunun və ya qeydi bitirin",
+    "micDenied": "Mikrofon mövcud deyil. Zəhmət olmasa, icazələri yoxlayın.",
+    "limited": "Emal vaxtı limiti doldu. Zəhmət olmasa, bitirin və iclas protokollarını yaradın.",
+    "noAgr": "Bildiriş təsdiq qeydi olmadığı üçün dayandırıldı. Zəhmət olmasa, bitirin və yenidən başlayın.",
+    "micLost": "Mikrofon bağlantısı kəsildi, yazı dayandırıldı. Zəhmət olmasa, [Mikrofonu Yenidən Qoşun] düyməsinə toxunun və ya bitirin.",
     "micRetry": "Mikrofonu yenidən qoş",
-    "gone": "Bu qeyd başqa yerdə bitirildi və ya silindi, buna görə qeyd dayandı — qeydləri açmaq üçün aşağıdakı düymədən istifadə edin",
+    "gone": "Bu qeyd başqa ekranda bitirildi və ya silindi, buna görə də yazı dayandırıldı. Zəhmət olmasa, aşağıdakı düyməni istifadə edərək iclas protokollarını yoxlayın.",
     "finishing": "Son sözləri yadda saxlayır…",
     "st": {
       "RECORDING": "Qeyd edilir",
@@ -972,7 +972,7 @@
       "DONE": "Hazırdır",
       "FAILED": "Uğursuz oldu"
     },
-    "downloadPiBrowser": "Markdown yükləmə yalnız adi brauzerdə (kompüter və ya mobil) işləyir. Pi Browser faylları saxlaya bilməz — bu qeydləri kompüter və ya telefon brauzerində (seminarz.vercel.app) açın."
+    "downloadPiBrowser": "Markdown yükləmə yalnız adi brauzerlərdə (PC/mobil) mövcuddur. Pi Browser faylları saxlaya bilməz. Eyni iclas protokollarını kompüter və ya mobil brauzerdə (seminarz.vercel.app) açın."
   },
   "plan": {
     "title": "Planlar",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} qoşulub",
     "producers": "{n} axın",
     "end": "Bitir {time}",
-    "stale": "Seminar bitdi, lakin otaq hələ də video serverdə açıqdır — onu məcburi bağlayın.",
+    "stale": "Seminar başa çatıb, lakin otaqlar video serverdə qalıb. Zəhmət olmasa, onları məcburi bağlayın.",
     "close": "Məcburi bağla",
     "confirmSeminar": "Bu, seminarı bitirir və otağı bağlayır. Hər kəs əlaqədən kəsiləcək.",
     "confirmRoom": "Bu, otağı bağlayır. Hər kəs əlaqədən kəsiləcək.",
@@ -1063,7 +1063,7 @@
     "cancel": "Ləğv et",
     "saving": "Saxlanılır…",
     "done": "Tətbiq edildi. {plan} qalan vaxt: {time}",
-    "invalid": "Azaltma müddətini 1 dəqiqə ilə 1000 saat arasında daxil edin (tam dəqiqələr 0–59).",
+    "invalid": "Azaltma müddətini 1 dəqiqə ilə 1000 saat arasında daxil edin (tam dəqiqələr 0~59).",
     "history": "Son tənzimləmələr",
     "noHistory": "Hələ heç bir tənzimləmə yoxdur.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

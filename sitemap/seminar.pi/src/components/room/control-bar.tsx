@@ -73,7 +73,7 @@ export function MediaButton({
 }) {
   const t = useTranslations('room')
   const base = t(`${kind === 'audio' ? 'mic' : 'cam'}.${on ? 'on' : 'off'}`)
-  const text = reason ? `${base} — ${reason}` : base
+  const text = reason ? `${base} : ${reason}` : base
   return (
     <button
       type="button"

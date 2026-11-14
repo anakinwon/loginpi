@@ -348,7 +348,7 @@ export async function summarize(
     .filter((s) => s.text.trim())
     .map((s) => `[${s.at}] ${s.spk}: ${s.text}`)
   if (!lines.length) return null
-  if (cut) lines.push('[…] (transcript truncated here — later part omitted)')
+  if (cut) lines.push('[…] (transcript truncated here, later part omitted)')
   const list = { type: 'array', items: { type: 'string' } }
   const out = await interactJson<Partial<NoteSummary>>(
     {

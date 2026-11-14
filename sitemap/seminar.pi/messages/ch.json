@@ -6,7 +6,7 @@
   "home": {
     "description": "Gastgeber eröffnen Seminare, und Teilnehmer treten Live-Videositzungen mit Pi bei.",
     "badge": "Live-Seminare auf wunderschönen Inseln",
-    "headline": "Zusammen schauen, hören und lernen – live",
+    "headline": "Zusammen schauen, hören und lernen : live",
     "ctaBrowse": "Seminare durchsuchen",
     "ctaPlan": "Pläne ansehen",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminare",
     "cal": {
       "title": "Seminarkalender",
-      "desc": "Von vergangenen bis zu kommenden Seminaren – tippen Sie auf ein Datum für Details.",
+      "desc": "Von vergangenen bis zu kommenden Seminaren: Tippen Sie auf ein Datum für Details.",
       "legendSmn": "Seminare",
       "legendEnded": "Vergangene Seminare",
       "legendMine": "Meine Termine",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Live-Video-Seminar",
-        "desc": "Unsere eigene Video-Engine Galápagos — das Ziel ist ein Moderator, der an bis zu 30 Teilnehmer streamt."
+        "desc": "Unsere eigene Video-Engine Galápagos: Ziel ist es, dass ein Moderator Video an bis zu 30 Zuschauer sendet."
       },
       "F02": {
         "name": "Ein Seminar erstellen",
@@ -254,7 +254,7 @@
       "dubbing": "Synthetische Sprachwiedergabe und leiseres Originalaudio"
     },
     "refLabel": "Referenzmodell",
-    "uiRef": "UI-Baseline — Bildschirm- und Funktionsmuster einer weit verbreiteten Web-Videokonferenz-App, angepasst für seminar.pi"
+    "uiRef": "UI-Standards: Anwendung von Bildschirm- und Funktionsmustern beliebter Webkonferenz-Apps auf seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Zuschauer verwenden keine Kamera oder kein Mikrofon. Nach dem Beitritt sehen und hören Sie den Moderator.",
     "preview": {
       "pending": "Kamera und Mikrofon werden vorbereitet…",
-      "audioOnly": "Kamera nicht verfügbar – nur Audio wird gesendet.",
+      "audioOnly": "Kamera nicht verfügbar : nur Audio wird gesendet.",
       "none": "Kamera und Mikrofon nicht verfügbar. Überprüfen Sie die Berechtigungen (Sie können trotzdem ohne Medien beitreten).",
-      "videoOnly": "Mikrofon nicht verfügbar – nur Video wird gesendet. Überprüfen Sie die Mikrofonberechtigung."
+      "videoOnly": "Mikrofon nicht verfügbar : nur Video wird gesendet. Überprüfen Sie die Mikrofonberechtigung."
     },
     "mic": {
       "on": "Mikrofon ausschalten",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Ihr Eintrittspass ist abgelaufen.",
       "TICKET_EXPIRED": "Ihr Eintrittspass ist abgelaufen.",
       "ROOM_FULL": "Dieser Seminarraum ist voll.",
-      "ROOM_CLOSED": "Der Raum wurde geschlossen – das Seminar ist beendet oder der Gastgeber war länger als 5 Minuten abwesend.",
+      "ROOM_CLOSED": "Der Raum ist geschlossen. Das Seminar ist beendet oder der Gastgeber war länger als 5 Minuten abwesend.",
       "DUPLICATE_SESSION": "Sie haben sich von einem anderen Gerät angemeldet, daher wurde diese Verbindung getrennt.",
       "ROLE_FORBIDDEN": "Sie haben keine Berechtigung zum Präsentieren.",
       "WS_FAILED": "Verbindung zum Videoserver konnte nicht hergestellt werden.",
@@ -488,7 +488,7 @@
     "toDetail": "Zur Seminarseite",
     "consent": {
       "title": "Bevor Sie Ihr Mikrofon einschalten",
-      "body": "Wenn in diesem Seminar Aufzeichnung, Untertitel oder KI-Besprechungsnotizen aktiviert sind, kann Ihre Stimme in Text umgewandelt, gespeichert und übersetzt werden. Die Sprachverarbeitung erfolgt durch einen KI-Dienst außerhalb Ihres Landes. Wenn Sie nicht zustimmen, schaltet sich Ihr Mikrofon trotzdem ein – nur Ihre Stimme wird von der Verarbeitung ausgeschlossen.",
+      "body": "Wenn in diesem Seminar Aufzeichnung, Untertitel oder KI-Besprechungsnotizen aktiviert sind, kann Ihre Stimme in Text umgewandelt, gespeichert und übersetzt werden. Die Sprachverarbeitung erfolgt durch einen KI-Dienst außerhalb Ihres Landes. Wenn Sie nicht zustimmen, schaltet sich Ihr Mikrofon trotzdem ein : nur Ihre Stimme wird von der Verarbeitung ausgeschlossen.",
       "privacy": "Datenschutzrichtlinie",
       "newTab": "(öffnet in neuem Tab)",
       "decline": "Nicht zustimmen",
@@ -613,7 +613,7 @@
       "title": "Aufnehmen",
       "badge": "Aufnahme läuft",
       "unsupported": "Dieser Browser kann nicht aufnehmen. Bitte nehmen Sie mit einem normalen Browser auf einem Computer auf.",
-      "piBrowserOnly": "Die Aufnahme funktioniert nur in einem normalen Browser (PC oder Mobilgerät). Pi Browser kann keine Aufnahmedateien speichern – öffnen Sie dieses Seminar in einem Computer- oder Telefonbrowser (seminarz.vercel.app), um aufzunehmen.",
+      "piBrowserOnly": "Die Aufzeichnung ist nur in regulären Browsern (PC/Mobil) verfügbar. Pi Browser kann keine aufgezeichneten Dateien speichern. Bitte öffnen Sie dasselbe Seminar in einem Computer- oder mobilen Browser (seminarz.vercel.app), um aufzuzeichnen.",
       "audioSuspended": "Die Tonaufnahme wurde auf diesem Gerät möglicherweise nicht gestartet. Es wird möglicherweise nur das Bild aufgenommen.",
       "notifyFailed": "Die Aufnahme wurde nicht gestartet, da die Teilnehmer nicht benachrichtigt werden konnten. Bitte versuchen Sie es in Kürze erneut.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Erneut speichern schließen"
       },
       "toast": {
-        "started": "Aufnahme gestartet – alle können es sehen.",
+        "started": "Die Aufzeichnung wurde gestartet. Dies wird allen Teilnehmern angezeigt.",
         "saved": "Aufnahme gespeichert. Überprüfen Sie Ihren Downloads-Ordner. Wenn nichts gespeichert wurde, tippen Sie oben auf dem Bildschirm auf [Erneut speichern].",
         "autoStopped": "Die Aufnahme wurde beendet, weil der Browser sie gestoppt hat oder das Größenlimit erreicht wurde. Alles bis zu diesem Zeitpunkt wurde gespeichert. Starten Sie die Aufnahme erneut, um fortzufahren.",
         "empty": "Es wurde nichts aufgenommen, daher wurde keine Datei erstellt.",
@@ -656,10 +656,10 @@
       "badge": "KI-Notizen aktiv",
       "started": "Der Moderator hat die KI-Notizen aktiviert",
       "stopped": "KI-Notizen deaktiviert",
-      "startedMine": "KI-Notizen aktiviert — für alle sichtbar",
-      "stoppedMine": "KI-Notizen deaktiviert — Notizen werden erstellt",
+      "startedMine": "Die AI-Besprechungsprotokollierung wurde gestartet. Dies wird allen Teilnehmern angezeigt.",
+      "stoppedMine": "Die AI-Besprechungsprotokollierung wurde beendet. Die Besprechungsprotokolle werden generiert.",
       "startFail": "KI-Notizen konnten nicht gestartet werden",
-      "gone": "KI-Notizen gestoppt — die Notizen wurden an anderer Stelle beendet oder gelöscht",
+      "gone": "KI-Notizen gestoppt : die Notizen wurden an anderer Stelle beendet oder gelöscht",
       "unsupported": "KI-Notizen können hier nicht aktiviert werden (keine Audioaufnahme-Unterstützung)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Tippen Sie unten auf [Google Kalender-Einstellungen öffnen].",
       "s2": "Wählen Sie unter 'Einstellungen für meine Kalender' links einen Kalender (z.B. Ihren Namen) aus.",
       "s3": "Scrollen Sie zu 'Kalender integrieren' und kopieren Sie 'Geheime Adresse im iCal-Format'.",
-      "s4": "Fügen Sie sie hier ein und tippen Sie auf [Hinzufügen] — Termintitel erscheinen im Kalender. Fügen Sie auf die gleiche Weise bis zu 5 weitere Kalender hinzu.",
+      "s4": "Fügen Sie sie hier ein und tippen Sie auf [Hinzufügen] : Termintitel erscheinen im Kalender. Fügen Sie auf die gleiche Weise bis zu 5 weitere Kalender hinzu.",
       "open": "Google Kalender-Einstellungen öffnen",
-      "privacy": "Diese Adresse ist ein Schlüssel zu Ihrem Kalender — teilen Sie sie nicht. Sie wird nur auf diesem Gerät gespeichert, niemals auf unserem Server."
+      "privacy": "Diese Adresse ist ein Schlüssel zu Ihrem Kalender : teilen Sie sie nicht. Sie wird nur auf diesem Gerät gespeichert, niemals auf unserem Server."
     },
     "title": "Ein Seminar erstellen",
     "name": "Lasst uns zu einer wunderschönen Insel reisen!",
     "subTitle": "Untertitel (optional, bis zu 60 Zeichen)",
     "startAt": "Startzeit",
-    "maxCnt": "Kapazität (1–100)",
+    "maxCnt": "Kapazität (1~100)",
     "submit": "Erstellen",
     "submitting": "Erstellt…",
-    "invalid": "Überprüfen Sie Ihre Eingabe — ein Datum innerhalb eines Jahres ab jetzt, Kapazität 1–100.",
+    "invalid": "Bitte überprüfen Sie die Eingabewerte: ein Datum innerhalb eines Jahres ab jetzt und eine Kapazität von 1~100.",
     "attendance": {
       "title": "Anwesenheit",
       "back": "Zurück zum Seminar",
@@ -840,18 +840,18 @@
         "state": "Status"
       },
       "durNote": "Die Anwesenheitszeit ist von der ersten Teilnahme bis zur letzten Sichtung, abzüglich der Abwesenheitszeit (Lücken länger als 2,5 Minuten).",
-      "csvPiBrowser": "Der CSV-Download funktioniert nur in einem regulären Browser (Computer oder Mobilgerät). Der Pi Browser kann keine Dateien speichern — öffnen Sie dieses Anwesenheitsblatt in einem Computer- oder Telefonbrowser (seminarz.vercel.app)."
+      "csvPiBrowser": "Der CSV-Download ist nur in regulären Browsern (PC/Mobil) verfügbar. Pi Browser kann keine Dateien speichern. Bitte öffnen Sie dieselbe Anwesenheitsliste in einem Computer- oder mobilen Browser (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Kostenlos — {time} diesen Monat übrig · keine KI",
-    "planPaid": "{name} {time} · {price} — bei Erstellung bezahlen",
+    "planFree": "Kostenlos: {time} diesen Monat verbleibend · Keine AI",
+    "planPaid": "{name} {time} · {price} · Zahlung bei Erstellung",
     "planHint": "Ein Seminar, das mit einem kostenpflichtigen Plan eröffnet wird, nutzt zuerst die Zeit dieses Plans und setzt dann mit der kostenlosen Zeit dieses Monats fort (keine KI im kostenlosen Teil). Ein aktiver Plan wird ohne Zahlung eröffnet; monatliche oder jährliche Pläne, die Sie nicht haben, werden mit Pi bezahlt, wenn Sie auf „Erstellen“ klicken, dann wird das Seminar eröffnet (Pi Browser). Der Beitritt ist für Teilnehmer immer kostenlos.",
-    "planOwned": "{name} — aktiv · {time} übrig",
+    "planOwned": "{name}: Abonniert · {time} verbleibend",
     "planEnds": "Die Startzeit liegt nach dem Ablauf dieses Plans. Verschieben Sie den Start vor oder wählen Sie einen anderen Plan.",
     "paidKept": "Ihr bezahlter Pass bleibt erhalten. Beheben Sie das Problem und drücken Sie erneut auf „Erstellen“ (keine zweite Zahlung)."
   },
   "privacy": {
-    "title": "Datenschutzrichtlinie — Sprach- und KI-Funktionen",
+    "title": "Datenschutzrichtlinie: Sprach- und AI-Funktionen",
     "effective": "Gültig ab {date}",
     "intro": "Diese Richtlinie erläutert die persönlichen Informationen, die wir verarbeiten, wenn Sie Live-Untertitel, übersetzte Untertitel, Sprachübersetzung, KI-Besprechungsnotizen und persönliche Notizen in einem Seminar verwenden. Diese Funktionen nutzen einen externen KI-Dienst, daher werden die Informationen ins Ausland übertragen.",
     "whoTitle": "Wessen Informationen werden verarbeitet",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Empfänger",
-        "v": "Google LLC (Gemini API) — Kontakt [TBD: Google Datenschutz-Kontakt]"
+        "v": "Google LLC (Gemini API): Kontakt [Ausstehend: Master, Google Datenschutz-Anfragekanal]"
       },
       {
         "k": "Länder",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Zweck",
-        "v": "Sprache zu Text, Übersetzung, Zusammenfassungen von Besprechungsnotizen, synthetische Sprache (Standardstimmen, keine Stimmklonung), Sprechertrennung für persönliche Notizen (Stimmen werden unterschieden und nach wahrgenommenem Geschlecht gekennzeichnet, z.B. Männlich 1 / Weiblich 1 — keine Namen oder Identitäten werden abgeleitet)"
+        "v": "Sprache-zu-Text-Konvertierung, Übersetzung, Zusammenfassung von Besprechungsprotokollen, synthetische Stimme (Standardstimme, keine Stimmklonung), Sprechertrennung in persönlichen Notizen (trennt Personen nach Stimme und zeigt sie als Mann 1, Frau 1 basierend auf dem wahrgenommenen Geschlecht an, identifiziert keine Namen oder Identitäten)"
       },
       {
         "k": "Aufbewahrung",
-        "v": "Endet, sobald das Ergebnis zurückgegeben wird. Wir bitten Google, Anfragen nicht zu speichern (store=false). Missbrauchsüberwachungsprotokolle können jedoch gemäß den Google-Bedingungen aufbewahrt werden [TBD: Aufbewahrungsfrist und Status der kostenpflichtigen Stufe]."
+        "v": "Endet sofort nach Erhalt der verarbeiteten Ergebnisse. Wir bitten Google, Anfragen nicht zu speichern (store=false). Aufzeichnungen zur Missbrauchsüberwachung gemäß den Google-Bedingungen können jedoch gespeichert werden [Ausstehend: Master, Speicherzeitraum und Anwendung der kostenpflichtigen Stufe]."
       },
       {
         "k": "Wie man ablehnt und was passiert",
@@ -895,8 +895,8 @@
     "keep": [
       "Original-Audio: Für Seminar-Untertitel und KI-Besprechungsnotizen wird es nicht gespeichert; es wird direkt nach der Umwandlung in Text verworfen. Für persönliche Notizen wird die Aufnahme in einem privaten Speicher aufbewahrt, damit sie nach dem Meeting genauer (mit Sprechern) transkribiert werden kann, und sie wird bei der täglichen Bereinigung gelöscht, sobald 1 Tag nach Beendigung der Notiz vergangen ist (sofort, wenn die Notiz gelöscht wird).",
       "Live-Untertitel: nicht gespeichert.",
-      "KI-Besprechungsnotizen (wenn der Moderator sie einschaltet): gesprochener Inhalt, Screenshots und die Zusammenfassung, aufbewahrt, bis die Notizen gelöscht werden [TBD: maximale Aufbewahrungsfrist].",
-      "Zustimmungsaufzeichnungen: Zeitpunkt der Zustimmung und die Version der Richtlinie, als Nachweis aufbewahrt [TBD: Aufbewahrungsfrist].",
+      "AI-Besprechungsprotokolle (falls vom Moderator aktiviert): Speichert Äußerungen, Screenshots und Zusammenfassungen, bis die Besprechungsprotokolle gelöscht werden [Ausstehend: Master, maximale Speicherdauer].",
+      "Einwilligungsaufzeichnungen: Speichert das Einwilligungsdatum und die Version der zugestimmten Richtlinie zum Nachweis [Ausstehend: Master, Speicherzeitraum].",
       "Nutzung: Minutengenaue Anfragenanzahl und Verarbeitungszeit, zur Durchsetzung von Kostenlimits verwendet.",
       "Anwesenheit: Die Zeit, zu der Sie beigetreten sind, die Zeit, zu der Sie zuletzt verbunden waren, Ihr Anzeigename und Ihr Pi-Benutzername werden gespeichert und dem Host als Anwesenheitsliste (auf dem Bildschirm und als CSV-Download) zur Verfügung gestellt. Aufbewahrt, bis das Seminar gelöscht wird.",
       "Fragen und Antworten und Umfragen: Der Fragetext und der Anzeigename des Fragestellers (oder Pi-Benutzername, falls keiner vorhanden) sind für jeden Teilnehmer sichtbar. Upvotes zeigen nur die Anzahl, niemals, wer sie abgegeben hat. Umfragestimmen zeigen den Teilnehmern nur die Anzahl; der Organisator und die Administratoren sehen für jede Option den Anzeigenamen (oder Pi-Benutzernamen, falls keiner vorhanden) jedes Wählers. Aufbewahrt, einschließlich versteckter Fragen, bis das Seminar gelöscht wird."
@@ -904,14 +904,14 @@
     "recTitle": "Aufnahme",
     "rec": "Aufnahmen werden nur als Datei auf dem Gerät des Moderators gespeichert. Sie werden nicht auf unsere Server hochgeladen oder ins Ausland übertragen. Während der Aufnahme oder der KI-Notizen wird allen Teilnehmern ein Indikator angezeigt.",
     "rightsTitle": "Ihre Rechte",
-    "rights": "Sie können den Zugriff, die Korrektur, die Löschung oder die Einstellung der Verarbeitung Ihrer Informationen beantragen. Kontakt: [TBD: Name und Kontakt des Datenschutzbeauftragten]"
+    "rights": "Sie können den Zugriff, die Korrektur, die Löschung und die Einstellung der Verarbeitung Ihrer Informationen beantragen. Kontakt: [Ausstehend: Master, Name und Kontakt des Datenschutzbeauftragten]"
   },
   "notes": {
     "title": "Notizen",
     "back": "Zurück zum Seminar",
     "loading": "Lädt…",
     "meta": "Notizen · {date} · {min} Min.",
-    "aiWarn": "KI-generierte Zusammenfassung — sie kann Fehler enthalten",
+    "aiWarn": "KI-generierte Zusammenfassung : sie kann Fehler enthalten",
     "points": "Wichtige Punkte",
     "decisions": "Entscheidungen",
     "todos": "Aktionspunkte",
@@ -921,11 +921,11 @@
     "making": "Erstellt die Notizen…",
     "makingLong": "Das dauert eine Weile. Bitte aktualisieren Sie später",
     "recording": "Nimmt noch auf",
-    "failed": "Zusammenfassung konnte nicht erstellt werden — das vollständige Transkript ist unten",
+    "failed": "Zusammenfassung konnte nicht erstellt werden. Das vollständige Transkript finden Sie unten.",
     "retry": "Erneut versuchen",
     "finish": "Aufnahme beenden und zusammenfassen",
     "none": "Nichts hier",
-    "blank": "Nichts zusammenzufassen — es wurde keine Sprache aufgenommen oder sie war zu kurz",
+    "blank": "Kein Inhalt zum Zusammenfassen. Es wurde keine Sprache aufgezeichnet oder sie war zu kurz.",
     "notFound": "Notizen nicht gefunden",
     "forbidden": "Sie haben keinen Zugriff auf diese Notizen",
     "shotAlt": "Bildschirmaufnahme um {at}",
@@ -938,7 +938,7 @@
     "delYes": "Löschen",
     "delNo": "Abbrechen",
     "delFail": "Konnte nicht gelöscht werden",
-    "dlFail": "Konnte nicht heruntergeladen werden — bitte versuchen Sie es erneut",
+    "dlFail": "Download fehlgeschlagen. Bitte tippen Sie erneut.",
     "recentNotes": "Aktuelle Notizen",
     "empty": "Noch keine Notizen",
     "newNote": "Persönliche Notizen starten",
@@ -959,12 +959,12 @@
     "aiOff": "KI-Notizen sind derzeit nicht verfügbar (Server-Einrichtung erforderlich). Vergangene Notizen sind unten aufgeführt",
     "reload": "Neu laden",
     "unsupported": "Aufnahme auf diesem Gerät nicht verfügbar",
-    "micDenied": "Mikrofon kann nicht verwendet werden – Berechtigung prüfen",
-    "limited": "Das Zeitlimit für die Verarbeitung ist aufgebraucht – beenden und Notizen erstellen",
-    "noAgr": "Gestoppt: Keine Bestätigung der Benachrichtigung bei Aufnahme – beenden und erneut starten",
-    "micLost": "Das Mikrofon wurde getrennt und die Aufnahme gestoppt – tippen Sie auf Mikrofon erneut verbinden oder beenden Sie die Notiz",
+    "micDenied": "Mikrofon ist nicht verfügbar. Bitte überprüfen Sie die Berechtigungen.",
+    "limited": "Verarbeitungszeitlimit erreicht. Bitte beenden Sie die Besprechung und generieren Sie die Protokolle.",
+    "noAgr": "Aufgrund fehlender Benachrichtigungsbestätigung gestoppt. Bitte beenden und neu starten.",
+    "micLost": "Mikrofonverbindung verloren, Aufnahme gestoppt. Bitte tippen Sie auf [Mikrofon wieder verbinden] oder beenden Sie die Besprechung.",
     "micRetry": "Mikrofon erneut verbinden",
-    "gone": "Diese Notiz wurde an anderer Stelle beendet oder gelöscht, daher wurde die Aufnahme gestoppt – verwenden Sie die Schaltfläche unten, um die Notizen zu öffnen",
+    "gone": "Diese Notiz wurde auf einem anderen Bildschirm beendet oder gelöscht, daher wurde die Aufnahme gestoppt. Bitte überprüfen Sie die Besprechungsprotokolle über die Schaltfläche unten.",
     "finishing": "Die letzten Worte werden gespeichert…",
     "st": {
       "RECORDING": "Aufnahme",
@@ -972,7 +972,7 @@
       "DONE": "Fertig",
       "FAILED": "Fehlgeschlagen"
     },
-    "downloadPiBrowser": "Der Markdown-Download funktioniert nur in einem regulären Browser (Computer oder Mobilgerät). Pi Browser kann keine Dateien speichern – öffnen Sie diese Notizen in einem Computer- oder Telefonbrowser (seminarz.vercel.app)."
+    "downloadPiBrowser": "Der Markdown-Download ist nur in regulären Browsern (PC/Mobil) verfügbar. Pi Browser kann keine Dateien speichern. Bitte öffnen Sie dasselbe Besprechungsprotokoll in einem Computer- oder mobilen Browser (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Pläne",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} verbunden",
     "producers": "{n} Streams",
     "end": "Endet {time}",
-    "stale": "Das Seminar ist beendet, aber der Raum ist auf dem Videoserver noch offen – schließen Sie ihn zwangsweise.",
+    "stale": "Das Seminar ist beendet, aber die Räume bleiben auf dem Videoserver. Bitte schließen Sie sie zwangsweise.",
     "close": "Zwangsweise schließen",
     "confirmSeminar": "Dies beendet das Seminar und schließt den Raum. Alle werden getrennt.",
     "confirmRoom": "Dies schließt den Raum. Alle werden getrennt.",
@@ -1063,7 +1063,7 @@
     "cancel": "Abbrechen",
     "saving": "Wird gespeichert…",
     "done": "Angewendet. {plan} verbleibende Zeit: {time}",
-    "invalid": "Geben Sie eine Reduzierung zwischen 1 Minute und 1000 Stunden ein (ganze Minuten 0–59).",
+    "invalid": "Geben Sie eine Reduzierung zwischen 1 Minute und 1000 Stunden ein (ganze Minuten 0~59).",
     "history": "Letzte Anpassungen",
     "noHistory": "Noch keine Anpassungen.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

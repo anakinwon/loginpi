@@ -6,7 +6,7 @@
   "home": {
     "description": "Waandaaji hufungua semina, na washiriki hujiunga na vipindi vya video vya moja kwa moja kwa kutumia Pi.",
     "badge": "Semina za moja kwa moja kwenye visiwa maridadi",
-    "headline": "Tazama, sikiliza, na ujifunze pamoja — moja kwa moja",
+    "headline": "Tazama, sikiliza, na ujifunze pamoja : moja kwa moja",
     "ctaBrowse": "Vinjari semina",
     "ctaPlan": "Angalia mipango",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Semina",
     "cal": {
       "title": "Kalenda ya Semina",
-      "desc": "Kuanzia semina zilizopita hadi zijazo — gusa tarehe kwa maelezo.",
+      "desc": "Kuanzia semina zilizopita hadi zijazo: gusa tarehe kwa maelezo.",
       "legendSmn": "Semina",
       "legendEnded": "Semina zilizopita",
       "legendMine": "Matukio yangu",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Semina ya video ya moja kwa moja",
-        "desc": "Injini yetu ya video Galápagos — lengo ni mwasilishaji mmoja anayetiririsha kwa hadi washiriki 30"
+        "desc": "Injini yetu ya video ya Galápagos: Lengo ni kwa mwasilishaji mmoja kutuma video kwa hadi watazamaji 30."
       },
       "F02": {
         "name": "Unda semina",
@@ -254,7 +254,7 @@
       "dubbing": "Uchezaji wa sauti ya sintetiki na sauti asili iliyopunguzwa"
     },
     "refLabel": "Mfano wa rejea",
-    "uiRef": "Msingi wa UI — skrini na mifumo ya vipengele vya programu ya mkutano wa video ya wavuti inayotumika sana, iliyobadilishwa kwa seminar.pi"
+    "uiRef": "Viwango vya UI: Kutumia mifumo ya skrini na vipengele vya programu maarufu za mikutano ya wavuti kwa seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Wanachama wa hadhira hawatumii kamera au maikrofoni. Baada ya kujiunga utaona na kusikia mwasilishaji.",
     "preview": {
       "pending": "Inatayarisha kamera na maikrofoni…",
-      "audioOnly": "Kamera haipatikani — inatuma sauti pekee.",
+      "audioOnly": "Kamera haipatikani : inatuma sauti pekee.",
       "none": "Kamera na maikrofoni hazipatikani. Angalia ruhusa (bado unaweza kujiunga bila media).",
-      "videoOnly": "Maikrofoni haipatikani — inatuma video pekee. Angalia ruhusa ya maikrofoni."
+      "videoOnly": "Maikrofoni haipatikani : inatuma video pekee. Angalia ruhusa ya maikrofoni."
     },
     "mic": {
       "on": "Zima maikrofoni",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Pasi yako ya kuingia imeisha muda.",
       "TICKET_EXPIRED": "Pasi yako ya kuingia imeisha muda.",
       "ROOM_FULL": "Semina hii imejaa.",
-      "ROOM_CLOSED": "Chumba kilifungwa — semina iliisha au mwenyeji hakuwepo kwa zaidi ya dakika 5.",
+      "ROOM_CLOSED": "Chumba kimefungwa. Semina imeisha au mwenyeji hayupo kwa zaidi ya dakika 5.",
       "DUPLICATE_SESSION": "Ulijiunga kutoka kifaa kingine, kwa hivyo skrini hii ilikatwa.",
       "ROLE_FORBIDDEN": "Huna ruhusa ya kuwasilisha.",
       "WS_FAILED": "Imeshindwa kuunganisha kwenye seva ya video.",
@@ -488,7 +488,7 @@
     "toDetail": "Nenda kwenye ukurasa wa semina",
     "consent": {
       "title": "Kabla ya kuwasha maikrofoni yako",
-      "body": "Ikiwa kurekodi, manukuu au madokezo ya mikutano ya AI yamewashwa katika semina hii, sauti yako inaweza kubadilishwa kuwa maandishi, kuhifadhiwa na kutafsiriwa. Uchakataji wa sauti unafanywa na huduma ya AI nje ya nchi yako. Ikiwa hukubaliani, maikrofoni yako bado huwaka — sauti yako pekee ndiyo huachwa nje ya uchakataji.",
+      "body": "Ikiwa kurekodi, manukuu au madokezo ya mikutano ya AI yamewashwa katika semina hii, sauti yako inaweza kubadilishwa kuwa maandishi, kuhifadhiwa na kutafsiriwa. Uchakataji wa sauti unafanywa na huduma ya AI nje ya nchi yako. Ikiwa hukubaliani, maikrofoni yako bado huwaka : sauti yako pekee ndiyo huachwa nje ya uchakataji.",
       "privacy": "Sera ya faragha",
       "newTab": "(inafungua katika kichupo kipya)",
       "decline": "Sikubaliani",
@@ -613,7 +613,7 @@
       "title": "Rekodi",
       "badge": "Inarekodi",
       "unsupported": "Kivinjari hiki hakiwezi kurekodi. Tafadhali rekodi kutoka kwa kivinjari cha kawaida kwenye kompyuta.",
-      "piBrowserOnly": "Kurekodi hufanya kazi tu katika kivinjari cha kawaida (PC au simu). Pi Browser haiwezi kuhifadhi faili za kurekodi — fungua semina hii katika kivinjari cha kompyuta au simu (seminarz.vercel.app) ili kurekodi.",
+      "piBrowserOnly": "Kurekodi kunapatikana tu katika vivinjari vya kawaida (PC/simu). Pi Browser haiwezi kuhifadhi faili zilizorekodiwa. Tafadhali fungua semina hiyo hiyo kwenye kompyuta au kivinjari cha simu (seminarz.vercel.app) ili kurekodi.",
       "audioSuspended": "Kurekodi sauti kunaweza kusiwe kumeanza kwenye kifaa hiki. Picha pekee ndiyo inaweza kurekodiwa.",
       "notifyFailed": "Kurekodi hakukuanza kwa sababu washiriki hawakuweza kuarifiwa. Tafadhali jaribu tena baada ya muda mfupi.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Funga hifadhi tena"
       },
       "toast": {
-        "started": "Kurekodi kumeanza — kila mtu anaweza kuona",
+        "started": "Kurekodi kumeanza. Hii itaonyeshwa kwa washiriki wote.",
         "saved": "Kurekodi kumehifadhiwa. Angalia folda yako ya vipakuliwa. Ikiwa hakuna kilichohifadhiwa, gusa [Hifadhi tena] juu ya skrini.",
         "autoStopped": "Kurekodi kuliisha kwa sababu kivinjari kilikisimamisha au kikomo cha ukubwa kilifikiwa. Kila kitu hadi wakati huo kilihifadhiwa. Anza kurekodi tena ili kuendelea.",
         "empty": "Hakuna kilichorekodiwa, kwa hivyo hakuna faili iliyoundwa.",
@@ -656,10 +656,10 @@
       "badge": "Vidokezo vya AI vimewashwa",
       "started": "Mwasilishaji amewasha vidokezo vya AI",
       "stopped": "Vidokezo vya AI vimezimwa",
-      "startedMine": "Vidokezo vya AI vimewashwa — vinaonyeshwa kwa kila mtu",
-      "stoppedMine": "Vidokezo vya AI vimezimwa — vinatengeneza vidokezo",
+      "startedMine": "Dakika za mkutano za AI zimeanza. Hii itaonyeshwa kwa washiriki wote.",
+      "stoppedMine": "Dakika za mkutano za AI zimesitishwa. Dakika za mkutano zinatengenezwa.",
       "startFail": "Imeshindwa kuanzisha vidokezo vya AI",
-      "gone": "Vidokezo vya AI vimesitishwa — vidokezo viliisha au vilifutwa mahali pengine",
+      "gone": "Vidokezo vya AI vimesitishwa : vidokezo viliisha au vilifutwa mahali pengine",
       "unsupported": "Vidokezo vya AI haviwezi kuwashwa hapa (hakuna usaidizi wa kurekodi sauti)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Gonga [Fungua mipangilio ya Kalenda ya Google] hapa chini.",
       "s2": "Chini ya 'Mipangilio ya kalenda zangu' upande wa kushoto, chagua kalenda (k.m. jina lako).",
       "s3": "Sogeza hadi 'Unganisha kalenda' na unakili 'Anwani ya siri katika umbizo la iCal'.",
-      "s4": "Bandika hapa na uguse [Ongeza] — majina ya matukio yanaonekana kwenye kalenda. Ongeza kalenda zingine kwa njia hiyo hiyo, hadi 5.",
+      "s4": "Bandika hapa na uguse [Ongeza] : majina ya matukio yanaonekana kwenye kalenda. Ongeza kalenda zingine kwa njia hiyo hiyo, hadi 5.",
       "open": "Fungua mipangilio ya Kalenda ya Google",
-      "privacy": "Anwani hii ni ufunguo wa kalenda yako — usishiriki. Imehifadhiwa kwenye kifaa hiki pekee, kamwe kwenye seva yetu."
+      "privacy": "Anwani hii ni ufunguo wa kalenda yako : usishiriki. Imehifadhiwa kwenye kifaa hiki pekee, kamwe kwenye seva yetu."
     },
     "title": "Unda semina",
     "name": "Tusafiri hadi kisiwa kizuri!",
     "subTitle": "Kichwa kidogo (si lazima, hadi herufi 60)",
     "startAt": "Muda wa kuanza",
-    "maxCnt": "Uwezo (1–100)",
+    "maxCnt": "Uwezo (1~100)",
     "submit": "Unda",
     "submitting": "Inaunda…",
-    "invalid": "Angalia ingizo lako — tarehe ndani ya mwaka mmoja kutoka sasa, uwezo 1–100.",
+    "invalid": "Tafadhali angalia thamani za ingizo: tarehe ndani ya mwaka mmoja kuanzia sasa, na uwezo wa 1-100.",
     "attendance": {
       "title": "Mahudhurio",
       "back": "Rudi kwenye semina",
@@ -840,18 +840,18 @@
         "state": "Hali"
       },
       "durNote": "Muda wa kuhudhuria ni kutoka kujiunga mara ya kwanza hadi kuonekana mara ya mwisho, ukiondoa muda wa kutokuwepo (mapengo marefu kuliko dakika 2.5).",
-      "csvPiBrowser": "Upakuaji wa CSV hufanya kazi tu kwenye kivinjari cha kawaida (kompyuta au simu). Pi Browser haiwezi kuhifadhi faili — fungua karatasi hii ya mahudhurio kwenye kivinjari cha kompyuta au simu (seminarz.vercel.app)."
+      "csvPiBrowser": "Upakuaji wa CSV unapatikana tu katika vivinjari vya kawaida (PC/simu). Pi Browser haiwezi kuhifadhi faili. Tafadhali fungua karatasi hiyo hiyo ya mahudhurio kwenye kompyuta au kivinjari cha simu (seminarz.vercel.app)."
     },
     "plan": "Mpango",
-    "planFree": "Bure — {time} zimesalia mwezi huu · hakuna AI",
-    "planPaid": "{name} {time} · {price} — lipa wakati wa kuunda",
+    "planFree": "Bure: {time} imebaki mwezi huu · Hakuna AI",
+    "planPaid": "{name} {time} · {price} · Malipo wakati wa kuunda",
     "planHint": "Semina iliyofunguliwa kwenye mpango wa kulipia hutumia muda wa mpango huo kwanza, kisha inaendelea kwa muda wa bure wa mwezi huu (hakuna AI katika sehemu ya bure). Mpango amilifu hufunguka bila malipo; Kila mwezi au Kila mwaka usio nao hulipwa kwa Pi unapobonyeza Unda, kisha semina hufunguka (Pi Browser). Kujiunga daima ni bure kwa washiriki.",
-    "planOwned": "{name} — amilifu · {time} zimesalia",
+    "planOwned": "{name}: Umesajiliwa · {time} imebaki",
     "planEnds": "Muda wa kuanza ni baada ya pasi ya mpango huu kuisha. Sogeza mwanzo mapema au chagua mpango mwingine.",
     "paidKept": "Pasi yako ya kulipia imehifadhiwa. Rekebisha suala na ubonyeze Unda tena (hakuna malipo ya pili)."
   },
   "privacy": {
-    "title": "Sera ya Faragha — Vipengele vya Sauti na AI",
+    "title": "Sera ya Faragha: Vipengele vya Sauti na AI",
     "effective": "Inaanza kutumika {date}",
     "intro": "Sera hii inaeleza taarifa za kibinafsi tunazochakata unapotumia manukuu ya moja kwa moja, manukuu yaliyotafsiriwa, tafsiri ya sauti, vidokezo vya mikutano vya AI na vidokezo vya ana kwa ana katika semina. Vipengele hivi hutumia huduma ya nje ya AI, kwa hivyo taarifa huhamishwa nje ya nchi.",
     "whoTitle": "Taarifa za nani zinachakatwa",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Mpokeaji",
-        "v": "Google LLC (Gemini API) — wasiliana [TBD: anwani ya faragha ya Google]"
+        "v": "Google LLC (Gemini API): Mawasiliano [Inasubiri: Mwalimu, Kituo cha Uchunguzi wa Faragha cha Google]"
       },
       {
         "k": "Nchi",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Kusudi",
-        "v": "Hotuba kwa maandishi, tafsiri, muhtasari wa vidokezo vya mkutano, hotuba ya sintetiki (sauti za kawaida, hakuna uigaji wa sauti), utenganishaji wa spika kwa vidokezo vya ana kwa ana (sauti hutenganishwa na kuwekewa lebo kwa jinsia inayoonekana, kama vile Mwanaume 1 / Mwanamke 1 — hakuna majina au vitambulisho vinavyotokana)"
+        "v": "Kubadilisha sauti kuwa maandishi, tafsiri, muhtasari wa dakika za mkutano, sauti sanisi (sauti ya kawaida, hakuna uigaji wa sauti), utenganishaji wa spika katika maelezo ya ana kwa ana (hutenganisha watu kwa sauti na kuonyesha kama mwanamume 1, mwanamke 1 kulingana na jinsia inayoonekana, haitambui majina au vitambulisho)"
       },
       {
         "k": "Uhifadhi",
-        "v": "Huisha mara tu matokeo yanaporudishwa. Tunaomba Google isihifadhi maombi (store=false). Kumbukumbu za ufuatiliaji wa matumizi mabaya zinaweza bado kuhifadhiwa chini ya masharti ya Google [TBD: muda wa uhifadhi na hali ya kiwango cha kulipia]."
+        "v": "Inaisha mara moja baada ya kupokea matokeo yaliyochakatwa. Tunaomba Google isihifadhi maombi (store=false). Hata hivyo, rekodi za ufuatiliaji wa matumizi mabaya kulingana na masharti ya Google zinaweza kuhifadhiwa [Inasubiri: Mwalimu, muda wa kuhifadhi na matumizi ya kiwango cha kulipia]."
       },
       {
         "k": "Jinsi ya kukataa, na nini kinatokea",
@@ -895,8 +895,8 @@
     "keep": [
       "Sauti asili: kwa manukuu ya semina na vidokezo vya mikutano vya AI haihifadhiwi; hutupwa mara tu baada ya kubadilishwa kuwa maandishi. Kwa vidokezo vya ana kwa ana, rekodi huhifadhiwa katika hifadhi ya faragha ili iweze kunukuliwa tena kwa usahihi zaidi (na spika) baada ya mkutano, na inafutwa wakati wa usafishaji wa kila siku mara tu siku 1 imepita tangu kidokezo kiishe (mara moja ikiwa kidokezo kimefutwa).",
       "Manukuu ya moja kwa moja: hayahifadhiwi.",
-      "Vidokezo vya mikutano vya AI (wakati mwasilishaji anapoviwasha): maudhui yaliyosemwa, picha za skrini na muhtasari, huhifadhiwa hadi vidokezo vifutwe [TBD: uhifadhi wa juu zaidi].",
-      "Rekodi za idhini: muda wa idhini na toleo la sera, huhifadhiwa kama ushahidi [TBD: muda wa uhifadhi].",
+      "Dakika za Mkutano za AI (ikiwa zimewashwa na mwasilishaji): Huhifadhi matamshi, picha za skrini, na muhtasari hadi dakika za mkutano zitakapofutwa [Inasubiri: Mwalimu, muda wa juu zaidi wa kuhifadhi].",
+      "Rekodi za Idhini: Huhifadhi tarehe ya idhini na toleo la sera iliyoidhinishwa kwa ushahidi [Inasubiri: Mwalimu, muda wa kuhifadhi].",
       "Matumizi: hesabu za maombi kwa dakika na muda wa usindikaji, hutumiwa kutekeleza vikomo vya gharama.",
       "Mahudhurio: muda ulijiunga, muda uliunganishwa mara ya mwisho, jina lako la onyesho na jina lako la mtumiaji la Pi huhifadhiwa na kupewa mwenyeji kama orodha ya mahudhurio (kwenye skrini na kama upakuaji wa CSV). Huhifadhiwa hadi semina ifutwe.",
       "Maswali na Majibu na kura: maandishi ya swali na jina la onyesho la muulizaji (au jina la mtumiaji la Pi ikiwa hakuna) huonekana kwa kila mshiriki. Kura za kupanda huonyesha hesabu tu, kamwe ni nani aliyepiga. Kura za kura huonyesha hesabu tu kwa washiriki; mratibu na wasimamizi huona, kwa kila chaguo, jina la onyesho (au jina la mtumiaji la Pi ikiwa hakuna) la kila mpiga kura. Huhifadhiwa, ikiwa ni pamoja na maswali yaliyofichwa, hadi semina ifutwe."
@@ -904,14 +904,14 @@
     "recTitle": "Kurekodi",
     "rec": "Rekodi huhifadhiwa tu kama faili kwenye kifaa cha mwasilishaji. Hazipakiiwi kwenye seva zetu au kuhamishwa nje ya nchi. Wakati kurekodi au vidokezo vya AI vimewashwa, kila mshiriki huona kiashiria.",
     "rightsTitle": "Haki zako",
-    "rights": "Unaweza kuomba kufikia, kusahihisha, kufuta au kusitisha usindikaji wa taarifa zako. Wasiliana: [TBD: jina na anwani ya afisa wa faragha]"
+    "rights": "Unaweza kuomba ufikiaji, marekebisho, kufutwa, na kusimamishwa kwa uchakataji wa habari zako. Mawasiliano: [Inasubiri: Mwalimu, Jina na Mawasiliano ya Afisa wa Faragha]"
   },
   "notes": {
     "title": "Vidokezo",
     "back": "Rudi kwenye semina",
     "loading": "Inapakia…",
     "meta": "Vidokezo · {date} · {min} min",
-    "aiWarn": "Muhtasari uliotengenezwa na AI — unaweza kuwa na makosa",
+    "aiWarn": "Muhtasari uliotengenezwa na AI : unaweza kuwa na makosa",
     "points": "Hoja muhimu",
     "decisions": "Maamuzi",
     "todos": "Vitu vya kufanya",
@@ -921,11 +921,11 @@
     "making": "Inatengeneza vidokezo…",
     "makingLong": "Hii inachukua muda. Tafadhali onyesha upya baadaye",
     "recording": "Bado inarekodi",
-    "failed": "Imeshindwa kuunda muhtasari — unukuzi kamili uko hapa chini",
+    "failed": "Imeshindwa kuunda muhtasari. Nakala kamili iko hapa chini.",
     "retry": "Jaribu tena",
     "finish": "Maliza kurekodi na ufanye muhtasari",
     "none": "Hakuna chochote hapa",
-    "blank": "Hakuna cha kufanya muhtasari — hakuna hotuba iliyorekodiwa au ilikuwa fupi sana",
+    "blank": "Hakuna maudhui ya kufupisha. Hakuna hotuba iliyorekodiwa au ilikuwa fupi sana.",
     "notFound": "Vidokezo havijapatikana",
     "forbidden": "Huna ufikiaji wa vidokezo hivi",
     "shotAlt": "Picha ya skrini saa {at}",
@@ -938,7 +938,7 @@
     "delYes": "Futa",
     "delNo": "Ghairi",
     "delFail": "Imeshindwa kufuta",
-    "dlFail": "Imeshindwa kupakua — tafadhali jaribu tena",
+    "dlFail": "Upakuaji umeshindwa. Tafadhali gusa tena.",
     "recentNotes": "Vidokezo vya hivi karibuni",
     "empty": "Hakuna vidokezo bado",
     "newNote": "Anzisha vidokezo vya ana kwa ana",
@@ -959,12 +959,12 @@
     "aiOff": "Madokezo ya AI hayapatikani kwa sasa (usanidi wa seva unahitajika). Madokezo ya zamani yameorodheshwa hapa chini",
     "reload": "Pakia upya",
     "unsupported": "Kurekodi hakupatikani kwenye kifaa hiki",
-    "micDenied": "Haiwezi kutumia maikrofoni — angalia ruhusa",
-    "limited": "Kikomo cha muda wa kuchakata kimetumika — maliza na uunde madokezo",
-    "noAgr": "Imesitishwa: hakuna uthibitisho wa ilani kwenye rekodi — maliza na uanze tena",
-    "micLost": "Maikrofoni imekatika na kurekodi kumesitishwa — gusa Unganisha tena maikrofoni au maliza dokezo",
+    "micDenied": "Maiki haipatikani. Tafadhali angalia ruhusa.",
+    "limited": "Kikomo cha muda wa kuchakata kimefikiwa. Tafadhali maliza na utengeneze dakika za mkutano.",
+    "noAgr": "Imesitishwa kwa sababu ya kukosa rekodi ya uthibitisho wa arifa. Tafadhali maliza na uanze upya.",
+    "micLost": "Muunganisho wa maiki umepotea, kurekodi kumesitishwa. Tafadhali gusa [Unganisha tena Maiki] au maliza.",
     "micRetry": "Unganisha tena maikrofoni",
-    "gone": "Dokezo hili lilikamilishwa au kufutwa mahali pengine, kwa hivyo kurekodi kumesitishwa — tumia kitufe kilicho hapa chini kufungua madokezo",
+    "gone": "Dokezo hili liliisha au lilifutwa kwenye skrini nyingine, kwa hivyo kurekodi kumesitishwa. Tafadhali angalia dakika za mkutano ukitumia kitufe kilicho hapa chini.",
     "finishing": "Inahifadhi maneno ya mwisho…",
     "st": {
       "RECORDING": "Inarekodi",
@@ -972,7 +972,7 @@
       "DONE": "Imekamilika",
       "FAILED": "Imeshindwa"
     },
-    "downloadPiBrowser": "Kupakua Markdown hufanya kazi tu katika kivinjari cha kawaida (kompyuta au simu). Pi Browser haiwezi kuhifadhi faili — fungua madokezo haya kwenye kivinjari cha kompyuta au simu (seminarz.vercel.app)."
+    "downloadPiBrowser": "Upakuaji wa Markdown unapatikana tu katika vivinjari vya kawaida (PC/simu). Pi Browser haiwezi kuhifadhi faili. Tafadhali fungua dakika hizo hizo za mkutano kwenye kompyuta au kivinjari cha simu (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Mipango",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} wameunganishwa",
     "producers": "Mitiririko {n}",
     "end": "Inaisha {time}",
-    "stale": "Semina imekwisha lakini chumba bado kiko wazi kwenye seva ya video — kifunge kwa nguvu.",
+    "stale": "Semina imeisha, lakini vyumba vimebaki kwenye seva ya video. Tafadhali vifunge kwa nguvu.",
     "close": "Funga kwa nguvu",
     "confirmSeminar": "Hii inamaliza semina na kufunga chumba. Kila mtu atakatwa.",
     "confirmRoom": "Hii inafunga chumba. Kila mtu atakatwa.",
@@ -1063,7 +1063,7 @@
     "cancel": "Ghairi",
     "saving": "Inahifadhi…",
     "done": "Imetumika. Muda uliobaki wa {plan}: {time}",
-    "invalid": "Weka upunguzaji kati ya dakika 1 na saa 1000 (dakika kamili 0–59).",
+    "invalid": "Weka upunguzaji kati ya dakika 1 na saa 1000 (dakika kamili 0~59).",
     "history": "Marekebisho ya hivi karibuni",
     "noHistory": "Hakuna marekebisho bado.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",

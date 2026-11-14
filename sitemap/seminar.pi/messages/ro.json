@@ -6,7 +6,7 @@
   "home": {
     "description": "Gazdele deschid seminarii, iar participanții se alătură sesiunilor video live cu Pi.",
     "badge": "Seminarii live pe insule frumoase",
-    "headline": "Urmăriți, ascultați și învățați împreună — live",
+    "headline": "Urmăriți, ascultați și învățați împreună : live",
     "ctaBrowse": "Răsfoiește seminarii",
     "ctaPlan": "Vezi planurile",
     "features": {
@@ -18,7 +18,7 @@
     "listTitle": "Seminarii",
     "cal": {
       "title": "Calendar seminarii",
-      "desc": "De la seminarii trecute la cele viitoare — atinge o dată pentru detalii.",
+      "desc": "De la seminariile trecute la cele viitoare: atingeți o dată pentru detalii.",
       "legendSmn": "Seminarii",
       "legendEnded": "Seminarii trecute",
       "legendMine": "Evenimentele mele",
@@ -155,7 +155,7 @@
       },
       "F05": {
         "name": "Seminar video live",
-        "desc": "Propriul nostru motor video Galápagos — scopul este un prezentator care transmite către până la 30 de participanți"
+        "desc": "Motorul nostru video Galápagos: Scopul este ca un prezentator să trimită video către până la 30 de membri ai audienței."
       },
       "F02": {
         "name": "Creează un seminar",
@@ -254,7 +254,7 @@
       "dubbing": "Redare voce sintetică și audio original redus"
     },
     "refLabel": "Model de referință",
-    "uiRef": "Linia de bază a interfeței de utilizator — modele de ecran și funcționalități ale unei aplicații web de întâlniri video utilizate pe scară largă, adaptate pentru seminar.pi"
+    "uiRef": "Standarde UI: Aplicarea modelelor de ecran și funcții ale aplicațiilor populare de conferințe web la seminar.pi"
   },
   "room": {
     "rename": {
@@ -291,9 +291,9 @@
     "audienceHint": "Membrii audienței nu folosesc o cameră sau un microfon. După ce te alături, vei vedea și auzi prezentatorul.",
     "preview": {
       "pending": "Se pregătesc camera și microfonul…",
-      "audioOnly": "Camera indisponibilă — se trimite doar audio.",
+      "audioOnly": "Camera indisponibilă : se trimite doar audio.",
       "none": "Camera și microfonul indisponibile. Verifică permisiunile (poți totuși să te alături fără media).",
-      "videoOnly": "Microfon indisponibil — se trimite doar video. Verifică permisiunea microfonului."
+      "videoOnly": "Microfon indisponibil : se trimite doar video. Verifică permisiunea microfonului."
     },
     "mic": {
       "on": "Oprește microfonul",
@@ -323,7 +323,7 @@
       "TICKET_INVALID": "Permisul tău de intrare a expirat.",
       "TICKET_EXPIRED": "Permisul tău de intrare a expirat.",
       "ROOM_FULL": "Acest seminar este plin.",
-      "ROOM_CLOSED": "Camera a fost închisă — seminarul s-a încheiat sau gazda a lipsit mai mult de 5 minute.",
+      "ROOM_CLOSED": "Camera este închisă. Seminarul s-a încheiat sau gazda a fost absentă mai mult de 5 minute.",
       "DUPLICATE_SESSION": "V-ați conectat de pe un alt dispozitiv, așa că această sesiune a fost deconectată.",
       "ROLE_FORBIDDEN": "Nu aveți permisiunea de a prezenta.",
       "WS_FAILED": "Nu s-a putut conecta la serverul video.",
@@ -488,7 +488,7 @@
     "toDetail": "Mergi la pagina seminarului",
     "consent": {
       "title": "Înainte de a porni microfonul",
-      "body": "Dacă în acest seminar sunt activate înregistrarea, subtitrările sau notele de întâlnire AI, vocea dumneavoastră poate fi convertită în text, stocată și tradusă. Procesarea vocii este realizată de un serviciu AI din afara țării dumneavoastră. Dacă nu sunteți de acord, microfonul dumneavoastră se va porni în continuare — doar vocea dumneavoastră va fi exclusă din procesare.",
+      "body": "Dacă în acest seminar sunt activate înregistrarea, subtitrările sau notele de întâlnire AI, vocea dumneavoastră poate fi convertită în text, stocată și tradusă. Procesarea vocii este realizată de un serviciu AI din afara țării dumneavoastră. Dacă nu sunteți de acord, microfonul dumneavoastră se va porni în continuare : doar vocea dumneavoastră va fi exclusă din procesare.",
       "privacy": "Politica de confidențialitate",
       "newTab": "(se deschide într-o filă nouă)",
       "decline": "Nu sunt de acord",
@@ -613,7 +613,7 @@
       "title": "Înregistrare",
       "badge": "Înregistrare",
       "unsupported": "Acest browser nu poate înregistra. Vă rugăm să înregistrați de pe un browser obișnuit de pe un computer.",
-      "piBrowserOnly": "Înregistrarea funcționează doar într-un browser obișnuit (PC sau mobil). Pi Browser nu poate salva fișierele de înregistrare — deschideți acest seminar într-un browser de computer sau telefon (seminarz.vercel.app) pentru a înregistra.",
+      "piBrowserOnly": "Înregistrarea este disponibilă numai în browserele obișnuite (PC/mobil). Pi Browser nu poate salva fișiere înregistrate. Vă rugăm să deschideți același seminar într-un browser de computer sau mobil (seminarz.vercel.app) pentru a înregistra.",
       "audioSuspended": "Este posibil ca înregistrarea sunetului să nu fi început pe acest dispozitiv. Doar imaginea poate fi înregistrată.",
       "notifyFailed": "Înregistrarea nu a început deoarece participanții nu au putut fi notificați. Vă rugăm să încercați din nou în scurt timp.",
       "confirm": {
@@ -630,7 +630,7 @@
         "dismiss": "Închide salvarea din nou"
       },
       "toast": {
-        "started": "Înregistrarea a început — toată lumea o poate vedea",
+        "started": "Înregistrarea a început. Aceasta va fi afișată tuturor participanților.",
         "saved": "Înregistrarea a fost salvată. Verificați folderul de descărcări. Dacă nu s-a salvat nimic, atingeți [Salvează din nou] în partea de sus a ecranului.",
         "autoStopped": "Înregistrarea s-a încheiat deoarece browserul a oprit-o sau limita de dimensiune a fost atinsă. Totul până în acel moment a fost salvat. Începeți din nou înregistrarea pentru a continua.",
         "empty": "Nu s-a înregistrat nimic, așa că nu a fost creat niciun fișier.",
@@ -656,10 +656,10 @@
       "badge": "Notițe AI activate",
       "started": "Prezentatorul a activat notițele AI",
       "stopped": "Notițele AI au fost dezactivate",
-      "startedMine": "Notițe AI activate — vizibile pentru toți",
-      "stoppedMine": "Notițe AI dezactivate — se creează notițele",
+      "startedMine": "Minutele AI ale ședinței au început. Aceasta va fi afișată tuturor participanților.",
+      "stoppedMine": "Minutele AI ale ședinței au fost oprite. Minutele ședinței sunt generate.",
       "startFail": "Nu s-au putut porni notițele AI",
-      "gone": "Notițele AI au fost oprite — notițele au fost încheiate sau șterse în altă parte",
+      "gone": "Notițele AI au fost oprite : notițele au fost încheiate sau șterse în altă parte",
       "unsupported": "Notițele AI nu pot fi activate aici (nu există suport pentru înregistrare audio)"
     },
     "dubbing": {
@@ -808,18 +808,18 @@
       "s1": "Atinge [Deschide setările Google Calendar] de mai jos.",
       "s2": "Sub „Setări pentru calendarele mele” din stânga, alege un calendar (ex. numele tău).",
       "s3": "Derulează la „Integrare calendar” și copiază „Adresa secretă în format iCal”.",
-      "s4": "Lipește-o aici și atinge [Adaugă] — titlurile evenimentelor apar în calendar. Adaugă și alte calendare în același mod, până la 5.",
+      "s4": "Lipește-o aici și atinge [Adaugă] : titlurile evenimentelor apar în calendar. Adaugă și alte calendare în același mod, până la 5.",
       "open": "Deschide setările Google Calendar",
-      "privacy": "Această adresă este o cheie pentru calendarul tău — nu o partaja. Este stocată doar pe acest dispozitiv, niciodată pe serverul nostru."
+      "privacy": "Această adresă este o cheie pentru calendarul tău : nu o partaja. Este stocată doar pe acest dispozitiv, niciodată pe serverul nostru."
     },
     "title": "Creează un seminar",
     "name": "Să călătorim pe o insulă frumoasă!",
     "subTitle": "Subtitlu (opțional, până la 60 de caractere)",
     "startAt": "Ora de începere",
-    "maxCnt": "Capacitate (1–100)",
+    "maxCnt": "Capacitate (1~100)",
     "submit": "Creează",
     "submitting": "Se creează…",
-    "invalid": "Verifică datele introduse — o dată în decurs de un an de acum, capacitate 1–100.",
+    "invalid": "Vă rugăm să verificați valorile introduse: o dată în termen de un an de acum și o capacitate de 1-100.",
     "attendance": {
       "title": "Prezență",
       "back": "Înapoi la seminar",
@@ -840,18 +840,18 @@
         "state": "Stare"
       },
       "durNote": "Timpul participat este de la prima alăturare până la ultima vizualizare, minus timpul absent (pauze mai lungi de 2,5 minute).",
-      "csvPiBrowser": "Descărcarea CSV funcționează doar într-un browser obișnuit (computer sau mobil). Pi Browser nu poate salva fișiere — deschide această foaie de prezență într-un browser de computer sau telefon (seminarz.vercel.app)."
+      "csvPiBrowser": "Descărcarea CSV este disponibilă numai în browserele obișnuite (PC/mobil). Pi Browser nu poate salva fișiere. Vă rugăm să deschideți aceeași foaie de prezență într-un browser de computer sau mobil (seminarz.vercel.app)."
     },
     "plan": "Plan",
-    "planFree": "Gratuit — {time} rămas luna aceasta · fără AI",
-    "planPaid": "{name} {time} · {price} — plătește la creare",
+    "planFree": "Gratuit: {time} rămase luna aceasta · Fără AI",
+    "planPaid": "{name} {time} · {price} · Plată la creare",
     "planHint": "Un seminar deschis pe un plan plătit folosește mai întâi timpul acelui plan, apoi continuă pe timpul gratuit al acestei luni (fără AI în partea gratuită). Un plan activ se deschide fără plată; Planul lunar sau anual pe care nu îl ai este plătit în Pi când apeși Creare, apoi seminarul se deschide (Pi Browser). Participarea este întotdeauna gratuită pentru participanți.",
-    "planOwned": "{name} — activ · {time} rămas",
+    "planOwned": "{name}: Abonat · {time} rămase",
     "planEnds": "Ora de începere este după expirarea abonamentului acestui plan. Mută ora de începere mai devreme sau alege un alt plan.",
     "paidKept": "Abonamentul tău plătit este păstrat. Remediază problema și apasă din nou Creare (fără a doua plată)."
   },
   "privacy": {
-    "title": "Politica de confidențialitate — Funcții vocale și AI",
+    "title": "Politica de confidențialitate: Funcții vocale și AI",
     "effective": "În vigoare de la {date}",
     "intro": "Această politică explică informațiile personale pe care le procesăm atunci când utilizați subtitrări live, subtitrări traduse, traducere vocală, notițe de întâlnire AI și notițe în persoană într-un seminar. Aceste funcții utilizează un serviciu AI extern, astfel încât informațiile sunt transferate în străinătate.",
     "whoTitle": "Ale cui informații sunt procesate",
@@ -864,7 +864,7 @@
     "xfer": [
       {
         "k": "Destinatar",
-        "v": "Google LLC (Gemini API) — contact [TBD: contact confidențialitate Google]"
+        "v": "Google LLC (Gemini API): Contact [În așteptare: Master, Canal de întrebări privind confidențialitatea Google]"
       },
       {
         "k": "Țări",
@@ -880,11 +880,11 @@
       },
       {
         "k": "Scop",
-        "v": "Vorbire în text, traducere, rezumate notițe de întâlnire, vorbire sintetică (voci standard, fără clonare vocală), separare vorbitori pentru notițe în persoană (vocile sunt diferențiate și etichetate după genul perceput, cum ar fi Masculin 1 / Feminin 1 — nu se inferă nume sau identități)"
+        "v": "Conversie voce în text, traducere, rezumarea minutelor ședinței, voce sintetică (voce standard, fără clonare vocală), separarea vorbitorilor în notele față în față (separă persoanele după voce și afișează ca bărbat 1, femeie 1 pe baza genului perceput, nu identifică nume sau identități)"
       },
       {
         "k": "Retenție",
-        "v": "Se încheie imediat ce rezultatul este returnat. Solicităm Google să nu stocheze cererile (store=false). Jurnalele de monitorizare a abuzurilor pot fi păstrate conform termenilor Google [TBD: perioada de retenție și statutul nivelului plătit]."
+        "v": "Se încheie imediat la primirea rezultatelor procesate. Solicităm ca Google să nu stocheze cererile (store=false). Cu toate acestea, înregistrările de monitorizare a utilizării abuzive conform termenilor Google pot fi stocate [În așteptare: Master, perioada de stocare și aplicarea nivelului plătit]."
       },
       {
         "k": "Cum să refuzi și ce se întâmplă",
@@ -895,8 +895,8 @@
     "keep": [
       "Audio original: pentru subtitrările seminarului și notițele de întâlnire AI nu este stocat; este eliminat imediat după conversia în text. Pentru notițele în persoană, înregistrarea este păstrată în stocare privată pentru a putea fi transcrisă din nou mai precis (cu vorbitori) după întâlnire și este ștearsă la curățarea zilnică odată ce a trecut 1 zi de la încheierea notiței (imediat dacă notița este ștearsă).",
       "Subtitrări live: nu sunt stocate.",
-      "Notițe de întâlnire AI (când prezentatorul le activează): conținut vorbit, capturi de ecran și rezumatul, păstrate până la ștergerea notițelor [TBD: retenție maximă].",
-      "Înregistrări de consimțământ: ora consimțământului și versiunea politicii, păstrate ca dovadă [TBD: perioada de retenție].",
+      "Minutele ședinței AI (dacă sunt activate de prezentator): Stochează enunțurile, capturile de ecran și rezumatele până la ștergerea minutelor ședinței [În așteptare: Master, perioada maximă de stocare].",
+      "Înregistrări de consimțământ: Stochează data consimțământului și versiunea politicii consimțite pentru dovezi [În așteptare: Master, perioada de stocare].",
       "Utilizare: numărul de cereri pe minut și timpul de procesare, utilizate pentru a impune limite de cost.",
       "Prezență: ora la care te-ai alăturat, ora la care ai fost ultima dată conectat, numele tău de afișare și numele tău de utilizator Pi sunt stocate și furnizate gazdei ca listă de prezență (pe ecran și ca descărcare CSV). Păstrate până la ștergerea seminarului.",
       "Întrebări și răspunsuri și sondaje: textul întrebării și numele de afișare al celui care a pus întrebarea (sau numele de utilizator Pi dacă nu există) sunt vizibile pentru fiecare participant. Voturile pozitive arată doar numărul, niciodată cine le-a dat. Voturile sondajului arată doar numărul pentru participanți; organizatorul și administratorii văd, pentru fiecare opțiune, numele de afișare (sau numele de utilizator Pi dacă nu există) al fiecărui votant. Păstrate, inclusiv întrebările ascunse, până la ștergerea seminarului."
@@ -904,14 +904,14 @@
     "recTitle": "Înregistrare",
     "rec": "Înregistrările sunt salvate doar ca fișier pe dispozitivul prezentatorului. Nu sunt încărcate pe serverele noastre sau transferate în străinătate. În timp ce înregistrarea sau notițele AI sunt active, fiecare participant vede un indicator.",
     "rightsTitle": "Drepturile tale",
-    "rights": "Poți solicita accesul, corectarea, ștergerea sau oprirea procesării informațiilor tale. Contact: [TBD: numele și contactul ofițerului de confidențialitate]"
+    "rights": "Puteți solicita accesul, corectarea, ștergerea și suspendarea prelucrării informațiilor dumneavoastră. Contact: [În așteptare: Master, Numele și contactul responsabilului cu protecția datelor]"
   },
   "notes": {
     "title": "Notițe",
     "back": "Înapoi la seminar",
     "loading": "Se încarcă…",
     "meta": "Notițe · {date} · {min} min",
-    "aiWarn": "Rezumat generat de AI — poate conține greșeli",
+    "aiWarn": "Rezumat generat de AI : poate conține greșeli",
     "points": "Puncte cheie",
     "decisions": "Decizii",
     "todos": "Acțiuni",
@@ -921,11 +921,11 @@
     "making": "Se creează notițele…",
     "makingLong": "Durează mai mult. Te rugăm să reîmprospătezi mai târziu",
     "recording": "Încă se înregistrează",
-    "failed": "Nu s-a putut crea rezumatul — transcrierea completă este mai jos",
+    "failed": "Nu s-a putut crea rezumatul. Transcripția completă este mai jos.",
     "retry": "Încearcă din nou",
     "finish": "Oprește înregistrarea și rezumă",
     "none": "Nimic aici",
-    "blank": "Nimic de rezumat — nu a fost înregistrată nicio vorbire sau a fost prea scurtă",
+    "blank": "Nu există conținut de rezumat. Nu a fost înregistrat niciun discurs sau a fost prea scurt.",
     "notFound": "Notițele nu au fost găsite",
     "forbidden": "Nu ai acces la aceste notițe",
     "shotAlt": "Captură de ecran la {at}",
@@ -938,7 +938,7 @@
     "delYes": "Șterge",
     "delNo": "Anulează",
     "delFail": "Nu s-a putut șterge",
-    "dlFail": "Nu s-a putut descărca — te rugăm să încerci din nou",
+    "dlFail": "Descărcare eșuată. Vă rugăm să atingeți din nou.",
     "recentNotes": "Notițe recente",
     "empty": "Încă nu există notițe",
     "newNote": "Începe notițe în persoană",
@@ -959,12 +959,12 @@
     "aiOff": "Notițele AI nu sunt disponibile momentan (este necesară configurarea serverului). Notițele anterioare sunt listate mai jos",
     "reload": "Reîncarcă",
     "unsupported": "Înregistrarea nu este disponibilă pe acest dispozitiv",
-    "micDenied": "Nu se poate utiliza microfonul — verifică permisiunea",
-    "limited": "Limita de timp de procesare a fost epuizată — finalizează și creează notițele",
-    "noAgr": "Oprit: nu există confirmare de notificare la înregistrare — finalizează și pornește din nou",
-    "micLost": "Microfonul s-a deconectat și înregistrarea s-a oprit — atinge Reconectează microfonul sau finalizează notița",
+    "micDenied": "Microfonul nu este disponibil. Vă rugăm să verificați permisiunile.",
+    "limited": "Limita de timp de procesare a fost atinsă. Vă rugăm să încheiați și să generați minutele ședinței.",
+    "noAgr": "Oprit din cauza lipsei înregistrării confirmării notificării. Vă rugăm să încheiați și să reporniți.",
+    "micLost": "Conexiunea microfonului a fost pierdută, înregistrarea a fost oprită. Vă rugăm să atingeți [Reconectați microfonul] sau să încheiați.",
     "micRetry": "Reconectează microfonul",
-    "gone": "Această notiță a fost finalizată sau ștearsă în altă parte, așa că înregistrarea s-a oprit — folosește butonul de mai jos pentru a deschide notițele",
+    "gone": "Această notă a fost încheiată sau ștearsă pe un alt ecran, așa că înregistrarea a fost oprită. Vă rugăm să verificați minutele ședinței folosind butonul de mai jos.",
     "finishing": "Se salvează ultimele cuvinte…",
     "st": {
       "RECORDING": "Înregistrare",
@@ -972,7 +972,7 @@
       "DONE": "Gata",
       "FAILED": "Eșuat"
     },
-    "downloadPiBrowser": "Descărcarea Markdown funcționează doar într-un browser obișnuit (computer sau mobil). Pi Browser nu poate salva fișiere — deschide aceste notițe într-un browser de computer sau telefon (seminarz.vercel.app)."
+    "downloadPiBrowser": "Descărcarea Markdown este disponibilă numai în browserele obișnuite (PC/mobil). Pi Browser nu poate salva fișiere. Vă rugăm să deschideți aceleași minute ale ședinței într-un browser de computer sau mobil (seminarz.vercel.app)."
   },
   "plan": {
     "title": "Planuri",
@@ -1010,7 +1010,7 @@
     "peers": "{n} / {cap} conectați",
     "producers": "{n} stream-uri",
     "end": "Se termină {time}",
-    "stale": "Seminarul s-a încheiat, dar camera este încă deschisă pe serverul video — închideți forțat.",
+    "stale": "Seminarul s-a încheiat, dar camerele au rămas pe serverul video. Vă rugăm să le închideți forțat.",
     "close": "Închide forțat",
     "confirmSeminar": "Aceasta încheie seminarul și închide camera. Toți participanții vor fi deconectați.",
     "confirmRoom": "Aceasta închide camera. Toți participanții vor fi deconectați.",
@@ -1063,7 +1063,7 @@
     "cancel": "Anulează",
     "saving": "Se salvează…",
     "done": "Aplicat. Timp {plan} rămas: {time}",
-    "invalid": "Introduceți o reducere între 1 minut și 1000 de ore (minute întregi 0–59).",
+    "invalid": "Introduceți o reducere între 1 minut și 1000 de ore (minute întregi 0~59).",
     "history": "Ajustări recente",
     "noHistory": "Nicio ajustare încă.",
     "histRow": "{at} · {plan} {delta} ({before} → {after}) · {by}",
