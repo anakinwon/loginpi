@@ -30,14 +30,12 @@ export default function Intro() {
   if (user) return null
   return (
     <div className="space-y-6">
-      {/* 머리 블록(흰 패널) — 왼쪽 2줄 제목, 오른쪽 6단계 키 흐름(이 화면의 빛나는 요소) */}
+      {/* 머리 블록(흰 패널) : 왼쪽 한 줄 제목, 오른쪽 6단계 키 흐름(이 화면의 빛나는 요소) */}
       <section className="panel grid gap-8 p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:p-10">
         <div>
           <p className="text-xs text-ink-3">{t('kicker')}</p>
           <h1 className="mt-2 text-2xl font-semibold text-ink lg:text-display">
             {t('headline1')}
-            <br />
-            {t('headline2')}
           </h1>
         </div>
         {/* lg 이상 = 키 가운데(번호 16 + 간격 8 + 키 절반 24 = 48px)를 잇는 1px 연결선, 양끝 = 첫·끝 칸 가운데 */}
