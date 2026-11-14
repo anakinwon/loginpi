@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<!-- pitel data 단계 소요 차이 분석 장표(지난 주말 4시간 43분 vs 2026-11-14 2시간 22분 50초) — 근거 = datagen 로그 2개·run-init 로그·컨테이너 설정, 공개 경로라 비밀·개인 경로 금지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pitel 적재 시간 차이 분석 — 4시간 43분 vs 2시간 23분</title>
+<style>
+  :root { --bg:#e9eaec; --paper:#fff; --ink:#1f2328; --sub:#59636e; --line:#d8dadd; --navy:#1f3864; --sky:#2e75b6; --org:#ed7d31; --old:#8c959f; --new:#2e75b6; --ok:#1a7f37; --warn:#9a6700; --red:#c62828; --band:#404040; --soft:#f2f4f7; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 'Malgun Gothic', system-ui, sans-serif }
+  .deck { max-width:1120px; margin:0 auto; padding:24px 12px 40px; display:grid; gap:22px }
+  .slide { background:var(--paper); aspect-ratio:16/9; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,.08); padding:30px 40px 22px; display:flex; flex-direction:column; position:relative; overflow:hidden }
+  .slide header { border-bottom:3px solid var(--navy); padding-bottom:8px; margin-bottom:14px; position:relative }
+  .slide header::after { content:''; position:absolute; left:0; bottom:-3px; width:90px; height:3px; background:var(--org) }
+  .crumb { position:absolute; right:0; top:-4px; font-size:11px; color:var(--sub); text-align:right; line-height:1.4 }
+  h1 { font-size:24px; margin:0; color:var(--navy) }
+  h2 { font-size:21px; margin:0; color:var(--navy) }
+  .gov { font-size:15px; color:var(--ink); margin:0 0 12px; font-weight:600 }
+  .gov b { color:var(--sky) }
+  .body { flex:1; display:grid; gap:14px; min-height:0 }
+  .c2 { grid-template-columns:1fr 1fr } .c3 { grid-template-columns:1.15fr .85fr }
+  .box { border:1px solid var(--line); border-radius:4px; overflow:hidden; display:flex; flex-direction:column }
+  .box > h3 { margin:0; background:var(--band); color:#fff; font-size:13.5px; padding:6px 12px; font-weight:800 }
+  .box > .in { padding:10px 14px; font-size:13.5px; flex:1 }
+  .finding { margin-top:12px; background:var(--soft); border-left:5px solid var(--sky); padding:8px 14px; font-size:14px }
+  .finding b { color:var(--navy) }
+  .src { font-size:11px; color:var(--sub); margin-top:8px }
+  table { width:100%; border-collapse:collapse; font-size:13px }
+  th, td { padding:5px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top }
+  th { background:var(--soft); color:var(--sub); font-weight:600 }
+  td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  .same { color:var(--ok); font-weight:700 } .diff { color:var(--org); font-weight:700 } .tbd { color:var(--red); font-weight:700 }
+  ul { margin:4px 0; padding-left:18px } li { margin:2px 0 }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+  .kpi { border:1px solid var(--line); border-radius:4px; padding:12px 14px; text-align:center }
+  .kpi .v { font-size:30px; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums }
+  .kpi .l { font-size:12px; color:var(--sub) }
+  .bars { display:grid; gap:4px; font-size:12px }
+  .bar { display:grid; grid-template-columns:190px 1fr 70px; align-items:center; gap:8px }
+  .track { height:10px; background:var(--soft); border-radius:3px; overflow:hidden }
+  .track i { display:block; height:100% }
+  .o i { background:var(--old) } .w i { background:var(--new) }
+  .cols { display:flex; align-items:flex-end; gap:8px; height:170px; padding:6px 4px 0; border-bottom:1px solid var(--sub) }
+  .col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; font-size:11px }
+  .col i { width:100%; background:var(--sky); border-radius:2px 2px 0 0 }
+  .col.hi i { background:var(--org) }
+  .col span { margin-bottom:3px; font-variant-numeric:tabular-nums }
+  .xl { display:flex; gap:8px; padding:3px 4px; font-size:11px; color:var(--sub) } .xl span { flex:1; text-align:center }
+  .tag { display:inline-block; font-size:11px; font-weight:700; padding:0 7px; border-radius:9px; margin-right:4px }
+  .t-h { background:#fde8d7; color:#b4520f } .t-m { background:#e3eefa; color:#1f5f99 } .t-l { background:#eef0f2; color:#59636e }
+  .pg { position:absolute; right:40px; bottom:10px; font-size:11px; color:var(--sub) }
+  .cover { justify-content:center; background:linear-gradient(135deg,#1f3864 0%,#2e5597 100%); color:#fff }
+  .cover h1 { color:#fff; font-size:34px; line-height:1.3 } .cover p { color:#dbe5f4; font-size:16px; margin:6px 0 }
+  .cover .big { font-size:52px; font-weight:800; margin:18px 0 6px; color:#fff } .cover .big small { font-size:22px; color:#f4b183 }
+  @media (max-width:760px) { .slide { aspect-ratio:auto; padding:22px 18px } .c2,.c3,.kpis { grid-template-columns:1fr } .crumb { display:none } .bar { grid-template-columns:110px 1fr 60px } }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- 1. 표지 -->
+  <section class="slide cover">
+    <p>pitel 샘플 DB 재구축 · data(생성·적재) 단계</p>
+    <h1>같은 코드·같은 노트북인데<br>왜 적재 시간이 절반이 되었나</h1>
+    <div class="big">4시간 43분 → 2시간 23분 <small>× 1.99 빨라짐</small></div>
+    <p>비교 대상 : 2026-11-07(토) 밤 포맷 전 실행 ↔ 2026-11-14(토) 포맷 직후 실행</p>
+    <p style="font-size:13px;margin-top:24px">근거 : datagen 로그 2개(조각 2,086개 시작·완료 시각) · run-init 로그(디스크 감시) · 컨테이너 기동 인자 · 백업 복구 가이드</p>
+  </section>
+
+  <!-- 2. 요약 -->
+  <section class="slide">
+    <header><h2>1. 요약 (1/1)</h2><div class="crumb">pitel 재구축<br>적재 시간 차이 분석<br>요약</div></header>
+    <p class="gov">조각 2,086개가 <b>하나도 빠짐없이 고르게 약 2배</b> 느렸다 → 코드·설정이 아니라 <b>호스트 실행 환경</b>이 원인</p>
+    <div class="body" style="grid-template-rows:auto 1fr">
+      <div class="kpis">
+        <div class="kpi"><div class="v">2.01×</div><div class="l">조각별 소요 비 중앙값 (지난 주말 ÷ 오늘)</div></div>
+        <div class="kpi"><div class="v">6.5만 → 12.9만</div><div class="l">초당 적재 행 수</div></div>
+        <div class="kpi"><div class="v">0건</div><div class="l">멈춤 공백(5분 이상) — 절전·중단 없음</div></div>
+      </div>
+      <div class="body c2">
+        <div class="box"><h3>확인된 사실</h3><div class="in"><ul>
+          <li>생성기·Postgres 설정 15개·동시 7·조각 2,086개·목표 행 = <span class="same">동일</span></li>
+          <li>하드웨어 = <span class="same">같은 노트북</span>(i7-1165G7 4코어 8스레드 · 메모리 15.7GB) · <code>.wslconfig</code> 둘 다 없음</li>
+          <li>느려짐은 특정 표·시간대 몰림이 아님 : 조각의 80%가 1.66~2.56배 범위</li>
+          <li>지난 주말은 뒤로 갈수록 더 느려짐 : 앞 10% 구간 1.62배 → 끝 20% 구간 2.3배</li>
+        </ul></div></div>
+        <div class="box"><h3>원인 판단</h3><div class="in"><ul>
+          <li><span class="tag t-h">높음</span>포맷 전 보안 계층 : 타사 백신(랜섬웨어 미끼 폴더 흔적)·DRM(.exs 암호화)이 디스크 쓰기를 가로챔 — 지금은 Windows 기본 보안만</li>
+          <li><span class="tag t-m">중간</span>Docker 디스크 상태 : 기존 데이터 220GB 가 찬 가상 디스크 + 후반 220→304GB 확장 — 오늘은 새 디스크</li>
+          <li><span class="tag t-l">낮음</span>Docker·WSL 버전 차이, 다른 컨테이너 동시 가동 <span class="tbd">[확인중]</span></li>
+        </ul></div></div>
+      </div>
+    </div>
+    <div class="finding"><b>시사점</b> — 다음 재구축 시간 기준은 <b>2시간 23분</b>(깨끗한 환경). 보안 프로그램을 다시 깔면 적재 전 해당 폴더 검사 제외를 먼저 확인한다.</div>
+    <div class="pg">2</div>
+  </section>
+
+  <!-- 3. 같은 것 / 다른 것 -->
+  <section class="slide">
+    <header><h2>2. 두 실행 조건 비교 (1/1)</h2><div class="crumb">pitel 재구축<br>적재 시간 차이 분석<br>조건 비교</div></header>
+    <p class="gov">결과에 영향을 줄 수 있는 조건을 모두 대조 — <b>바뀐 것은 Windows 위 환경뿐</b></p>
+    <div class="body">
+      <table>
+        <tr><th style="width:22%">항목</th><th style="width:30%">지난 주말 (11-07 21:37 ~ 11-08 02:21)</th><th style="width:30%">오늘 (11-14 08:19 ~ 10:42)</th><th>판정</th></tr>
+        <tr><td>생성기 코드·옵션</td><td>datagen <code>--scale 1 --jobs 7</code> (run-init 실행기)</td><td>같은 datagen <code>--scale 1 --jobs 7</code> (rebuild 실행기)</td><td class="same">동일</td></tr>
+        <tr><td>조각·목표 행</td><td>2,086개 · 1,101,170,707행</td><td>2,086개 · 1,101,170,707행</td><td class="same">동일</td></tr>
+        <tr><td>Postgres 설정</td><td colspan="2">postgres:17 · shared_buffers 2GB · wal_level logical · synchronous_commit off · max_wal_size 16GB · autovacuum 끔(적재 중) 등 15개</td><td class="same">동일</td></tr>
+        <tr><td>하드웨어</td><td colspan="2">같은 노트북 — i7-1165G7(4코어 8스레드) · 메모리 15.7GB · WSL 기본 한도(약 8GB)</td><td class="same">동일</td></tr>
+        <tr><td>전원·절전</td><td>실행기가 AC 절전·최대절전 해제</td><td>균형 조정 · 작업 중 절전 없음</td><td class="same">영향 없음</td></tr>
+        <tr><td>보안 프로그램</td><td>타사 백신(미끼 폴더 <code>C:\!!…</code>) + DRM(새 파일 .exs 암호화)</td><td>Windows Defender + 삼성 보안 지원만</td><td class="diff">다름</td></tr>
+        <tr><td>Docker 가상 디스크</td><td>시작 때 이미 220GB(다른 데이터 포함), 01:06 부터 확장 → 304GB</td><td>포맷 뒤 새로 만든 디스크</td><td class="diff">다름</td></tr>
+        <tr><td>Docker·WSL 버전</td><td><span class="tbd">[확인중 : 포맷 전 버전 기록 없음]</span></td><td>Docker 29.9.3 · WSL 3.0.5</td><td class="diff">다를 가능성</td></tr>
+        <tr><td>다른 컨테이너</td><td><span class="tbd">[확인중 : 가동 목록 기록 없음]</span></td><td>없음(샘플 DB 5종 중지)</td><td class="diff">다를 가능성</td></tr>
+        <tr><td>Claude 작업</td><td>1개 세션, 도구 20회 — 대부분 대기</td><td>1개 세션, 도구 17회</td><td class="same">영향 미미</td></tr>
+      </table>
+    </div>
+    <div class="src">※ 출처 : 컨테이너 기동 인자(<code>docker inspect</code>)·rebuild.mjs 설정 15개, run-init.log 사전점검·감시 줄, 백업 복구 가이드(백업 제외 항목), 작업 이력 로그</div>
+    <div class="pg">3</div>
+  </section>
+
+  <!-- 4. 조각별 분석 -->
+  <section class="slide">
+    <header><h2>3. 조각별 소요 비교 (1/2)</h2><div class="crumb">pitel 재구축<br>적재 시간 차이 분석<br>조각 분석</div></header>
+    <p class="gov">큰 표 상위 10개 모두 <b>1.5~2.0배</b> — 특정 표 문제가 아니라 <b>전체가 같은 비율로</b> 느렸다</p>
+    <div class="body c3">
+      <div class="box"><h3>표별 조각 소요 합계 (상위 10, 단위 분)</h3><div class="in bars">
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_pay_use_l</span><div><div class="track o"><i style="width:100%"></i></div><div class="track w" style="margin-top:2px"><i style="width:55%"></i></div></div><span>190 → 105</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_pay_chrg_calc_l</span><div><div class="track o"><i style="width:61%"></i></div><div class="track w" style="margin-top:2px"><i style="width:31%"></i></div></div><span>116 → 59</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_pay_raw_use_l</span><div><div class="track o"><i style="width:48%"></i></div><div class="track w" style="margin-top:2px"><i style="width:24%"></i></div></div><span>92 → 45</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_pay_bill_d</span><div><div class="track o"><i style="width:37%"></i></div><div class="track w" style="margin-top:2px"><i style="width:18%"></i></div></div><span>71 → 35</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_inv_rcv_allc_d</span><div><div class="track o"><i style="width:37%"></i></div><div class="track w" style="margin-top:2px"><i style="width:18%"></i></div></div><span>70 → 34</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_inv_rcv_m</span><div><div class="track o"><i style="width:34%"></i></div><div class="track w" style="margin-top:2px"><i style="width:17%"></i></div></div><span>65 → 32</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_col_unpd_d</span><div><div class="track o"><i style="width:33%"></i></div><div class="track w" style="margin-top:2px"><i style="width:19%"></i></div></div><span>62 → 36</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_col_unpd_stts_h</span><div><div class="track o"><i style="width:30%"></i></div><div class="track w" style="margin-top:2px"><i style="width:21%"></i></div></div><span>58 → 39</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_col_unpd_mm_t</span><div><div class="track o"><i style="width:26%"></i></div><div class="track w" style="margin-top:2px"><i style="width:15%"></i></div></div><span>50 → 29</span></div>
+        <div class="bar"><span style="font:11.5px ui-monospace,Consolas,monospace">ptl_col_dun_sndng_rslt_l</span><div><div class="track o"><i style="width:22%"></i></div><div class="track w" style="margin-top:2px"><i style="width:14%"></i></div></div><span>41 → 27</span></div>
+        <div style="font-size:11px;color:var(--sub)"><span style="display:inline-block;width:10px;height:10px;background:var(--old)"></span> 지난 주말 &nbsp; <span style="display:inline-block;width:10px;height:10px;background:var(--new)"></span> 오늘 — 동시 7 이라 합계는 실제 경과 시간의 약 7배</div>
+      </div></div>
+      <div class="box"><h3>분포 (5초 이상 조각 1,069개)</h3><div class="in">
+        <table>
+          <tr><th>지표</th><th class="n">값</th></tr>
+          <tr><td>조각 소요 합계</td><td class="n">33.1시간 → 16.6시간</td></tr>
+          <tr><td>합계 비</td><td class="n">1.99배</td></tr>
+          <tr><td>조각 비 하위 10%</td><td class="n">1.66배</td></tr>
+          <tr><td>조각 비 중앙값</td><td class="n">2.01배</td></tr>
+          <tr><td>조각 비 상위 10%</td><td class="n">2.56배</td></tr>
+          <tr><td>최대 공백(지난 주말)</td><td class="n">254초</td></tr>
+          <tr><td>최대 공백(오늘)</td><td class="n">144초</td></tr>
+        </table>
+        <p style="margin:10px 0 0">공백이 4분 남짓이라 <b>절전·일시 정지로 잃은 시간은 없다</b>. 2배는 처리 속도 자체가 반이었다는 뜻.</p>
+      </div></div>
+    </div>
+    <div class="finding"><b>Key Finding</b> — 조각 80%가 1.66~2.56배 안에 몰림 = 모든 쓰기에 <b>같은 비율의 추가 비용</b>이 붙었다 (표 구조·데이터 편향과 무관)</div>
+    <div class="pg">4</div>
+  </section>
+
+  <!-- 5. 시간 흐름 -->
+  <section class="slide">
+    <header><h2>3. 조각별 소요 비교 (2/2)</h2><div class="crumb">pitel 재구축<br>적재 시간 차이 분석<br>시간 흐름</div></header>
+    <p class="gov">지난 주말은 <b>뒤로 갈수록 더 느려졌다</b> — 후반 가상 디스크 확장 구간에서 2.3배까지</p>
+    <div class="body c3">
+      <div class="box"><h3>지난 주말 경과 구간별 조각 비 중앙값 (지난 주말 ÷ 오늘)</h3><div class="in">
+        <div class="cols">
+          <div class="col"><span>1.62</span><i style="height:66%"></i></div>
+          <div class="col"><span>1.81</span><i style="height:74%"></i></div>
+          <div class="col"><span>1.95</span><i style="height:80%"></i></div>
+          <div class="col"><span>2.08</span><i style="height:85%"></i></div>
+          <div class="col"><span>1.99</span><i style="height:81%"></i></div>
+          <div class="col"><span>2.06</span><i style="height:84%"></i></div>
+          <div class="col"><span>2.03</span><i style="height:83%"></i></div>
+          <div class="col"><span>2.11</span><i style="height:86%"></i></div>
+          <div class="col hi"><span>2.35</span><i style="height:96%"></i></div>
+          <div class="col hi"><span>2.26</span><i style="height:92%"></i></div>
+        </div>
+        <div class="xl"><span>0~10%</span><span>10~</span><span>20~</span><span>30~</span><span>40~</span><span>50~</span><span>60~</span><span>70~</span><span>80~</span><span>90~100%</span></div>
+        <p style="margin:8px 0 0;font-size:12.5px">주황 = 가상 디스크(vhdx) 확장 구간(01:06 이후 220.1 → 304.5GB)</p>
+      </div></div>
+      <div class="box"><h3>지난 주말 디스크 감시 기록 (run-init)</h3><div class="in">
+        <table>
+          <tr><th>시각</th><th class="n">DB</th><th class="n">vhdx</th></tr>
+          <tr><td>21:37</td><td class="n">0 GB</td><td class="n">220.1 GB</td></tr>
+          <tr><td>22:36</td><td class="n">36.1 GB</td><td class="n">220.1 GB</td></tr>
+          <tr><td>23:36</td><td class="n">76.6 GB</td><td class="n">220.1 GB</td></tr>
+          <tr><td>00:36</td><td class="n">109.2 GB</td><td class="n">220.1 GB</td></tr>
+          <tr><td>01:06</td><td class="n">127.1 GB</td><td class="n">232.0 GB</td></tr>
+          <tr><td>02:06</td><td class="n">166.9 GB</td><td class="n">270.9 GB</td></tr>
+        </table>
+        <p style="margin:8px 0 0;font-size:12.5px">DB 증가 속도 : 지난 주말 <b>시간당 약 38GB</b> ↔ 오늘 <b>시간당 약 65GB</b></p>
+      </div></div>
+    </div>
+    <div class="finding"><b>Key Finding</b> — 앞쪽(디스크 확장 전)에도 이미 1.6~2.0배 → 디스크 확장은 <b>후반 가중 요인</b>일 뿐, 주원인은 처음부터 있던 다른 비용</div>
+    <div class="pg">5</div>
+  </section>
+
+  <!-- 6. 원인 -->
+  <section class="slide">
+    <header><h2>4. 원인 분석 (1/1)</h2><div class="crumb">pitel 재구축<br>적재 시간 차이 분석<br>원인</div></header>
+    <p class="gov">처음부터 일정하게 2배 = <b>모든 디스크 쓰기에 붙는 고정 비용</b> → 보안 계층이 가장 유력</p>
+    <div class="body">
+      <table>
+        <tr><th style="width:20%">후보 원인</th><th style="width:40%">근거</th><th style="width:28%">들어맞는 정도</th><th>가능성</th></tr>
+        <tr><td>① 보안 계층<br>(타사 백신 실시간 검사 + DRM)</td><td>포맷 전 PC 에 랜섬웨어 미끼 폴더를 만드는 타사 백신과 새 파일을 .exs 로 암호화하는 DRM 이 있었다. 둘 다 파일 쓰기마다 끼어드는 필터 드라이버 방식 — Docker 가상 디스크(vhdx) 쓰기 수백 GB 가 전부 통과</td><td>처음부터 일정한 2배, 표·조각 구분 없이 균일 — 쓰기당 고정 비용 모양과 일치</td><td><span class="tag t-h">높음</span></td></tr>
+        <tr><td>② Docker 디스크 상태</td><td>시작 때 220GB 가 이미 찬 가상 디스크(다른 데이터·지운 데이터 공간 재사용), 후반엔 디스크 확장(+84GB) 동반</td><td>후반 2.3배 상승은 설명, 초반 1.6배는 설명 못 함</td><td><span class="tag t-m">중간</span></td></tr>
+        <tr><td>③ Docker·WSL 버전</td><td>포맷 뒤 최신판(Docker 29.9.3·WSL 3.0.5) 설치. 포맷 전 버전 <span class="tbd">[확인중]</span></td><td>입출력 경로 개선 가능성은 있으나 2배를 혼자 설명하긴 큼</td><td><span class="tag t-l">낮음~중간</span></td></tr>
+        <tr><td>④ 다른 컨테이너 동시 가동</td><td>Docker 데이터 390GB(백업 제외 항목) — 다른 컨테이너가 있었음. 그날 가동 여부 <span class="tbd">[확인중]</span></td><td>가동 중이었다면 CPU·메모리 경쟁으로 일정 비율 감속 가능</td><td><span class="tag t-l">낮음~중간</span></td></tr>
+        <tr><td>⑤ 코드·설정·하드웨어·절전</td><td>설정 15개·동시 7·조각 계획 동일, 같은 노트북, 4분 넘는 공백 없음</td><td>배제</td><td><span class="tag t-l">없음</span></td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>판단</b> — ①이 주원인, ②가 후반 가중. ③·④는 기록이 없어 단정 불가 <span class="tbd">[확인중 : 아래 재현 시험으로 확정]</span></div>
+    <div class="pg">6</div>
+  </section>
+
+  <!-- 7. 시사점 -->
+  <section class="slide">
+    <header><h2>5. 시사점·후속 조치 (1/1)</h2><div class="crumb">pitel 재구축<br>적재 시간 차이 분석<br>시사점</div></header>
+    <p class="gov">재구축 기준 시간을 <b>2시간 23분(data)·3시간 37분(전체)</b>으로 바꾸고, 보안 프로그램 재설치 때 <b>Docker 경로 검사 제외</b>를 지킨다</p>
+    <div class="body c2">
+      <div class="box"><h3>운영 기준</h3><div class="in"><ul>
+        <li>REBUILD.md 예상 시간 : data 2시간 23분 · 전체 3시간 37분 (깨끗한 환경 실측)</li>
+        <li>적재 중에는 다른 컨테이너를 멈춘다 (오늘 조건 = 기준 조건)</li>
+        <li>백신·DRM 을 다시 설치하면 실시간 검사 제외에 Docker 데이터 폴더(<code>%LOCALAPPDATA%\Docker\wsl</code>)를 등록 — 회사 정책상 불가하면 기준 시간 × 2 로 잡는다</li>
+        <li>가상 디스크는 데이터를 지워도 줄지 않는다 — 큰 적재 전 디스크 정리(압축) 여부 확인</li>
+      </ul></div></div>
+      <div class="box"><h3>원인 확정용 재현 시험 (선택)</h3><div class="in">
+        <table>
+          <tr><th>시험</th><th>방법</th><th>보는 것</th></tr>
+          <tr><td>A. 컨테이너 경쟁</td><td>배율 0.01 을 샘플 DB 5종 켠 채 / 끈 채 각 1회</td><td>소요 비</td></tr>
+          <tr><td>B. 보안 계층</td><td>보안 프로그램 설치 후 검사 제외 없이 / 있이 배율 0.01</td><td>소요 비</td></tr>
+          <tr><td>C. 디스크 확장</td><td>새 가상 디스크 vs 꽉 찬 디스크에서 배율 0.01</td><td>후반 감속</td></tr>
+        </table>
+        <p style="margin:8px 0 0;font-size:12.5px">배율 0.01 은 약 1,100만 행 · 수십 분이면 끝나, 한 번에 한 조건만 바꿔 비교 가능</p>
+      </div></div>
+    </div>
+    <div class="finding"><b>결론</b> — 이번 단축은 생성기 개선이 아니라 <b>포맷으로 사라진 보안 계층·오래된 디스크 비용</b>이다. 같은 성능은 같은 환경 조건이 지켜질 때만 재현된다.</div>
+    <div class="pg">7</div>
+  </section>
+
+</div>
+</body>
+</html>
