@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- PC 포맷 뒤 개발 환경 복원 현황판 — 정적 스냅샷(2026-11-14), 값은 손으로 갱신. 공개 경로라 비밀번호·키·개인 경로 금지 -->
+<!-- PC 포맷 뒤 개발 환경 복원 현황판 : 정적 스냅샷(2026-11-14), 값은 손으로 갱신. 공개 경로라 비밀번호·키·개인 경로 금지 -->
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Restore 현황판 — 포맷 뒤 개발 환경 복원</title>
+<title>Restore 현황판 : 포맷 뒤 개발 환경 복원</title>
 <style>
   :root { --bg:#f7f7f5; --card:#fff; --ink:#1f2328; --sub:#59636e; --line:#e3e3df; --ok:#1a7f37; --okbg:#e6f4ea; --warn:#9a6700; --warnbg:#fff4d6; --off:#59636e; --offbg:#eef0f2; --bad:#c62828; }
   @media (prefers-color-scheme: dark) { :root { --bg:#111315; --card:#1a1d21; --ink:#e6e8eb; --sub:#9aa3ad; --line:#2c3137; --ok:#4ac26b; --okbg:#12301c; --warn:#d4a72c; --warnbg:#33290d; --off:#9aa3ad; --offbg:#24282d; --bad:#ff6b6b; } }
@@ -66,10 +66,10 @@
     <h2>2. MCP 서버</h2>
     <table>
       <tr><th>서버</th><th>상태</th><th>비고</th></tr>
-      <tr><td>exa · context7 · serena · playwright · sequential-thinking · gemini · filesystem · shadcn · ruflo · ecc-memory-vault · agentmemory · rea</td><td><span class="b ok">연결</span></td><td>—</td></tr>
+      <tr><td>exa · context7 · serena · playwright · sequential-thinking · gemini · filesystem · shadcn · ruflo · ecc-memory-vault · agentmemory · rea</td><td><span class="b ok">연결</span></td><td>-</td></tr>
       <tr><td>vercel · supabase</td><td><span class="b ok">로그인 완료</span></td><td>OAuth 인증(2026-11-14)</td></tr>
-      <tr><td>github</td><td><span class="b warn">재시작 대기</span></td><td>환경변수 <code>GITHUB_MCP_PAT</code> 설정 완료 — Claude Code 재시작 뒤 연결</td></tr>
-      <tr><td>sentry · cloudinary</td><td><span class="b off">미사용</span></td><td>앱 코드에서 쓰지 않음(오류 수집·이미지 CDN) — 연결 불필요</td></tr>
+      <tr><td>github</td><td><span class="b warn">재시작 대기</span></td><td>환경변수 <code>GITHUB_MCP_PAT</code> 설정 완료, Claude Code 재시작 뒤 연결</td></tr>
+      <tr><td>sentry · cloudinary</td><td><span class="b off">미사용</span></td><td>앱 코드에서 쓰지 않음(오류 수집·이미지 CDN), 연결 불필요</td></tr>
     </table>
   </section>
 
@@ -85,7 +85,7 @@
       <tr><td>oracle21c</td><td>oracle21c</td><td class="n">1521</td><td>가이드 실습(SID ORCLCDB)</td><td><span class="b ok">가동</span></td></tr>
     </table>
     <ul>
-      <li>샘플 5종은 pitel 재구축 동안 중지했다가 15:20 재기동 — 6개 동시 가동 메모리 약 5 GB / 7.6 GB(oracle21c 2.0 · pitel-pg 2.0 · sql-server 0.7), pitel 대량 조회 때 부족하면 <code>docker stop oracle21c</code> 먼저</li>
+      <li>샘플 5종은 pitel 재구축 동안 중지했다가 15:20 재기동. 6개 동시 가동 메모리 약 5 GB / 7.6 GB(oracle21c 2.0 · pitel-pg 2.0 · sql-server 0.7), pitel 대량 조회 때 부족하면 <code>docker stop oracle21c</code> 먼저</li>
       <li>포트 55432~55439 는 Windows 동적 예약과 겹쳐 관리자 예약(<code>excludedportrange</code>)으로 고정</li>
     </ul>
   </section>
@@ -95,7 +95,7 @@
     <p class="meta" style="margin:0 0 8px">2026-11-14 08:19:24 → 11:55:54 · 막대 = 지난 주말 최장 단계(data 4시간 43분) 대비 · data 단계가 절반으로 줄어든 이유는 <a href="differ.html">분석 장표</a> 참조</p>
     <table>
       <tr><th>단계</th><th>이번</th><th></th><th>지난 주말</th><th></th></tr>
-      <tr><td>container·db·ddl</td><td class="n">7초</td><td><div class="bar"><i style="width:0.1%"></i></div></td><td class="n">—</td><td></td></tr>
+      <tr><td>container·db·ddl</td><td class="n">7초</td><td><div class="bar"><i style="width:0.1%"></i></div></td><td class="n">-</td><td></td></tr>
       <tr><td>data (생성·적재)</td><td class="n">2시간 22분 50초</td><td><div class="bar"><i style="width:50.5%"></i></div></td><td class="n">4시간 43분</td><td><div class="bar old"><i style="width:100%"></i></div></td></tr>
       <tr><td>constraints (PK·인덱스 532)</td><td class="n">44분 24초</td><td><div class="bar"><i style="width:15.7%"></i></div></td><td class="n">1시간 15분</td><td><div class="bar old"><i style="width:26.5%"></i></div></td></tr>
       <tr><td>analyze</td><td class="n">8분 34초</td><td><div class="bar"><i style="width:3%"></i></div></td><td class="n">13분</td><td><div class="bar old"><i style="width:4.6%"></i></div></td></tr>
@@ -109,7 +109,7 @@
       <tr><td>인덱스(PK + 보조) · 무효</td><td class="n">532 · 0</td><td class="n">532 · 0</td><td><span class="b ok">일치</span></td></tr>
       <tr><td>DEFAULT 파티션 행</td><td class="n">0</td><td class="n">0</td><td><span class="b ok">일치</span></td></tr>
       <tr><td>FK 고아 비율(434개 FK)</td><td class="n">0.039%</td><td class="n">약 0.05%</td><td><span class="b ok">통과</span></td></tr>
-      <tr><td>DB 크기</td><td class="n">264 GB</td><td class="n">—</td><td>—</td></tr>
+      <tr><td>DB 크기</td><td class="n">264 GB</td><td class="n">-</td><td>-</td></tr>
     </table>
   </section>
 
@@ -117,10 +117,10 @@
     <h2>5. 남은 조치</h2>
     <table>
       <tr><th>할 일</th><th>담당</th><th>상태</th></tr>
-      <tr><td>github MCP — Claude Code 재시작 뒤 <code>claude mcp list</code> 로 연결 확인</td><td>마스터</td><td><span class="b warn">대기</span></td></tr>
+      <tr><td>github MCP : Claude Code 재시작 뒤 <code>claude mcp list</code> 로 연결 확인</td><td>마스터</td><td><span class="b warn">대기</span></td></tr>
       <tr><td>vercel·supabase MCP OAuth 로그인</td><td>마스터</td><td><span class="b ok">완료</span></td></tr>
-      <tr><td>schema.pi 운영 메타 적재(loader) — pitel <code>REBUILD.md</code> 8절</td><td>마스터 직접</td><td><span class="b warn">대기</span></td></tr>
-      <tr><td>샘플 DB 5종 재기동</td><td>—</td><td><span class="b ok">완료</span></td></tr>
+      <tr><td>schema.pi 운영 메타 적재(loader) : pitel <code>REBUILD.md</code> 8절</td><td>마스터 직접</td><td><span class="b warn">대기</span></td></tr>
+      <tr><td>샘플 DB 5종 재기동</td><td>-</td><td><span class="b ok">완료</span></td></tr>
     </table>
   </section>
 
