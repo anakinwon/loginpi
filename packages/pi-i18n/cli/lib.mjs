@@ -167,11 +167,24 @@ const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 export const hasTerm = (text, term, inflect = false) =>
   new RegExp(`(?<![A-Za-z])${esc(term)}${inflect ? '' : '(?![A-Za-z])'}`).test(String(text))
 
+// 화면 문구 줄표(— –) 금지(docs/REPORT_STANDARD.md 3절) : 번역 결과를 이 규칙으로 고친다
+//  한 글자 값 → '-', 숫자 사이 → '~', 맨 앞 → ': ', 나머지 → ' : '
+export function normDash(s) {
+  if (typeof s !== 'string' || !/[—–]/.test(s)) return s
+  if (/^\s*[—–]\s*$/.test(s)) return '-'
+  return s
+    .replace(/(\d)\s*[—–]\s*(\d)/g, '$1~$2')
+    .replace(/^\s*[—–]\s*/, ': ')
+    .replace(/\s*[—–]\s*/g, ' : ')
+    .replace(/ {2,}/g, ' ')
+}
+
 // 키 1개 검사 → { errors: string[], warnings: string[] } (translate 는 둘 다 탈락, validate 는 errors 만 오류)
 export function checkValue(koText, text, locale, glossary, numericArgs = BASE_NUMERIC_ARGS) {
   const errors = []
   const warnings = []
   if (typeof text !== 'string' || text === '') return { errors: ['빈 값'], warnings }
+  if (/[—–]/.test(text)) errors.push('줄표(— –) 금지')
   let koShape = null
   try {
     koShape = icuShape(koText)

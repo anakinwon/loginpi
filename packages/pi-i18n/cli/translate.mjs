@@ -5,7 +5,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { expand } from './expand.mjs'
-import { checkValue, findGeminiKey, flatten, getInfo, hash, loadConfig, parseArgs, pickLocales, readJson, rebuild, sourceFile } from './lib.mjs'
+import { checkValue, normDash, findGeminiKey, flatten, getInfo, hash, loadConfig, parseArgs, pickLocales, readJson, rebuild, sourceFile } from './lib.mjs'
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
@@ -22,6 +22,7 @@ function systemPrompt(glossary, numericArgs) {
     '5. Keep code identifiers (snake_case, camelCase, text in backticks), URLs and e-mail addresses unchanged.',
     '6. These are short UI labels and messages: write natural, concise text. Korean loanwords from English should become the natural term in the target language (or the English original).',
     '7. Output must not contain any Korean characters.',
+    '8. Never use the em dash (—) or en dash (–). Use a colon, comma or period instead, and "~" for ranges.',
   ].join('\n')
 }
 
@@ -141,6 +142,7 @@ export async function run(argv, cwd = process.cwd()) {
         }
         let ok = 0
         for (const k of keys) {
+          out[k] = normDash(out[k])
           const { errors, warnings } = checkValue(koFlat[k], out[k], locale, cfg.glossary, cfg.numericArgs)
           if (errors.length || warnings.length) {
             summary[locale].rejected++

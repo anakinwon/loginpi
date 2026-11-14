@@ -2,7 +2,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { deepMerge } from '../src/merge.ts'
-import { CATALOG, checkValue, flatten, hasTerm, LOCALE_LANG, rebuild, resolveLanguages, resolveLocales, ROUTING } from '../cli/lib.mjs'
+import { CATALOG, checkValue, normDash, flatten, hasTerm, LOCALE_LANG, rebuild, resolveLanguages, resolveLocales, ROUTING } from '../cli/lib.mjs'
 
 test('카탈로그 : 67개 · 코드 중복 없음 · 필드 완비 · 상위 순서 고정 · RTL 6개', () => {
   assert.equal(CATALOG.length, 67)
@@ -263,4 +263,16 @@ test('routes : /api/i18n/countries 는 스냅숏을 loginpi 와 같은 모양으
   const body = await countriesGET().json()
   assert.deepEqual(Object.keys(body), ['locales', 'countries'])
   assert.deepEqual(body.locales, readData('locales.json'))
+})
+
+test('normDash : 줄표를 쌍점·물결·하이픈으로 바꾸고 checkValue 는 줄표를 오류로 잡는다', () => {
+  assert.equal(normDash('—'), '-')
+  assert.equal(normDash('10:00–19:00'), '10:00~19:00')
+  assert.equal(normDash('{from}–{to}'), '{from} : {to}')
+  assert.equal(normDash('Plan — pay per unit'), 'Plan : pay per unit')
+  assert.equal(normDash('— pay per unit'), ': pay per unit')
+  assert.equal(normDash('1–3 days'), '1~3 days')
+  assert.equal(normDash('no dash'), 'no dash')
+  assert.ok(checkValue('가', 'a — b', 'en', []).errors.includes('줄표(— –) 금지'))
+  assert.deepEqual(checkValue('가', 'a : b', 'en', []).errors, [])
 })
