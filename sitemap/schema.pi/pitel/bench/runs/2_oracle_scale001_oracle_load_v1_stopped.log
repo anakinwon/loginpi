@@ -1,0 +1,23 @@
+조각 214개(완료 건너뜀 0) · 테이블 214 · 목표 12,170,698행 · 동시 6
+시작 ptl_col_unpd_m:all 2026-11-15T00:12:33.268Z
+시작 ptl_col_unpd_d:all 2026-11-15T00:12:33.274Z
+시작 ptl_col_ovdu_adchg_l:all 2026-11-15T00:12:33.280Z
+시작 ptl_col_dun_l:all 2026-11-15T00:12:33.286Z
+시작 ptl_col_susp_m:all 2026-11-15T00:12:33.292Z
+시작 ptl_col_exoftrmn_m:all 2026-11-15T00:12:33.298Z
+완료 ptl_col_exoftrmn_m:all 2026-11-15T00:12:58.387Z
+시작 ptl_col_rcvb_trnsf_m:all 2026-11-15T00:12:58.388Z
+완료 ptl_col_rcvb_trnsf_m:all 2026-11-15T00:13:09.899Z
+시작 ptl_col_div_pay_agrmt_m:all 2026-11-15T00:13:09.899Z
+완료 ptl_col_div_pay_agrmt_m:all 2026-11-15T00:13:22.489Z
+시작 ptl_col_bddt_m:all 2026-11-15T00:13:22.490Z
+완료 ptl_col_susp_m:all 2026-11-15T00:13:43.745Z
+시작 ptl_col_unpd_stts_h:all 2026-11-15T00:13:43.745Z
+완료 ptl_col_bddt_m:all 2026-11-15T00:13:57.066Z
+시작 ptl_col_ovdu_adchg_std_c:all 2026-11-15T00:13:57.066Z
+완료 ptl_col_ovdu_adchg_std_c:all 2026-11-15T00:13:57.448Z
+시작 ptl_col_dun_plcy_m:all 2026-11-15T00:13:57.448Z
+완료 ptl_col_dun_plcy_m:all 2026-11-15T00:14:02.208Z
+시작 ptl_col_dun_sndng_rslt_l:all 2026-11-15T00:14:02.209Z
+실패 ptl_col_unpd_m:all : sqlplus 종료 코드 1
+시작 ptl_col_susp_h:all 2026-11-15T00:15:03.715Z

@@ -1,0 +1,2251 @@
+{
+  "at": "2026-11-15T01:46:42.691Z",
+  "sec": 2224.308,
+  "tables": 214,
+  "rows": 12170698,
+  "sameTables": 106,
+  "diffTables": [
+    "PTL_COL_OVDU_ADCHG_L",
+    "PTL_COL_UNPD_M",
+    "PTL_COL_DUN_L",
+    "PTL_COL_BDDT_M",
+    "PTL_COL_UNPD_D",
+    "PTL_COL_EXOFTRMN_PRNTC_L",
+    "PTL_COL_DUN_SNDNG_RSLT_L",
+    "PTL_COL_SUSP_H",
+    "PTL_COL_COLL_RTRVL_L",
+    "PTL_COL_UNPD_STTS_H",
+    "PTL_COL_CRINFO_REG_L",
+    "PTL_COL_PAY_PRMS_L",
+    "PTL_COL_CRINFO_RLS_L",
+    "PTL_COL_RCVB_DSPSL_L",
+    "PTL_COL_DIV_PAY_TMS_D",
+    "PTL_COL_RCVB_PRSCR_H",
+    "PTL_CUS_INDV_CUST_D",
+    "PTL_CUS_CUST_CNTC_D",
+    "PTL_CUS_CUST_GRD_H",
+    "PTL_COL_UNPD_MM_T",
+    "PTL_CUS_CUST_H",
+    "PTL_CUS_CUST_AGRE_L",
+    "PTL_CUS_BILL_ACNT_H",
+    "PTL_CUS_CUST_CNTC_H",
+    "PTL_CUS_CUST_ADDR_H",
+    "PTL_CUS_AGRE_ITM_C",
+    "PTL_CUS_CUST_AGRE_H",
+    "PTL_CUS_CUST_MBSP_M",
+    "PTL_CUS_CUST_CVLCPT_L",
+    "PTL_CUS_MBSP_POINT_L",
+    "PTL_CUS_ZIP_M",
+    "PTL_CUS_CUST_CNSL_L",
+    "PTL_INV_ATRF_APLY_L",
+    "PTL_INV_PAY_MTHD_M",
+    "PTL_INV_VACCT_M",
+    "PTL_INV_OVPAY_M",
+    "PTL_INV_RCV_M",
+    "PTL_INV_BANK_C",
+    "PTL_INV_CARD_CO_C",
+    "PTL_INV_RCV_ALLC_D",
+    "PTL_INV_PAY_MTHD_H",
+    "PTL_INV_ATRF_WDRW_RSLT_L",
+    "PTL_INV_CARD_ATMT_PAY_APRV_L",
+    "PTL_INV_UNIDNTF_DPST_L",
+    "PTL_INV_GIRO_RCV_L",
+    "PTL_INV_RFND_ACCT_D",
+    "PTL_INV_RCV_AGT_INST_M",
+    "PTL_INV_ATRF_WDRW_REQ_L",
+    "PTL_INV_PRPAY_USE_L",
+    "PTL_INV_RCV_DD_T",
+    "PTL_INV_RCV_AGT_FEE_L",
+    "PTL_INV_CASH_RCIPT_PBLCN_L",
+    "PTL_INV_RCV_MM_S",
+    "PTL_ORD_SBSC_CTRT_M",
+    "PTL_ORD_SBSC_APLY_M",
+    "PTL_ORD_LINE_M",
+    "PTL_ORD_SVC_NO_M",
+    "PTL_ORD_MNP_APLY_M",
+    "PTL_ORD_AGRMT_CTRT_M",
+    "PTL_ORD_SBSC_DOC_L",
+    "PTL_ORD_SBSC_PROD_M",
+    "PTL_ORD_LINE_STTS_H",
+    "PTL_ORD_SBSC_CTRT_H",
+    "PTL_ORD_LINE_CHG_H",
+    "PTL_ORD_OPNG_PRCS_L",
+    "PTL_ORD_SUBSD_APLCN_L",
+    "PTL_ORD_ADSVC_APLY_L",
+    "PTL_ORD_AGRMT_CTRT_H",
+    "PTL_ORD_LINE_EQP_R",
+    "PTL_ORD_USIM_CHG_L",
+    "PTL_ORD_SBSC_PROD_H",
+    "PTL_ORD_MNP_H",
+    "PTL_ORD_TRMN_APLY_L",
+    "PTL_ORD_SVC_NO_H",
+    "PTL_PAY_RAW_USE_L",
+    "PTL_PAY_USE_QTY_MM_T",
+    "PTL_PAY_BILL_M",
+    "PTL_PAY_BILL_TAX_D",
+    "PTL_PAY_USE_QTY_ERR_L",
+    "PTL_PAY_USE_L",
+    "PTL_PAY_BSCPRVD_EXHST_L",
+    "PTL_PAY_USE_QTY_DD_T",
+    "PTL_PAY_CHRG_CALC_H",
+    "PTL_PAY_CHRG_CALC_L",
+    "PTL_PAY_PNLT_IMPS_L",
+    "PTL_PAY_DSCNT_APLCN_L",
+    "PTL_PAY_CMBN_DSCNT_ALLC_L",
+    "PTL_PAY_EQP_INSTL_BILL_D",
+    "PTL_PAY_BILL_DDLN_H",
+    "PTL_PAY_MCPAY_BILL_D",
+    "PTL_PAY_CNTS_UTLZ_CHRG_L",
+    "PTL_PAY_INVC_PBLCN_L",
+    "PTL_PAY_CHRG_ITM_MM_S",
+    "PTL_PAY_BILL_JOB_STEP_H",
+    "PTL_PAY_BILL_ACNT_MM_T",
+    "PTL_PRD_RTPLN_M",
+    "PTL_PRD_ADSVC_M",
+    "PTL_PAY_BILL_D",
+    "PTL_PRD_PBANC_SUBSD_H",
+    "PTL_PRM_PRTNR_M",
+    "PTL_PRM_SHOP_M",
+    "PTL_PRM_TXINV_M",
+    "PTL_PRM_STLM_M",
+    "PTL_PRM_ORG_H",
+    "PTL_PRM_USIM_STCK_L",
+    "PTL_PRM_EQP_STCK_L",
+    "PTL_PRM_STLM_GIVE_L",
+    "PTL_PRM_STLM_CFMTN_H"
+  ],
+  "diffCols": [
+    "PTL_COL_OVDU_ADCHG_L.ADCHG_IMPS_DTM",
+    "PTL_COL_UNPD_M.UNPD_OCRN_DTM",
+    "PTL_COL_UNPD_M.CMPLPAY_DTM",
+    "PTL_COL_DUN_L.DUN_SNDNG_DTM",
+    "PTL_COL_DUN_L.SNDNG_RSLT_RCPTN_DTM",
+    "PTL_COL_BDDT_M.BDDT_DPRC_DTM",
+    "PTL_COL_UNPD_D.LAST_RCV_RFLT_DTM",
+    "PTL_COL_EXOFTRMN_PRNTC_L.EXOFTRMN_PRNTC_DTM",
+    "PTL_COL_DUN_SNDNG_RSLT_L.DUN_SNDNG_DTM",
+    "PTL_COL_DUN_SNDNG_RSLT_L.SNDNG_RSLT_RCPTN_DTM",
+    "PTL_COL_SUSP_H.VLD_BGNG_DTM",
+    "PTL_COL_SUSP_H.VLD_END_DTM",
+    "PTL_COL_COLL_RTRVL_L.COLL_RTRVL_DTM",
+    "PTL_COL_UNPD_STTS_H.STTS_CHG_DTM",
+    "PTL_COL_UNPD_STTS_H.VLD_BGNG_DTM",
+    "PTL_COL_UNPD_STTS_H.VLD_END_DTM",
+    "PTL_COL_CRINFO_REG_L.CRINFO_REG_DTM",
+    "PTL_COL_CRINFO_REG_L.REG_PRNTC_DTM",
+    "PTL_COL_PAY_PRMS_L.PAY_PRMS_DTM",
+    "PTL_COL_CRINFO_RLS_L.CRINFO_RLS_DTM",
+    "PTL_COL_RCVB_DSPSL_L.RCVB_DSPSL_DTM",
+    "PTL_COL_DIV_PAY_TMS_D.PAY_CMPTN_DTM",
+    "PTL_COL_RCVB_PRSCR_H.VLD_BGNG_DTM",
+    "PTL_COL_RCVB_PRSCR_H.VLD_END_DTM",
+    "PTL_CUS_INDV_CUST_D.INDV_CUST_REG_DTM",
+    "PTL_CUS_CUST_CNTC_D.CNTC_REG_DTM",
+    "PTL_CUS_CUST_GRD_H.GRD_ASMT_DTM",
+    "PTL_COL_UNPD_MM_T.AGG_DTM",
+    "PTL_CUS_CUST_H.VLD_END_DTM",
+    "PTL_CUS_CUST_AGRE_L.AGRE_DTM",
+    "PTL_CUS_CUST_AGRE_L.AGRE_WTHDR_DTM",
+    "PTL_CUS_BILL_ACNT_H.VLD_END_DTM",
+    "PTL_CUS_CUST_CNTC_H.VLD_END_DTM",
+    "PTL_CUS_CUST_ADDR_H.VLD_END_DTM",
+    "PTL_CUS_AGRE_ITM_C.AGRE_ITM_REG_DTM",
+    "PTL_CUS_CUST_AGRE_H.VLD_END_DTM",
+    "PTL_CUS_CUST_MBSP_M.MBSP_SBSC_DTM",
+    "PTL_CUS_CUST_CVLCPT_L.CVLCPT_ACPT_DTM",
+    "PTL_CUS_MBSP_POINT_L.POINT_TRD_DTM",
+    "PTL_CUS_ZIP_M.ZIP_REG_DTM",
+    "PTL_CUS_CUST_CNSL_L.CNSL_DTM",
+    "PTL_INV_ATRF_APLY_L.ATRF_APLY_DTM",
+    "PTL_INV_PAY_MTHD_M.PAY_MTHD_REG_DTM",
+    "PTL_INV_VACCT_M.VACCT_ISSU_DTM",
+    "PTL_INV_VACCT_M.VLD_END_DTM",
+    "PTL_INV_VACCT_M.RTRVL_DTM",
+    "PTL_INV_OVPAY_M.OVPAY_OCRN_DTM",
+    "PTL_INV_RCV_M.RCV_DTM",
+    "PTL_INV_BANK_C.BANK_REG_DTM",
+    "PTL_INV_CARD_CO_C.CARD_CO_REG_DTM",
+    "PTL_INV_RCV_ALLC_D.RCV_ALLC_DTM",
+    "PTL_INV_PAY_MTHD_H.VLD_END_DTM",
+    "PTL_INV_ATRF_WDRW_RSLT_L.WDRW_RSLT_DTM",
+    "PTL_INV_CARD_ATMT_PAY_APRV_L.CARD_APRV_REQ_DTM",
+    "PTL_INV_CARD_ATMT_PAY_APRV_L.CARD_APRV_DTM",
+    "PTL_INV_UNIDNTF_DPST_L.DPST_DTM",
+    "PTL_INV_UNIDNTF_DPST_L.UNIDNTF_DPST_IDNTF_DTM",
+    "PTL_INV_GIRO_RCV_L.GIRO_RCV_DTM",
+    "PTL_INV_RFND_ACCT_D.RFND_ACCT_REG_DTM",
+    "PTL_INV_RCV_AGT_INST_M.RCV_AGT_INST_REG_DTM",
+    "PTL_INV_ATRF_WDRW_REQ_L.WDRW_REQ_DTM",
+    "PTL_INV_PRPAY_USE_L.PRPAY_USE_DTM",
+    "PTL_INV_RCV_DD_T.AGG_DTM",
+    "PTL_INV_RCV_AGT_FEE_L.FEE_ASMT_DTM",
+    "PTL_INV_CASH_RCIPT_PBLCN_L.CASH_RCIPT_PBLCN_DTM",
+    "PTL_INV_RCV_MM_S.AGG_DTM",
+    "PTL_ORD_SBSC_CTRT_M.SBSC_CTRT_DTM",
+    "PTL_ORD_SBSC_CTRT_M.OPNG_DTM",
+    "PTL_ORD_SBSC_CTRT_M.TRMN_DTM",
+    "PTL_ORD_SBSC_APLY_M.SBSC_APLY_DTM",
+    "PTL_ORD_SBSC_APLY_M.SBSC_APLY_CNCL_DTM",
+    "PTL_ORD_LINE_M.LINE_REG_DTM",
+    "PTL_ORD_LINE_M.OPNG_DTM",
+    "PTL_ORD_LINE_M.TRMN_DTM",
+    "PTL_ORD_SVC_NO_M.SVC_NO_REG_DTM",
+    "PTL_ORD_SVC_NO_M.LAST_ASGN_DTM",
+    "PTL_ORD_SVC_NO_M.LAST_RTRVL_DTM",
+    "PTL_ORD_MNP_APLY_M.MNP_APLY_DTM",
+    "PTL_ORD_AGRMT_CTRT_M.AGRMT_CTRT_DTM",
+    "PTL_ORD_AGRMT_CTRT_M.AGRMT_TRMN_DTM",
+    "PTL_ORD_SBSC_DOC_L.DOC_SBMSN_DTM",
+    "PTL_ORD_SBSC_PROD_M.PROD_SBSC_DTM",
+    "PTL_ORD_SBSC_PROD_M.VLD_BGNG_DTM",
+    "PTL_ORD_SBSC_PROD_M.VLD_END_DTM",
+    "PTL_ORD_SBSC_PROD_M.PROD_TRMN_DTM",
+    "PTL_ORD_LINE_STTS_H.LINE_STTS_CHG_DTM",
+    "PTL_ORD_LINE_STTS_H.VLD_BGNG_DTM",
+    "PTL_ORD_LINE_STTS_H.VLD_END_DTM",
+    "PTL_ORD_SBSC_CTRT_H.SBSC_CTRT_CHG_DTM",
+    "PTL_ORD_SBSC_CTRT_H.VLD_BGNG_DTM",
+    "PTL_ORD_SBSC_CTRT_H.VLD_END_DTM",
+    "PTL_ORD_LINE_CHG_H.LINE_CHG_DTM",
+    "PTL_ORD_LINE_CHG_H.VLD_BGNG_DTM",
+    "PTL_ORD_LINE_CHG_H.VLD_END_DTM",
+    "PTL_ORD_OPNG_PRCS_L.OPNG_PRCS_DTM",
+    "PTL_ORD_OPNG_PRCS_L.OPNG_PRCS_CMPTN_DTM",
+    "PTL_ORD_SUBSD_APLCN_L.SUBSD_APLCN_DTM",
+    "PTL_ORD_ADSVC_APLY_L.ADSVC_APLY_DTM",
+    "PTL_ORD_AGRMT_CTRT_H.AGRMT_CTRT_CHG_DTM",
+    "PTL_ORD_AGRMT_CTRT_H.VLD_BGNG_DTM",
+    "PTL_ORD_AGRMT_CTRT_H.VLD_END_DTM",
+    "PTL_ORD_LINE_EQP_R.VLD_BGNG_DTM",
+    "PTL_ORD_LINE_EQP_R.VLD_END_DTM",
+    "PTL_ORD_USIM_CHG_L.USIM_CHG_DTM",
+    "PTL_ORD_SBSC_PROD_H.SBSC_PROD_CHG_DTM",
+    "PTL_ORD_SBSC_PROD_H.VLD_BGNG_DTM",
+    "PTL_ORD_SBSC_PROD_H.VLD_END_DTM",
+    "PTL_ORD_MNP_H.MNP_STTS_CHG_DTM",
+    "PTL_ORD_TRMN_APLY_L.TRMN_APLY_DTM",
+    "PTL_ORD_SVC_NO_H.SVC_NO_STTS_CHG_DTM",
+    "PTL_ORD_SVC_NO_H.VLD_BGNG_DTM",
+    "PTL_ORD_SVC_NO_H.VLD_END_DTM",
+    "PTL_PAY_RAW_USE_L.CLCT_DTM",
+    "PTL_PAY_RAW_USE_L.USE_BGNG_DTM",
+    "PTL_PAY_RAW_USE_L.USE_END_DTM",
+    "PTL_PAY_USE_QTY_MM_T.AGG_DTM",
+    "PTL_PAY_BILL_M.BILL_CFMTN_DTM",
+    "PTL_PAY_BILL_TAX_D.TAX_CALC_DTM",
+    "PTL_PAY_USE_QTY_ERR_L.ERR_OCRN_DTM",
+    "PTL_PAY_USE_QTY_ERR_L.LAST_RE_PRCS_DTM",
+    "PTL_PAY_USE_L.USE_BGNG_DTM",
+    "PTL_PAY_USE_L.USE_END_DTM",
+    "PTL_PAY_USE_L.RAT_DTM",
+    "PTL_PAY_BSCPRVD_EXHST_L.EXHST_DTM",
+    "PTL_PAY_USE_QTY_DD_T.AGG_DTM",
+    "PTL_PAY_CHRG_CALC_H.CHRG_CALC_DTM",
+    "PTL_PAY_CHRG_CALC_L.CHRG_CALC_DTM",
+    "PTL_PAY_PNLT_IMPS_L.PNLT_IMPS_DTM",
+    "PTL_PAY_DSCNT_APLCN_L.DSCNT_APLCN_DTM",
+    "PTL_PAY_CMBN_DSCNT_ALLC_L.CMBN_DSCNT_ALLC_DTM",
+    "PTL_PAY_EQP_INSTL_BILL_D.INSTL_BILL_DTM",
+    "PTL_PAY_BILL_DDLN_H.BILL_DDLN_DTM",
+    "PTL_PAY_MCPAY_BILL_D.PYMT_DTM",
+    "PTL_PAY_MCPAY_BILL_D.PYMT_CNCL_DTM",
+    "PTL_PAY_CNTS_UTLZ_CHRG_L.CNTS_UTLZ_DTM",
+    "PTL_PAY_INVC_PBLCN_L.INVC_PBLCN_DTM",
+    "PTL_PAY_INVC_PBLCN_L.SNDNG_CMPTN_DTM",
+    "PTL_PAY_CHRG_ITM_MM_S.AGG_DTM",
+    "PTL_PAY_BILL_JOB_STEP_H.STEP_BGNG_DTM",
+    "PTL_PAY_BILL_ACNT_MM_T.AGG_DTM",
+    "PTL_PRD_RTPLN_M.RTPLN_REG_DTM",
+    "PTL_PRD_ADSVC_M.ADSVC_REG_DTM",
+    "PTL_PAY_BILL_D.BILL_DTL_CRT_DTM",
+    "PTL_PRD_PBANC_SUBSD_H.SUBSD_APLCN_END_DTM",
+    "PTL_PRM_PRTNR_M.PRTNR_REG_DTM",
+    "PTL_PRM_SHOP_M.SHOP_REG_DTM",
+    "PTL_PRM_TXINV_M.TXINV_PBLCN_DTM",
+    "PTL_PRM_STLM_M.STLM_DTM",
+    "PTL_PRM_STLM_M.STLM_CFMTN_DTM",
+    "PTL_PRM_ORG_H.VLD_END_DTM",
+    "PTL_PRM_USIM_STCK_L.WRHS_DTM",
+    "PTL_PRM_EQP_STCK_L.WRHS_DTM",
+    "PTL_PRM_EQP_STCK_L.SHPM_DTM",
+    "PTL_PRM_STLM_GIVE_L.STLM_GIVE_DTM",
+    "PTL_PRM_STLM_CFMTN_H.PRCS_DTM"
+  ],
+  "detail": [
+    {
+      "tbl": "PTL_COL_OVDU_ADCHG_L",
+      "area": "COL",
+      "rows": 188026,
+      "oraRows": 188026,
+      "rowSum": false,
+      "diffCols": [
+        "ADCHG_IMPS_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_UNPD_M",
+      "area": "COL",
+      "rows": 94013,
+      "oraRows": 94013,
+      "rowSum": false,
+      "diffCols": [
+        "UNPD_OCRN_DTM",
+        "CMPLPAY_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_EXOFTRMN_M",
+      "area": "COL",
+      "rows": 7051,
+      "oraRows": 7051,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_RCVB_TRNSF_M",
+      "area": "COL",
+      "rows": 4701,
+      "oraRows": 4701,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_SUSP_M",
+      "area": "COL",
+      "rows": 28204,
+      "oraRows": 28204,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_DIV_PAY_AGRMT_M",
+      "area": "COL",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_DUN_L",
+      "area": "COL",
+      "rows": 235033,
+      "oraRows": 235033,
+      "rowSum": false,
+      "diffCols": [
+        "DUN_SNDNG_DTM",
+        "SNDNG_RSLT_RCPTN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_OVDU_ADCHG_STD_C",
+      "area": "COL",
+      "rows": 20,
+      "oraRows": 20,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_BDDT_M",
+      "area": "COL",
+      "rows": 18803,
+      "oraRows": 18803,
+      "rowSum": false,
+      "diffCols": [
+        "BDDT_DPRC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_DUN_PLCY_M",
+      "area": "COL",
+      "rows": 2000,
+      "oraRows": 2000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_UNPD_D",
+      "area": "COL",
+      "rows": 282039,
+      "oraRows": 282039,
+      "rowSum": false,
+      "diffCols": [
+        "LAST_RCV_RFLT_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_SUSP_RLS_L",
+      "area": "COL",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_EXOFTRMN_PRNTC_L",
+      "area": "COL",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "EXOFTRMN_PRNTC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_RCVB_COLL_CO_M",
+      "area": "COL",
+      "rows": 200,
+      "oraRows": 200,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_COLL_DLGT_D",
+      "area": "COL",
+      "rows": 7051,
+      "oraRows": 7051,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_DUN_SNDNG_RSLT_L",
+      "area": "COL",
+      "rows": 258536,
+      "oraRows": 258536,
+      "rowSum": false,
+      "diffCols": [
+        "DUN_SNDNG_DTM",
+        "SNDNG_RSLT_RCPTN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_SUSP_H",
+      "area": "COL",
+      "rows": 70510,
+      "oraRows": 70510,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_COLL_RTRVL_L",
+      "area": "COL",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "COLL_RTRVL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_COLL_FEE_L",
+      "area": "COL",
+      "rows": 12000,
+      "oraRows": 12000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_UNPD_STTS_H",
+      "area": "COL",
+      "rows": 329046,
+      "oraRows": 329046,
+      "rowSum": false,
+      "diffCols": [
+        "STTS_CHG_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_CRINFO_REG_L",
+      "area": "COL",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "CRINFO_REG_DTM",
+        "REG_PRNTC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_PAY_PRMS_L",
+      "area": "COL",
+      "rows": 18803,
+      "oraRows": 18803,
+      "rowSum": false,
+      "diffCols": [
+        "PAY_PRMS_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_CRINFO_RLS_L",
+      "area": "COL",
+      "rows": 11752,
+      "oraRows": 11752,
+      "rowSum": false,
+      "diffCols": [
+        "CRINFO_RLS_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_BDDT_RTRVL_L",
+      "area": "COL",
+      "rows": 1880,
+      "oraRows": 1880,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_RCVB_DSPSL_L",
+      "area": "COL",
+      "rows": 3000,
+      "oraRows": 3000,
+      "rowSum": false,
+      "diffCols": [
+        "RCVB_DSPSL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_DIV_PAY_TMS_D",
+      "area": "COL",
+      "rows": 56408,
+      "oraRows": 56408,
+      "rowSum": false,
+      "diffCols": [
+        "PAY_CMPTN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_BDDT_DPRC_D",
+      "area": "COL",
+      "rows": 56408,
+      "oraRows": 56408,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_UNPD_RTRVL_MM_S",
+      "area": "COL",
+      "rows": 20000,
+      "oraRows": 20000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_COL_RCVB_PRSCR_H",
+      "area": "COL",
+      "rows": 122217,
+      "oraRows": 122217,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CORP_CUST_D",
+      "area": "CUS",
+      "rows": 1645,
+      "oraRows": 1645,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_M",
+      "area": "CUS",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_INDV_CUST_D",
+      "area": "CUS",
+      "rows": 21858,
+      "oraRows": 21858,
+      "rowSum": false,
+      "diffCols": [
+        "INDV_CUST_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_PYR_M",
+      "area": "CUS",
+      "rows": 25854,
+      "oraRows": 25854,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_BILL_ACNT_M",
+      "area": "CUS",
+      "rows": 28204,
+      "oraRows": 28204,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_CNTC_D",
+      "area": "CUS",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": false,
+      "diffCols": [
+        "CNTC_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CUST_GRD_H",
+      "area": "CUS",
+      "rows": 32905,
+      "oraRows": 32905,
+      "rowSum": false,
+      "diffCols": [
+        "GRD_ASMT_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_COL_UNPD_MM_T",
+      "area": "COL",
+      "rows": 282039,
+      "oraRows": 282039,
+      "rowSum": false,
+      "diffCols": [
+        "AGG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CUST_ADDR_D",
+      "area": "CUS",
+      "rows": 28204,
+      "oraRows": 28204,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_RGN_C",
+      "area": "CUS",
+      "rows": 20000,
+      "oraRows": 20000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_H",
+      "area": "CUS",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_LGLRP_D",
+      "area": "CUS",
+      "rows": 1410,
+      "oraRows": 1410,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CORP_PIC_D",
+      "area": "CUS",
+      "rows": 2820,
+      "oraRows": 2820,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_AGRE_L",
+      "area": "CUS",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "AGRE_DTM",
+        "AGRE_WTHDR_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CORP_BPLC_D",
+      "area": "CUS",
+      "rows": 1880,
+      "oraRows": 1880,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_R",
+      "area": "CUS",
+      "rows": 7051,
+      "oraRows": 7051,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_RLNM_CRTF_L",
+      "area": "CUS",
+      "rows": 28204,
+      "oraRows": 28204,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_BILL_ACNT_H",
+      "area": "CUS",
+      "rows": 32905,
+      "oraRows": 32905,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_INVC_RCPT_MTHD_H",
+      "area": "CUS",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_CNTC_H",
+      "area": "CUS",
+      "rows": 42306,
+      "oraRows": 42306,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_PYR_H",
+      "area": "CUS",
+      "rows": 25854,
+      "oraRows": 25854,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_ADDR_H",
+      "area": "CUS",
+      "rows": 32905,
+      "oraRows": 32905,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_AGRE_ITM_C",
+      "area": "CUS",
+      "rows": 10000,
+      "oraRows": 10000,
+      "rowSum": false,
+      "diffCols": [
+        "AGRE_ITM_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_MKT_RCPTN_DENY_L",
+      "area": "CUS",
+      "rows": 4701,
+      "oraRows": 4701,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_CUS_CUST_AGRE_H",
+      "area": "CUS",
+      "rows": 56408,
+      "oraRows": 56408,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CUST_MBSP_M",
+      "area": "CUS",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "MBSP_SBSC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CUST_CVLCPT_L",
+      "area": "CUS",
+      "rows": 2350,
+      "oraRows": 2350,
+      "rowSum": false,
+      "diffCols": [
+        "CVLCPT_ACPT_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_MBSP_POINT_L",
+      "area": "CUS",
+      "rows": 70510,
+      "oraRows": 70510,
+      "rowSum": false,
+      "diffCols": [
+        "POINT_TRD_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_ZIP_M",
+      "area": "CUS",
+      "rows": 35000,
+      "oraRows": 35000,
+      "rowSum": false,
+      "diffCols": [
+        "ZIP_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CUST_CNSL_L",
+      "area": "CUS",
+      "rows": 56408,
+      "oraRows": 56408,
+      "rowSum": false,
+      "diffCols": [
+        "CNSL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_CUS_CUST_MM_S",
+      "area": "CUS",
+      "rows": 70510,
+      "oraRows": 70510,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_ATRF_APLY_L",
+      "area": "INV",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "ATRF_APLY_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_PAY_MTHD_M",
+      "area": "INV",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "PAY_MTHD_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_VACCT_M",
+      "area": "INV",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "VACCT_ISSU_DTM",
+        "VLD_END_DTM",
+        "RTRVL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_OVPAY_M",
+      "area": "INV",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "OVPAY_OCRN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_RFND_L",
+      "area": "INV",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_RCV_M",
+      "area": "INV",
+      "rows": 470065,
+      "oraRows": 470065,
+      "rowSum": false,
+      "diffCols": [
+        "RCV_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_PRPAY_M",
+      "area": "INV",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_BANK_C",
+      "area": "INV",
+      "rows": 10000,
+      "oraRows": 10000,
+      "rowSum": false,
+      "diffCols": [
+        "BANK_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_CARD_CO_C",
+      "area": "INV",
+      "rows": 10000,
+      "oraRows": 10000,
+      "rowSum": false,
+      "diffCols": [
+        "CARD_CO_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_RCV_ALLC_D",
+      "area": "INV",
+      "rows": 564078,
+      "oraRows": 564078,
+      "rowSum": false,
+      "diffCols": [
+        "RCV_ALLC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_PAY_MTHD_H",
+      "area": "INV",
+      "rows": 94013,
+      "oraRows": 94013,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_ATRF_WDRW_RSLT_L",
+      "area": "INV",
+      "rows": 150421,
+      "oraRows": 150421,
+      "rowSum": false,
+      "diffCols": [
+        "WDRW_RSLT_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_CARD_ATMT_PAY_APRV_L",
+      "area": "INV",
+      "rows": 70510,
+      "oraRows": 70510,
+      "rowSum": false,
+      "diffCols": [
+        "CARD_APRV_REQ_DTM",
+        "CARD_APRV_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_RCV_CNCL_L",
+      "area": "INV",
+      "rows": 5641,
+      "oraRows": 5641,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_UNIDNTF_DPST_L",
+      "area": "INV",
+      "rows": 2350,
+      "oraRows": 2350,
+      "rowSum": false,
+      "diffCols": [
+        "DPST_DTM",
+        "UNIDNTF_DPST_IDNTF_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_VACCT_DPST_L",
+      "area": "INV",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_GIRO_RCV_L",
+      "area": "INV",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": false,
+      "diffCols": [
+        "GIRO_RCV_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_RFND_ACCT_D",
+      "area": "INV",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "RFND_ACCT_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_OVPAY_H",
+      "area": "INV",
+      "rows": 28204,
+      "oraRows": 28204,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_RCV_AGT_INST_M",
+      "area": "INV",
+      "rows": 10000,
+      "oraRows": 10000,
+      "rowSum": false,
+      "diffCols": [
+        "RCV_AGT_INST_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_ATRF_WDRW_REQ_L",
+      "area": "INV",
+      "rows": 141020,
+      "oraRows": 141020,
+      "rowSum": false,
+      "diffCols": [
+        "WDRW_REQ_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_PRPAY_USE_L",
+      "area": "INV",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": false,
+      "diffCols": [
+        "PRPAY_USE_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_RCV_CHNL_C",
+      "area": "INV",
+      "rows": 50,
+      "oraRows": 50,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_RCV_ALLC_PRRT_C",
+      "area": "INV",
+      "rows": 200,
+      "oraRows": 200,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_RCV_RCNCL_L",
+      "area": "INV",
+      "rows": 1410,
+      "oraRows": 1410,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_RCV_DD_T",
+      "area": "INV",
+      "rows": 2350,
+      "oraRows": 2350,
+      "rowSum": false,
+      "diffCols": [
+        "AGG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_RCV_AGT_FEE_L",
+      "area": "INV",
+      "rows": 10000,
+      "oraRows": 10000,
+      "rowSum": false,
+      "diffCols": [
+        "FEE_ASMT_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_CASH_RCIPT_PBLCN_L",
+      "area": "INV",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "CASH_RCIPT_PBLCN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_INV_RCIPT_PBLCN_L",
+      "area": "INV",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_INV_RCV_MM_S",
+      "area": "INV",
+      "rows": 16000,
+      "oraRows": 16000,
+      "rowSum": false,
+      "diffCols": [
+        "AGG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_SBSC_CTRT_M",
+      "area": "ORD",
+      "rows": 61108,
+      "oraRows": 61108,
+      "rowSum": false,
+      "diffCols": [
+        "SBSC_CTRT_DTM",
+        "OPNG_DTM",
+        "TRMN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_SBSC_APLY_M",
+      "area": "ORD",
+      "rows": 61108,
+      "oraRows": 61108,
+      "rowSum": false,
+      "diffCols": [
+        "SBSC_APLY_DTM",
+        "SBSC_APLY_CNCL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_LINE_M",
+      "area": "ORD",
+      "rows": 56408,
+      "oraRows": 56408,
+      "rowSum": false,
+      "diffCols": [
+        "LINE_REG_DTM",
+        "OPNG_DTM",
+        "TRMN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_EQP_INSTL_CTRT_M",
+      "area": "ORD",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_SVC_NO_M",
+      "area": "ORD",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "SVC_NO_REG_DTM",
+        "LAST_ASGN_DTM",
+        "LAST_RTRVL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_CMBN_CTRT_M",
+      "area": "ORD",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_MNP_APLY_M",
+      "area": "ORD",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "MNP_APLY_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_AGRMT_CTRT_M",
+      "area": "ORD",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": false,
+      "diffCols": [
+        "AGRMT_CTRT_DTM",
+        "AGRMT_TRMN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_SBSC_APLY_D",
+      "area": "ORD",
+      "rows": 94013,
+      "oraRows": 94013,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_SBSC_DOC_L",
+      "area": "ORD",
+      "rows": 70510,
+      "oraRows": 70510,
+      "rowSum": false,
+      "diffCols": [
+        "DOC_SBMSN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_SBSC_PROD_M",
+      "area": "ORD",
+      "rows": 141020,
+      "oraRows": 141020,
+      "rowSum": false,
+      "diffCols": [
+        "PROD_SBSC_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM",
+        "PROD_TRMN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_LINE_STTS_H",
+      "area": "ORD",
+      "rows": 131618,
+      "oraRows": 131618,
+      "rowSum": false,
+      "diffCols": [
+        "LINE_STTS_CHG_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_SBSC_CTRT_H",
+      "area": "ORD",
+      "rows": 84612,
+      "oraRows": 84612,
+      "rowSum": false,
+      "diffCols": [
+        "SBSC_CTRT_CHG_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_LINE_CHG_H",
+      "area": "ORD",
+      "rows": 75210,
+      "oraRows": 75210,
+      "rowSum": false,
+      "diffCols": [
+        "LINE_CHG_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_OPNG_PRCS_L",
+      "area": "ORD",
+      "rows": 61108,
+      "oraRows": 61108,
+      "rowSum": false,
+      "diffCols": [
+        "OPNG_PRCS_DTM",
+        "OPNG_PRCS_CMPTN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_RTPLN_CHG_APLY_L",
+      "area": "ORD",
+      "rows": 28204,
+      "oraRows": 28204,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_SUBSD_APLCN_L",
+      "area": "ORD",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": false,
+      "diffCols": [
+        "SUBSD_APLCN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_ADSVC_APLY_L",
+      "area": "ORD",
+      "rows": 56408,
+      "oraRows": 56408,
+      "rowSum": false,
+      "diffCols": [
+        "ADSVC_APLY_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_AGRMT_CTRT_H",
+      "area": "ORD",
+      "rows": 42306,
+      "oraRows": 42306,
+      "rowSum": false,
+      "diffCols": [
+        "AGRMT_CTRT_CHG_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_LINE_EQP_R",
+      "area": "ORD",
+      "rows": 70510,
+      "oraRows": 70510,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_EQP_CHG_L",
+      "area": "ORD",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_USIM_CHG_L",
+      "area": "ORD",
+      "rows": 18803,
+      "oraRows": 18803,
+      "rowSum": false,
+      "diffCols": [
+        "USIM_CHG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_SBSC_PROD_H",
+      "area": "ORD",
+      "rows": 150421,
+      "oraRows": 150421,
+      "rowSum": false,
+      "diffCols": [
+        "SBSC_PROD_CHG_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_MNP_H",
+      "area": "ORD",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "MNP_STTS_CHG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_NMNE_CHG_L",
+      "area": "ORD",
+      "rows": 4701,
+      "oraRows": 4701,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_PAUS_L",
+      "area": "ORD",
+      "rows": 7051,
+      "oraRows": 7051,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_EQP_INSTL_D",
+      "area": "ORD",
+      "rows": 211529,
+      "oraRows": 211529,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_CMBN_CMPS_LINE_R",
+      "area": "ORD",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_ORD_TRMN_APLY_L",
+      "area": "ORD",
+      "rows": 32905,
+      "oraRows": 32905,
+      "rowSum": false,
+      "diffCols": [
+        "TRMN_APLY_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_ORD_SVC_NO_H",
+      "area": "ORD",
+      "rows": 108115,
+      "oraRows": 108115,
+      "rowSum": false,
+      "diffCols": [
+        "SVC_NO_STTS_CHG_DTM",
+        "VLD_BGNG_DTM",
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_RAW_USE_L",
+      "area": "PAY",
+      "rows": 470065,
+      "oraRows": 470065,
+      "rowSum": false,
+      "diffCols": [
+        "CLCT_DTM",
+        "USE_BGNG_DTM",
+        "USE_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_BILL_CYCL_C",
+      "area": "PAY",
+      "rows": 30,
+      "oraRows": 30,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_BILL_JOB_M",
+      "area": "PAY",
+      "rows": 5000,
+      "oraRows": 5000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_USE_QTY_MM_T",
+      "area": "PAY",
+      "rows": 94013,
+      "oraRows": 94013,
+      "rowSum": false,
+      "diffCols": [
+        "AGG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_BILL_M",
+      "area": "PAY",
+      "rows": 117516,
+      "oraRows": 117516,
+      "rowSum": false,
+      "diffCols": [
+        "BILL_CFMTN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_BILL_ADJ_L",
+      "area": "PAY",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_BILL_TAX_D",
+      "area": "PAY",
+      "rows": 141020,
+      "oraRows": 141020,
+      "rowSum": false,
+      "diffCols": [
+        "TAX_CALC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_USE_QTY_CLCT_FILE_L",
+      "area": "PAY",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_USE_QTY_ERR_L",
+      "area": "PAY",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "ERR_OCRN_DTM",
+        "LAST_RE_PRCS_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_USE_L",
+      "area": "PAY",
+      "rows": 705098,
+      "oraRows": 705098,
+      "rowSum": false,
+      "diffCols": [
+        "USE_BGNG_DTM",
+        "USE_END_DTM",
+        "RAT_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_BSCPRVD_EXHST_L",
+      "area": "PAY",
+      "rows": 94013,
+      "oraRows": 94013,
+      "rowSum": false,
+      "diffCols": [
+        "EXHST_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_USE_QTY_DD_T",
+      "area": "PAY",
+      "rows": 470065,
+      "oraRows": 470065,
+      "rowSum": false,
+      "diffCols": [
+        "AGG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_CHRG_CALC_H",
+      "area": "PAY",
+      "rows": 70510,
+      "oraRows": 70510,
+      "rowSum": false,
+      "diffCols": [
+        "CHRG_CALC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_CHRG_CALC_L",
+      "area": "PAY",
+      "rows": 470065,
+      "oraRows": 470065,
+      "rowSum": false,
+      "diffCols": [
+        "CHRG_CALC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_DYPRT_CHRG_D",
+      "area": "PAY",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_PNLT_IMPS_L",
+      "area": "PAY",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "PNLT_IMPS_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_DSCNT_APLCN_L",
+      "area": "PAY",
+      "rows": 141020,
+      "oraRows": 141020,
+      "rowSum": false,
+      "diffCols": [
+        "DSCNT_APLCN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_CMBN_DSCNT_ALLC_L",
+      "area": "PAY",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "CMBN_DSCNT_ALLC_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_EQP_INSTL_BILL_D",
+      "area": "PAY",
+      "rows": 94013,
+      "oraRows": 94013,
+      "rowSum": false,
+      "diffCols": [
+        "INSTL_BILL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_ROAM_USE_L",
+      "area": "PAY",
+      "rows": 23503,
+      "oraRows": 23503,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_BILL_ADJ_RSN_C",
+      "area": "PAY",
+      "rows": 200,
+      "oraRows": 200,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_BILL_DDLN_H",
+      "area": "PAY",
+      "rows": 15000,
+      "oraRows": 15000,
+      "rowSum": false,
+      "diffCols": [
+        "BILL_DDLN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_MCPAY_BILL_D",
+      "area": "PAY",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "PYMT_DTM",
+        "PYMT_CNCL_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_CNTS_UTLZ_CHRG_L",
+      "area": "PAY",
+      "rows": 47007,
+      "oraRows": 47007,
+      "rowSum": false,
+      "diffCols": [
+        "CNTS_UTLZ_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_INVC_PBLCN_L",
+      "area": "PAY",
+      "rows": 131618,
+      "oraRows": 131618,
+      "rowSum": false,
+      "diffCols": [
+        "INVC_PBLCN_DTM",
+        "SNDNG_CMPTN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_INVC_RE_PBLCN_L",
+      "area": "PAY",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_CHRG_ITM_MM_S",
+      "area": "PAY",
+      "rows": 100000,
+      "oraRows": 100000,
+      "rowSum": false,
+      "diffCols": [
+        "AGG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_BILL_JOB_STEP_H",
+      "area": "PAY",
+      "rows": 50000,
+      "oraRows": 50000,
+      "rowSum": false,
+      "diffCols": [
+        "STEP_BGNG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PAY_BILL_ACNT_MM_T",
+      "area": "PAY",
+      "rows": 117516,
+      "oraRows": 117516,
+      "rowSum": false,
+      "diffCols": [
+        "AGG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRD_PROD_M",
+      "area": "PRD",
+      "rows": 20000,
+      "oraRows": 20000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_RTPLN_M",
+      "area": "PRD",
+      "rows": 3000,
+      "oraRows": 3000,
+      "rowSum": false,
+      "diffCols": [
+        "RTPLN_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRD_DSCNT_PROD_M",
+      "area": "PRD",
+      "rows": 4000,
+      "oraRows": 4000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_ADSVC_M",
+      "area": "PRD",
+      "rows": 10000,
+      "oraRows": 10000,
+      "rowSum": false,
+      "diffCols": [
+        "ADSVC_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRD_CMBN_PROD_M",
+      "area": "PRD",
+      "rows": 500,
+      "oraRows": 500,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_AGRMT_PROD_M",
+      "area": "PRD",
+      "rows": 300,
+      "oraRows": 300,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_EQP_MDL_M",
+      "area": "PRD",
+      "rows": 5000,
+      "oraRows": 5000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_USIM_PROD_M",
+      "area": "PRD",
+      "rows": 200,
+      "oraRows": 200,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_CHRG_ITM_C",
+      "area": "PRD",
+      "rows": 2000,
+      "oraRows": 2000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_PROD_PRC_H",
+      "area": "PRD",
+      "rows": 940,
+      "oraRows": 940,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_PROD_CMPS_R",
+      "area": "PRD",
+      "rows": 30000,
+      "oraRows": 30000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_RTPLN_BSCPRVD_D",
+      "area": "PRD",
+      "rows": 15000,
+      "oraRows": 15000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_RAT_ZONE_C",
+      "area": "PRD",
+      "rows": 200,
+      "oraRows": 200,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_PROD_EXCLN_R",
+      "area": "PRD",
+      "rows": 50000,
+      "oraRows": 50000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PAY_BILL_D",
+      "area": "PAY",
+      "rows": 470065,
+      "oraRows": 470065,
+      "rowSum": false,
+      "diffCols": [
+        "BILL_DTL_CRT_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRD_ROAM_NATN_C",
+      "area": "PRD",
+      "rows": 250,
+      "oraRows": 250,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_TMBND_TRF_D",
+      "area": "PRD",
+      "rows": 5000,
+      "oraRows": 5000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_ROAM_TRF_D",
+      "area": "PRD",
+      "rows": 30000,
+      "oraRows": 30000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_DSCNT_CND_D",
+      "area": "PRD",
+      "rows": 12000,
+      "oraRows": 12000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_DSCNT_RT_D",
+      "area": "PRD",
+      "rows": 12000,
+      "oraRows": 12000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_ADSVC_CHRG_D",
+      "area": "PRD",
+      "rows": 30000,
+      "oraRows": 30000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_CMBN_CMPS_D",
+      "area": "PRD",
+      "rows": 2000,
+      "oraRows": 2000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_CMBN_DSCNT_D",
+      "area": "PRD",
+      "rows": 3000,
+      "oraRows": 3000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_AGRMT_PNLT_D",
+      "area": "PRD",
+      "rows": 3000,
+      "oraRows": 3000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_RTPLN_EXCS_TRF_D",
+      "area": "PRD",
+      "rows": 60000,
+      "oraRows": 60000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_PBANC_SUBSD_H",
+      "area": "PRD",
+      "rows": 14102,
+      "oraRows": 14102,
+      "rowSum": false,
+      "diffCols": [
+        "SUBSD_APLCN_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRD_EQP_SHPM_PRC_H",
+      "area": "PRD",
+      "rows": 50000,
+      "oraRows": 50000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_CHRG_ITM_CLSF_C",
+      "area": "PRD",
+      "rows": 50,
+      "oraRows": 50,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_PROD_SALE_PRD_H",
+      "area": "PRD",
+      "rows": 40000,
+      "oraRows": 40000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_PROD_SALE_CHNL_R",
+      "area": "PRD",
+      "rows": 100000,
+      "oraRows": 100000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRD_PROD_CHG_H",
+      "area": "PRD",
+      "rows": 9401,
+      "oraRows": 9401,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_ORG_M",
+      "area": "PRM",
+      "rows": 2000,
+      "oraRows": 2000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_AGNC_M",
+      "area": "PRM",
+      "rows": 5000,
+      "oraRows": 5000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_CARR_M",
+      "area": "PRM",
+      "rows": 300,
+      "oraRows": 300,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_CNTS_PRVD_CO_M",
+      "area": "PRM",
+      "rows": 8000,
+      "oraRows": 8000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_ROAM_BZMN_M",
+      "area": "PRM",
+      "rows": 1200,
+      "oraRows": 1200,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_PRTNR_CTRT_M",
+      "area": "PRM",
+      "rows": 705,
+      "oraRows": 705,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_PRTNR_M",
+      "area": "PRM",
+      "rows": 60000,
+      "oraRows": 60000,
+      "rowSum": false,
+      "diffCols": [
+        "PRTNR_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_PRTNR_H",
+      "area": "PRM",
+      "rows": 1880,
+      "oraRows": 1880,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_PRTNR_CTRT_H",
+      "area": "PRM",
+      "rows": 2350,
+      "oraRows": 2350,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_SHOP_M",
+      "area": "PRM",
+      "rows": 40000,
+      "oraRows": 40000,
+      "rowSum": false,
+      "diffCols": [
+        "SHOP_REG_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_TXINV_M",
+      "area": "PRM",
+      "rows": 16452,
+      "oraRows": 16452,
+      "rowSum": false,
+      "diffCols": [
+        "TXINV_PBLCN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_PRTNR_PIC_D",
+      "area": "PRM",
+      "rows": 705,
+      "oraRows": 705,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_STLM_M",
+      "area": "PRM",
+      "rows": 18803,
+      "oraRows": 18803,
+      "rowSum": false,
+      "diffCols": [
+        "STLM_DTM",
+        "STLM_CFMTN_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_ORG_H",
+      "area": "PRM",
+      "rows": 10000,
+      "oraRows": 10000,
+      "rowSum": false,
+      "diffCols": [
+        "VLD_END_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_PRTNR_ACCT_D",
+      "area": "PRM",
+      "rows": 90000,
+      "oraRows": 90000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_FEE_PLCY_M",
+      "area": "PRM",
+      "rows": 5000,
+      "oraRows": 5000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_USIM_STCK_L",
+      "area": "PRM",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": false,
+      "diffCols": [
+        "WRHS_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_STLM_D",
+      "area": "PRM",
+      "rows": 42306,
+      "oraRows": 42306,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_EQP_STCK_L",
+      "area": "PRM",
+      "rows": 42306,
+      "oraRows": 42306,
+      "rowSum": false,
+      "diffCols": [
+        "WRHS_DTM",
+        "SHPM_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_FEE_CLBK_L",
+      "area": "PRM",
+      "rows": 7051,
+      "oraRows": 7051,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_INCNTV_PLCY_M",
+      "area": "PRM",
+      "rows": 30000,
+      "oraRows": 30000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_ATRCT_FEE_L",
+      "area": "PRM",
+      "rows": 42306,
+      "oraRows": 42306,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_FEE_TRF_D",
+      "area": "PRM",
+      "rows": 80000,
+      "oraRows": 80000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_INTCN_TRF_D",
+      "area": "PRM",
+      "rows": 3000,
+      "oraRows": 3000,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_INTCN_USE_T",
+      "area": "PRM",
+      "rows": 940,
+      "oraRows": 940,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_ROAM_STLM_L",
+      "area": "PRM",
+      "rows": 2350,
+      "oraRows": 2350,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_CNTS_STLM_L",
+      "area": "PRM",
+      "rows": 7521,
+      "oraRows": 7521,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_INCNTV_GIVE_L",
+      "area": "PRM",
+      "rows": 37605,
+      "oraRows": 37605,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_MGMT_FEE_L",
+      "area": "PRM",
+      "rows": 188026,
+      "oraRows": 188026,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_STLM_GIVE_L",
+      "area": "PRM",
+      "rows": 19743,
+      "oraRows": 19743,
+      "rowSum": false,
+      "diffCols": [
+        "STLM_GIVE_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_ROAM_STLM_FILE_L",
+      "area": "PRM",
+      "rows": 28204,
+      "oraRows": 28204,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_STLM_CFMTN_H",
+      "area": "PRM",
+      "rows": 42306,
+      "oraRows": 42306,
+      "rowSum": false,
+      "diffCols": [
+        "PRCS_DTM"
+      ]
+    },
+    {
+      "tbl": "PTL_PRM_TXINV_D",
+      "area": "PRM",
+      "rows": 32905,
+      "oraRows": 32905,
+      "rowSum": true,
+      "diffCols": []
+    },
+    {
+      "tbl": "PTL_PRM_STLM_MM_S",
+      "area": "PRM",
+      "rows": 20000,
+      "oraRows": 20000,
+      "rowSum": true,
+      "diffCols": []
+    }
+  ]
+}

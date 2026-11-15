@@ -1,0 +1,149 @@
+{
+  "at": "2026-11-15T00:21:28.159Z",
+  "keys": 10000,
+  "sec": 7.514,
+  "res": [
+    {
+      "fn": "h53",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "uniform",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "skew",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "skew_big",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "wpick",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "wcode",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "recent_dtm",
+      "same": 9997,
+      "diff": 3,
+      "sample": [
+        {
+          "k": "301095875",
+          "pg": "2079-10-04 12:26:49.694911",
+          "ora": "2079-10-04 12:26:49.694910"
+        },
+        {
+          "k": "324555171",
+          "pg": "2080-12-01 13:18:15.912866",
+          "ora": "2080-12-01 13:18:15.912865"
+        },
+        {
+          "k": "349690131",
+          "pg": "2082-02-03 03:03:52.195686",
+          "ora": "2082-02-03 03:03:52.195685"
+        }
+      ]
+    },
+    {
+      "fn": "after_dtm",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "month_edge",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "ymd",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "fmt",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "orphan",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "person_nm",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "corp_nm",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "phone",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "amt",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "dirty",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "memo_1000",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "memo_lob",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "f2n_round",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    },
+    {
+      "fn": "dtm_to_k",
+      "same": 10000,
+      "diff": 0,
+      "sample": []
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+▶ oracle setup 시작 2026-11-15T00:21:33.809Z
+■ oracle setup 끝 13.6초 · 기존 사용자·테이블스페이스 지우고 다시 만듦
+▶ oracle tables 시작 2026-11-15T00:21:47.407Z
+■ oracle tables 끝 9.8초
+▶ oracle gen 시작 2026-11-15T00:21:57.231Z
+■ oracle gen 끝 0.5초 · INTERPRETED·최적화 3 컴파일, 오류 0
+▶ oracle load 시작 2026-11-15T00:21:57.761Z
+   조각 214개(완료 건너뜀 0) · 테이블 214 · 목표 12,170,698행 · 동시 6
+   진행 20/214 · 262초
+   진행 40/214 · 365초
+   진행 60/214 · 461초
+   진행 80/214 · 611초
+   진행 100/214 · 859초
+   진행 120/214 · 1028초
+   진행 140/214 · 1610초
+   진행 160/214 · 1710초
+   진행 180/214 · 1745초
+   진행 200/214 · 1814초
+   진행 214/214 · 2068초
+   끝 · 성공 214 · 실패 0 · 2068초
+■ oracle load 끝 2068.5초 · 끝 · 성공 214 · 실패 0 · 2068초
+▶ oracle constraints 시작 2026-11-15T00:56:26.279Z
+실패 : CREATE INDEX X_PTL_COL_RCVB_PRSCR_H_01 ON PTL_COL_RCVB_PRSCR_H (CASE WHEN vld_end_dtm = '9999-12-31 23:59:59' THEN EXTSH_PRSCR_EXPRY_DT END)
+                                                                                        *
+ERROR at line 1:
+ORA-01847: day of month must be between 1 and last day of month
+exit 1

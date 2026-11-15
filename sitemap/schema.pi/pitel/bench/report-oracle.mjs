@@ -58,6 +58,63 @@ const rowsS = S.map(s => {
 const maxDP = Math.max(...rowsS.map(r => r.dP)), maxDO = Math.max(...rowsS.map(r => r.dO))
 const avgP = T / (PG / 600), avgO = T / (OR / 600)
 
+// MS-SQL·MySQL 실행(테스트 불가) : 적재 로그에서 10분 누적 완료 행 · 마지막 완료 시각 · 작업 단위 · 실패
+const nOf = new Map(plan.map(p => [p.tbl, p.n]))
+const tA = Date.UTC(2010, 0, 1), tB = Date.UTC(2026, 9, 31, 23, 59, 59)
+const kOf = (y, N) => Math.max(0, Math.min(N, Math.floor(N * Math.pow((Date.UTC(y, 0, 1) - tA) / (tB - tA), 1 / 0.22))))
+const unitRows = id => {
+  const [t, y] = id.split(':'), N = nOf.get(t)
+  if (y === 'all') return N
+  const yy = +y
+  return Math.max(0, (yy === 2026 ? N : kOf(yy + 1, N)) - (yy === 2010 ? 1 : kOf(yy, N) + 1) + 1)
+}
+function runOf(file) {
+  let first
+  let fails = 0
+  const done = []
+  for (const l of fs.readFileSync(file, 'utf8').split('\n')) {
+    if (l.startsWith('실패 ')) fails++
+    const m = l.match(/^(시작|완료) (\S+:\S+) (\S+)$/)
+    if (!m) continue
+    const t = new Date(m[3]).getTime()
+    if (m[1] === '시작' && (!first || t < first)) first = t
+    if (m[1] === '완료') done.push({ id: m[2], t })
+  }
+  const list = done.map(d => ({ sec: (d.t - first) / 1000, rows: unitRows(d.id) }))
+  return { last: Math.max(...list.map(x => x.sec)), units: list.length, rows: list.reduce((s, x) => s + x.rows, 0), fails, at: m => list.filter(x => x.sec <= m * 60).reduce((s, x) => s + x.rows, 0) }
+}
+const RUNS = [
+  { nm: 'MS-SQL 1차', file: 'mssql/out/full_load_grant_wait_stopped.log', c: '#f4b183', kst: '15:08 ~ 16:05', why: '메모리 할당 대기(세션 6개 RESOURCE_SEMAPHORE)와 잠금 메모리 부족(오류 1204·701)' },
+  { nm: 'MS-SQL 2차', file: 'mssql/out/full_load_mem_reaped_stopped.log', c: '#ed7d31', kst: '17:00 ~ 17:56', why: 'PC 여유 메모리 부족으로 적재 프로세스가 강제 종료됨' },
+  { nm: 'MySQL', file: 'mysql/out/full_load.log', c: '#548235', kst: '18:18 ~ 19:47', why: 'Docker Desktop 무응답(엔진 API 500, docker ps 시간 초과)' },
+].map(r => ({ ...r, ...runOf(path.join(R, r.file)) }))
+const MS2 = RUNS[1], MY = RUNS[2]
+
+// 4개 DBMS 누적 완료율 선 그래프 : 끝난 DBMS 는 끝 시각 100% 동그라미, 중단된 실행은 마지막 완료 지점 X 표시
+function chart4() {
+  const W = 560, H = 400, L = 40, B = 26, Tp = 10, Rr = 12
+  const xmax = 150
+  const x = m => L + (m / xmax) * (W - L - Rr)
+  const y = p => Tp + (1 - p) * (H - Tp - B)
+  const poly = (pts, c, dash) => `<polyline fill="none" stroke="${c}" stroke-width="2.4"${dash ? ' stroke-dasharray="5 4"' : ''} points="${pts.map(([m, v]) => `${x(m).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>`
+  const fin = (k, end, c) => {
+    const p = [[0, 0], ...S.filter(s => s.min < end / 60).map(s => [s.min, s[k] / T]), [end / 60, 1]]
+    return poly(p, c) + `<circle cx="${x(end / 60).toFixed(1)}" cy="${y(1)}" r="5" fill="#fff" stroke="${c}" stroke-width="2.4"/>`
+  }
+  const cut = r => {
+    const p = [[0, 0]]
+    for (let m = 10; m * 60 <= r.last; m += 10) p.push([m, r.at(m) / T])
+    p.push([r.last / 60, r.rows / T])
+    const [ex, ey] = [x(r.last / 60), y(r.rows / T)]
+    return poly(p, r.c, true) + `<path d="M${ex - 5} ${ey - 5}L${ex + 5} ${ey + 5}M${ex + 5} ${ey - 5}L${ex - 5} ${ey + 5}" stroke="${r.c}" stroke-width="2.4"/>`
+  }
+  let g = ''
+  for (let p = 0; p <= 1.0001; p += 0.25) g += `<line x1="${L}" x2="${W - Rr}" y1="${y(p)}" y2="${y(p)}" stroke="#e5e7ea"/><text x="${L - 6}" y="${y(p) + 4}" text-anchor="end" font-size="11" fill="#59636e">${Math.round(p * 100)}%</text>`
+  for (let m = 0; m <= xmax; m += 30) g += `<text x="${x(m)}" y="${H - 10}" text-anchor="middle" font-size="11" fill="#59636e">${m}분</text>`
+  const lab = (c, t, row) => `<circle cx="${L + 14}" cy="${Tp + 16 + row * 18}" r="5" fill="${c}"/><text x="${L + 26}" y="${Tp + 20 + row * 18}" font-size="12" font-weight="700" fill="${c}">${t}</text>`
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:330px" role="img" aria-label="DBMS 4종 누적 완료율">${g}${fin('pg', PG, '#8c959f')}${fin('tg', OR, '#2e75b6')}${RUNS.map(cut).join('')}${lab('#2e75b6', `Oracle 끝 ${hms(OR)}`, 0)}${lab('#8c959f', `PostgreSQL 끝 ${hms(PG)}`, 1)}${RUNS.map((r, i) => lab(r.c, `${r.nm} 중단 ${pct(r.rows, T)}`, i + 2)).join('')}</svg>`
+}
+
 // 누적 완료율 선 그래프(SVG)
 function chart() {
   const W = 560, H = 400, L = 40, B = 26, Tp = 10, Rr = 12
@@ -102,6 +159,7 @@ const S0 = (() => {
     <div class="big">${hms(PG)} → ${hms(OR)} <small>· ${ratio.toFixed(2)}배</small></div>
     <p>같은 생성 규칙 · 같은 작업 단위 2,086개 · 동시 7개 · 1,101,170,707행 · 준비 단계를 뺀 데이터 적재 시간</p>
     <p style="margin-top:18px;font-size:13px">근거 : PostgreSQL 적재 로그(2026-11-14 배율 1) · Oracle 적재 로그(2026-11-15 배율 1) · 테이블 214개 건수 대조 · Oracle 대기 이벤트(v$system_event) · 두 DB 크기 조회 · 테이블 133개 행당 비용 분석</p>
+    <p style="font-size:13px">MS-SQL 2022 · MySQL 26.10 : 같은 방식으로 적재했으나 실행 환경 문제로 중단되어 테스트 불가(3 · 10장)</p>
     <p style="font-size:13px">생성 값 : 규칙(키 → 값 공식·분포·NULL 비율)은 같고, 난수 해시는 엔진 내장 함수(PostgreSQL hashint8extended · Oracle ORA_HASH)라 개별 값은 다르다</p>
   </section>
 `
@@ -115,14 +173,14 @@ const S1 = slide('1. 요약', `11억 행을 Oracle 은 <b>${hms(OR)}</b>, Postgr
         <div class="kpi"><div class="v">${gb(pgSizeAll)} · ${gb(orSizeAll)} GB</div><div class="l">데이터 크기 PostgreSQL · Oracle (인덱스 제외)</div></div>
       </div>
       <table>
-        <tr><th>DBMS</th><th class="n">목표 건수</th><th class="n">적재 건수</th><th class="n">완료율</th><th class="n">적재 시간</th><th class="n">10분당 평균 적재</th><th class="n">10분당 최대 적재</th><th class="n">실패</th></tr>
+        <tr><th>DBMS</th><th class="n">목표 건수</th><th class="n">적재(완료) 건수</th><th class="n">완료율</th><th class="n">적재 시간</th><th class="n">10분당 평균 적재</th><th class="n">10분당 최대 적재</th><th class="n">실패</th></tr>
         <tr><td>PostgreSQL 17.12</td><td class="n">${f(T)}</td><td class="n">${f(T)}</td><td class="n">100.0%</td><td class="n">${hms(PG)}</td><td class="n">${f(avgP)}</td><td class="n">${f(maxDP)}</td><td class="n">0</td></tr>
         <tr><td><b>Oracle 21.3 EE</b></td><td class="n">${f(T)}</td><td class="n">${f(T)}</td><td class="n">100.0%</td><td class="n"><b>${hms(OR)}</b></td><td class="n"><b>${f(avgO)}</b></td><td class="n">${f(maxDO)}</td><td class="n">0</td></tr>
-        <tr><td>MS-SQL</td><td class="n" colspan="7" style="text-align:center;color:var(--sub)">다음 실증 대상(같은 방식)</td></tr>
-        <tr><td>MySQL</td><td class="n" colspan="7" style="text-align:center;color:var(--sub)">마지막 실증 대상(같은 방식)</td></tr>
+        <tr><td>MS-SQL 2022</td><td class="n">${f(T)}</td><td class="n">${f(MS2.rows)}</td><td class="n">${pct(MS2.rows, T)}</td><td colspan="4"><span class="tbd">테스트 불가</span> : 메모리 이상 2회 중단(2차 기준 도달, 10장)</td></tr>
+        <tr><td>MySQL 26.10</td><td class="n">${f(T)}</td><td class="n">${f(MY.rows)}</td><td class="n">${pct(MY.rows, T)}</td><td colspan="4"><span class="tbd">테스트 불가</span> : Docker Desktop 무응답으로 중단(10장)</td></tr>
       </table>
     </div>`,
-  `<b>Key Finding</b> : 시간 차이는 디스크 쓰기에서 생기지 않았다. 두 DB 모두 세션 7개가 끝까지 계산으로 바빴고, 값을 만드는 생성식 계산 방식의 차이가 시간을 갈랐다(6~8장).`,
+  `<b>Key Finding</b> : 시간 차이는 디스크 쓰기에서 생기지 않았다. 두 DB 모두 세션 7개가 끝까지 계산으로 바빴고, 값을 만드는 생성식 계산 방식의 차이가 시간을 갈랐다(7~9장).`,
   `적재 로그 database/datagen_pitel-pg.log · oracle/out/full_load.log, 건수 대조 oracle/out/full_verify.log(${verify.replace(/ · \d+초$/, '')}). 10분당 평균 = 목표 건수 ÷ 적재 시간(10분 단위)`)
 
 const S2 = slide('2. 10분 단위 적재 현황', `30분에 Oracle <b>${pct(S[2].tg, T)}</b> · PostgreSQL ${pct(S[2].pg, T)}, 110분에 Oracle <b>${pct(S[10].tg, T)}</b> · PostgreSQL ${pct(S[10].pg, T)} : Oracle 이 처음부터 앞섰다`,
@@ -137,7 +195,20 @@ const S2 = slide('2. 10분 단위 적재 현황', `30분에 Oracle <b>${pct(S[2]
   `<b>Key Finding</b> : 적재 건수는 끝난 작업 단위의 행 합이다. 큰 테이블의 작업 단위가 끝나는 10분 구간에서 적재 건수가 크게 뛴다(Oracle 110~120분 ${f(rowsS[11].dO)}행).`,
   `두 적재 로그의 작업 단위별 시작·완료 시각(bench/analyze.mjs). PostgreSQL 은 2026-11-14 실측, Oracle 은 2026-11-15 실측`)
 
-const S3 = slide('3. 시험 조건', '규모·작업 단위·동시 수·적재 방식은 <b>같고</b>, 엔진 설정과 생성식 계산 방식이 <b>다르다</b>',
+const pctRun = (r, m) => (m * 60 <= r.last ? pct(r.at(m), T) : (m - 10) * 60 <= r.last ? `<span class="tbd">중단 ${Math.round(r.last / 60)}분</span>` : '')
+const S2b = slide('3. DBMS 4종 10분 단위 완료율', `끝까지 간 DBMS 는 <b>Oracle · PostgreSQL</b> 두 개이고, <b>MS-SQL 2차 · MySQL</b> 은 중단 전까지 매 10분 두 DB 보다 앞섰다`,
+  `<div class="body" style="grid-template-columns:1.18fr .82fr;gap:16px">
+      <table class="tight">
+        <tr><th class="n">경과</th><th class="n">PostgreSQL</th><th class="n">Oracle</th>${RUNS.map(r => `<th class="n">${r.nm}</th>`).join('')}</tr>
+        ${S.map(s => `<tr><td class="n">${s.min}분</td><td class="n">${pct(s.pg, T)}</td><td class="n">${pct(s.tg, T)}</td>${RUNS.map(r => `<td class="n">${pctRun(r, s.min)}</td>`).join('')}</tr>`).join('\n        ')}
+        <tr><th class="n">결과</th><th class="n">${hms(PG)}</th><th class="n">${hms(OR)}</th>${RUNS.map(r => `<th class="n"><span class="tbd">테스트 불가</span></th>`).join('')}</tr>
+      </table>
+      <div class="box"><h3>누적 완료율 (점선 = 중단된 실행)</h3><div class="in" style="display:flex;align-items:center">${chart4()}</div></div>
+    </div>`,
+  `<b>Key Finding</b> : MS-SQL · MySQL 의 중간 완료율은 참고값이다. 적재를 끝내지 못해 데이터 적재 시간을 비교할 수 없고, 비교 결론은 Oracle · PostgreSQL 두 DB 로만 낸다(10장).`,
+  '네 DBMS 적재 로그의 작업 단위 완료 시각(같은 작업 단위 2,086개 · 같은 순서 · 동시 7개). 완료율 = 끝난 작업 단위의 행 합 ÷ 1,101,170,707')
+
+const S3 = slide('4. 시험 조건', '규모·작업 단위·동시 수·적재 방식은 <b>같고</b>, 엔진 설정과 생성식 계산 방식이 <b>다르다</b>',
   `<div class="body"><table style="font-size:12.5px">
       <tr><th style="width:15%">항목</th><th>PostgreSQL</th><th>Oracle</th><th style="width:8%">판정</th></tr>
       <tr><td>제품</td><td>PostgreSQL 17.12 (Docker pitel-pg)</td><td>Oracle Database 21.3 Enterprise Edition (Docker oracle21c, PDB ORCLPDB)</td><td class="diff">다름</td></tr>
@@ -153,7 +224,7 @@ const S3 = slide('3. 시험 조건', '규모·작업 단위·동시 수·적재 
     </table></div>`,
   null, 'pitel/REBUILD.md(2026-11-14 본 구축), pg_settings · v$parameter 조회(2026-11-15), datagen/00_gen_functions.sql, oracle/inline.mjs')
 
-const S4 = slide('4. 주제영역별 결과', `7개 영역 가운데 <b>6개</b>에서 Oracle 작업 단위가 더 많은 행을 처리했고, <b>수납(INV)</b>은 PostgreSQL 이 빨랐다`,
+const S4 = slide('5. 주제영역별 결과', `7개 영역 가운데 <b>6개</b>에서 Oracle 작업 단위가 더 많은 행을 처리했고, <b>수납(INV)</b>은 PostgreSQL 이 빨랐다`,
   `<div class="body"><table style="font-size:12.5px">
       <tr><th>주제영역</th><th class="n">목표 행</th><th class="n">작업 단위</th><th class="n">PG 끝난 시각</th><th class="n">Oracle 끝난 시각</th><th class="n">PG 행/초</th><th class="n">Oracle 행/초</th><th class="n">배수</th><th class="n">PG 크기(GB)</th><th class="n">Oracle 크기(GB)</th></tr>
       ${A.areas.map(a => `<tr><td>${a.area} ${AREA_NM[a.area]}</td><td class="n">${f(a.target)}</td><td class="n">${a.pg.units}</td><td class="n">${Math.round(a.pg.end / 60)}분</td><td class="n">${Math.round(a.tg.end / 60)}분</td><td class="n">${f(a.pg.rps)}</td><td class="n">${f(a.tg.rps)}</td><td class="n ${a.tg.rps > a.pg.rps ? 'same' : 'diff'}">${(a.tg.rps / a.pg.rps).toFixed(2)}</td><td class="n">${gb(PG_SIZE[a.area])}</td><td class="n">${gb(oSize.sz[a.area])}</td></tr>`).join('\n      ')}
@@ -162,7 +233,7 @@ const S4 = slide('4. 주제영역별 결과', `7개 영역 가운데 <b>6개</b>
   `<b>Key Finding</b> : 데이터 크기는 ${gb(pgSizeAll)} GB · ${gb(orSizeAll)} GB 로 거의 같다(차이 ${((1 - orSizeAll / pgSizeAll) * 100).toFixed(1)}%). 두 DB 가 같은 양을 썼으므로 시간 차이는 쓰기 양에서 나오지 않았다.`,
   `행/초 = 영역 행 ÷ 그 영역 작업 단위 소요 합(세션 하나 기준), 배수 = Oracle ÷ PostgreSQL. 크기 PostgreSQL pg_table_size(인덱스 ${gb(PG_IDX)} GB 별도), Oracle dba_segments`)
 
-const S5 = slide('5. 자원 사용', `두 DB 모두 세션 7개가 적재 시간의 <b>99.9%</b> 동안 일했고, Oracle 은 그 시간의 <b>${pct(tm['DB CPU'], tm['DB time'])}</b>를 CPU 계산에 썼다`,
+const S5 = slide('6. 자원 사용', `두 DB 모두 세션 7개가 적재 시간의 <b>99.9%</b> 동안 일했고, Oracle 은 그 시간의 <b>${pct(tm['DB CPU'], tm['DB time'])}</b>를 CPU 계산에 썼다`,
   `<div class="body c2 tight">
       <div class="box"><h3>세션 가동 (두 적재 로그)</h3><div class="in"><table>
         <tr><th></th><th class="n">PostgreSQL</th><th class="n">Oracle</th></tr>
@@ -184,7 +255,7 @@ const S5 = slide('5. 자원 사용', `두 DB 모두 세션 7개가 적재 시간
   `<b>Key Finding</b> : Oracle 의 I/O 대기는 DB time 의 ${pct(ioWait, tm['DB time'])}다. 적재는 계산(CPU)이 묶은 작업이었고, 세션 하나가 행 하나에 쓴 시간이 ${f1((A.pg.busy / T) * 1e6)} µs → ${f1((A.tg.busy / T) * 1e6)} µs 로 줄어 전체 시간이 ${ratio.toFixed(2)}배가 되었다.`,
   'oracle/out/full_waits.txt(v$system_event · v$sys_time_model · v$sysstat · v$log_history, 2026-11-15 05:3x 조회), 인스턴스 시작 03:25:28(적재 시작 03:26:07)')
 
-const S6 = slide('6. 행당 비용 분해', `행 하나의 비용을 나누면 PostgreSQL 은 <b>가중 선택 호출</b>(${FIT.pg.w} µs), Oracle 은 <b>행마다 드는 고정 비용</b>(${FIT.or.fixed} µs)이 크다`,
+const S6 = slide('7. 행당 비용 분해', `행 하나의 비용을 나누면 PostgreSQL 은 <b>가중 선택 호출</b>(${FIT.pg.w} µs), Oracle 은 <b>행마다 드는 고정 비용</b>(${FIT.or.fixed} µs)이 크다`,
   `<div class="body c2">
       <div class="box"><h3>행 하나 비용 모형 (테이블 ${FIT.tables}개, µs/행)</h3><div class="in"><table>
         <tr><th>항목</th><th class="n">PostgreSQL</th><th class="n">Oracle</th><th class="n">배수</th></tr>
@@ -202,7 +273,7 @@ const S6 = slide('6. 행당 비용 분해', `행 하나의 비용을 나누면 P
   '<b>Key Finding</b> : 두 엔진의 강점이 반대로 나타났다. pitel 은 코드형 칼럼(상태·유형 코드)이 많아 가중 선택 호출이 많고, 이 비용이 큰 PostgreSQL 이 전체 시간에서 뒤졌다.',
   '테이블별 작업 단위 소요 합(두 적재 로그) ÷ 행 수, 함수 호출 수는 datagen/out/plan.json 생성 SQL 에서 셈. 가중 선택 = 코드 값을 비율대로 고르는 함수(예 상태코드 정상 90% · 정지 10%)')
 
-const S7 = slide('7. 원인 분석', '시간 차이의 주원인은 <b>PostgreSQL 가중 선택 함수의 plpgsql 호출</b>이고, Oracle 의 <b>행당 고정 비용</b>이 그 이득의 일부를 깎았다',
+const S7 = slide('8. 원인 분석', '시간 차이의 주원인은 <b>PostgreSQL 가중 선택 함수의 plpgsql 호출</b>이고, Oracle 의 <b>행당 고정 비용</b>이 그 이득의 일부를 깎았다',
   `<div class="body"><table style="font-size:12.5px">
       <tr><th style="width:4%">#</th><th style="width:24%">원인 후보</th><th>근거</th><th style="width:9%">가능성</th></tr>
       <tr><td>1</td><td>PostgreSQL gen.wpick 이 plpgsql 이라 질의 안에 펼쳐지지 못함</td><td>호출 1회 ${FIT.pg.w} µs(그 밖의 SQL 함수 ${FIT.pg.o} µs 의 ${(FIT.pg.w / FIT.pg.o).toFixed(0)}배). 가중 선택이 많은 테이블일수록 Oracle 이 빨라짐(0개 2.16배 → 3개 이상 0.57배). 고객 이력 ptl_cus_cust_h 는 0.32배</td><td><span class="tag t-h">높음</span></td></tr>
@@ -212,12 +283,12 @@ const S7 = slide('7. 원인 분석', '시간 차이의 주원인은 <b>PostgreSQ
       <tr><td>5</td><td>메모리 크기(SGA 3GB · shared_buffers 2GB)</td><td>계산이 묶은 작업이고 읽기 대기가 작음(db file sequential read ${f(+ev.find(w => w[1] === 'db file sequential read')[4])}초)</td><td><span class="tag t-l">낮음</span></td></tr>
       <tr><td>6</td><td>실행 순서·동시성 차이</td><td>같은 작업 단위 2,086개·같은 순서·동시 7개, 두 DB 세션 가동률 99.9%</td><td><span class="tag t-l">배제</span></td></tr>
     </table></div>`,
-  `<b>판단</b> : 이번 차이는 엔진 쓰기 성능보다 <b>생성식 계산 방식</b>에서 나왔다. 회귀로 추정하면 gen.wpick 을 SQL 식으로 바꿀 때 PostgreSQL 적재가 약 ${f((WCALLS * (FIT.pg.w - FIT.pg.o) * 1e-6) / 7 / 60)}분 줄어 Oracle 보다 빨라질 수 있다(추정, 9장 재측정으로 확정).`,
-  '6장 비용 모형, 5장 Oracle 통계, oracle/out/full_analysis.json(테이블별 소요 비교)')
+  `<b>판단</b> : 이번 차이는 엔진 쓰기 성능보다 <b>생성식 계산 방식</b>에서 나왔다. 회귀로 추정하면 gen.wpick 을 SQL 식으로 바꿀 때 PostgreSQL 적재가 약 ${f((WCALLS * (FIT.pg.w - FIT.pg.o) * 1e-6) / 7 / 60)}분 줄어 Oracle 보다 빨라질 수 있다(추정, 11장 재측정으로 확정).`,
+  '7장 비용 모형, 6장 Oracle 통계, oracle/out/full_analysis.json(테이블별 소요 비교)')
 
 const fast = A.fastest.slice(0, 5), slow = A.slowest.slice(0, 5)
 const gcount = t => (plan.find(p => p.tbl === t).sql.match(/gen\.(wpick|wcode)\(/g) || []).length
-const S8 = slide('8. 테이블별 차이 사례', `Oracle 이 빠른 테이블 5개는 가중 선택을 <b>2~6개</b>, 느린 테이블 5개는 <b>0~2개</b> 쓴다`,
+const S8 = slide('9. 테이블별 차이 사례', `Oracle 이 빠른 테이블 5개는 가중 선택을 <b>2~6개</b>, 느린 테이블 5개는 <b>0~2개</b> 쓴다`,
   `<div class="body c2">
       ${[['Oracle 이 빠른 테이블 5개', fast], ['Oracle 이 느린 테이블 5개', slow]].map(([h, L]) => `<div class="box"><h3>${h}</h3><div class="in"><table style="font-size:12px">
         <tr><th>테이블</th><th class="n">행</th><th class="n">가중 선택</th><th class="n">PG 초</th><th class="n">Oracle 초</th><th class="n">배수</th></tr>
@@ -227,7 +298,31 @@ const S8 = slide('8. 테이블별 차이 사례', `Oracle 이 빠른 테이블 5
   '<b>Key Finding</b> : 같은 Oracle 안에서도 테이블 성격에 따라 0.32배 ~ 3.14배로 갈린다. DBMS 비교는 전체 시간과 함께 테이블 성격별 배수를 같이 보아야 한다.',
   '테이블별 작업 단위 소요 합(두 DB 모두 30초 넘는 테이블), 배수 = Oracle ÷ PostgreSQL')
 
-const S9 = slide('9. 시사점과 후속 조치', `11억 행 적재는 <b>Oracle ${hms(OR)} · PostgreSQL ${hms(PG)}</b>로 끝났고, 다음 비교는 <b>MS-SQL</b>, 마지막은 <b>MySQL</b>이다`,
+const S9b = slide('10. MS-SQL · MySQL 테스트 불가', `MS-SQL 2회 · MySQL 1회 모두 <b>실행 환경 문제</b>로 적재를 끝내지 못해 시간 비교에서 뺐다`,
+  `<div class="body" style="grid-template-rows:auto 1fr">
+      <table class="tight">
+        <tr><th>실행</th><th>시각(KST)</th><th class="n">경과</th><th class="n">작업 단위</th><th class="n">완료 행</th><th class="n">완료율</th><th class="n">실패</th><th>중단 원인</th></tr>
+        ${RUNS.map(r => `<tr><td>${r.nm}</td><td>${r.kst}</td><td class="n">${hms(r.last)}</td><td class="n">${f(r.units)} / 2,086</td><td class="n">${f(r.rows)}</td><td class="n">${pct(r.rows, T)}</td><td class="n">${r.fails}</td><td>${r.why}</td></tr>`).join('\n        ')}
+      </table>
+      <div class="c2" style="display:grid;gap:14px">
+        <div class="box"><h3>MS-SQL 2022 조건과 조치</h3><div class="in"><ul>
+          <li>메모리 상한 4,317 MB(Oracle SGA + PGA 와 같게), 로그 16 GB · SIMPLE, UTF-8 정렬</li>
+          <li>VARCHAR(n) → varchar(n×3), CHAR(n) → nchar(n)(마스터 선택), 파티션 2,306개</li>
+          <li>1차 중단 뒤 마스터 선택 : 문장별 메모리 상한 MAX_GRANT_PERCENT 12 · 페이지 잠금 PAGLOCK 을 넣고 처음부터 다시 적재</li>
+          <li>2차는 메모리 대기가 풀렸으나(7문장 중 6개 실행) PC 메모리 부족으로 적재 프로세스가 끊겼다</li>
+        </ul></div></div>
+        <div class="box"><h3>MySQL 26.10 조건과 조치</h3><div class="in"><ul>
+          <li>버퍼 풀 3,072 MB, redo 16 GB, 바이너리 로그 켬(기본값), utf8mb4</li>
+          <li>MS-SQL 2차 중단을 막으려고 적재 프로그램을 Windows 독립 프로세스로 실행</li>
+          <li>실패 0건으로 진행하다 Docker 엔진이 응답을 멈췄다. 이때 WSL 메모리 사용은 586 MB 로 줄어 있었다</li>
+          <li>마스터 지시로 적재를 멈췄고, Docker 재시작 · DB 정리는 하지 않았다</li>
+        </ul></div></div>
+      </div>
+    </div>`,
+  `<b>판단</b> : MS-SQL 1차 중단은 엔진 메모리 설정(할당 · 잠금)에서, MS-SQL 2차와 MySQL 중단은 호스트(PC 메모리 16 GB · Docker · WSL)에서 생겼다. 재시험 전에 Docker · WSL 메모리 한도를 먼저 점검한다.`,
+  'pitel/mssql/MSSQL_LOG.md · pitel/mysql/MYSQL_LOG.md, 적재 로그 mssql/out · mysql/out')
+
+const S9 = slide('11. 시사점과 후속 조치', `11억 행 적재는 <b>Oracle ${hms(OR)} · PostgreSQL ${hms(PG)}</b>로 끝났고, <b>MS-SQL · MySQL</b> 은 실행 환경 문제로 테스트 불가였다`,
   `<div class="body c2">
       <div class="box"><h3>시사점</h3><div class="in"><ul>
         <li>DBMS 비교의 첫째 측정값은 <b>시간 · 작업 건수 · 완료율</b>이다. 10분 단위 표와 주제영역별 표를 같은 도구(bench/progress.mjs · bench/analyze.mjs)로 남긴다</li>
@@ -235,13 +330,12 @@ const S9 = slide('9. 시사점과 후속 조치', `11억 행 적재는 <b>Oracle
         <li>Oracle 은 행마다 고정 비용이 크다. 단순 테이블이 많은 업무는 PostgreSQL 이 유리하다</li>
         <li>두 DB 의 데이터 크기는 같다(${gb(pgSizeAll)} · ${gb(orSizeAll)} GB). 저장 공간은 DBMS 선택 기준에서 차이를 만들지 않았다</li>
       </ul></div></div>
-      <div class="box"><h3>후속 조치</h3><div class="in"><table style="font-size:12.5px">
+      <div class="box"><h3>후속 조치</h3><div class="in"><table class="tight nw3">
         <tr><th>할 일</th><th>확정하는 것</th><th>상태</th></tr>
-        <tr><td>MS-SQL 배율 1 적재(같은 방식)</td><td>DBMS 별 시간 · 건수 · 완료율</td><td>다음</td></tr>
-        <tr><td>MySQL 배율 1 적재(같은 방식)</td><td>DBMS 별 시간 · 건수 · 완료율</td><td>마지막</td></tr>
-        <tr><td>PostgreSQL gen.wpick SQL 식 판으로 표본 재측정</td><td>원인 1 의 크기(7장 추정 확인)</td><td>제안</td></tr>
+        <tr><td>MS-SQL · MySQL 재시험 : 호스트 메모리 16GB · Docker · WSL 메모리 한도 점검 뒤</td><td>DBMS 별 시간 · 건수 · 완료율</td><td>대기</td></tr>
+        <tr><td>PostgreSQL gen.wpick SQL 식 판으로 표본 재측정</td><td>원인 1 의 크기(8장 추정 확인)</td><td>제안</td></tr>
         <tr><td>Oracle 행 생성기 단독 시간 측정</td><td>원인 2 의 몫(행 생성기 · undo/redo)</td><td>제안</td></tr>
-        <tr><td>다음 적재부터 대기 표본 1분 간격 기록</td><td>5장 PostgreSQL 대기 공백 해소</td><td>제안</td></tr>
+        <tr><td>다음 적재부터 대기 표본 1분 간격 기록</td><td>6장 PostgreSQL 대기 공백 해소</td><td>제안</td></tr>
         <tr><td>PK · 인덱스 · 통계 단계 비교</td><td>적재 뒤 단계 시간</td><td>제안</td></tr>
       </table></div></div>
     </div>`,
@@ -259,11 +353,12 @@ const html = `<!DOCTYPE html>
 ${CSS}
   .tight td, .tight th { padding:2px 6px; font-size:11.5px; line-height:1.35 }
   .tight .in { padding:6px 10px }
+  .nw3 td:nth-child(3), .nw3 th:nth-child(3) { white-space:nowrap }
 </style>
 </head>
 <body>
 <main class="deck">
-${S0}${S1}${S2}${S3}${S4}${S5}${S6}${S7}${S8}${S9}</main>
+${S0}${S1}${S2}${S2b}${S3}${S4}${S5}${S6}${S7}${S8}${S9b}${S9}</main>
 </body>
 </html>
 `

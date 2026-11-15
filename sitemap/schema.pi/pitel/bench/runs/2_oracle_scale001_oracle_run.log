@@ -1,0 +1,7 @@
+▶ oracle constraints 시작 2026-11-15T01:00:22.627Z
+■ oracle constraints 끝 172.5초
+▶ oracle stats 시작 2026-11-15T01:03:15.156Z
+■ oracle stats 끝 113.3초
+▶ oracle verify 시작 2026-11-15T01:05:08.509Z
+■ oracle verify 끝 22.8초 · {"tables":214,"rows":12170698,"parts":2306,"pk":214,"idx":318,"gb":14.94,"defaultRows":"0/38"}
+exit 0

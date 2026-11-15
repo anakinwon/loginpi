@@ -1,0 +1,37 @@
+START|2026-11-15 03:25:28
+EV|direct path write|User I/O|516173|1926
+EV|enq: TT - contention|Other|30|195
+EV|local write wait|User I/O|6814|117
+EV|Data file init write|User I/O|300471|76
+EV|enq: HW - contention|Configuration|5015|45
+EV|buffer busy waits|Concurrency|313018|40
+EV|db file sequential read|User I/O|65731|40
+EV|direct path read|User I/O|214650|33
+EV|wait for a undo record|Other|41433|32
+EV|enq: FB - contention|Other|46619|28
+EV|db file scattered read|User I/O|39902|27
+EV|log file sync|Commit|3490|26
+ST|user commits|2400
+ST|CPU used by this session|4641412
+ST|DB time|4955651
+ST|physical write total bytes|152783945728
+ST|physical reads|19845795
+ST|db block changes|207681616
+ST|physical writes|265247
+ST|redo size|168134853716
+ST|redo wastage|0
+ST|redo log space requests|597
+TM|DB time|49472
+TM|DB CPU|46471
+TM|background elapsed time|0
+TM|sql execute elapsed time|49228
+LOG|43
+P|cpu_count|8
+P|disk_asynch_io|TRUE
+P|filesystemio_options|SETALL
+P|sga_target|0
+P|db_block_size|8192
+P|db_cache_size|0
+P|db_writer_processes|4
+P|log_buffer|6766592
+P|pga_aggregate_target|1380974592
