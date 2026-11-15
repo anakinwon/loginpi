@@ -42,6 +42,11 @@ const q = s => "'" + String(s).replace(/'/g, "''") + "'"
 //  Oracle 차이 : 정수 나눗셈 TRUNC·나머지 MOD, 배열 → '|' 구분 문자열·CASE, null_p(다형) → CASE, generate_series → 파이프라인 gen.series,
 //  VARCHAR(n) 가 4,000바이트를 넘을 수 있는 칼럼(n > 1333, 한글 3바이트) = CLOB(oracle/ddl-oracle.mjs 와 같은 규칙)
 const LOB_CHARS = 1333
+// gen.dtm_to_k 의 JS 계산(조각 경계용) : 일시 → 키 번호 근사, recent_dtm 의 역함수
+function dtmToK(y, n) {
+  const t0 = Date.UTC(2010, 0, 1), t1 = Date.UTC(2026, 9, 31, 23, 59, 59)
+  return Math.max(0, Math.min(n, Math.floor(n * Math.pow((Date.UTC(y, 0, 1) - t0) / (t1 - t0), 1 / 0.22))))
+}
 const DIALECT = {
   pg: {
     idiv: (a, b) => `${a} / ${b}`,
@@ -77,7 +82,9 @@ const DIALECT = {
     memo: (s, p, len, lob) => `gen.${lob ? 'memo_lob' : 'memo'}(K, ${s}, ${p}, ${len})`,
     coalesce: (a, b, lob) => `NVL(${a}, ${lob ? `TO_CLOB(${b})` : b})`,
     tsLit: y => `TIMESTAMP '${y}-01-01 00:00:00'`,
-    insert: (tbl, cols, sel) => `INSERT /*+ APPEND */ INTO ${tbl} (${cols})\nSELECT\n${sel}\nFROM (SELECT column_value AS k FROM TABLE(gen.series(__KFROM__, __KTO__)))`,
+    // 조각 경계 = 숫자(행 값은 키로만 정해져 경계는 결과에 영향 없음), 키 = SQL 행 생성기(10만 × 묶음), 일반 INSERT(PostgreSQL 처럼 같은 테이블 조각을 동시에 넣음)
+    bound: (y, n) => String(dtmToK(y, n)),
+    insert: (tbl, cols, sel) => `INSERT INTO ${tbl} (${cols})\nSELECT\n${sel}\nFROM (SELECT __KFROM__ + g1.n * 100000 + g2.n AS k FROM (SELECT LEVEL - 1 AS n FROM dual CONNECT BY LEVEL <= CEIL((__KTO__ - __KFROM__ + 1) / 100000)) g1, (SELECT LEVEL - 1 AS n FROM dual CONNECT BY LEVEL <= 100000) g2 WHERE g1.n * 100000 + g2.n <= __KTO__ - __KFROM__)`,
   },
 }
 
@@ -300,8 +307,9 @@ function chunks(p, D = DIALECT.pg) {
   if (p.n < C.chunkMin) return [{ id: `${p.tbl}:all`, from: '1', to: String(p.n) }]
   const out = []
   for (let y = C.years[0]; y <= C.years[1]; y++) {
-    const from = y === C.years[0] ? '1' : `gen.dtm_to_k(${D.tsLit(y)}, ${p.n}) + 1`
-    const to = y === C.years[1] ? String(p.n) : `gen.dtm_to_k(${D.tsLit(y + 1)}, ${p.n})`
+    const b = yy => (D.bound ? D.bound(yy, p.n) : `gen.dtm_to_k(${D.tsLit(yy)}, ${p.n})`)
+    const from = y === C.years[0] ? '1' : `${b(y)} + 1`
+    const to = y === C.years[1] ? String(p.n) : b(y + 1)
     out.push({ id: `${p.tbl}:${y}`, from, to })
   }
   return out
@@ -335,6 +343,7 @@ async function run() {
   const isOra = target === 'oracle'
   const D = DIALECT[target]
   const oraLib = isOra ? await import('../oracle/ora.mjs') : null
+  const inl = isOra ? await import('../oracle/inline.mjs') : null
   const which = arg('db', 'dev')
   if (which === 'prod' && arg('yes') !== true) throw new Error('pitel 최종 적재는 --yes 필요(최종 적재는 지정 세션만 — CONTEXT 4절)')
   const schema = arg('schema', which === 'prod' ? 'public' : 'chk_gen')
@@ -347,10 +356,8 @@ async function run() {
   const model = loadModel()
   const plans = build(model, scale, D).filter(p => !only || only.split(',').includes(p.tbl))
 
-  if (isOra) {
-    const st = oraLib.rows(await oraLib.ora("SELECT object_type || ':' || status FROM user_objects WHERE object_name = 'GEN' ORDER BY 1;"))
-    if (st.join(',') !== 'PACKAGE BODY:VALID,PACKAGE:VALID') throw new Error(`Oracle GEN 패키지 상태 이상(${st.join(',') || '없음'}) — node oracle/s1.mjs gen --target oracle 먼저`)
-  } else await psql(db, fs.readFileSync(path.join(HERE, '00_gen_functions.sql'), 'utf8'))
+  // Oracle : gen.* 를 내장 함수 식으로 펼치므로 설치할 함수 없음(oracle/inline.mjs)
+  if (!isOra) await psql(db, fs.readFileSync(path.join(HERE, '00_gen_functions.sql'), 'utf8'))
   if (arg('ddl') === true && !isOra) {
     await psql(db, `CREATE SCHEMA IF NOT EXISTS ${schema};`)
     for (const f of fs.readFileSync(path.join(ROOT, 'ddl/00_run_order.txt'), 'utf8').split('\n').filter(l => /_tables\.sql$/.test(l.trim())))
@@ -387,7 +394,8 @@ async function run() {
   async function worker() {
     while (queue.length) {
       const c = queue.shift()
-      const sql = head + c.p.sql.replace('__KFROM__', `(${c.from})`).replace('__KTO__', `(${c.to})`) + ';\n'
+      const body = c.p.sql.replaceAll('__KFROM__', `(${c.from})`).replaceAll('__KTO__', `(${c.to})`)
+      const sql = head + (isOra ? inl.wrapLines(inl.inlineGen(body)) : body) + ';\n'
       // 조각 시작·완료 시각 줄 — database/run-init.mjs 가 이 로그로 테이블별 시작·종료를 기록(완료 줄은 state 기록 뒤)
       console.log(`시작 ${c.id} ${new Date().toISOString()}`)
       try {
