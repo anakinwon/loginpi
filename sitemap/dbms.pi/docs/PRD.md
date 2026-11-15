@@ -1,6 +1,6 @@
 # PRD: dbms.pi
 
-> 버전 v0.7(11.1 QCPi 품질점검 추가 — 상위 8단계) · 작성 2026-11-01 · `node scripts/tenant-env.mjs new` 생성 후 결정 2건·11절 반영 — [TBD] 를 채워 v1.0 확정 후 앱 코드 착수
+> 버전 v0.8(11.6 Oracle 이기종 실증 추가) · 작성 2026-11-01 · `node scripts/tenant-env.mjs new` 생성 후 결정 2건·11절 반영 — [TBD] 를 채워 v1.0 확정 후 앱 코드 착수
 > 상위 플랜 : [PRD_28 멀티사이트](../../../docs/PRD_28_PI_MULTISITE.md) §8 · 데이터 플랫폼 8단계(이 앱 = 5~8단계 주관, 2026-11-12)·앱 경계 : [schema.pi MASTER_ROADMAP](../../schema.pi/docs/MASTER_ROADMAP.md) §3-10 · 사업 근거 : [PRD_27](../../../docs/PRD_27_PI_FACTORY.md) 사이트 표 · 할 일 : [TODO 목록](../../multitenant_create_TODO-List.md)
 
 ## 1. 개요 (sitemap/sites.json)
@@ -102,7 +102,7 @@
 | 5 | `Pi` 접두·`.pi` 이름 상표 점검(MASTER_ROADMAP §8-2) — 앱 생성 전 pi-mainnet-listing-auditor | 서비스 | [확인중] |
 | 6 | 실행 워커 위치·실행 지시 경로(11.0 A2) — 고객망 로컬 에이전트 우선 + 클라우드 원천용 관리형 워커(Vultr VPS·Supabase·Vercel Queues/Workflow 중), 지시 경로 ① dbms.pi → schema.pi 중계(현 에이전트 = schema.pi 발급 토큰·서버 1곳 폴링) ② 에이전트가 dbms.pi 와 직접 통신(토큰 dbms.pi 발급) — #2 와 함께 결정 | 서비스 설계 → 마스터 | [확인중 : Phase 3 분석] |
 | 7 | 레이크 저장소(11.4 ANL-R01) — 고객 쪽 저장소 vs Supabase Storage 등 클라우드(행 데이터가 클라우드에 머묾 → PRD_28 §1.1-1 해석 필요) | 마스터 → legal-compliance-advisor | [확인중 : Phase 7 분석] |
-| 8 | Oracle·Tibero 변경 캡처(LogMiner·ProSync 등) 범위·라이선스 — 1차는 PostgreSQL·폴링만 | 마스터 | [확인중 : Phase 6 분석] |
+| 8 | Oracle·Tibero 변경 캡처(LogMiner·ProSync 등) 범위·라이선스 — 1차는 PostgreSQL·폴링만 | 마스터 | [확인중 : Phase 6 분석]. Oracle 을 대상(적재)으로 쓰는 경로는 11.6 실증에서 시험한다(2026-11-16 ~ 11-27). 운영 적용 때 Enterprise Edition Partitioning 옵션 라이선스도 이 항목에서 함께 본다 |
 | 9 | 성능 수집 대상 — 고객 DB(에이전트 경유)만인지, Pi 앱들(cafe·sitemap 등) 자기 DB 까지인지(제안서 §5 B안 = 19 사이트 접속은 PRD_28 §1.1-1 해석 전 보류) | 마스터 | [확인중 : Phase 3 분석] |
 | 10 | 알림 채널(P44 이메일·Slack 등) — 이행 실패 알림(MIG-R06)부터 필요 | 마스터 | [확인중 : Phase 5 분석] |
 | 11 | AI 튜닝 모델·월 토큰 상한(P40)·외부 전송 승인 | 마스터 | **월 상한 확정 2026-11-02** — 요금제 횟수 상한(D2 월 30회·D3 월 100회, 1회 최대 4,000토큰, `dbm_fee_plan.ai_mon_cnt`). 모델·외부 전송 승인은 [확인중 : Phase 7 분석] |
@@ -222,6 +222,56 @@
 | 6 | 이행 작업·단계·청크 체크포인트·검증 결과·실행 승인 이력 | 행 데이터 칼럼 없음(A3) |
 | 7 | 파이프라인 정의·실행·워터마크·지연 지표 | |
 | 8 | `prf_clct_hist`·`prf_qry_hist`·`prf_tbl_hist`·`prf_idx_hist`·`prf_tune_rcmd`·`prf_tune_rslt`(제안서 §4-2, **가칭** — 제안서 §8-2 결정(`metric_` 재사용 여부·약어 길이 규칙)에 따라 접두사·테이블명 변경 가능) | 접두사와 신규 단어·도메인 `ms` 는 schema.pi 표준 등재(P01·P02 → P20 승인) 선행 |
+
+### 11.6 이기종 실증 : Pi통신 과금 시스템 PostgreSQL → Oracle (2026-11-15 신설)
+
+> 목적 : PostgreSQL 로 만든 Pi통신 과금 시스템(pitel)을 Oracle 판으로 다시 구축하고, PostgreSQL → Oracle 복제와 CDC 를 로컬에서 실증한다. 6단계 PiMig·7단계 PiCDC 요구사항을 이기종 대상에서 먼저 시험하고, 측정값으로 ROADMAP Phase 5·6 작업일을 다시 산정한다.
+> 범위 : 로컬 Docker 컨테이너 두 개. dbms.pi 운영 DB·Vercel 은 쓰지 않고 행 데이터는 로컬에만 둔다(A3). schema.pi 에는 메타(Oracle 물리모델)만 만든다.
+> 일정 : ROADMAP 'Oracle 실증 트랙'(2026-11-16 ~ 11-27, 10 작업일).
+
+**환경 (2026-11-15 확인)**
+
+| 항목 | 원천 | 대상 |
+|---|---|---|
+| 컨테이너 | `pitel-pg` : PostgreSQL 17, 포트 55432 | `oracle21c` : Oracle Database 21.3 Enterprise Edition(이미지 설치 목록에서 확인), CDB `ORCLCDB`·PDB `ORCLPDB`, 포트 1521 |
+| 데이터 | pitel 배율 1 : 테이블 214개, 조각 2,306개, 1,101,170,707행, 264GB | 비어 있음 |
+| 복제 설정 | `wal_level` logical, 복제 슬롯 상한 10 | 이번 범위는 적재 쪽 |
+| 상태 | 실행 중 | 정지(2026-11-14 종료 코드 137) |
+| 호스트 | 메모리 15.7GB(Docker 사용 약 7.6GB), C: 여유 535GB | |
+
+**규모** : 실증 기본 배율은 0.01 이다(테이블 214개, 12,170,698행, `datagen plan` 2026-11-15 산출). 배율 0.1(111,170,700행)과 배율 1 은 실증에서 잰 처리량을 보고 따로 결정한다.
+
+**시나리오**
+
+| 시나리오 | 내용 | 끝난 상태 |
+|---|---|---|
+| S1 | Oracle 물리모델 생성 → 기존 스크립트로 초기 데이터 구축 | Oracle 에 pitel 테이블 214개와 배율 0.01 데이터 |
+| S1.1 | Oracle 환경 초기화 | pitel 사용자·테이블스페이스를 지운 빈 상태 |
+| S2 | Oracle 물리모델 재생성 → CDC 환경 구축 | 빈 테이블 214개, 원천 발행·슬롯, 복제 워커 준비 |
+| S3 | PostgreSQL → Oracle 복제, CDC 활성화 | 초기 복제 검증 통과, 원천 변경이 대상에 반영되는 중 |
+
+| ID | 시나리오 | 요구사항 | 통과 기준 | 연결 |
+|---|---|---|---|---|
+| ORA-R01 | S1 | **Oracle 물리모델 생성** : schema.pi 'Pi통신 과금 데이터 표준화' 분류체계(엔터티 214개, PostgreSQL 물리모델 1개 적재됨)에서 ModelPi 로 Oracle 물리모델(DBMS 코드 0001)을 추가로 만들고 DDL 을 내려받는다. 이름은 대문자, PK 는 `PK_<테이블>`, 인덱스는 `X_<테이블>_NN` 이고 물리 FK 는 만들지 않는다(ModelPi Oracle 프로파일) | 테이블 214개 DDL, 생성 오류 0. 30자를 넘는 이름(테이블 2개의 PK·인덱스, 2026-11-15 산출)은 줄임 규칙을 정해 적용 | 4단계 PHY, MIG-R01 |
+| ORA-R02 | S1 | **타입·길이** : `VARCHAR(n)` → `VARCHAR2(n)`, `CHAR(n)` → `CHAR(n)`, `NUMERIC(p,s)` → `NUMBER(p,s)`, `TIMESTAMP` → `TIMESTAMP`(pitel 칼럼 2,124개의 타입은 이 4종). DDL 적용 세션의 `NLS_LENGTH_SEMANTICS` 를 CHAR 로 두어 한글 바이트 증가로 길이가 넘치지 않게 한다. 대응 정본은 schema.pi 타입 매핑(`std_tp_map`) | 적재 중 길이 넘침 0건 | MIG-R09·R10 |
+| ORA-R03 | S1 | **조각(파티션)** : 조각 테이블 38개(연·월 단위 RANGE + DEFAULT)를 Oracle RANGE 조각으로 옮기고, DEFAULT 조각은 `MAXVALUE` 조각으로 바꾼다(배율 1 에서 DEFAULT 조각 38개 모두 0행). ModelPi 는 조각 정보를 저장하지 않으므로 이번에는 pitel 물리모델 JSON 의 `partition` 값으로 조각 절을 덧붙인다 | 조각 수 2,306개로 PostgreSQL 과 같음 | ModelPi 조각 지원은 schema.pi 4단계 후속 |
+| ORA-R04 | S1 | **생성 함수 이식** : `datagen/00_gen_functions.sql` 의 `gen.*` 21개를 PL/SQL 패키지 `GEN` 으로 옮긴다. 난수 기준인 PostgreSQL `hashint8extended` 를 같은 계산으로 구현해 같은 키에서 같은 값을 낸다 | 함수마다 표본 1만 키의 결과가 PostgreSQL 과 같음 | |
+| ORA-R05 | S1 | **초기 데이터 구축** : `datagen.mjs` 에 Oracle 출력(`--target oracle`)을 더해 기존 생성 규칙 그대로 배율 0.01 을 적재한다. PK·인덱스는 적재 뒤 만들고 통계(`DBMS_STATS`)를 모은다 | 테이블별 행 수가 `datagen plan` 목표와 같음(합계 12,170,698행), 적재 시간 기록 | MIG-R14 |
+| ORA-R06 | S1 | **같은 배율 대조** : PostgreSQL 에 배율 0.01 스키마를 따로 만들고(S3 원천으로 다시 씀) 테이블별 건수·숫자 칼럼 합계·표본 1,000키 해시를 대조한다 | 행 수·문자·숫자 칼럼 불일치 0건, 일시 칼럼은 1µs 이내(2026-11-15 마스터 결정 : 엔진마다 따로 생성한 데이터는 POWER 마지막 1비트 차이로 1µs 가 갈릴 수 있음. 엄격한 동일성은 S3 ORA-R12) | MIG-R04 |
+| ORA-R07 | S1.1 | **Oracle 환경 초기화** : pitel 사용자(`DROP USER … CASCADE`)와 전용 테이블스페이스를 지우고 다시 만드는 스크립트. 접속 대상은 로컬 컨테이너 PDB 로 고정하고 `--yes` 를 줄 때만 실행한다 | 실행 뒤 pitel 객체 0개, S1 재실행 시 ORA-R05 와 같은 건수 | R-P6 |
+| ORA-R08 | S2 | **대상 재생성** : S1.1 뒤 ORA-R01~R03 DDL 로 빈 테이블 214개를 다시 만든다. 대상 쪽에 오프셋 기록 테이블과 오류 행 격리 테이블을 둔다 | 빈 테이블 214개, 보조 테이블 2개 | A3·A6 |
+| ORA-R09 | S2 | **원천 CDC 설정** : 배율 0.01 원천 스키마에 발행(publication)을 만들고 `publish_via_partition_root` 를 켠다(조각 변경을 최상위 테이블 이름으로 받기 위해). 복제 전용 계정(REPLICATION 권한, 대상 테이블 SELECT)과 복제 슬롯 1개를 만든다 | 발행 대상 214테이블, 슬롯 1개 | CDC-R01 ②, A10 |
+| ORA-R10 | S2 | **사전 점검** : ① NOT NULL 문자 칼럼의 빈 문자열(Oracle 은 빈 문자열을 NULL 로 저장해 적재가 실패한다) ② Oracle 예약어(`V$RESERVED_WORDS`)와 겹치는 칼럼명 ③ 길이 넘침 후보를 원천에서 찾는다 | 발견 건마다 변환 규칙 또는 제외 결정. 핵심 예약어 목록 대조는 2026-11-15 에 0건 | CDC-R00, MIG-R09 |
+| ORA-R11 | S2 | **복제 워커** : Debezium Engine 을 내장한 Java 워커(Kafka 미사용)가 `pgoutput` 으로 변경을 읽고 대상에는 JDBC `MERGE`(키 기준 upsert)로 쓴다. Debezium Engine 에는 적재 부품이 없어 `MERGE` 는 워커가 직접 만든다. 오프셋은 대상 DB 에 기록한다. Java 는 Debezium 3.x 기준 17 이상 | 단건 입력·수정·삭제가 대상에 반영 | A2, [CDC 방향 검토](../../schema.pi/public/restore/needsCDC.html) B안 |
+| ORA-R12 | S3 | **초기 복제** : 슬롯의 일관 시점 스냅샷으로 전량 복제하고 시작 LSN 을 인계 지점으로 기록한다 | 시작 LSN 기록, 테이블별 건수·숫자 합계·표본 해시 일치, 처리량(행/초) 기록 | MIG-R03·R04·R08 |
+| ORA-R13 | S3 | **시퀀스·시각** : 대상에 시퀀스·identity 가 있으면 적재 뒤 키 최댓값 다음으로 맞춘다. 시각 값은 원천과 같은 시간대 해석으로 대조한다 | 재동기화 완료, 시각 불일치 0건 | MIG-R12·R13 |
+| ORA-R14 | S3 | **CDC 활성화·정확성(시험 A)** : 원천 한 주제영역에 입력·수정·삭제를 섞은 변경 10만 건을 넣는다 | 누락 0, 중복 반영 0, 키별 순서 유지, 반영 지연(lag) 기록 | CDC-R04 |
+| ORA-R15 | S3 | **재시작(시험 B)** : 반영 중 워커를 강제 종료하고 다시 띄우기를 3회 한다 | 누락 0 | A6 |
+| ORA-R16 | S3 | **슬롯 보호(시험 C)** : 대상 DB 를 30분 멈춘다 | 원천 WAL 증가량 측정, 지연 경보 동작, 실증 뒤 슬롯 삭제 | CDC-R06 |
+
+완료 기준 : ORA-R01~R16 통과와 측정값 4종(S1 적재 시간, 초기 복제 처리량, CDC 지연, 시험 C 의 WAL 증가량) 기록. 측정값은 ROADMAP Phase 5·6 재산정과 CDC 방향 검토 결정(11.3 반영) 승인 자료로 쓴다.
+
+이번 범위 밖 : Oracle 을 원천으로 하는 캡처(LogMiner·ARCHIVELOG·보조 로깅, 10절 #8), 배율 0.1·1 복제, dbms.pi 화면·API 연동(워커 지시·상태 업로드는 Phase 5 설계), AI 매핑 정확도 시험.
 
 ## 12. 기능 트리 v0.4 — schema.pi 연결 서비스 (대분류 · 중분류, 마스터 승인 2026-11-01)
 
@@ -347,3 +397,4 @@ MASTER_ROADMAP §3-10 의 dbms 영역(설치·파라미터·백업·복구·보�
 | 2026-11-07 | v0.6 — 9절 기능 권한에 성능 자동 수집(D1, 매일 KST 03:00 크론) 추가 (`sql/021`) |
 | 2026-11-12 | v0.7 — 상위 7 → 8단계 개정(마스터 지시 "dbms.pi 5 QCPi 품질점검 - 데이터 구조·값·관리체계, 6 PiMig, 7 PiCDC, 8 PiAnal") : 11절 5~8단계로, 11.1 QCPi 요구사항 QC-R01~R10 신설(기존 11.1~11.4 → 11.2~11.5, 데이터 후보 5단계 행), F-06·머리말 정합, 12절 대분류 11 QCPi(Phase 4) 신설·기존 Phase 4~6 태그 → 5~7, 확인 필요 #7·#8·#10~#12 Phase 번호 정합·#15 QCPi 범위 신설 |
 | 2026-11-12 | v0.7 보완 — QCPi 마스터 결정 3건 확정(2026-11-12 마스터 확정) : ① 값 품질 = QCPi 포함(제안서 §0 값 프로파일링 제외 권고 해제, 11.1 머리말), ② 업무 규칙 정의 = schema.pi 메타·진단 실행·결과 = dbms.pi(QC-R06), ③ 품질기준 7종 = 값 6종·사용성은 관리체계(QC-R07), 10절 #15 부분 확정(요금제 등급·진단 주기·표본 기준은 미결 유지) |
+| 2026-11-15 | v0.8 : 11.6 Oracle 이기종 실증 신설(마스터 지시 "Pi통신 과금 시스템을 PostgreSQL로 구현된것을 ORACLE 버전으로 구축", 시나리오 S1·S1.1·S2·S3) : 환경·규모·요구사항 ORA-R01~R16·완료 기준·범위 밖, 10절 #8 에 Oracle 을 대상으로 쓰는 실증 경로와 Partitioning 라이선스 검토 반영 |
