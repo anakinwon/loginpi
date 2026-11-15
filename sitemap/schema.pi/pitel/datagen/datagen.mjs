@@ -8,6 +8,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { concatFix } from '../mssql/inline.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(HERE, '..')
@@ -85,6 +86,33 @@ const DIALECT = {
     // 조각 경계 = 숫자(행 값은 키로만 정해져 경계는 결과에 영향 없음), 키 = SQL 행 생성기(10만 × 묶음), 일반 INSERT(PostgreSQL 처럼 같은 테이블 조각을 동시에 넣음)
     bound: (y, n) => String(dtmToK(y, n)),
     insert: (tbl, cols, sel) => `INSERT INTO ${tbl} (${cols})\nSELECT\n${sel}\nFROM (SELECT __KFROM__ + g1.n * 100000 + g2.n AS k FROM (SELECT LEVEL - 1 AS n FROM dual CONNECT BY LEVEL <= CEIL((__KTO__ - __KFROM__ + 1) / 100000)) g1, (SELECT LEVEL - 1 AS n FROM dual CONNECT BY LEVEL <= 100000) g2 WHERE g1.n * 100000 + g2.n <= __KTO__ - __KFROM__)`,
+  },
+  // MS-SQL(--target mssql, PRD dbms.pi 11.7 대상 ②) : gen.* · lpad · to_char 는 mssql/inline.mjs 가 T-SQL 식으로 펼치고, || 는 칼럼 식마다 CONCAT 으로 바꾼다
+  //  키 = GENERATE_SERIES(SQL Server 2022), 일반 INSERT, 문장 하나 = CPU 하나(MAXDOP 1 : PostgreSQL·Oracle 처럼 동시 7문장 = 7코어)
+  //  2026-11-15 마스터 선택 : 문장별 메모리 상한 MAX_GRANT_PERCENT = 12(한 문장이 메모리 할당을 독차지해 6문장이 RESOURCE_SEMAPHORE 대기),
+  //  PAGLOCK(행 잠금이 메모리에 수백만 개 쌓여 1204·701 오류 : 같은 테이블 동시 적재라 잠금 상향이 막힘. PostgreSQL·Oracle 은 행 잠금을 블록 안에 기록)
+  mssql: {
+    idiv: (a, b) => `(${a} / ${b})`,
+    mod: (a, b) => `(${a} % ${b})`,
+    txt: e => `CAST(${e} AS varchar(40))`,
+    num: e => e,
+    f2n: e => `gen.f2n(${e})`,
+    left: (e, n) => `LEFT(${e}, ${n})`,
+    nullp: (e, s, p) => `CASE WHEN gen.u(K, ${s}) < ${p} THEN NULL ELSE ${e} END`,
+    hours: kk => `DATEADD(hour, ${kk}, gen.t0())`,
+    days: kk => `DATEADD(day, ${kk}, gen.t0())`,
+    monthsYm: kk => `CONVERT(char(6), DATEADD(month, ${kk}, gen.t0()), 112)`,
+    wcode: (s, codes, ws) => `gen.wcode(K, ${s}, ${q(codes.join('|'))}, ${q(ws.join('|'))})`,
+    pick: (list, i) => `CASE ${i} ${list.map((v, j) => `WHEN ${j + 1} THEN ${q(v)}`).join(' ')} END`,
+    memo: (s, p, len) => `gen.memo(K, ${s}, ${p}, ${len})`,
+    coalesce: (a, b) => `COALESCE(${a}, ${b})`,
+    tsLit: y => `CAST('${y}-01-01' AS datetime2(6))`,
+    bound: (y, n) => String(dtmToK(y, n)),
+    insert: (tbl, cols, sel) =>
+      `INSERT INTO ${tbl} WITH (PAGLOCK) (${cols})\nSELECT\n${sel
+        .split(',\n')
+        .map(l => l.replace(/^(\s*)([\s\S]*) AS (\w+)$/, (_, a, e, c) => `${a}${concatFix(e)} AS ${c}`))
+        .join(',\n')}\nFROM (SELECT value AS k FROM GENERATE_SERIES(CAST(__KFROM__ AS bigint), CAST(__KTO__ AS bigint))) g\nOPTION (MAXDOP 1, MAX_GRANT_PERCENT = 12)`,
   },
 }
 
@@ -339,26 +367,29 @@ function psql(db, sql) {
 async function run() {
   // --target oracle : oracle/ora.mjs 로 sqlplus 실행(GEN 패키지·테이블은 oracle/s1.mjs gen·tables 단계가 먼저 만든다), 조각 = INSERT /*+ APPEND */ 1문 + COMMIT
   const target = arg('target', 'pg')
-  if (!DIALECT[target]) throw new Error(`--target 은 pg 또는 oracle : ${target}`)
+  if (!DIALECT[target]) throw new Error(`--target 은 pg · oracle · mssql : ${target}`)
+  const isMs = target === 'mssql'
   const isOra = target === 'oracle'
   const D = DIALECT[target]
   const oraLib = isOra ? await import('../oracle/ora.mjs') : null
-  const inl = isOra ? await import('../oracle/inline.mjs') : null
+  const inl = isOra || isMs ? await import('../oracle/inline.mjs') : null
+  const msLib = isMs ? await import('../mssql/ms.mjs') : null
+  const msInl = isMs ? await import('../mssql/inline.mjs') : null
   const which = arg('db', 'dev')
   if (which === 'prod' && arg('yes') !== true) throw new Error('pitel 최종 적재는 --yes 필요(최종 적재는 지정 세션만 — CONTEXT 4절)')
   const schema = arg('schema', which === 'prod' ? 'public' : 'chk_gen')
   const scale = +arg('scale', 0.001)
   const jobs = +arg('jobs', 6)
   const only = arg('only', null)
-  const db = isOra ? 'ora' : dbName(which)
-  const head = isOra ? '' : `SET search_path = ${schema}, gen; SET synchronous_commit = off;\n`
-  const exec = isOra ? sql => oraLib.ora(sql + 'COMMIT;\n') : sql => psql(db, sql)
+  const db = isOra ? 'ora' : isMs ? 'ms' : dbName(which)
+  const head = isOra || isMs ? '' : `SET search_path = ${schema}, gen; SET synchronous_commit = off;\n`
+  const exec = isOra ? sql => oraLib.ora(sql + 'COMMIT;\n') : isMs ? sql => msLib.ms(sql) : sql => psql(db, sql)
   const model = loadModel()
   const plans = build(model, scale, D).filter(p => !only || only.split(',').includes(p.tbl))
 
   // Oracle : gen.* 를 내장 함수 식으로 펼치므로 설치할 함수 없음(oracle/inline.mjs)
-  if (!isOra) await psql(db, fs.readFileSync(path.join(HERE, '00_gen_functions.sql'), 'utf8'))
-  if (arg('ddl') === true && !isOra) {
+  if (!isOra && !isMs) await psql(db, fs.readFileSync(path.join(HERE, '00_gen_functions.sql'), 'utf8'))
+  if (arg('ddl') === true && !isOra && !isMs) {
     await psql(db, `CREATE SCHEMA IF NOT EXISTS ${schema};`)
     for (const f of fs.readFileSync(path.join(ROOT, 'ddl/00_run_order.txt'), 'utf8').split('\n').filter(l => /_tables\.sql$/.test(l.trim())))
       await psql(db, `SET search_path = ${schema};\n` + fs.readFileSync(path.join(ROOT, 'ddl', f.trim()), 'utf8'))
@@ -395,7 +426,8 @@ async function run() {
     while (queue.length) {
       const c = queue.shift()
       const body = c.p.sql.replaceAll('__KFROM__', `(${c.from})`).replaceAll('__KTO__', `(${c.to})`)
-      const sql = head + (isOra ? inl.wrapLines(inl.inlineGen(body)) : body) + ';\n'
+      // MS-SQL : sqlcmd 가 약 4,000자 넘는 줄을 잘라서 1,000자 단위로 나눈다(문자열 상수 밖 공백에서)
+      const sql = head + (isOra ? inl.wrapLines(inl.inlineGen(body)) : isMs ? inl.wrapLines(msInl.inlineGen(body), 1000) : body) + ';\n'
       // 조각 시작·완료 시각 줄 — database/run-init.mjs 가 이 로그로 테이블별 시작·종료를 기록(완료 줄은 state 기록 뒤)
       console.log(`시작 ${c.id} ${new Date().toISOString()}`)
       try {

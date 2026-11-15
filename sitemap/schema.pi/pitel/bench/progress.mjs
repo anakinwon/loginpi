@@ -30,7 +30,20 @@ const SIZE = {
     const lob = +rows(await ora("SELECT NVL(SUM(bytes), 0) FROM dba_segments WHERE owner = 'PITEL' AND segment_name NOT LIKE 'PTL\\_%' ESCAPE '\\';", { sysdba: true }))[0]
     return { sz, lob }
   },
-  // shortcut: MS-SQL·MySQL 크기 조회는 해당 실증 착수 때 추가(sys.allocation_units / information_schema.TABLES)
+  // MS-SQL : 할당 페이지(8KB) 합, 테이블 이름 PTL_<영역>_, varchar(max) 넘침 데이터(LOB_DATA)는 lob 으로 따로
+  mssql: async () => {
+    const { ms, rows } = await import('../mssql/ms.mjs')
+    const sz = Object.fromEntries(AREAS.map(a => [a, 0]))
+    let lob = 0
+    const q = "SELECT SUBSTRING(t.name, 5, 3), au.type_desc, SUM(au.total_pages) * 8192 FROM sys.tables t JOIN sys.partitions p ON p.object_id = t.object_id JOIN sys.allocation_units au ON au.container_id = p.partition_id WHERE t.name LIKE 'PTL[_]%' GROUP BY SUBSTRING(t.name, 5, 3), au.type_desc;"
+    for (const l of rows(await ms(q))) {
+      const [a, ty, b] = l.trim().split('|')
+      if (ty === 'LOB_DATA') lob += +b
+      else if (a in sz) sz[a] += +b
+    }
+    return { sz, lob }
+  },
+  // shortcut: MySQL 크기 조회는 해당 실증 착수 때 추가(information_schema.TABLES)
 }
 if (!SIZE[TARGET]) throw new Error(`크기 조회 미구현 대상 : ${TARGET}`)
 
