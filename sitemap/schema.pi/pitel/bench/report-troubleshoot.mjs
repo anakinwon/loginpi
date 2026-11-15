@@ -89,7 +89,7 @@ const s3 = tsSlide(3, '진행 방식', TS[0], '진행 방식의 실수 4건은 �
 const s4 = tsSlide(4, 'Oracle 21c', TS[1], 'Oracle 은 <b>컨테이너 제약(NATIVE 컴파일 · OMF)</b> 과 <b>쓰기 설정(DBWR · 비동기 I/O)</b> 을 먼저 맞춰야 한다')
 const s5 = tsSlide(5, 'MS-SQL 2022', TS[2], 'MS-SQL 은 <b>메모리 할당 · 잠금 메모리</b> 가 대량 동시 적재의 첫 병목이다')
 const s6 = tsSlide(6, 'MySQL 26.10', TS[3], 'MySQL 은 <b>연산자 · 연결 · 이름 규칙</b> 차이를 맞춘 뒤 실패 0 으로 진행했고, <b>Docker 무응답</b> 으로 멈췄다')
-const s7 = tsSlide(7, '실행 환경 · 도구', TS[4], '도구 쪽 문제는 모두 고쳤고, 재시험 절차(9장)에 반영했다')
+const s7 = tsSlide(7, '실행 환경 · 도구', TS[4], '도구 문제는 고쳤고, Docker 디스크 문제(TS-31 · 32)는 재시험 절차(9장)와 점검표(10장)에 반영했다')
 const s8 = slide('8. DBMS 별 설정 대응표', '다음 시험은 이 설정에서 출발한다', htmlTable(table('## 4.'), 'tight'), null, src)
 const s9 = slide('9. 재시험 절차', '준비 → 기능 점검 → 독립 프로세스 적재 → 5분 진행 보고 → 건수 대조 순서를 <b>그대로 따른다</b>',
   `<pre style="margin:0;background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:10px 12px;font-size:11.5px;line-height:1.5;white-space:pre-wrap;overflow:hidden">${esc(code('## 5.'))}</pre>`,
@@ -99,7 +99,7 @@ const inv = table('## 7.')
 const s11 = slide('11. 분석 사례 : 수납(INV) 은 왜 PostgreSQL 이 빨랐나', '수납 영역은 <b>가중 선택이 적고 일반 함수가 많아</b> Oracle 의 행당 고정 비용이 드러났다',
   `<div class="c2" style="display:grid;gap:14px"><div>${htmlTable(inv, 'tight')}</div><div class="box"><h3>근거</h3><div class="in" style="font-size:12.5px">${inline(para('## 7.'))}<br><br>${inline(after('## 7.'))}</div></div></div>`,
   null, '결과 보고서 7장(행당 비용 분해) · 9장(테이블별 차이 사례), 두 적재 로그의 테이블별 소요 합')
-const s12 = slide('12. 결론과 후속 조치', '두 DBMS 의 결과와 30건의 문제 해결 기록을 남겼고, <b>재시험은 점검표 통과 뒤</b> 한다',
+const s12 = slide('12. 결론과 후속 조치', `두 DBMS 의 결과와 ${nTs}건의 문제 해결 기록을 남겼고, <b>재시험은 점검표 통과 뒤</b> 한다`,
   `<div class="c2" style="display:grid;gap:14px">
       <div class="box"><h3>결론</h3><div class="in"><ul>
         <li>같은 조건에서 Oracle 이 PostgreSQL 의 0.83배 시간(7,120초 · 8,569초)에 11억 행을 넣었다</li>

@@ -87,6 +87,8 @@
 | TS-28 | 한글 이름 일부가 깨져 보임 | 실행기가 출력 조각 경계에서 UTF-8 글자를 갈라 읽음 | 표준출력 `setEncoding('utf8')` | 실행 도우미 3종(ora · ms · my)에 적용됨 |
 | TS-29 | 시간대별 표 일부 크기 '기록 없음' | 진행 감시(30분 만료)를 다시 거는 사이 크기 측정이 빠짐 | 다음 기록부터 이어짐 | 완료율 · 건수는 로그에서 다시 계산되어 빠지지 않는다 |
 | TS-30 | S1 중 `pitel-pg` 가 정지(종료 코드 137) | 외부 정지 요청(주체 확인 못 함) | `docker start`, 데이터 보존 확인 | 시험 중 다른 도구가 컨테이너를 건드리지 않게 한다 |
+| TS-31 | 실증 뒤 C 드라이브 여유 8GB(952GB 중), DB 를 지워도 늘지 않음 | Docker 데이터 디스크 `docker_data.vhdx` 가 864GB 로 커짐. 이 파일은 안에서 지운 공간을 Windows 에 돌려주지 않는 형식(희소 파일 아님). MySQL 적재 중 디스크가 차서 Docker 가 멈춘 것으로 본다(TS-24) | MySQL · MS-SQL pitel 흔적 삭제(MySQL 은 데이터 볼륨 재초기화), fstrim 으로 디스크 안 사용량 763GB → 501GB. 파일 압축은 관리자 권한 `Optimize-VHD` 필요 | 시험 전 Docker Desktop 디스크 크기 한도를 정하고, 끝나면 `wsl --shutdown` 뒤 관리자 PowerShell `Optimize-VHD -Path <vhdx> -Mode Full` |
+| TS-32 | 2026-11-15 마스터가 Docker Desktop 을 삭제, PostgreSQL · Oracle 데이터 소멸 | 디스크 확보를 위해 Docker 전체 삭제(vhdx 864GB 포함), 남은 폴더(`%LOCALAPPDATA%\Docker` · `%APPDATA%\Docker` · `.docker`)도 지움 | C 드라이브 여유 9GB → 876GB. `C:\ProgramData\DockerDesktop` 빈 폴더만 남음(관리자 권한) | 재시험은 Docker 재설치 → PostgreSQL `REBUILD.md`(약 3시간 30분) · Oracle 재적재부터. 실행 기록은 `bench/runs/`(git) 에 보관됨 |
 
 ## 4. DBMS 별 설정 대응표 (다음 시험의 출발점)
 
@@ -132,7 +134,7 @@ node bench/analyze.mjs --log mssql/out/full_load.log > mssql/out/full_analysis.j
 | 1 | PC 여유 메모리 | 측정 DB 메모리 + 4GB 이상 여유 | TS-19 |
 | 2 | WSL · Docker 메모리 한도(`%UserProfile%\.wslconfig` memory) | 측정 DB 메모리 + 2GB 이상, PC 전체의 70% 이하 | TS-19 · TS-24 |
 | 3 | 다른 DB 컨테이너 정지 | 측정 컨테이너만 실행 | 같은 조건 |
-| 4 | 디스크 여유 | 300GB 이상(데이터 약 175GB + 로그 · 임시) | 없음(455GB 여유) |
+| 4 | 디스크 여유 · Docker 디스크 한도 | 300GB 이상(데이터 약 175GB + 로그 · 임시), Docker 디스크는 DBMS 하나 시험 뒤 정리 | TS-31 |
 | 5 | 적재 실행 방식 | `bench/launch.mjs` WMI 독립 프로세스 | TS-19 |
 | 6 | 첫 10분 대기 종류 확인 | 대기가 한쪽(메모리 · 잠금 · 쓰기)에 몰리지 않음 | TS-11 · TS-17 · TS-18 |
 | 7 | 진행 상태 파일 | `datagen/state/<db>_*` 없음 | 이어 넣기 방지 |
