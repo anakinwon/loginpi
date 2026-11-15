@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<!-- Pi통신 과금 시나리오 S1 : PostgreSQL 17 ↔ Oracle 21c 같은 데이터 구축 비교 보고서. 근거 = pitel/oracle/S1_LOG.md·oracle/out 기록, 공개 경로라 비밀·개인 경로 금지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi통신 과금 S1 : PostgreSQL · Oracle 구축 비교</title>
+<style>
+  :root { --bg:#e9eaec; --paper:#fff; --ink:#1f2328; --sub:#59636e; --line:#d8dadd; --navy:#1f3864; --sky:#2e75b6; --org:#ed7d31; --old:#8c959f; --new:#2e75b6; --ok:#1a7f37; --warn:#9a6700; --red:#c62828; --band:#404040; --soft:#f2f4f7; }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 'Malgun Gothic', system-ui, sans-serif }
+  .deck { max-width:1120px; margin:0 auto; padding:24px 12px 40px; display:grid; gap:22px }
+  .slide { background:var(--paper); aspect-ratio:16/9; border-radius:6px; box-shadow:0 2px 10px rgba(0,0,0,.08); padding:30px 40px 8px; display:flex; flex-direction:column; position:relative; overflow:hidden }
+  .slide header { border-bottom:3px solid var(--navy); padding-bottom:8px; margin-bottom:14px; position:relative }
+  .slide header::after { content:''; position:absolute; left:0; bottom:-3px; width:90px; height:3px; background:var(--org) }
+  .crumb { position:absolute; right:0; top:-4px; font-size:11px; color:var(--sub); text-align:right; line-height:1.4 }
+  h1 { font-size:24px; margin:0; color:var(--navy) }
+  h2 { font-size:21px; margin:0; color:var(--navy) }
+  .gov { font-size:15px; color:var(--ink); margin:0 0 12px; font-weight:600 }
+  .gov b { color:var(--sky) }
+  .body { flex:1; display:grid; gap:14px; min-height:0 }
+  .c2 { grid-template-columns:1fr 1fr } .c3 { grid-template-columns:1.15fr .85fr }
+  .box { border:1px solid var(--line); border-radius:4px; overflow:hidden; display:flex; flex-direction:column }
+  .box > h3 { margin:0; background:var(--band); color:#fff; font-size:13.5px; padding:6px 12px; font-weight:800 }
+  .box > .in { padding:10px 14px; font-size:13.5px; flex:1 }
+  .finding { margin-top:12px; background:var(--soft); border-left:5px solid var(--sky); padding:8px 14px; font-size:14px }
+  .finding b { color:var(--navy) }
+  .src { font-size:11px; color:var(--sub); margin-top:8px }
+  table { width:100%; border-collapse:collapse; font-size:13px }
+  th, td { padding:5px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top }
+  th { background:var(--soft); color:var(--sub); font-weight:600 }
+  td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  .same { color:var(--ok); font-weight:700 } .diff { color:var(--org); font-weight:700 } .tbd { color:var(--red); font-weight:700 }
+  ul { margin:4px 0; padding-left:18px } li { margin:2px 0 }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+  .kpi { border:1px solid var(--line); border-radius:4px; padding:12px 14px; text-align:center }
+  .kpi .v { font-size:30px; font-weight:800; color:var(--navy); font-variant-numeric:tabular-nums }
+  .kpi .l { font-size:12px; color:var(--sub) }
+  .bars { display:grid; gap:4px; font-size:12px }
+  .bar { display:grid; grid-template-columns:190px 1fr 70px; align-items:center; gap:8px }
+  .track { height:10px; background:var(--soft); border-radius:3px; overflow:hidden }
+  .track i { display:block; height:100% }
+  .o i { background:var(--old) } .w i { background:var(--new) }
+  .cols { display:flex; align-items:flex-end; gap:8px; height:170px; padding:6px 4px 0; border-bottom:1px solid var(--sub) }
+  .col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; font-size:11px }
+  .col i { width:100%; background:var(--sky); border-radius:2px 2px 0 0 }
+  .col.hi i { background:var(--org) }
+  .col span { margin-bottom:3px; font-variant-numeric:tabular-nums }
+  .xl { display:flex; gap:8px; padding:3px 4px; font-size:11px; color:var(--sub) } .xl span { flex:1; text-align:center }
+  .tag { display:inline-block; font-size:11px; font-weight:700; padding:0 7px; border-radius:9px; margin-right:4px }
+  .t-h { background:#fde8d7; color:#b4520f } .t-m { background:#e3eefa; color:#1f5f99 } .t-l { background:#eef0f2; color:#59636e }
+  .pg { margin-top:10px; padding-top:5px; border-top:1px solid var(--line); text-align:center; font-size:11px; color:var(--sub) }
+  .cover { justify-content:center; background:linear-gradient(135deg,#1f3864 0%,#2e5597 100%); color:#fff }
+  .cover h1 { color:#fff; font-size:34px; line-height:1.3 } .cover p { color:#dbe5f4; font-size:16px; margin:6px 0 }
+  .cover .big { font-size:52px; font-weight:800; margin:18px 0 6px; color:#fff } .cover .big small { font-size:22px; color:#f4b183 }
+  @media (max-width:760px) { .slide { aspect-ratio:auto; padding:22px 18px } .c2,.c3,.kpis { grid-template-columns:1fr } .crumb { display:none } .bar { grid-template-columns:110px 1fr 60px } }
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:99;background:#c00000;color:#fff;padding:10px 16px;font:700 15px/1.5 sans-serif">
+  실패 사례 보존본 (2026-11-15) : 승인 없이 배율 0.01(1,217만 행)로 축소해 실행한 결과입니다. 요청은 11억 행(배율 1) 비교였으므로 이 보고서의 시간·크기·배수는 비교 근거로 쓸 수 없습니다. 정식 보고서는 11억 행 적재 완료 후 다시 작성합니다.
+</div>
+<div class="deck">
+
+  <!-- 1. 표지 -->
+  <section class="slide cover">
+    <p>Pi통신 과금 시스템 · 시나리오 S1 (dbms.pi PRD 11.6)</p>
+    <h1>PostgreSQL 과 Oracle, 같은 데이터 구축 비교</h1>
+    <div class="big">5분 0초 → 40분 1초 <small>× 8.0</small></div>
+    <p>비교 대상 : PostgreSQL 17 ↔ Oracle 21c Enterprise Edition, 같은 PC · 같은 배율 0.01(12,170,698행) · 같은 생성 규칙</p>
+    <p style="font-size:13px;margin-top:24px">근거 : 단계별 시간 기록 2개 · 테이블별 적재 로그 2개 · 생성 함수 대조(키 10,000개) · 214테이블 전 행 체크섬 대조 · 실행 기록 S1_LOG.md (2026-11-15)</p>
+  </section>
+
+  <!-- 핵심 요약 : 무엇을 · 크기 · 시간 -->
+  <section class="slide">
+    <header><h2>핵심 요약</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>핵심 요약</div></header>
+    <p class="gov">같은 1,217만 행을 넣는 데 Oracle 이 <b>8배</b> 오래 걸렸고, 실제 쓴 크기는 <b>거의 같다</b></p>
+    <div class="body key" style="grid-template-rows:auto 1fr;gap:10px">
+      <style>.key .kpi{padding:7px 10px}.key .kpi .v{font-size:24px}.key td,.key th{padding:3px 8px;font-size:12.5px}.key small{font-size:11px;color:var(--sub)}</style>
+      <div class="kpis">
+        <div class="kpi"><div class="v">12,170,698행</div><div class="l">테이블 214 · 조각 2,306 · PK 214 · 인덱스 318 (두 DB 같음)</div></div>
+        <div class="kpi"><div class="v">5분 → 40분</div><div class="l">전체 소요 8.0배 (적재 15.2배)</div></div>
+        <div class="kpi"><div class="v">1.89 GB</div><div class="l">표 데이터 실사용 (두 DB 같음, Oracle 할당은 13.42 GB)</div></div>
+      </div>
+      <table>
+        <tr><th>무엇을</th><th>규모</th><th class="n">PostgreSQL 크기</th><th class="n">Oracle 크기</th><th class="n">PostgreSQL 시간</th><th class="n">Oracle 시간</th><th class="n">배수</th></tr>
+        <tr><td>테이블·조각 생성</td><td>214테이블 · 조각 2,306</td><td class="n">-</td><td class="n">-</td><td class="n">3.5초</td><td class="n">9.8초</td><td class="n">2.8</td></tr>
+        <tr><td><b>데이터 생성·적재</b></td><td>12,170,698행 · 2,124칼럼</td><td class="n">1.89 GB</td><td class="n">실사용 1.89 GB <small>할당 13.42 GB(표 11.53 · LOB 1.89)</small></td><td class="n">2분 16초</td><td class="n"><b>34분 29초</b></td><td class="n"><b>15.2</b></td></tr>
+        <tr><td>PK·인덱스</td><td>PK 214 · 보조 318</td><td class="n">1.22 GB</td><td class="n">실사용 1.01 GB <small>할당 1.52 GB</small></td><td class="n">32.6초</td><td class="n">2분 52초</td><td class="n">5.3</td></tr>
+        <tr><td>통계 수집</td><td>테이블 214 · 조각 2,306</td><td class="n">-</td><td class="n">-</td><td class="n">1분 53초</td><td class="n">1분 53초</td><td class="n">1.0</td></tr>
+        <tr><td>준비·함수 설치·검증</td><td>스키마·사용자 · 함수 21개 · 건수 214</td><td class="n">-</td><td class="n">-</td><td class="n">14.2초</td><td class="n">36.9초</td><td class="n">2.6</td></tr>
+        <tr><td><b>합계</b></td><td></td><td class="n"><b>3.11 GB</b></td><td class="n"><b>할당 14.94 GB</b> <small>실사용 약 2.9 GB(LOB 제외)</small></td><td class="n"><b>5분 0초</b></td><td class="n"><b>40분 1초</b></td><td class="n"><b>8.0</b></td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>Key Finding</b> : 시간 차이는 적재(생성 함수 실행 방식)에서, 크기 차이는 Oracle 조각마다 잡는 첫 공간 8MB 에서 나온다. 데이터 자체는 문자·숫자 전 행이 같다.</div>
+    <p class="src">※ 출처 : 단계 시간 oracle/out/s1_pg.json · s1_oracle.json. 크기 PostgreSQL pg_table_size · pg_indexes_size, Oracle user_segments(할당) · 통계 blocks · leaf_blocks(실사용, 8KB 블록)</p>
+    <div class="pg">2</div>
+  </section>
+
+  <!-- 2. 요약 -->
+  <section class="slide">
+    <header><h2>1. 요약</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>요약</div></header>
+    <p class="gov">구조와 데이터는 <b>같게</b> 만들어졌고, Oracle 은 <b>적재 단계에서 15배</b> 오래 걸렸다</p>
+    <div class="body" style="grid-template-rows:auto 1fr">
+      <div class="kpis">
+        <div class="kpi"><div class="v">12,170,698</div><div class="l">두 DB 행 수 (테이블 214 · 조각 2,306 · PK 214 · 인덱스 318 모두 같음)</div></div>
+        <div class="kpi"><div class="v">15.2×</div><div class="l">데이터 생성·적재 시간 (136.5초 → 2,068.5초)</div></div>
+        <div class="kpi"><div class="v">1,855개</div><div class="l">문자·숫자 칼럼 전 행 일치 (일시 칼럼 일부 행 1µs 차이)</div></div>
+      </div>
+      <div class="box"><h3>한눈에</h3><div class="in"><ul>
+        <li>Oracle 판 물리모델은 schema.pi ModelPi DDL 생성기(Oracle 프로파일)로 만들고, 초기 데이터는 기존 생성기에 Oracle 방언을 더해 같은 규칙으로 넣었다</li>
+        <li>7단계 가운데 적재가 Oracle 시간의 86%(34분 29초)를 차지한다. 통계 수집은 두 DB 가 같다</li>
+        <li>적재 차이의 원인은 생성 함수 실행 방식이다. PostgreSQL 은 SQL 함수를 질의 안에 펼쳐 C 함수로 계산하고, Oracle 은 행·칼럼마다 PL/SQL 함수를 해석 실행한다</li>
+        <li>일시 칼럼 1µs 차이는 두 엔진의 거듭제곱(POWER) 계산이 마지막 1비트 다른 경우에 생긴다. 허용 기준으로 정했다</li>
+      </ul></div></div>
+    </div>
+    <div class="pg">3</div>
+  </section>
+
+  <!-- 3. 같은 조건 -->
+  <section class="slide">
+    <header><h2>2. 비교 조건</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>조건</div></header>
+    <p class="gov">같은 PC 에서 <b>배율·생성 규칙·동시 실행 수</b>를 맞추고 차례로 실행했다</p>
+    <div class="body">
+      <table>
+        <tr><th>항목</th><th>PostgreSQL</th><th>Oracle</th><th>판정</th></tr>
+        <tr><td>제품</td><td>PostgreSQL 17.12</td><td>Oracle Database 21c EE 21.3</td><td><span class="diff">다름</span></td></tr>
+        <tr><td>실행 위치</td><td>Docker 컨테이너</td><td>Docker 컨테이너(PDB 1개)</td><td><span class="same">같음</span></td></tr>
+        <tr><td>CPU · 메모리</td><td colspan="2">8코어, Docker 전체 7.6GB 를 두 컨테이너가 나눠 씀</td><td><span class="same">같음</span></td></tr>
+        <tr><td>DB 메모리</td><td>shared_buffers 2GB, work_mem 64MB</td><td>SGA 1,536MB, PGA 512MB</td><td><span class="diff">다름</span></td></tr>
+        <tr><td>문자셋</td><td>UTF8</td><td>AL32UTF8 (길이 단위 CHAR)</td><td><span class="same">같음</span></td></tr>
+        <tr><td>로그</td><td>wal_level logical, 동기 커밋 끔</td><td>NOARCHIVELOG</td><td><span class="diff">다름</span></td></tr>
+        <tr><td>배율 · 행</td><td colspan="2">0.01 · 214테이블 12,170,698행</td><td><span class="same">같음</span></td></tr>
+        <tr><td>생성 규칙</td><td colspan="2">model/physical 7개 JSON → datagen.mjs (같은 키 = 같은 값)</td><td><span class="same">같음</span></td></tr>
+        <tr><td>동시 실행</td><td colspan="2">적재 6, PK·인덱스 영역 3</td><td><span class="same">같음</span></td></tr>
+        <tr><td>실행 시각(UTC)</td><td>2026-11-15 00:06~00:11</td><td>00:21~01:05</td><td><span class="diff">차례로</span></td></tr>
+      </table>
+    </div>
+    <div class="finding"><b>Key Finding</b> : 하드웨어와 데이터 조건은 같고, 다른 것은 DB 엔진과 그 기본 설정이다.</div>
+    <div class="pg">4</div>
+  </section>
+
+  <!-- 4. 단계별 작업 -->
+  <section class="slide">
+    <header><h2>3. 단계별로 한 일</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>작업</div></header>
+    <p class="gov">7단계 순서는 같고, <b>쓰는 문법과 부품</b>이 엔진마다 다르다</p>
+    <div class="body">
+      <table>
+        <tr><th>단계</th><th>PostgreSQL</th><th>Oracle</th></tr>
+        <tr><td>준비</td><td>CREATE SCHEMA</td><td>사용자·bigfile 테이블스페이스 생성, 권한</td></tr>
+        <tr><td>테이블·조각</td><td>pitel DDL(조각은 DO 블록 반복)</td><td>ModelPi genDdl(Oracle 0001) + 조각 절 생성기</td></tr>
+        <tr><td>생성 함수</td><td>SQL 함수 20개 + PL/pgSQL 1개</td><td>PL/SQL 패키지 GEN(같은 계산, 해석 실행)</td></tr>
+        <tr><td>적재</td><td>INSERT … SELECT … generate_series</td><td>INSERT /*+ APPEND */ … SELECT … TABLE(gen.series)</td></tr>
+        <tr><td>PK·인덱스</td><td>ADD PRIMARY KEY + CREATE INDEX(부분 인덱스 96)</td><td>유일 인덱스(조각은 LOCAL) → PK 제약, 함수 기반 인덱스 26</td></tr>
+        <tr><td>통계</td><td>ANALYZE</td><td>DBMS_STATS.GATHER_SCHEMA_STATS</td></tr>
+        <tr><td>검증</td><td colspan="2">테이블별 count(*) · 조각 · PK · 인덱스 · 크기 · DEFAULT 조각 행</td></tr>
+      </table>
+    </div>
+    <p class="src">※ 출처 : sitemap/schema.pi/pitel/oracle/s1.mjs · ddl-oracle.mjs · gen_pkg.sql</p>
+    <div class="pg">5</div>
+  </section>
+
+  <!-- 5. 소요 시간 -->
+  <section class="slide">
+    <header><h2>4. 단계별 소요 시간</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>시간</div></header>
+    <p class="gov">Oracle 40분 가운데 <b>적재가 34분 29초</b>이고, 통계 수집은 <b>두 DB 가 같다</b></p>
+    <div class="body c3">
+      <div class="box"><h3>단계별 소요 (막대 = Oracle 적재 2,068.5초 대비, 회색 PostgreSQL · 파랑 Oracle)</h3><div class="in bars">
+        <div class="bar"><span>준비</span><div><div class="track o"><i style="width:0.5%"></i></div><div class="track w" style="margin-top:2px"><i style="width:0.7%"></i></div></div><span>0.3 → 13.6초</span></div>
+        <div class="bar"><span>테이블·조각</span><div><div class="track o"><i style="width:0.5%"></i></div><div class="track w" style="margin-top:2px"><i style="width:0.5%"></i></div></div><span>3.5 → 9.8초</span></div>
+        <div class="bar"><span>생성 함수 설치</span><div><div class="track o"><i style="width:0.5%"></i></div><div class="track w" style="margin-top:2px"><i style="width:0.5%"></i></div></div><span>0.1 → 0.5초</span></div>
+        <div class="bar"><span>데이터 생성·적재</span><div><div class="track o"><i style="width:6.6%"></i></div><div class="track w" style="margin-top:2px"><i style="width:100%"></i></div></div><span>136.5 → 2,068.5초</span></div>
+        <div class="bar"><span>PK·인덱스</span><div><div class="track o"><i style="width:1.6%"></i></div><div class="track w" style="margin-top:2px"><i style="width:8.3%"></i></div></div><span>32.6 → 172.5초</span></div>
+        <div class="bar"><span>통계 수집</span><div><div class="track o"><i style="width:5.5%"></i></div><div class="track w" style="margin-top:2px"><i style="width:5.5%"></i></div></div><span>113.4 → 113.3초</span></div>
+        <div class="bar"><span>건수 검증</span><div><div class="track o"><i style="width:0.7%"></i></div><div class="track w" style="margin-top:2px"><i style="width:1.1%"></i></div></div><span>13.8 → 22.8초</span></div>
+      </div></div>
+      <div class="box"><h3>배수 (Oracle ÷ PostgreSQL)</h3><div class="in"><table>
+        <tr><th>단계</th><th class="n">배수</th></tr>
+        <tr><td>준비</td><td class="n">39.1</td></tr>
+        <tr><td>테이블·조각</td><td class="n">2.8</td></tr>
+        <tr><td>생성 함수 설치</td><td class="n">3.9</td></tr>
+        <tr><td><b>데이터 생성·적재</b></td><td class="n"><b>15.2</b></td></tr>
+        <tr><td>PK·인덱스</td><td class="n">5.3</td></tr>
+        <tr><td>통계 수집</td><td class="n">1.0</td></tr>
+        <tr><td>건수 검증</td><td class="n">1.7</td></tr>
+        <tr><td><b>합계 5분 0초 → 40분 1초</b></td><td class="n"><b>8.0</b></td></tr>
+      </table></div></div>
+    </div>
+    <p class="src">※ 출처 : oracle/out/s1_pg.json · s1_oracle.json (node oracle/s1.mjs report). 준비 단계 차이는 Oracle 1GB 데이터 파일 생성</p>
+    <div class="pg">6</div>
+  </section>
+
+  <!-- 6. 결과 -->
+  <section class="slide">
+    <header><h2>5. 결과와 크기</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>결과</div></header>
+    <p class="gov">건수·구조는 <b>모두 같고</b>, 크기는 Oracle 이 <b>4.8배</b>다(대부분 빈 첫 공간)</p>
+    <div class="body c2">
+      <div class="box"><h3>검증 결과</h3><div class="in"><table>
+        <tr><th>항목</th><th class="n">PostgreSQL</th><th class="n">Oracle</th></tr>
+        <tr><td>테이블</td><td class="n">214</td><td class="n">214</td></tr>
+        <tr><td>행</td><td class="n">12,170,698</td><td class="n">12,170,698</td></tr>
+        <tr><td>조각</td><td class="n">2,306</td><td class="n">2,306</td></tr>
+        <tr><td>PK</td><td class="n">214</td><td class="n">214</td></tr>
+        <tr><td>보조 인덱스</td><td class="n">318</td><td class="n">318</td></tr>
+        <tr><td>DEFAULT 조각 행 / 개수</td><td class="n">0 / 38</td><td class="n">0 / 38</td></tr>
+        <tr><td>크기</td><td class="n">3.11 GB</td><td class="n">14.94 GB</td></tr>
+      </table><p style="font-size:12.5px;margin:8px 0 0">테이블별 행 수 214개 모두 생성 계획 목표와 같다.</p></div></div>
+      <div class="box"><h3>Oracle 크기 내역</h3><div class="in"><table>
+        <tr><th>세그먼트</th><th class="n">개수</th><th class="n">합계</th><th class="n">정확히 8MB</th></tr>
+        <tr><td>TABLE PARTITION</td><td class="n">1,268</td><td class="n">10.85 GB</td><td class="n">1,257</td></tr>
+        <tr><td>LOB PARTITION</td><td class="n">223</td><td class="n">1.87 GB</td><td class="n">223</td></tr>
+        <tr><td>INDEX PARTITION</td><td class="n">5,584</td><td class="n">1.12 GB</td><td class="n">3</td></tr>
+        <tr><td>TABLE · INDEX · LOB</td><td class="n">626</td><td class="n">1.09 GB</td><td class="n">6</td></tr>
+      </table><p style="font-size:12.5px;margin:8px 0 0">조각 세그먼트는 데이터가 적어도 첫 공간 8MB 를 잡는다. 배율 0.01 은 조각당 행이 적어 이 몫이 커진다.</p></div></div>
+    </div>
+    <div class="finding"><b>Key Finding</b> : 크기 비교는 조각당 행이 많은 배율 1 에서 다시 재야 의미가 있다.</div>
+    <div class="pg">7</div>
+  </section>
+
+  <!-- 7. 데이터 대조 -->
+  <section class="slide">
+    <header><h2>6. 데이터 대조</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>동일성</div></header>
+    <p class="gov">문자·숫자 칼럼 <b>1,855개는 전 행 같고</b>, 일시 칼럼 일부 행만 <b>1µs</b> 다르다</p>
+    <div class="body c2">
+      <div class="box"><h3>214테이블 전 행 체크섬</h3><div class="in"><table>
+        <tr><th>항목</th><th class="n">값</th></tr>
+        <tr><td>대조 행</td><td class="n">12,170,698</td></tr>
+        <tr><td>행 수가 같은 테이블</td><td class="n">214 / 214</td></tr>
+        <tr><td>모든 칼럼이 같은 테이블</td><td class="n">106</td></tr>
+        <tr><td>VARCHAR · CHAR · NUMERIC 칼럼</td><td class="n"><span class="same">1,855 전 행 같음</span></td></tr>
+        <tr><td>TIMESTAMP 칼럼</td><td class="n">269 중 <span class="diff">155 일부 행 다름</span></td></tr>
+        <tr><td>표본 : 미납기본 발생일시</td><td class="n">94,013행 중 7행 ±1µs</td></tr>
+      </table></div></div>
+      <div class="box"><h3>생성 함수 21개 × 키 10,000개</h3><div class="in"><table>
+        <tr><th>결과</th><th class="n">함수</th></tr>
+        <tr><td>10,000개 모두 같음</td><td class="n">20</td></tr>
+        <tr><td>범위 밖 키(2079년 이후) 3개에서 1µs</td><td class="n">1 (recent_dtm)</td></tr>
+      </table><p style="font-size:12.5px;margin:8px 0 0">해시·난수·코드 선택·이름·금액·메모(CLOB 포함)·반올림은 모두 같은 값을 낸다.</p></div></div>
+    </div>
+    <p class="src">※ 출처 : oracle/out/s1_compare.json · s1_fncheck.json (칼럼 MD5 → 행 해시 → 앞 60비트 합, 시스템 칼럼 제외)</p>
+    <div class="pg">8</div>
+  </section>
+
+  <!-- 8. 이식하며 바뀐 것 -->
+  <section class="slide">
+    <header><h2>7. 이식하며 바뀐 것</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>변환</div></header>
+    <p class="gov">Oracle 에 없는 기능 <b>3가지</b>와 한도 <b>2가지</b>를 다른 방법으로 맞췄다</p>
+    <div class="body">
+      <table>
+        <tr><th>항목</th><th>PostgreSQL</th><th>Oracle</th><th>이유</th></tr>
+        <tr><td>부분 인덱스 96개</td><td>CREATE INDEX … WHERE</td><td>일반 70 · 함수 기반 26</td><td>부분 인덱스가 없음. 함수 기반은 CASE 식으로 크기·내용을 맞춤</td></tr>
+        <tr><td>긴 문자 14칼럼</td><td>VARCHAR(4000)</td><td>CLOB</td><td>VARCHAR2 상한 4,000바이트, 한글 메모 최대 약 5,300바이트</td></tr>
+        <tr><td>이름 10개</td><td>30자 넘는 PK·인덱스 이름</td><td>ModelPi 규칙으로 끝을 자름</td><td>DA 표준 이름 상한 30자</td></tr>
+        <tr><td>조각 경계</td><td>FROM · TO + DEFAULT</td><td>LESS THAN + MAXVALUE</td><td>하한 문법이 없음. 데이터 범위 안이라 결과 같음</td></tr>
+        <tr><td>배열·다형 함수</td><td>ARRAY[…], null_p(anyelement)</td><td>'90|10' 문자열, CASE 식</td><td>PL/SQL 다형 인자 없음, 행마다 배열 생성은 느림</td></tr>
+        <tr><td>정수 나눗셈</td><td>a / b · a % b</td><td>TRUNC(a / b) · MOD(a, b)</td><td>Oracle / 는 소수 나눗셈</td></tr>
+        <tr><td>일시 비교 1건</td><td>= '9999-12-31 23:59:59'</td><td>= TIMESTAMP '9999-12-31 23:59:59'</td><td>문자열 일시 변환이 세션 형식을 따름(ORA-01847)</td></tr>
+        <tr><td>시스템 칼럼 기본값</td><td>'SYSTEM' · CURRENT_TIMESTAMP</td><td>'ADMIN' · SYSTIMESTAMP</td><td>pitel DDL 과 ModelPi 규칙 차이(대조에서 제외)</td></tr>
+      </table>
+    </div>
+    <p class="src">※ 출처 : oracle/ddl/ddl_report.md · datagen/datagen.mjs (PostgreSQL 출력은 바꾸기 전과 바이트 단위로 같음)</p>
+    <div class="pg">9</div>
+  </section>
+
+  <!-- 9. 원인 -->
+  <section class="slide">
+    <header><h2>8. 적재가 느린 이유와 1µs 차이의 원인</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>원인</div></header>
+    <p class="gov">속도는 <b>함수 실행 방식</b>, 1µs 는 <b>POWER 마지막 1비트</b>에서 갈린다</p>
+    <div class="body c2">
+      <div class="box"><h3>함수 실행 방식</h3><div class="in"><ul>
+        <li>PostgreSQL : SQL 함수를 플래너가 질의에 펼친다. EXPLAIN VERBOSE 에서 gen.uniform(k, 12, 40) 이 hashint8extended(k, 12) 식으로 바뀌어 C 함수가 바로 돈다</li>
+        <li>Oracle : PL/SQL 함수는 펼쳐지지 않는다. 행·칼럼마다 SQL → PL/SQL 전환과 해석 실행을 거친다. 기계어 컴파일(NATIVE)은 컨테이너가 막아 ORA-00600</li>
+      </ul><table style="margin-top:6px">
+        <tr><th>측정</th><th class="n">1차 원형</th><th class="n">2차 튜닝</th></tr>
+        <tr><td>gen.u 1회</td><td class="n">8.4µs</td><td class="n">5.2µs</td></tr>
+        <tr><td>직권해지 테이블(7,051행)</td><td class="n">25.1초</td><td class="n">9.1초</td></tr>
+        <tr><td>정지 테이블(28,204행)</td><td class="n">70.5초</td><td class="n">35.3초</td></tr>
+      </table><p style="font-size:12px;margin:6px 0 0">2차 = 해시 32비트 정수(SIMPLE_INTEGER) · 자동 인라인 · 배열 복사 제거. 같은 테이블 PostgreSQL 0.7초 · 2.4초</p></div></div>
+      <div class="box"><h3>1µs 차이 : 다른 행의 POWER(x, 0.22) 비트</h3><div class="in"><table>
+        <tr><th>키</th><th>PostgreSQL</th><th>Oracle</th></tr>
+        <tr><td>19633</td><td>…bdc34cc</td><td>…bdc34cb</td></tr>
+        <tr><td>36600</td><td>…c86b49f</td><td>…c86b4a0</td></tr>
+        <tr><td>38554</td><td>…229e30c</td><td>…229e30d</td></tr>
+        <tr><td>100(같은 예)</td><td>…09385a0</td><td>…09385a0</td></tr>
+      </table><p style="font-size:12.5px;margin:8px 0 0">난수 gen.u 는 두 DB 비트가 같다. 거듭제곱이 1비트 다르면 기간(약 5.3×10¹¹µs)을 곱해 마이크로초로 반올림할 때 1µs 가 갈린다. 같은 값에서 나온 일자(CHAR(8)) 칼럼은 모두 같다.</p></div></div>
+    </div>
+    <div class="finding"><b>Key Finding</b> : PostgreSQL 함수를 Oracle 로 옮길 때 SQL 함수의 인라인 효과가 사라지는 비용이 가장 크다.</div>
+    <div class="pg">10</div>
+  </section>
+
+  <!-- 10. 문제와 조치 -->
+  <section class="slide">
+    <header><h2>9. 실행 중 생긴 문제와 조치</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>문제</div></header>
+    <p class="gov">문제 <b>10건</b> 가운데 Oracle 이식에서 생긴 것이 <b>6건</b>이다</p>
+    <div class="body">
+      <table style="font-size:12px">
+        <tr><th>시각(UTC)</th><th>증상</th><th>원인</th><th>조치</th></tr>
+        <tr><td>00:04</td><td>ORA-02236 테이블스페이스</td><td>파일 자동 관리(OMF) 미설정</td><td>데이터 파일 경로 지정</td></tr>
+        <tr><td>00:04</td><td>ORA-00600 NATIVE 컴파일</td><td>컨테이너가 실행 메모리 매핑 차단</td><td>해석 실행으로 컴파일</td></tr>
+        <tr><td>00:05</td><td>ORA-01405 함수 대조</td><td>해시 함수에 NULL 입력</td><td>NULL 을 먼저 거름</td></tr>
+        <tr><td>00:05</td><td>한글 이름 4건 깨짐</td><td>대조 도구가 UTF-8 조각 경계를 갈라 읽음</td><td>UTF-8 해독 뒤 일치</td></tr>
+        <tr><td>00:11</td><td>DEFAULT 조각 22/38</td><td>PostgreSQL DDL 의 조각 이름 3가지</td><td>경계식으로 찾음 → 0/38</td></tr>
+        <tr><td>00:12</td><td>1차 적재 14~36배 느림</td><td>해석 실행 · NUMBER 연산 · 배열 복사</td><td>중단, 2차 튜닝 뒤 재실행</td></tr>
+        <tr><td>00:17</td><td>pitel-pg 정지(137)</td><td>외부 정지 요청(주체 확인 못 함)</td><td>재기동, 데이터 보존 확인</td></tr>
+        <tr><td>00:18</td><td>ORA-06502 튜닝 중</td><td>SIMPLE_INTEGER OUT 인자가 NULL 로 시작</td><td>IN OUT 으로 변경</td></tr>
+        <tr><td>00:56</td><td>ORA-01847 PK·인덱스</td><td>일시 문자열 암묵 변환</td><td>TIMESTAMP 리터럴, 재실행</td></tr>
+        <tr><td>01:06</td><td>132테이블 '다름'</td><td>대조 SQL 한 줄이 2,499자 상한 초과</td><td>줄을 나눠 재대조</td></tr>
+      </table>
+    </div>
+    <p class="src">※ 출처 : sitemap/schema.pi/pitel/oracle/S1_LOG.md 8절</p>
+    <div class="pg">11</div>
+  </section>
+
+  <!-- 11. 판단 -->
+  <section class="slide">
+    <header><h2>10. 판정과 다음 작업</h2><div class="crumb">Pi통신 과금<br>PostgreSQL · Oracle 비교<br>판정</div></header>
+    <p class="gov">S1 요구사항 6개 가운데 <b>5개 통과</b>, ORA-R01 은 <b>운영 저장 여부</b>가 남았다</p>
+    <div class="body c2">
+      <div class="box"><h3>요구사항 판정</h3><div class="in"><table>
+        <tr><th>ID</th><th>내용</th><th>판정</th></tr>
+        <tr><td>ORA-R01</td><td>Oracle 물리모델 생성</td><td><span class="diff">부분 통과</span></td></tr>
+        <tr><td>ORA-R02</td><td>타입·길이</td><td><span class="same">통과</span></td></tr>
+        <tr><td>ORA-R03</td><td>조각 2,306개</td><td><span class="same">통과</span></td></tr>
+        <tr><td>ORA-R04</td><td>생성 함수 이식</td><td><span class="same">통과</span></td></tr>
+        <tr><td>ORA-R05</td><td>초기 데이터 구축</td><td><span class="same">통과</span></td></tr>
+        <tr><td>ORA-R06</td><td>같은 배율 대조(일시 1µs 허용)</td><td><span class="same">통과</span></td></tr>
+      </table></div></div>
+      <div class="box"><h3>다음 작업</h3><div class="in"><table>
+        <tr><th>할 일</th><th>담당</th></tr>
+        <tr><td>ORA-R01 : schema.pi 운영 DB 에 Oracle 물리모델 저장 여부</td><td>마스터</td></tr>
+        <tr><td>S1.1 : 초기화 스크립트 분리·재현 확인(ORA-R07)</td><td>아소카</td></tr>
+        <tr><td>S2 : 빈 테이블 재생성, 원천 발행·슬롯, 복제 워커</td><td>아소카</td></tr>
+        <tr><td>S3 : 복제·CDC 시험 A·B·C, 엄격한 동일성 검증</td><td>아소카</td></tr>
+        <tr><td>배율 1 에서 크기·속도 재측정(선택)</td><td>마스터 결정</td></tr>
+      </table></div></div>
+    </div>
+    <div class="finding"><b>결론</b> : Oracle 판 Pi통신 과금 시스템은 같은 구조와 같은 데이터로 구축되었다. 엔진 차이는 생성 속도와 일시 1µs 에서 드러났고, 이는 S2·S3 의 복제 경로에는 영향이 없다.</div>
+    <div class="pg">12</div>
+  </section>
+
+</div>
+</body>
+</html>
