@@ -15,5 +15,6 @@ pitel/database/verify_state.json
 pitel/database/init_data*.html
 pitel/datagen/state/
 pitel/datagen/out/
+pitel/oracle/out/
 pitel/model/std/_build_log.txt
 pitel/database/init_data.json

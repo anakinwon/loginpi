@@ -1,6 +1,7 @@
 // Pi통신 테스트 데이터 생성기 — model/physical/*.json 을 읽어 테이블별 INSERT…SELECT(gen 함수)를 만들고 테이블×연도 단위로 병렬 적재
 // 실행 : node datagen/datagen.mjs plan --scale 0.001            → datagen/out/plan.json·volume.md (SQL 미리보기)
 //        node datagen/datagen.mjs run  --db dev --schema chk_gen --scale 0.001 --jobs 6 [--only ptl_pay_bill_m] [--ddl]
+//        node datagen/datagen.mjs run  --target oracle --scale 0.01 --jobs 6   (Oracle 판 : oracle/s1.mjs 가 부름, PRD dbms.pi 11.6)
 // 접속 : docker exec pitel-pg psql (DB 이름은 sitemap/schema.pi/pitel/.env.local 의 PITEL_DB_URL·PITEL_DEV_DB_URL 경로에서 — 값 출력 안 함)
 // 재시작 : 끝난 조각은 datagen/state/<db>_<schema>.json 에 기록, 다시 실행하면 건너뜀. 조각 1개 = INSERT 1문(원자적)
 import fs from 'node:fs'
@@ -37,6 +38,49 @@ const arg = (k, d) => {
 }
 const q = s => "'" + String(s).replace(/'/g, "''") + "'"
 
+// SQL 방언 : pg = 기존 출력(글자 단위로 같음), oracle = oracle/gen_pkg.sql 의 GEN 패키지(--target oracle, PRD dbms.pi 11.6 ORA-R05)
+//  Oracle 차이 : 정수 나눗셈 TRUNC·나머지 MOD, 배열 → '|' 구분 문자열·CASE, null_p(다형) → CASE, generate_series → 파이프라인 gen.series,
+//  VARCHAR(n) 가 4,000바이트를 넘을 수 있는 칼럼(n > 1333, 한글 3바이트) = CLOB(oracle/ddl-oracle.mjs 와 같은 규칙)
+const LOB_CHARS = 1333
+const DIALECT = {
+  pg: {
+    idiv: (a, b) => `${a} / ${b}`,
+    mod: (a, b) => `${a} % ${b}`,
+    txt: e => `${e}::text`,
+    num: e => `${e}::numeric`,
+    f2n: e => `${e}::numeric`,
+    left: (e, n) => `left(${e}, ${n})`,
+    nullp: (e, s, p) => `gen.null_p(${e}, K, ${s}, ${p})`,
+    hours: kk => `(gen.t0() + (${kk}) * interval '1 hour')`,
+    days: kk => `gen.t0() + (${kk}) * interval '1 day'`,
+    monthsYm: kk => `to_char(gen.t0() + (${kk}) * interval '1 month', 'YYYYMM')`,
+    wcode: (s, codes, ws) => `gen.wcode(K, ${s}, ARRAY[${codes.map(q).join(',')}], ARRAY[${ws.join(',')}]::float8[])`,
+    pick: (list, i) => `(ARRAY[${list.map(q).join(',')}])[${i}]`,
+    memo: (s, p) => `gen.memo(K, ${s}, ${p})`,
+    coalesce: (a, b) => `coalesce(${a}, ${b})`,
+    tsLit: y => `timestamp '${y}-01-01'`,
+    insert: (tbl, cols, sel) => `INSERT INTO ${tbl} (${cols})\nSELECT\n${sel}\nFROM generate_series(__KFROM__::bigint, __KTO__::bigint) k`,
+  },
+  oracle: {
+    idiv: (a, b) => `TRUNC(${a} / ${b})`,
+    mod: (a, b) => `MOD(${a}, ${b})`,
+    txt: e => `TO_CHAR(${e})`,
+    num: e => e,
+    f2n: e => `gen.f2n(${e})`,
+    left: (e, n) => `SUBSTR(${e}, 1, ${n})`,
+    nullp: (e, s, p) => `CASE WHEN gen.u(K, ${s}) < ${p} THEN NULL ELSE ${e} END`,
+    hours: kk => `(gen.t0() + NUMTODSINTERVAL(${kk}, 'HOUR'))`,
+    days: kk => `gen.t0() + NUMTODSINTERVAL(${kk}, 'DAY')`,
+    monthsYm: kk => `TO_CHAR(ADD_MONTHS(gen.t0(), ${kk}), 'YYYYMM')`,
+    wcode: (s, codes, ws) => `gen.wcode(K, ${s}, ${q(codes.join('|'))}, ${q(ws.join('|'))})`,
+    pick: (list, i) => `CASE ${i} ${list.map((v, j) => `WHEN ${j + 1} THEN ${q(v)}`).join(' ')} END`,
+    memo: (s, p, len, lob) => `gen.${lob ? 'memo_lob' : 'memo'}(K, ${s}, ${p}, ${len})`,
+    coalesce: (a, b, lob) => `NVL(${a}, ${lob ? `TO_CLOB(${b})` : b})`,
+    tsLit: y => `TIMESTAMP '${y}-01-01 00:00:00'`,
+    insert: (tbl, cols, sel) => `INSERT /*+ APPEND */ INTO ${tbl} (${cols})\nSELECT\n${sel}\nFROM (SELECT column_value AS k FROM TABLE(gen.series(__KFROM__, __KTO__)))`,
+  },
+}
+
 // ---------- 모델 적재 ----------
 function loadModel() {
   const dir = path.join(ROOT, 'model/physical')
@@ -69,7 +113,7 @@ function typeOf(dataTp) {
 }
 
 // ---------- 식 생성 ----------
-function build(model, scale) {
+function build(model, scale, D = DIALECT.pg) {
   const { tables, codes } = model
   const byName = new Map(tables.map(t => [t.tblNm, t]))
   const N = volumes(tables, scale)
@@ -100,7 +144,7 @@ function build(model, scale) {
       const pfn = pkExprs(byName.get(idf.refTbl))
       idf.cols.forEach((c, i) => {
         const rc = idf.refCols[i]
-        fns[c] = K => (pfn[rc] ? pfn[rc](`(((${K}) - 1) / ${fan} + 1)`) : `gen.fmt('X', ${K}, 10)`)
+        fns[c] = K => (pfn[rc] ? pfn[rc](`(${D.idiv(`((${K}) - 1)`, fan)} + 1)`) : `gen.fmt('X', ${K}, 10)`)
       })
     }
     const fk2 = idf && (t.fks || []).find(f => f !== idf && byName.has(f.refTbl) && f.refTbl !== t.tblNm && f.cols.every(c => pkCols.includes(c)) && f.cols.some(c => !fns[c]))
@@ -110,7 +154,7 @@ function build(model, scale) {
       fk2.cols.forEach((c, i) => {
         if (fns[c]) return
         const rc = fk2.refCols[i]
-        fns[c] = K => (pf2[rc] ? pf2[rc](`((((${K}) - 1) / ${fan} + ((${K}) - 1) % ${fan}) % ${pn2} + 1)`) : `gen.fmt('X', ${K}, 10)`)
+        fns[c] = K => (pf2[rc] ? pf2[rc](`(${D.mod(`(${D.idiv(`((${K}) - 1)`, fan)} + ${D.mod(`((${K}) - 1)`, fan)})`, pn2)} + 1)`) : `gen.fmt('X', ${K}, 10)`)
       })
     }
     // 겸용 FK : 식별 부모가 없고 PK 일부가 FK 에 속하면 그 칼럼은 FK 부모 값(유일성은 나머지 PK 칼럼이 보장)
@@ -129,11 +173,11 @@ function build(model, scale) {
       const col = t.cols.find(x => x.colNm === c)
       const ty = typeOf(col.dataTp)
       const isSeq = idf && i === 0
-      const key = isSeq ? K => `(((${K}) - 1) % ${fan} + 1)` : K => `(${K})`
+      const key = isSeq ? K => `(${D.mod(`((${K}) - 1)`, fan)} + 1)` : K => `(${K})`
       const nn = isSeq ? fan : n
       // 유일성을 맡지 않는 뒤쪽 숫자 키는 자릿수 안에서 순환(NUMERIC(p) 넘침 방지)
       const lead = i === 0
-      fns[c] = K => keyExpr(col, ty, lead || ty.base !== 'NUMERIC' ? key(K) : `((${key(K)} - 1) % ${10 ** Math.min(ty.len - ty.scale, 15) - 1} + 1)`, K, nn, n, t, isSeq)
+      fns[c] = K => keyExpr(col, ty, lead || ty.base !== 'NUMERIC' ? key(K) : `(${D.mod(`(${key(K)} - 1)`, 10 ** Math.min(ty.len - ty.scale, 15) - 1)} + 1)`, K, nn, n, t, isSeq)
     })
     const res = fns
     memo.set(t.tblNm, res)
@@ -144,9 +188,9 @@ function build(model, scale) {
   function keyExpr(col, ty, kk, K, nn, n, t, isSeq) {
     const nm = col.colNm
     // 식별 자식의 날짜형 순번 : 기준일 + 순번(일·월) — 같은 부모 안에서 겹치지 않게
-    if (isSeq && ty.base === 'TIMESTAMP') return `(gen.t0() + (${kk}) * interval '1 hour')`
-    if (isSeq && ty.base === 'CHAR' && ty.len === 8) return `gen.ymd(gen.t0() + (${kk}) * interval '1 day')`
-    if (isSeq && ty.base === 'CHAR' && ty.len === 6) return `to_char(gen.t0() + (${kk}) * interval '1 month', 'YYYYMM')`
+    if (isSeq && ty.base === 'TIMESTAMP') return D.hours(kk)
+    if (isSeq && ty.base === 'CHAR' && ty.len === 8) return `gen.ymd(${D.days(kk)})`
+    if (isSeq && ty.base === 'CHAR' && ty.len === 6) return D.monthsYm(kk)
     if (ty.base === 'TIMESTAMP') return `gen.recent_dtm(${K}, ${n})`
     if (ty.base === 'CHAR' && ty.len === 8) return `gen.ymd(gen.recent_dtm(${K}, ${n}))`
     if (ty.base === 'CHAR' && ty.len === 6) return `to_char(gen.recent_dtm(${K}, ${n}), 'YYYYMM')`
@@ -155,7 +199,7 @@ function build(model, scale) {
     const digits = String(nn).length
     const pre = digits + 1 > L ? '' : (t.tblNm.split('_')[2] || 'X')[0]
     const w = Math.max(digits, Math.min(L - pre.length, digits + 2))
-    if (/_CD$/.test(nm) && (ty.len || 20) <= 10) return `lpad((${kk})::text, ${Math.min(ty.len || 10, Math.max(2, String(nn).length))}, '0')`
+    if (/_CD$/.test(nm) && (ty.len || 20) <= 10) return `lpad(${D.txt(`(${kk})`)}, ${Math.min(ty.len || 10, Math.max(2, String(nn).length))}, '0')`
     return `gen.fmt(${q(pre)}, ${kk}, ${w})`
   }
 
@@ -166,8 +210,9 @@ function build(model, scale) {
     const s = saltSeq++
     const term = col.termNm || ''
     const len = ty.len || 20
-    const cut = e => (ty.base === 'VARCHAR' || ty.base === 'CHAR') ? `left(${e}, ${len})` : e
-    const nul = (e, p) => (col.nullYn ? `gen.null_p(${e}, K, ${s + 7}, ${p})` : e)
+    const cut = e => (ty.base === 'VARCHAR' || ty.base === 'CHAR') ? D.left(e, len) : e
+    const nul = (e, p) => (col.nullYn ? D.nullp(e, s + 7, p) : e)
+    const lob = ty.base === 'VARCHAR' && len > LOB_CHARS
     const base = `gen.recent_dtm(K, ${n})`
     // 유일 인덱스(PK 밖) : 식별 관계처럼 — 인덱스와 겹치는 FK 는 부모 번호 = (K-1)/fan+1, 인덱스의 나머지 칼럼은 순번 (K-1)%fan+1
     const pkc = t.pk?.cols || []
@@ -177,7 +222,7 @@ function build(model, scale) {
       const f = uxFk(x)
       const fan = f ? Math.max(1, Math.ceil(n / N.get(f.refTbl))) : 1
       const others = x.cols.filter(c => !(f?.cols || []).includes(c) && !pkc.includes(c))
-      if (others[0] === nm) return cut(keyExpr(col, ty, f ? `(((K) - 1) % ${fan} + 1)` : '(K)', 'K', f ? fan : n, n, t, !!f))
+      if (others[0] === nm) return cut(keyExpr(col, ty, f ? `(${D.mod('((K) - 1)', fan)} + 1)` : '(K)', 'K', f ? fan : n, n, t, !!f))
     }
     // 비식별 FK
     const fk = (t.fks || []).filter(f => f.cols.includes(nm) && byName.has(f.refTbl)).sort((a, b) => b.cols.length - a.cols.length)[0]
@@ -190,42 +235,42 @@ function build(model, scale) {
         const uniq = ux.some(x => uxFk(x) === fk)
         // PK 에 걸친 겸용 FK 는 PK 쪽과 같은 부모를 써야 하므로 고아를 섞지 않는다
         const shared = fk.cols.some(c => pkc.includes(c))
-        const pk = uniq ? `(((K) - 1) / ${Math.max(1, Math.ceil(n / pn))} + 1)` : fkParentK(fk, fk.cols[0] === nm && !shared)
+        const pk = uniq ? `(${D.idiv('((K) - 1)', Math.max(1, Math.ceil(n / pn)))} + 1)` : fkParentK(fk, fk.cols[0] === nm && !shared)
         return nul(cut(pfn[rc](pk)), C.nullFk)
       }
     }
     if (ty.base === 'TIMESTAMP') return nul(/RG|REG|CRT/.test(nm) ? base : `gen.after_dtm(gen.month_edge(${base}, K, ${s}, 0.05), K, ${s + 1}, 30)`, C.nullCol)
     if (ty.base === 'CHAR' && ty.len === 8) return nul(`gen.ymd(gen.after_dtm(${base}, K, ${s}, 30))`, C.nullCol)
     if (ty.base === 'CHAR' && ty.len === 6) return nul(`to_char(${base}, 'YYYYMM')`, C.nullCol)
-    if (/_YN$/.test(nm)) return nul(`gen.wcode(K, ${s}, ARRAY['N','Y'], ARRAY[90,10]::float8[])`, C.nullCol)
+    if (/_YN$/.test(nm)) return nul(D.wcode(s, ['N', 'Y'], ['90', '10']), C.nullCol)
     if (/_CD$/.test(nm)) {
       const vals = codes.get(term)
       if (vals?.length) {
         const main = /STTS/.test(nm) ? C.sttsMain : 0.6
         const ws = vals.map((_, i) => (i === 0 ? main : (1 - main) / (vals.length - 1 || 1)))
-        const e = `gen.wcode(K, ${s}, ARRAY[${vals.map(q).join(',')}], ARRAY[${ws.map(w => w.toFixed(6)).join(',')}]::float8[])`
+        const e = D.wcode(s, vals, ws.map(w => w.toFixed(6)))
         return nul(len >= 6 && ty.base === 'VARCHAR' ? `gen.dirty(${e}, K, ${s + 2}, ${C.dirtyP})` : e, C.nullCol)
       }
-      return nul(cut(`lpad(gen.skew(K, ${s}, 50, 2)::text, 2, '0')`), C.nullCol)
+      return nul(cut(`lpad(${D.txt(`gen.skew(K, ${s}, 50, 2)`)}, 2, '0')`), C.nullCol)
     }
     if (/TELNO$/.test(nm)) return nul(cut('gen.phone(K)'), C.nullCol)
-    if (/ZIP$/.test(nm)) return nul(cut(`lpad(gen.uniform(K, ${s}, 63999)::text, 5, '0')`), C.nullCol)
-    if (/BRNO$/.test(nm)) return nul(cut(`lpad(gen.uniform(K, ${s}, 999999999)::text, 10, '0')`), C.nullCol)
-    if (/ADDR$/.test(nm)) return nul(cut(`(ARRAY['서울특별시','경기도','부산광역시','인천광역시','대구광역시','대전광역시'])[gen.skew(K, ${s}, 6, 2)] || ' 테스트로 ' || gen.uniform(K, ${s + 1}, 999)`), C.nullCol)
+    if (/ZIP$/.test(nm)) return nul(cut(`lpad(${D.txt(`gen.uniform(K, ${s}, 63999)`)}, 5, '0')`), C.nullCol)
+    if (/BRNO$/.test(nm)) return nul(cut(`lpad(${D.txt(`gen.uniform(K, ${s}, 999999999)`)}, 10, '0')`), C.nullCol)
+    if (/ADDR$/.test(nm)) return nul(cut(`${D.pick(['서울특별시', '경기도', '부산광역시', '인천광역시', '대구광역시', '대전광역시'], `gen.skew(K, ${s}, 6, 2)`)} || ' 테스트로 ' || gen.uniform(K, ${s + 1}, 999)`), C.nullCol)
     if (/_NM$/.test(nm)) {
       if (/고객명|성명|대표자명|담당자명|납부자명|예금주명|수령인명|신청인명/.test(term)) return nul(cut('gen.person_nm(K)'), C.nullCol)
       if (/법인명|상호|파트너명|대리점명|판매점명|회사명|사업자명/.test(term)) return nul(cut('gen.corp_nm(K)'), C.nullCol)
       return nul(cut(`${q(term.replace(/명$/, ''))} || ' ' || gen.uniform(K, ${s}, 5000)`), C.nullCol)
     }
     if (/_CN$/.test(nm) || len >= 1000) {
-      const m = `gen.memo(K, ${s}, ${C.memoP})`
-      return cut(col.nullYn ? m : `coalesce(${m}, ${q(term || nm)} || ' ' || K)`)
+      const m = D.memo(s, C.memoP, len, lob)
+      return cut(col.nullYn ? m : D.coalesce(m, `${q(term || nm)} || ' ' || K`, lob))
     }
     if (ty.base === 'NUMERIC') {
       const max = Math.max(1, Math.min(10 ** Math.min(ty.len - ty.scale, 12) - 1, 1e9))
       // 극단값 x1000 이 자릿수를 넘지 않게 기본값 상한 = max/1000
-      if (/AMT$/.test(nm)) return nul(`gen.amt(gen.uniform(K, ${s}, ${Math.max(1, Math.min(Math.floor(max / 1000), 50000))})::numeric, K, ${s + 1})`, C.nullCol)
-      if (/RT$/.test(nm)) return nul(`round((gen.u(K, ${s}) * ${Math.min(max, 100)})::numeric, ${ty.scale})`, C.nullCol)
+      if (/AMT$/.test(nm)) return nul(`gen.amt(${D.num(`gen.uniform(K, ${s}, ${Math.max(1, Math.min(Math.floor(max / 1000), 50000))})`)}, K, ${s + 1})`, C.nullCol)
+      if (/RT$/.test(nm)) return nul(`round(${D.f2n(`(gen.u(K, ${s}) * ${Math.min(max, 100)})`)}, ${ty.scale})`, C.nullCol)
       return nul(`gen.skew(K, ${s}, ${Math.min(max, 100000)}, 2)`, C.nullCol)
     }
     if (/_NO$/.test(nm)) return nul(cut(`gen.fmt('N', gen.uniform(K, ${s}, 99999999), 10)`), C.nullCol)
@@ -244,19 +289,19 @@ function build(model, scale) {
       tbl: t.tblNm.toLowerCase(),
       area: t.area,
       n,
-      sql: `INSERT INTO ${t.tblNm.toLowerCase()} (${t.cols.map(c => c.colNm.toLowerCase()).join(', ')})\nSELECT\n${sel.join(',\n')}\nFROM generate_series(__KFROM__::bigint, __KTO__::bigint) k`,
+      sql: D.insert(t.tblNm.toLowerCase(), t.cols.map(c => c.colNm.toLowerCase()).join(', '), sel.join(',\n')),
     })
   }
   return plans
 }
 
 // 조각 : 큰 테이블은 연도별 키 범위(dtm_to_k), 작은 테이블은 1조각
-function chunks(p) {
+function chunks(p, D = DIALECT.pg) {
   if (p.n < C.chunkMin) return [{ id: `${p.tbl}:all`, from: '1', to: String(p.n) }]
   const out = []
   for (let y = C.years[0]; y <= C.years[1]; y++) {
-    const from = y === C.years[0] ? '1' : `gen.dtm_to_k(timestamp '${y}-01-01', ${p.n}) + 1`
-    const to = y === C.years[1] ? String(p.n) : `gen.dtm_to_k(timestamp '${y + 1}-01-01', ${p.n})`
+    const from = y === C.years[0] ? '1' : `gen.dtm_to_k(${D.tsLit(y)}, ${p.n}) + 1`
+    const to = y === C.years[1] ? String(p.n) : `gen.dtm_to_k(${D.tsLit(y + 1)}, ${p.n})`
     out.push({ id: `${p.tbl}:${y}`, from, to })
   }
   return out
@@ -284,19 +329,29 @@ function psql(db, sql) {
 }
 
 async function run() {
+  // --target oracle : oracle/ora.mjs 로 sqlplus 실행(GEN 패키지·테이블은 oracle/s1.mjs gen·tables 단계가 먼저 만든다), 조각 = INSERT /*+ APPEND */ 1문 + COMMIT
+  const target = arg('target', 'pg')
+  if (!DIALECT[target]) throw new Error(`--target 은 pg 또는 oracle : ${target}`)
+  const isOra = target === 'oracle'
+  const D = DIALECT[target]
+  const oraLib = isOra ? await import('../oracle/ora.mjs') : null
   const which = arg('db', 'dev')
   if (which === 'prod' && arg('yes') !== true) throw new Error('pitel 최종 적재는 --yes 필요(최종 적재는 지정 세션만 — CONTEXT 4절)')
   const schema = arg('schema', which === 'prod' ? 'public' : 'chk_gen')
   const scale = +arg('scale', 0.001)
   const jobs = +arg('jobs', 6)
   const only = arg('only', null)
-  const db = dbName(which)
-  const head = `SET search_path = ${schema}, gen; SET synchronous_commit = off;\n`
+  const db = isOra ? 'ora' : dbName(which)
+  const head = isOra ? '' : `SET search_path = ${schema}, gen; SET synchronous_commit = off;\n`
+  const exec = isOra ? sql => oraLib.ora(sql + 'COMMIT;\n') : sql => psql(db, sql)
   const model = loadModel()
-  const plans = build(model, scale).filter(p => !only || only.split(',').includes(p.tbl))
+  const plans = build(model, scale, D).filter(p => !only || only.split(',').includes(p.tbl))
 
-  await psql(db, fs.readFileSync(path.join(HERE, '00_gen_functions.sql'), 'utf8'))
-  if (arg('ddl') === true) {
+  if (isOra) {
+    const st = oraLib.rows(await oraLib.ora("SELECT object_type || ':' || status FROM user_objects WHERE object_name = 'GEN' ORDER BY 1;"))
+    if (st.join(',') !== 'PACKAGE BODY:VALID,PACKAGE:VALID') throw new Error(`Oracle GEN 패키지 상태 이상(${st.join(',') || '없음'}) — node oracle/s1.mjs gen --target oracle 먼저`)
+  } else await psql(db, fs.readFileSync(path.join(HERE, '00_gen_functions.sql'), 'utf8'))
+  if (arg('ddl') === true && !isOra) {
     await psql(db, `CREATE SCHEMA IF NOT EXISTS ${schema};`)
     for (const f of fs.readFileSync(path.join(ROOT, 'ddl/00_run_order.txt'), 'utf8').split('\n').filter(l => /_tables\.sql$/.test(l.trim())))
       await psql(db, `SET search_path = ${schema};\n` + fs.readFileSync(path.join(ROOT, 'ddl', f.trim()), 'utf8'))
@@ -307,7 +362,7 @@ async function run() {
   fs.mkdirSync(stDir, { recursive: true })
   const stFile = path.join(stDir, `${ST_PRE}${db}_${schema}_${scale}.json`)
   const done = new Set(fs.existsSync(stFile) ? JSON.parse(fs.readFileSync(stFile, 'utf8')) : [])
-  const queue = plans.flatMap(p => chunks(p).map(c => ({ ...c, p }))).filter(c => !done.has(c.id))
+  const queue = plans.flatMap(p => chunks(p, D).map(c => ({ ...c, p }))).filter(c => !done.has(c.id))
   const total = queue.length
   const fails = []
   const t0 = Date.now()
@@ -336,7 +391,7 @@ async function run() {
       // 조각 시작·완료 시각 줄 — database/run-init.mjs 가 이 로그로 테이블별 시작·종료를 기록(완료 줄은 state 기록 뒤)
       console.log(`시작 ${c.id} ${new Date().toISOString()}`)
       try {
-        await psql(db, sql)
+        await exec(sql)
         done.add(c.id)
         await saveState() // 기록 실패는 조각 실패가 아님(적재는 이미 커밋) — done 은 다음 기록에 반영
         console.log(`완료 ${c.id} ${new Date().toISOString()}`)
@@ -359,7 +414,7 @@ async function run() {
 function plan() {
   const scale = +arg('scale', 1)
   const model = loadModel()
-  const plans = build(model, scale)
+  const plans = build(model, scale, DIALECT[arg('target', 'pg')])
   const outDir = path.join(HERE, 'out')
   fs.mkdirSync(outDir, { recursive: true })
   fs.writeFileSync(path.join(outDir, 'plan.json'), JSON.stringify(plans, null, 1))
@@ -372,4 +427,4 @@ function plan() {
 const cmd = process.argv[2]
 if (cmd === 'plan') plan()
 else if (cmd === 'run') run().catch(e => { console.error(e.message); process.exit(1) })
-else console.log('사용 : node datagen/datagen.mjs plan|run [--scale 0.001] [--db dev|prod] [--schema chk_gen] [--jobs 6] [--only tbl,...] [--ddl]')
+else console.log('사용 : node datagen/datagen.mjs plan|run [--scale 0.001] [--db dev|prod] [--schema chk_gen] [--jobs 6] [--only tbl,...] [--ddl] [--target pg|oracle]')
