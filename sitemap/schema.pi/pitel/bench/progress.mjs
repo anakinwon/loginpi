@@ -43,7 +43,17 @@ const SIZE = {
     }
     return { sz, lob }
   },
-  // shortcut: MySQL 크기 조회는 해당 실증 착수 때 추가(information_schema.TABLES)
+  // MySQL : 테이블스페이스 파일 할당 크기(파티션마다 파일 1개), 이름 pitel/ptl_<영역>_…
+  mysql: async () => {
+    const { my, rows } = await import('../mysql/my.mjs')
+    const sz = Object.fromEntries(AREAS.map(a => [a, 0]))
+    const q = "SELECT UPPER(SUBSTRING(NAME, 11, 3)), SUM(ALLOCATED_SIZE) FROM information_schema.INNODB_TABLESPACES WHERE NAME LIKE 'pitel/ptl\\_%' GROUP BY UPPER(SUBSTRING(NAME, 11, 3));"
+    for (const l of rows(await my(q))) {
+      const [a, b] = l.trim().split('\t')
+      if (a in sz) sz[a] = +b
+    }
+    return { sz, lob: 0 }
+  },
 }
 if (!SIZE[TARGET]) throw new Error(`크기 조회 미구현 대상 : ${TARGET}`)
 

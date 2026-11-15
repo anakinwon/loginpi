@@ -17,5 +17,6 @@ pitel/datagen/state/
 pitel/datagen/out/
 pitel/oracle/out/
 pitel/mssql/out/
+pitel/mysql/out/
 pitel/model/std/_build_log.txt
 pitel/database/init_data.json
