@@ -31,6 +31,16 @@
   .bar i { display:block; height:100%; background:var(--ok) }
   .bar.slow i { background:var(--warn) }
   footer { color:var(--sub); font-size:12px; margin-top:18px }
+  /* 선그래프 : 범주색 4칸(dataviz 기본 팔레트, 라이트·다크 검증 통과, 라이트 대비 WARN 은 끝 라벨·표로 보완) */
+  :root { --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grid:#ececea; --axis:#898781 }
+  @media (prefers-color-scheme: dark) { :root { --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grid:#2c3137 } }
+  .chart { position:relative; margin:0 0 10px }
+  .chart svg { width:100%; height:auto; display:block; font:11px system-ui, 'Malgun Gothic', sans-serif }
+  .chart .lg { cursor:pointer; opacity:.75 } .chart .lg:hover { opacity:1 }
+  /* nivo 툴팁 모양 : 흰 바탕·그림자·네모 칩 */
+  .tip { position:absolute; pointer-events:none; background:var(--card); color:var(--ink); border-radius:2px; padding:5px 9px; font-size:12px; box-shadow:0 1px 2px rgba(0,0,0,.25); white-space:nowrap }
+  .tip b { display:block; margin-bottom:3px; font-weight:600 } .tip div { display:flex; align-items:center; gap:7px; padding:2px 0 }
+  .tip i { display:inline-block; width:12px; height:12px }
 </style>
 </head>
 <body>
@@ -61,6 +71,7 @@
   <section>
     <h2>2. 10분 단위 누적 완료율</h2>
     <p class="meta" style="margin:0 0 8px">PostgreSQL은 첫 10분 14.1%로 출발이 늦고, 나머지 3종은 20~28%로 출발한다</p>
+    <div class="chart"><svg id="pace" viewBox="0 0 800 340" role="img" aria-label="10분 단위 누적 완료율 선그래프 : 아래 표와 같은 값"></svg><div id="tip" class="tip" hidden></div></div>
     <table>
       <tr><th>DBMS</th><th class="n">10분</th><th class="n">20분</th><th class="n">30분</th><th class="n">40분</th><th class="n">50분</th><th class="n">60분</th><th class="n">70분</th></tr>
       <tr><td>MySQL</td><td class="n">28.2%</td><td class="n">46.4%</td><td class="n">62.1%</td><td class="n">73.4%</td><td class="n">98.7%</td><td class="n">100%</td><td class="n">100%</td></tr>
@@ -113,5 +124,57 @@
 
   <footer>근거 : <code>pitel/bench/runs/9~12_*_newpc_20261121_report.md</code> · <code>_verify_count.log</code> · <code>_complete.log</code> 첫 줄, <code>mysql/MYSQL_LOG.md</code> · <code>mssql/MSSQL_LOG.md</code> 새 PC 절 (커밋 e2999d22) · 값은 스냅샷 · <a href="index.html">Restore 현황판</a></footer>
 </main>
+<script>
+// 2절 선그래프(nivo Line 모양 재현 : 포인트 속 흰색·테두리 2px, 축 눈금선 5px·축 제목, 오른쪽 세로 범례 원형 기호, x 단위 슬라이스 툴팁)
+// 값 = 2절 표와 같은 출처, 끝 점 = 완료 경과 시간. 외부 리소스 없음, 색 = 검증 통과 4색(nivo 기본 파스텔은 검증 FAIL)
+(() => {
+  const S = [
+    { name: 'MySQL', c: 'var(--s1)', p: [[0, 0], [10, 28.2], [20, 46.4], [30, 62.1], [40, 73.4], [50, 98.7], [50.25, 100]] },
+    { name: 'MS-SQL', c: 'var(--s2)', p: [[0, 0], [10, 26.3], [20, 47.5], [30, 65.5], [40, 80.8], [46.73, 100]] },
+    { name: 'PostgreSQL', c: 'var(--s3)', p: [[0, 0], [10, 14.1], [20, 28.2], [30, 44.8], [40, 59.2], [50, 67.2], [60, 78.6], [70, 99.6]] },
+    { name: 'Oracle', c: 'var(--s4)', p: [[0, 0], [10, 20.1], [20, 37.8], [30, 60.9], [40, 75.8], [49.9, 100]] },
+  ]
+  const M = { t: 30, r: 160, b: 60, l: 70 }, W = 800, H = 340, L = M.l, R = W - M.r, T = M.t, B = H - M.b
+  const xs = m => L + (R - L) * m / 70, ys = v => B - (B - T) * v / 100
+  const svg = document.getElementById('pace'), tip = document.getElementById('tip'), NS = 'http://www.w3.org/2000/svg'
+  const el = (tag, a, txt, parent = svg) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; parent.appendChild(e); return e }
+  // 격자(y)·축선·눈금선 5px·눈금 글자
+  for (const v of [0, 20, 40, 60, 80, 100]) {
+    el('line', { x1: L, x2: R, y1: ys(v), y2: ys(v), stroke: 'var(--grid)' })
+    el('line', { x1: L - 5, x2: L, y1: ys(v), y2: ys(v), stroke: 'var(--axis)' }); el('text', { x: L - 9, y: ys(v) + 4, 'text-anchor': 'end', fill: 'var(--sub)' }, v)
+  }
+  for (let m = 0; m <= 70; m += 10) { el('line', { x1: xs(m), x2: xs(m), y1: B, y2: B + 5, stroke: 'var(--axis)' }); el('text', { x: xs(m), y: B + 18, 'text-anchor': 'middle', fill: 'var(--sub)' }, m) }
+  el('line', { x1: L, x2: R, y1: B, y2: B, stroke: 'var(--axis)' }); el('line', { x1: L, x2: L, y1: T, y2: B, stroke: 'var(--axis)' })
+  el('text', { x: (L + R) / 2, y: B + 44, 'text-anchor': 'middle', fill: 'var(--ink)' }, '경과 시간(분)')
+  el('text', { transform: `translate(${L - 46},${(T + B) / 2}) rotate(-90)`, 'text-anchor': 'middle', fill: 'var(--ink)' }, '누적 완료율(%)')
+  const cross = el('line', { y1: T, y2: B, stroke: 'var(--ink)', 'stroke-width': 1, 'stroke-dasharray': '6 6', opacity: .6, visibility: 'hidden' })
+  // 선·포인트(nivo pointSize 10 · pointColor 바탕 · pointBorderWidth 2)
+  const G = S.map(s => {
+    const g = el('g', {})
+    el('polyline', { points: s.p.map(([m, v]) => xs(m) + ',' + ys(v)).join(' '), fill: 'none', stroke: s.c, 'stroke-width': 2, 'stroke-linejoin': 'round' }, null, g)
+    for (const [m, v] of s.p) el('circle', { cx: xs(m), cy: ys(v), r: 5, fill: 'var(--card)', stroke: s.c, 'stroke-width': 2 }, null, g)
+    return g
+  })
+  const focus = i => G.forEach((g, j) => g.setAttribute('opacity', i == null || i === j ? 1 : .15))
+  // 오른쪽 세로 범례(원형 기호 12px, 항목 간격 4px, 투명도 .75 → 올리면 1·해당 선 강조)
+  S.forEach((s, i) => {
+    const g = el('g', { class: 'lg', transform: `translate(${R + 24},${B - (S.length - i) * 24})` })
+    el('rect', { x: -4, y: -10, width: 120, height: 20, fill: 'transparent' }, null, g)
+    el('circle', { cx: 6, cy: 0, r: 6, fill: s.c }, null, g); el('text', { x: 20, y: 4, fill: 'var(--ink)' }, s.name, g)
+    g.addEventListener('mouseenter', () => focus(i)); g.addEventListener('mouseleave', () => focus(null))
+  })
+  // 슬라이스 툴팁 : 마우스 x 에 가까운 10분 눈금의 4종 값
+  const at = (s, m) => { const q = s.p.find(([x]) => x === m); return q ? q[1] : m > s.p.at(-1)[0] ? 100 : null }
+  const hit = el('rect', { x: L, y: T, width: R - L, height: B - T, fill: 'transparent' })
+  hit.addEventListener('mousemove', e => {
+    const r = svg.getBoundingClientRect(), k = W / r.width
+    const m = Math.max(0, Math.min(70, Math.round(((e.clientX - r.left) * k - L) / (R - L) * 7) * 10))
+    cross.setAttribute('x1', xs(m)); cross.setAttribute('x2', xs(m)); cross.setAttribute('visibility', 'visible')
+    tip.innerHTML = `<b>${m}분</b>` + S.map(s => `<div><i style="background:${s.c}"></i>${s.name} <b style="margin:0 0 0 auto;padding-left:10px">${at(s, m) ?? '-'}%</b></div>`).join('')
+    tip.hidden = false; const px = xs(m) / k; tip.style.left = (px > r.width / 2 ? px - tip.offsetWidth - 14 : px + 14) + 'px'; tip.style.top = (T / k) + 'px'
+  })
+  hit.addEventListener('mouseleave', () => { cross.setAttribute('visibility', 'hidden'); tip.hidden = true })
+})()
+</script>
 </body>
 </html>
