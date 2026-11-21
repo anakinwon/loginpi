@@ -1,7 +1,7 @@
 // MySQL 판 준비(PRD dbms.pi 11.7 대상 ③) : 버퍼 풀·redo 설정 → pitel DB 재생성(utf8mb4) → 키 생성용 숫자표 pitel_seq(0~99,999) → 테이블 214개·파티션 2,306개
 // DDL 은 model/physical/*.json 에서 직접 만든다(ModelPi 에 MySQL 프로파일 없음). 테이블 이름은 소문자(Linux MySQL 은 이름 대소문자 구분, datagen 이 소문자로 넣음)
 // 시스템 칼럼 4개는 맨 끝, PK·인덱스는 적재 뒤 단계라 만들지 않는다
-// 실행 : node mysql/setup.mjs --yes (기존 pitel DB 를 지우고 다시 만든다). DDL 만 : --ddl-only → mysql/ddl/tables.sql
+// 실행 : node mysql/setup.mjs --yes [--buffer-pool-mb 8192] (기존 pitel DB 를 지우고 다시 만든다). DDL 만 : --ddl-only → mysql/ddl/tables.sql
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -9,8 +9,10 @@ import { my, rows } from './my.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(HERE, '..')
+const bpArg = process.argv.indexOf('--buffer-pool-mb')
 const C = {
-  bufferPoolMb: 3072, // Oracle SGA 3GB · MS-SQL 시험 메모리 상한과 같은 규모
+  // 기본 3072 = 2026-11-15 이전 PC 조건(Oracle SGA 3GB 규모). 새 PC 조건(2026-11-21)은 --buffer-pool-mb 8192
+  bufferPoolMb: bpArg > 0 ? +process.argv[bpArg + 1] : 3072,
   redoMb: 16384, // PostgreSQL max_wal_size 16GB · Oracle redo 4GB × 4 와 맞춤
   rowMax: 65535, // InnoDB 한 행 최대(TEXT 제외)
 }

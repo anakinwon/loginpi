@@ -8,8 +8,10 @@ import { ms, rows } from './ms.mjs'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(HERE, '..')
+const mmArg = process.argv.indexOf('--max-mem-mb')
 const C = {
-  maxMemMb: 4317, // Oracle 실증의 SGA 3,072MB + PGA 1,317MB 합과 맞춤(2026-11-15)
+  // 기본 4317 = Oracle 실증의 SGA 3,072MB + PGA 1,317MB 합(2026-11-15 이전 PC). 새 PC 조건(2026-11-21)은 --max-mem-mb 8192
+  maxMemMb: mmArg > 0 ? +process.argv[mmArg + 1] : 4317,
   collation: 'Korean_100_CI_AS_SC_UTF8',
   dataGb: 8,
   logGb: 16, // PostgreSQL max_wal_size 16GB · Oracle redo 4GB × 4 와 맞춤

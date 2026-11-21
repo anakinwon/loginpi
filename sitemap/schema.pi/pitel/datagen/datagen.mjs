@@ -116,6 +116,7 @@ const DIALECT = {
   },
   // MySQL(--target mysql, PRD dbms.pi 11.7 대상 ③) : gen.* · to_char 는 mysql/inline.mjs 가 펼치고, || 는 세션 PIPES_AS_CONCAT 로 문자열 연결(mysql/my.mjs)
   //  키 = 숫자표 pitel_seq(0~99,999) 2단 결합(Oracle CONNECT BY 와 같은 10만 × 묶음), 일반 INSERT
+  //  묶음 수는 정수 DIV : MySQL `/` 는 소수 4자리(div_precision_increment)라 CEIL(3/100000) = 0 → 4행 이하 작업 단위가 0행(2026-11-21 14테이블 43행 누락)
   mysql: {
     idiv: (a, b) => `(${a} DIV ${b})`,
     mod: (a, b) => `MOD(${a}, ${b})`,
@@ -134,7 +135,7 @@ const DIALECT = {
     tsLit: y => `TIMESTAMP '${y}-01-01 00:00:00'`,
     bound: (y, n) => String(dtmToK(y, n)),
     insert: (tbl, cols, sel) =>
-      `INSERT INTO ${tbl} (${cols})\nSELECT\n${sel}\nFROM (SELECT __KFROM__ + a.n * 100000 + b.n AS k FROM pitel_seq a JOIN pitel_seq b ON a.n < CEIL((__KTO__ - __KFROM__ + 1) / 100000) WHERE a.n * 100000 + b.n <= __KTO__ - __KFROM__) g`,
+      `INSERT INTO ${tbl} (${cols})\nSELECT\n${sel}\nFROM (SELECT __KFROM__ + a.n * 100000 + b.n AS k FROM pitel_seq a JOIN pitel_seq b ON a.n <= (__KTO__ - __KFROM__) DIV 100000 WHERE a.n * 100000 + b.n <= __KTO__ - __KFROM__) g`,
   },
 }
 
@@ -405,6 +406,8 @@ async function run() {
   const schema = arg('schema', which === 'prod' ? 'public' : 'chk_gen')
   const scale = +arg('scale', 0.001)
   const jobs = +arg('jobs', 6)
+  // MS-SQL 문장별 메모리 상한(%) : 동시 문장 상한 합을 84%(2026-11-15 동시 7 × 12%)로 유지 → 동시 7 = 12, 동시 15 = 5
+  const msGrant = Math.max(1, Math.floor(84 / jobs))
   const only = arg('only', null)
   const db = isOra ? 'ora' : isMs ? 'ms' : isMy ? 'my' : dbName(which)
   const head = isOra || isMs || isMy ? '' : `SET search_path = ${schema}, gen; SET synchronous_commit = off;\n`
@@ -452,7 +455,7 @@ async function run() {
       const c = queue.shift()
       const body = c.p.sql.replaceAll('__KFROM__', `(${c.from})`).replaceAll('__KTO__', `(${c.to})`)
       // MS-SQL : sqlcmd 가 약 4,000자 넘는 줄을 잘라서 1,000자 단위로 나눈다(문자열 상수 밖 공백에서)
-      const sql = head + (isOra ? inl.wrapLines(inl.inlineGen(body)) : isMs ? inl.wrapLines(msInl.inlineGen(body), 1000) : isMy ? myInl.inlineGen(body) : body) + ';\n'
+      const sql = head + (isOra ? inl.wrapLines(inl.inlineGen(body)) : isMs ? inl.wrapLines(msInl.inlineGen(body).replace('MAX_GRANT_PERCENT = 12', `MAX_GRANT_PERCENT = ${msGrant}`), 1000) : isMy ? myInl.inlineGen(body) : body) + ';\n'
       // 조각 시작·완료 시각 줄 — database/run-init.mjs 가 이 로그로 테이블별 시작·종료를 기록(완료 줄은 state 기록 뒤)
       console.log(`시작 ${c.id} ${new Date().toISOString()}`)
       try {
