@@ -132,6 +132,24 @@
     </table>
   </section>
 
+  <section>
+    <h2>6. 순위 해석 : 예상과 다른 이유</h2>
+    <p class="meta" style="margin:0 0 8px">예상 Oracle &gt; PostgreSQL &gt; MS-SQL &gt; MySQL · 실제 MS-SQL &gt; Oracle &gt; MySQL &gt; PostgreSQL · 근거 = 실행 로그 테이블 149개 행당 비용 회귀(R² PostgreSQL 0.93)</p>
+    <p style="margin:0 0 10px;padding:8px 12px;border-left:3px solid var(--warn);background:var(--warnbg)"><b>결론</b> : 이번 시험은 값을 계산해 넣는 속도만 잰다. 순위를 가른 것은 엔진 성능보다 <b>생성식이 DBMS별로 다르게 번역된 방식</b>이다</p>
+    <table>
+      <tr><th>DBMS</th><th class="n">예상 → 실제</th><th>핵심 이유</th></tr>
+      <tr><td>PostgreSQL</td><td class="n">2 → 4</td><td>PostgreSQL 판만 PL/pgSQL 함수 <code>gen.wpick</code> 을 행마다 호출(22.99억 회 × 9.75µs = 22,406 작업초, 작업 시간의 36%). 다른 3종은 같은 식을 CASE 로 펼침. 이 비용을 빼면 MS-SQL 과 비슷한 약 45분(추정)</td></tr>
+      <tr><td>Oracle</td><td class="n">1 → 2</td><td>대량 적재 경로(direct-path APPEND · NOLOGGING · 병렬 DML) 미사용, 일반 INSERT 라 행마다 undo·redo. INV·COL 에서 1.67~2.16배로 느림</td></tr>
+      <tr><td>MS-SQL</td><td class="n">3 → 1</td><td>CASE 인라인으로 함수 비용 없음 · 식 계산 비용 가장 낮음(0.92µs/회) · 저장 크기 가장 작음(166.2GB)</td></tr>
+      <tr><td>MySQL</td><td class="n">4 → 3</td><td>CASE 인라인 · 바이너리 로그 끔 조건. 크기는 가장 크지만 PostgreSQL 보다 빠름 → 순위는 쓰기 양보다 식 계산 비용이 가름</td></tr>
+    </table>
+    <ul style="color:var(--sub);font-size:13px">
+      <li>2위와 3위 차이 21초(0.7%), 1위와 2위 차이 6.8% · 크게 벌어진 것은 PostgreSQL 하나</li>
+      <li>로그 설정이 서로 다름(MySQL 바이너리 로그 끔 · MS-SQL SIMPLE · PostgreSQL wal_level logical · Oracle 메모리 기록 없음)</li>
+      <li>다음 할 일 : PostgreSQL <code>wpick</code> 을 CASE 로 인라인한 뒤 재측정, 이어서 DBMS별 최적 적재 경로(APPEND · COPY · TABLOCK · LOAD DATA) 별도 비교</li>
+    </ul>
+  </section>
+
   <footer>근거 : <code>pitel/bench/runs/9~12_*_newpc_20261121_report.md</code> · <code>_verify_count.log</code> · <code>_complete.log</code> 첫 줄, <code>mysql/MYSQL_LOG.md</code> · <code>mssql/MSSQL_LOG.md</code> 새 PC 절 (커밋 e2999d22) · 값은 스냅샷 · <a href="index.html">Restore 현황판</a></footer>
 </main>
 <script>
