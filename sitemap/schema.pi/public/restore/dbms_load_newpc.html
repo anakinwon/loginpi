@@ -58,7 +58,8 @@
 
   <section>
     <h2>1. 4종 결과 비교</h2>
-    <p class="meta" style="margin:0 0 8px">막대 = 가장 느린 PostgreSQL 70분 대비 생성 시간 · 실행 순서대로 정렬 · 동시 15, 측정 대상 외 DB는 정지한 상태에서 하나씩 측정 · 굵은 값 = 가장 좋음</p>
+    <p class="meta" style="margin:0 0 8px">표 막대 = 가장 느린 PostgreSQL 70분 대비 생성 시간 · 처리량 = 행 수 ÷ 생성 시간(시간과 같은 정보라 그래프는 시간·크기 2축) · 동시 15, 측정 대상 외 DB는 정지한 상태에서 하나씩 측정 · 굵은 값 = 가장 좋음</p>
+    <div class="chart"><svg id="scatter" viewBox="0 0 800 340" role="img" aria-label="생성 시간과 크기 산점도 : 아래 표와 같은 값"></svg><div class="tip" hidden></div></div>
     <table>
       <tr><th>순서</th><th>DBMS</th><th>시작 ~ 끝(KST)</th><th class="n">생성 시간</th><th class="n">행/초</th><th class="n">크기(GB)</th><th class="n">작업 단위</th><th>COUNT 검증</th></tr>
       <tr><td>1</td><td>MySQL 26.10.0</td><td>10:23:43 ~ 11:13:59</td><td class="n">50분 15초<div class="bar"><i style="width:71.8%"></i></div></td><td class="n">365,177</td><td class="n">198.3</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 130초</span></td></tr>
@@ -174,6 +175,37 @@
     tip.hidden = false; const px = xs(m) / k; tip.style.left = (px > r.width / 2 ? px - tip.offsetWidth - 14 : px + 14) + 'px'; tip.style.top = (T / k) + 'px'
   })
   hit.addEventListener('mouseleave', () => { cross.setAttribute('visibility', 'hidden'); tip.hidden = true })
+})()
+// 1절 산점도(nivo ScatterPlot 모양 재현 : 노드 지름 16, 축 눈금선 5px·축 제목, 격자, 노드 툴팁 칩) — 독립 지표 2개(시간·크기)를 축 하나씩, 처리량은 시간에서 계산되는 값이라 툴팁에만, 값 = 1절 표와 같은 출처
+;(() => {
+  const P = [
+    { n: 'MySQL', c: 'var(--s1)', t: 50.25, z: 198.3, lab: '50:15 · 198.3GB', rps: '365,177', ax: 'r' },
+    { n: 'MS-SQL', c: 'var(--s2)', t: 46.733, z: 166.2, lab: '46:44 · 166.2GB', rps: '392,703', ax: 'r' },
+    { n: 'PostgreSQL', c: 'var(--s3)', t: 70, z: 174.9, lab: '70:00 · 174.9GB', rps: '262,212', ax: 'l' },
+    { n: 'Oracle', c: 'var(--s4)', t: 49.9, z: 172.6, lab: '49:54 · 172.6GB (LOB 3.8 포함)', rps: '367,819', ax: 'r' },
+  ]
+  const svg = document.getElementById('scatter'), tip = svg.parentNode.querySelector('.tip'), NS = 'http://www.w3.org/2000/svg'
+  const W = 800, L = 70, R = 770, T = 20, B = 280, X0 = 40, X1 = 75, Y0 = 160, Y1 = 205
+  const xs = v => L + (R - L) * (v - X0) / (X1 - X0), ys = v => B - (B - T) * (v - Y0) / (Y1 - Y0)
+  const el = (tag, a, txt) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; svg.appendChild(e); return e }
+  for (let v = X0; v <= X1; v += 5) { el('line', { x1: xs(v), x2: xs(v), y1: T, y2: B, stroke: 'var(--grid)' }); el('line', { x1: xs(v), x2: xs(v), y1: B, y2: B + 5, stroke: 'var(--axis)' }); el('text', { x: xs(v), y: B + 18, 'text-anchor': 'middle', fill: 'var(--sub)' }, v) }
+  for (let v = Y0; v <= Y1; v += 10) { el('line', { x1: L, x2: R, y1: ys(v), y2: ys(v), stroke: 'var(--grid)' }); el('line', { x1: L - 5, x2: L, y1: ys(v), y2: ys(v), stroke: 'var(--axis)' }); el('text', { x: L - 9, y: ys(v) + 4, 'text-anchor': 'end', fill: 'var(--sub)' }, v) }
+  el('line', { x1: L, x2: R, y1: B, y2: B, stroke: 'var(--axis)' }); el('line', { x1: L, x2: L, y1: T, y2: B, stroke: 'var(--axis)' })
+  el('text', { x: (L + R) / 2, y: B + 44, 'text-anchor': 'middle', fill: 'var(--ink)' }, '생성 시간(분) · 왼쪽일수록 빠름')
+  el('text', { transform: `translate(${L - 46},${(T + B) / 2}) rotate(-90)`, 'text-anchor': 'middle', fill: 'var(--ink)' }, '크기(GB) · 아래일수록 작음')
+  el('text', { x: L + 10, y: B - 10, fill: 'var(--sub)' }, '↙ 빠르고 작음')
+  for (const p of P) {
+    const cx = xs(p.t), cy = ys(p.z), right = p.ax === 'r'
+    const c = el('circle', { cx, cy, r: 8, fill: p.c, stroke: 'var(--card)', 'stroke-width': 2 })
+    el('text', { x: right ? cx + 14 : cx - 14, y: cy - 2, 'text-anchor': right ? 'start' : 'end', fill: 'var(--ink)', 'font-weight': 600 }, p.n)
+    el('text', { x: right ? cx + 14 : cx - 14, y: cy + 13, 'text-anchor': right ? 'start' : 'end', fill: 'var(--sub)' }, p.lab)
+    c.addEventListener('mousemove', e => {
+      const b = svg.getBoundingClientRect()
+      tip.innerHTML = `<b>${p.n}</b><div><i style="background:${p.c}"></i>생성 ${p.lab.split(' · ')[0]} · 크기 ${p.z} GB</div><div>처리량 ${p.rps} 행/초</div>`
+      tip.hidden = false; const px = e.clientX - b.left; tip.style.left = (px > b.width / 2 ? px - tip.offsetWidth - 14 : px + 14) + 'px'; tip.style.top = Math.max(0, e.clientY - b.top - 30) + 'px'
+    })
+    c.addEventListener('mouseleave', () => { tip.hidden = true })
+  }
 })()
 </script>
 </body>
