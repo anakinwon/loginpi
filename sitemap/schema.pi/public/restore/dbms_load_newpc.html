@@ -41,6 +41,7 @@
   .tip { position:absolute; pointer-events:none; background:var(--card); color:var(--ink); border-radius:2px; padding:5px 9px; font-size:12px; box-shadow:0 1px 2px rgba(0,0,0,.25); white-space:nowrap }
   .tip b { display:block; margin-bottom:3px; font-weight:600 } .tip div { display:flex; align-items:center; gap:7px; padding:2px 0 }
   .tip i { display:inline-block; width:12px; height:12px }
+  details.fold summary { cursor:pointer; color:var(--sub); font-size:12px; padding:4px 0; user-select:none } details.fold summary:hover { color:var(--ink) } details.fold[open] summary { margin-bottom:6px }
 </style>
 </head>
 <body>
@@ -60,6 +61,7 @@
     <h2>1. 4종 결과 비교</h2>
     <p class="meta" style="margin:0 0 8px">표 막대 = 가장 느린 PostgreSQL 70분 대비 생성 시간 · 처리량 = 행 수 ÷ 생성 시간(시간과 같은 정보라 그래프는 시간·크기 2축) · 동시 15, 측정 대상 외 DB는 정지한 상태에서 하나씩 측정 · 굵은 값 = 가장 좋음</p>
     <div class="chart"><svg id="scatter" viewBox="0 0 800 340" role="img" aria-label="생성 시간과 크기 산점도 : 아래 표와 같은 값"></svg><div class="tip" hidden></div></div>
+    <details class="fold"><summary>표로 보기</summary>
     <table>
       <tr><th>순서</th><th>DBMS</th><th>시작 ~ 끝(KST)</th><th class="n">생성 시간</th><th class="n">행/초</th><th class="n">크기(GB)</th><th class="n">작업 단위</th><th>COUNT 검증</th></tr>
       <tr><td>1</td><td>MySQL 26.10.0</td><td>10:23:43 ~ 11:13:59</td><td class="n">50분 15초<div class="bar"><i style="width:71.8%"></i></div></td><td class="n">365,177</td><td class="n">198.3</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 130초</span></td></tr>
@@ -67,12 +69,14 @@
       <tr><td>3</td><td>PostgreSQL 17.12</td><td>12:29:29 ~ 13:39:29</td><td class="n">70분 0초<div class="bar slow"><i style="width:100%"></i></div></td><td class="n">262,212</td><td class="n">174.9</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 733초</span></td></tr>
       <tr><td>4</td><td>Oracle 21c EE</td><td>19:22:35 ~ 20:12:29</td><td class="n">49분 54초<div class="bar"><i style="width:71.3%"></i></div></td><td class="n">367,819</td><td class="n">168.8 (+LOB 3.8)</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 63초</span></td></tr>
     </table>
+    </details>
   </section>
 
   <section>
     <h2>2. 10분 단위 누적 완료율</h2>
     <p class="meta" style="margin:0 0 8px">PostgreSQL은 첫 10분 14.1%로 출발이 늦고, 나머지 3종은 20~28%로 출발한다</p>
     <div class="chart"><svg id="pace" viewBox="0 0 800 340" role="img" aria-label="10분 단위 누적 완료율 선그래프 : 아래 표와 같은 값"></svg><div id="tip" class="tip" hidden></div></div>
+    <details class="fold"><summary>표로 보기</summary>
     <table>
       <tr><th>DBMS</th><th class="n">10분</th><th class="n">20분</th><th class="n">30분</th><th class="n">40분</th><th class="n">50분</th><th class="n">60분</th><th class="n">70분</th></tr>
       <tr><td>MySQL</td><td class="n">28.2%</td><td class="n">46.4%</td><td class="n">62.1%</td><td class="n">73.4%</td><td class="n">98.7%</td><td class="n">100%</td><td class="n">100%</td></tr>
@@ -80,12 +84,14 @@
       <tr><td>PostgreSQL</td><td class="n">14.1%</td><td class="n">28.2%</td><td class="n">44.8%</td><td class="n">59.2%</td><td class="n">67.2%</td><td class="n">78.6%</td><td class="n">99.6%</td></tr>
       <tr><td>Oracle</td><td class="n">20.1%</td><td class="n">37.8%</td><td class="n">60.9%</td><td class="n">75.8%</td><td class="n best">100%</td><td class="n">100%</td><td class="n">100%</td></tr>
     </table>
+    </details>
   </section>
 
   <section>
     <h2>3. 주제영역별 생성 시간</h2>
     <p class="meta" style="margin:0 0 8px">영역 첫 작업 단위 시작 ~ 마지막 완료 · 영역끼리 겹쳐 진행되므로 합은 전체보다 크다 · 굵은 값 = 영역별 가장 빠름</p>
     <div class="chart"><svg id="heat" viewBox="0 0 760 340" role="img" aria-label="주제영역별 생성 시간 히트맵 : 아래 표와 같은 값"></svg></div>
+    <details class="fold"><summary>표로 보기</summary>
     <table>
       <tr><th>주제영역</th><th class="n">행</th><th class="n">MySQL</th><th class="n">MS-SQL</th><th class="n">PostgreSQL</th><th class="n">Oracle</th></tr>
       <tr><td>PRD 상품</td><td class="n">2,931,840</td><td class="n">0:00:33</td><td class="n">0:01:04</td><td class="n">0:00:54</td><td class="n best">0:00:30</td></tr>
@@ -96,6 +102,7 @@
       <tr><td>COL 미납</td><td class="n">214,810,094</td><td class="n best">0:07:37</td><td class="n">0:07:56</td><td class="n">0:15:33</td><td class="n">0:16:27</td></tr>
       <tr><td>PRM 파트너</td><td class="n">57,561,457</td><td class="n best">0:02:49</td><td class="n">0:02:52</td><td class="n">0:04:00</td><td class="n">0:04:17</td></tr>
     </table>
+    </details>
   </section>
 
   <section>
