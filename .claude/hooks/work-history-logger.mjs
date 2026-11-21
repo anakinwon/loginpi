@@ -348,6 +348,8 @@ try {
   } else {
     const input = JSON.parse(fs.readFileSync(0, 'utf8') || '{}')
     const sid = input.session_id, transcript = input.transcript_path
+    // `logger && work-stats-refresh` 에서 stdin 은 로거가 다 읽어 refresh 가 못 받음 → 마지막 Stop 입력을 파일로 넘김(refresh settleTurn)
+    if (input.hook_event_name === 'Stop') { fs.mkdirSync(STATE_DIR, { recursive: true }); fs.writeFileSync(path.join(STATE_DIR, 'last-stop.json'), JSON.stringify(input)) }
     if (sid && /^[\w-]+$/.test(sid) && transcript && fs.existsSync(transcript)) {
       const isEnd = input.hook_event_name === 'SessionEnd'
       const st = processTranscript(transcript, sid, loadState(sid), { final: isEnd })
