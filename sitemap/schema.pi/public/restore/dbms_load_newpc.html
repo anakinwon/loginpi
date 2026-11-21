@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!-- 새 PC DBMS 4종 11억 행 적재 현황판 : 정적 스냅샷(2026-11-21 측정), 값 출처 = pitel/bench/runs/9~12_*_newpc_20261121_*. 공개 경로라 비밀번호·키·개인 경로 금지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DBMS 4종 적재 현황판 : 새 PC 11억 행 (2026-11-21)</title>
+<style>
+  :root { --bg:#f7f7f5; --card:#fff; --ink:#1f2328; --sub:#59636e; --line:#e3e3df; --ok:#1a7f37; --okbg:#e6f4ea; --warn:#9a6700; --warnbg:#fff4d6; --off:#59636e; --offbg:#eef0f2; --bad:#c62828; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111315; --card:#1a1d21; --ink:#e6e8eb; --sub:#9aa3ad; --line:#2c3137; --ok:#4ac26b; --okbg:#12301c; --warn:#d4a72c; --warnbg:#33290d; --off:#9aa3ad; --offbg:#24282d; --bad:#ff6b6b; } }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.6 system-ui, 'Malgun Gothic', sans-serif }
+  main { max-width:1080px; margin:0 auto; padding:28px 16px 48px }
+  h1 { font-size:22px; margin:0 0 4px }
+  .meta { color:var(--sub); margin:0 0 20px }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:20px }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px 14px }
+  .kpi b { display:block; font-size:22px; font-variant-numeric:tabular-nums }
+  .kpi span { color:var(--sub); font-size:12px }
+  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px; margin-bottom:14px; overflow-x:auto }
+  h2 { font-size:16px; margin:0 0 10px; display:flex; gap:8px; align-items:center }
+  table { width:100%; border-collapse:collapse; font-size:13px }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top }
+  th { color:var(--sub); font-weight:600 }
+  td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  td.best { font-weight:700 }
+  code { font:12px ui-monospace, Consolas, monospace; background:var(--offbg); padding:1px 4px; border-radius:4px }
+  .b { display:inline-block; font-size:12px; font-weight:600; padding:1px 8px; border-radius:10px; white-space:nowrap }
+  .ok { color:var(--ok); background:var(--okbg) } .warn { color:var(--warn); background:var(--warnbg) } .off { color:var(--off); background:var(--offbg) }
+  .bar { height:8px; background:var(--offbg); border-radius:4px; overflow:hidden; min-width:80px; margin-top:6px }
+  .bar i { display:block; height:100%; background:var(--ok) }
+  .bar.slow i { background:var(--warn) }
+  footer { color:var(--sub); font-size:12px; margin-top:18px }
+</style>
+</head>
+<body>
+<main>
+  <h1>DBMS 4종 적재 현황판</h1>
+  <p class="meta">Pi통신 과금 샘플 DB(pitel) · 새 PC 조건 · 측정일 2026-11-21 (KST) · 비교 구간 = 순수 데이터 생성 시간(PK·인덱스·통계 제외) · 정적 스냅샷</p>
+
+  <div class="kpis">
+    <div class="kpi"><span>적재 완료</span><b>4 / 4</b><span>MySQL · MS-SQL · PostgreSQL · Oracle</span></div>
+    <div class="kpi"><span>DBMS마다 적재 행</span><b>11.0억</b><span>1,101,170,707행 · 테이블 214</span></div>
+    <div class="kpi"><span>가장 빠름</span><b>46분 44초</b><span>MS-SQL · 392,703행/초</span></div>
+    <div class="kpi"><span>가장 느림</span><b>70분 0초</b><span>PostgreSQL · MS-SQL 대비 1.50배</span></div>
+    <div class="kpi"><span>건수 검증</span><b>856 / 856</b><span>테이블 214 × 4종 전부 일치 · 실패 0</span></div>
+  </div>
+
+  <section>
+    <h2>1. 4종 결과 비교</h2>
+    <p class="meta" style="margin:0 0 8px">막대 = 가장 느린 PostgreSQL 70분 대비 생성 시간 · 실행 순서대로 정렬 · 동시 15, 측정 대상 외 DB는 정지한 상태에서 하나씩 측정 · 굵은 값 = 가장 좋음</p>
+    <table>
+      <tr><th>순서</th><th>DBMS</th><th>시작 ~ 끝(KST)</th><th class="n">생성 시간</th><th class="n">행/초</th><th class="n">크기(GB)</th><th class="n">작업 단위</th><th>COUNT 검증</th></tr>
+      <tr><td>1</td><td>MySQL 26.10.0</td><td>10:23:43 ~ 11:13:59</td><td class="n">50분 15초<div class="bar"><i style="width:71.8%"></i></div></td><td class="n">365,177</td><td class="n">198.3</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 130초</span></td></tr>
+      <tr><td>2</td><td>MS-SQL 2022 CU28</td><td>11:32:33 ~ 12:19:18</td><td class="n best">46분 44초<div class="bar"><i style="width:66.8%"></i></div></td><td class="n best">392,703</td><td class="n best">166.2</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 56초</span></td></tr>
+      <tr><td>3</td><td>PostgreSQL 17.12</td><td>12:29:29 ~ 13:39:29</td><td class="n">70분 0초<div class="bar slow"><i style="width:100%"></i></div></td><td class="n">262,212</td><td class="n">174.9</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 733초</span></td></tr>
+      <tr><td>4</td><td>Oracle 21c EE</td><td>19:22:35 ~ 20:12:29</td><td class="n">49분 54초<div class="bar"><i style="width:71.3%"></i></div></td><td class="n">367,819</td><td class="n">168.8 (+LOB 3.8)</td><td class="n">2,086 / 2,086</td><td><span class="b ok">214 일치 · 63초</span></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>2. 10분 단위 누적 완료율</h2>
+    <p class="meta" style="margin:0 0 8px">PostgreSQL은 첫 10분 14.1%로 출발이 늦고, 나머지 3종은 20~28%로 출발한다</p>
+    <table>
+      <tr><th>DBMS</th><th class="n">10분</th><th class="n">20분</th><th class="n">30분</th><th class="n">40분</th><th class="n">50분</th><th class="n">60분</th><th class="n">70분</th></tr>
+      <tr><td>MySQL</td><td class="n">28.2%</td><td class="n">46.4%</td><td class="n">62.1%</td><td class="n">73.4%</td><td class="n">98.7%</td><td class="n">100%</td><td class="n">100%</td></tr>
+      <tr><td>MS-SQL</td><td class="n">26.3%</td><td class="n">47.5%</td><td class="n">65.5%</td><td class="n">80.8%</td><td class="n best">100%</td><td class="n">100%</td><td class="n">100%</td></tr>
+      <tr><td>PostgreSQL</td><td class="n">14.1%</td><td class="n">28.2%</td><td class="n">44.8%</td><td class="n">59.2%</td><td class="n">67.2%</td><td class="n">78.6%</td><td class="n">99.6%</td></tr>
+      <tr><td>Oracle</td><td class="n">20.1%</td><td class="n">37.8%</td><td class="n">60.9%</td><td class="n">75.8%</td><td class="n best">100%</td><td class="n">100%</td><td class="n">100%</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. 주제영역별 생성 시간</h2>
+    <p class="meta" style="margin:0 0 8px">영역 첫 작업 단위 시작 ~ 마지막 완료 · 영역끼리 겹쳐 진행되므로 합은 전체보다 크다 · 굵은 값 = 영역별 가장 빠름</p>
+    <table>
+      <tr><th>주제영역</th><th class="n">행</th><th class="n">MySQL</th><th class="n">MS-SQL</th><th class="n">PostgreSQL</th><th class="n">Oracle</th></tr>
+      <tr><td>PRD 상품</td><td class="n">2,931,840</td><td class="n">0:00:33</td><td class="n">0:01:04</td><td class="n">0:00:54</td><td class="n best">0:00:30</td></tr>
+      <tr><td>CUS 고객</td><td class="n">75,886,548</td><td class="n best">0:03:32</td><td class="n">0:03:37</td><td class="n">0:06:50</td><td class="n">0:04:51</td></tr>
+      <tr><td>ORD 가입</td><td class="n">181,680,272</td><td class="n">0:08:27</td><td class="n best">0:07:18</td><td class="n">0:13:02</td><td class="n">0:08:09</td></tr>
+      <tr><td>PAY 청구</td><td class="n">386,093,910</td><td class="n">0:23:54</td><td class="n best">0:21:03</td><td class="n">0:28:53</td><td class="n">0:22:41</td></tr>
+      <tr><td>INV 수납</td><td class="n">182,206,586</td><td class="n">0:09:28</td><td class="n best">0:08:38</td><td class="n">0:12:03</td><td class="n">0:14:23</td></tr>
+      <tr><td>COL 미납</td><td class="n">214,810,094</td><td class="n best">0:07:37</td><td class="n">0:07:56</td><td class="n">0:15:33</td><td class="n">0:16:27</td></tr>
+      <tr><td>PRM 파트너</td><td class="n">57,561,457</td><td class="n best">0:02:49</td><td class="n">0:02:52</td><td class="n">0:04:00</td><td class="n">0:04:17</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>4. 측정 조건</h2>
+    <table>
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td>PC · Docker</td><td>Windows 11 · 메모리 32 GB · 논리 CPU 16 / Docker 29.9.3 · WSL 3.0.5 · 16 CPU · 16.4 GB(<code>.wslconfig</code> 기본값)</td></tr>
+      <tr><td>규모</td><td>배율 1 · 테이블 214 · 파티션 2,306 · 작업 단위 2,086 · 동시 15(CPU 수 − 1)</td></tr>
+      <tr><td>MySQL</td><td>buffer pool 8,192 MB · redo 16 GB · 바이너리 로그 끔 · 일반 INSERT</td></tr>
+      <tr><td>MS-SQL</td><td>max server memory 8,192 MB · SIMPLE 복구 · 데이터 파일 1개 · MAXDOP 1 · MAX_GRANT_PERCENT 5</td></tr>
+      <tr><td>PostgreSQL</td><td>shared_buffers 8 GB · max_wal_size 16 GB · synchronous_commit off · wal_level logical · autovacuum off</td></tr>
+      <tr><td>Oracle</td><td>동시 15 · 메모리 설정은 실행 로그에 기록되지 않음</td></tr>
+      <tr><td>실행</td><td><code>bench/launch.mjs</code> 독립 프로세스 · 실행 중 절전 막기</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. 이슈와 남은 일</h2>
+    <table>
+      <tr><th>내용</th><th>상태</th></tr>
+      <tr><td>MySQL 생성 결함 : 4행 이하 작업 단위가 0행(14테이블 43행 부족) → 정수 <code>DIV</code> 로 수정, 보충 후 214 일치(커밋 5c85cf7f)</td><td><span class="b ok">해결</span></td></tr>
+      <tr><td>MS-SQL 첫 5분 공간 할당 경합(<code>PAGELATCH</code>, 데이터 파일 1개) · 조건 유지, 5분 뒤 해소</td><td><span class="b off">기록</span></td></tr>
+      <tr><td>지난주(2026-11-15) MS-SQL 메모리 이상 중단 · MySQL Docker 멈춤 → 새 PC에서 4종 모두 완주</td><td><span class="b ok">해결</span></td></tr>
+      <tr><td>PK·인덱스 532개 · 통계 · FK 고아 검증 단계는 이번 비교 구간 밖(4종 실행 기록 없음)</td><td><span class="b warn">미측정</span></td></tr>
+      <tr><td>이전 PC 결과(2026-11-14~15)와는 조건이 달라 직접 비교하지 않음</td><td><span class="b off">참고</span></td></tr>
+    </table>
+  </section>
+
+  <footer>근거 : <code>pitel/bench/runs/9~12_*_newpc_20261121_report.md</code> · <code>_verify_count.log</code> · <code>_complete.log</code> 첫 줄, <code>mysql/MYSQL_LOG.md</code> · <code>mssql/MSSQL_LOG.md</code> 새 PC 절 (커밋 e2999d22) · 값은 스냅샷 · <a href="index.html">Restore 현황판</a></footer>
+</main>
+</body>
+</html>
