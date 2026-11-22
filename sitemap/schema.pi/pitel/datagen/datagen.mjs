@@ -39,7 +39,7 @@ const arg = (k, d) => {
 }
 const q = s => "'" + String(s).replace(/'/g, "''") + "'"
 
-// SQL 방언 : pg = 기존 출력(글자 단위로 같음, 단 가중 선택은 2026-11-22 부터 CASE 인라인 — 생성값은 같음), oracle = oracle/gen_pkg.sql 의 GEN 패키지(--target oracle, PRD dbms.pi 11.6 ORA-R05)
+// SQL 방언 : pg = 기존 출력(글자 단위로 같음), oracle = oracle/gen_pkg.sql 의 GEN 패키지(--target oracle, PRD dbms.pi 11.6 ORA-R05)
 //  Oracle 차이 : 정수 나눗셈 TRUNC·나머지 MOD, 배열 → '|' 구분 문자열·CASE, null_p(다형) → CASE, generate_series → 파이프라인 gen.series,
 //  VARCHAR(n) 가 4,000바이트를 넘을 수 있는 칼럼(n > 1333, 한글 3바이트) = CLOB(oracle/ddl-oracle.mjs 와 같은 규칙)
 const LOB_CHARS = 1333
@@ -60,14 +60,7 @@ const DIALECT = {
     hours: kk => `(gen.t0() + (${kk}) * interval '1 hour')`,
     days: kk => `gen.t0() + (${kk}) * interval '1 day'`,
     monthsYm: kk => `to_char(gen.t0() + (${kk}) * interval '1 month', 'YYYYMM')`,
-    // 가중 선택 = CASE 인라인(2026-11-22 마스터 결정 B, TEST_RECORD 점검표 10번) : PL/pgSQL gen.wpick 호출이 1회 2.96µs → CASE 0.09µs(실측 200만 행)
-    //  gen.wpick 과 같은 float8 연산을 같은 순서로 — r = u × 합(배열 순서 합), 앞에서부터 빼서 처음 음수가 되는 값, 끝까지 아니면 마지막 값
-    wcode: (s, codes, ws) => {
-      const sum = ws.map(Number).reduce((a, b) => a + b)
-      let r = `(gen.u(K, ${s}) * ${sum}::float8)`
-      const when = codes.slice(0, -1).map((c, i) => `WHEN ${(r = `(${r} - ${ws[i]}::float8)`)} < 0 THEN ${q(c)}`)
-      return `CASE ${when.join(' ')} ELSE ${q(codes.at(-1))} END`
-    },
+    wcode: (s, codes, ws) => `gen.wcode(K, ${s}, ARRAY[${codes.map(q).join(',')}], ARRAY[${ws.join(',')}]::float8[])`,
     pick: (list, i) => `(ARRAY[${list.map(q).join(',')}])[${i}]`,
     memo: (s, p) => `gen.memo(K, ${s}, ${p})`,
     coalesce: (a, b) => `coalesce(${a}, ${b})`,
