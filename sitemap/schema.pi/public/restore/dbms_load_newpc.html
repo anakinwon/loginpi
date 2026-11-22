@@ -159,6 +159,39 @@
     </table>
   </section>
 
+  <section>
+    <h2>7. PostgreSQL 재적재 구축 시나리오 (적재 대기)</h2>
+    <p class="meta" style="margin:0 0 8px">점검 시각 2026-11-22 10:10 (KST) · 값 = 이번 조회 결과 · 기준 = <code>pitel/bench/TEST_RECORD.md</code> 3절 문제 해결 · 6절 점검표, <code>REBUILD.md</code></p>
+    <h3 style="font-size:14px;margin:4px 0 6px">① 적재 전 점검 (실패 원인 체크리스트)</h3>
+    <table>
+      <tr><th class="n">#</th><th>점검</th><th>기준(근거)</th><th>현재값</th><th>판정</th></tr>
+      <tr><td class="n">1</td><td>PC 여유 메모리</td><td>DB 메모리 8GB + 4GB 이상(TS-19 : 여유 부족으로 적재 강제 종료)</td><td>16,437MB / 32,128MB</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td class="n">2</td><td>Docker 메모리 한도</td><td>DB 메모리 + 2GB 이상 · PC 의 70% 이하(TS-19 · TS-24 : Docker 무응답)</td><td>16 CPU · 16.4GB(<code>.wslconfig</code> 없음, 어제와 같음)</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td class="n">3</td><td>다른 DB 컨테이너 정지</td><td>측정 컨테이너만 실행(같은 조건)</td><td><code>pitel-pg</code> 1개만</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td class="n">4</td><td>디스크 여유</td><td>배율 1 약 331GB(REBUILD 5절), 점검표 300GB 이상(TS-31)</td><td>C: 783GB · 컨테이너 데이터 영역 954GB</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td class="n">5</td><td>적재 실행 방식</td><td><code>bench/launch.mjs</code> 독립 프로세스 + 절전 막기(TS-19, 이 PC 절전 5분)</td><td>시나리오 ③에 반영</td><td><span class="b ok">준비</span></td></tr>
+      <tr><td class="n">6</td><td>첫 10분 대기 종류</td><td>대기가 한쪽에 몰리지 않음(TS-11 · TS-17 · TS-18)</td><td>적재 시작 뒤 확인</td><td><span class="b off">적재 중</span></td></tr>
+      <tr><td class="n">7</td><td>진행 기록 파일</td><td>완료 조각 기록 없음(남으면 건너뜀)</td><td>빈 실패 기록 1개(완료 기록 0)</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td class="n">8</td><td>외부 도구 접속</td><td>DBeaver 등 끊김(TS-09) · 다른 도구가 컨테이너를 건드리지 않음(TS-30)</td><td>DBeaver 프로세스 0</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td class="n">9</td><td>규모 · plan 방언</td><td>배율 1 · 1,101,170,707행, plan.json = PostgreSQL 방언(TS-26)</td><td><code>generate_series</code> 214 · 다른 방언 0</td><td><span class="b ok">통과</span></td></tr>
+      <tr><td class="n">10</td><td>생성식 동일(<code>gen.wpick</code> CASE 인라인)</td><td>재측정 조건(6절)</td><td>미적용(코드 그대로)</td><td><span class="b warn">마스터 결정</span></td></tr>
+      <tr><td class="n">11</td><td>Oracle 문자열 타입</td><td>Oracle 재측정 조건</td><td>이번 PostgreSQL 적재와 무관</td><td><span class="b off">해당 없음</span></td></tr>
+      <tr><td class="n">12</td><td>로그 설정 동일</td><td>어제 PostgreSQL 측정과 같은 설정</td><td>shared_buffers 8GB · max_wal_size 16GB · synchronous_commit off · wal_level logical · /dev/shm 1GB</td><td><span class="b ok">통과</span></td></tr>
+    </table>
+    <h3 style="font-size:14px;margin:14px 0 6px">② 구축 상태 (완료)</h3>
+    <p style="margin:0">PostgreSQL 17.12 · 포트 55432 · DB <code>pitel</code>·<code>pitel_dev</code> · <code>pg_stat_statements</code> · gen 함수 21 · 테이블 214 · 파티션 하위 2,306 · 인덱스 0 · 데이터 0행 (REBUILD 단계 container · db · ddl 와 같은 명령)</p>
+    <h3 style="font-size:14px;margin:14px 0 6px">③ 적재 시나리오 (마스터 "시작" 지시 후)</h3>
+    <table>
+      <tr><th class="n">단계</th><th>작업</th><th>근거</th></tr>
+      <tr><td class="n">1</td><td>점검표 10번 결정 반영(인라인 적용 시 코드 수정 · 기능 점검 뒤 시작)</td><td>마스터 결정</td></tr>
+      <tr><td class="n">2</td><td><code>ALTER SYSTEM SET autovacuum = off</code> + 설정 다시 읽기 (현재 on)</td><td>rebuild data 단계 · 어제 로그 첫 줄 autovacuum off</td></tr>
+      <tr><td class="n">3</td><td>로그 첫 줄에 설정 기록 → <code>bench/launch.mjs &lt;로그&gt; run --db prod --yes --schema public --scale 1 --jobs 15</code></td><td>TEST_RECORD 5절 · rebuild data 단계 인자</td></tr>
+      <tr><td class="n">4</td><td>5분마다 진행 보고 <code>bench/progress.mjs --target pg</code>, 첫 10분 대기 종류 확인(#6)</td><td>TEST_RECORD 5절</td></tr>
+      <tr><td class="n">5</td><td>끝 : 로그 '실패 0' · 'exit 0' 확인 → 테이블 214개 COUNT 대조</td><td>TEST_RECORD 5절</td></tr>
+      <tr><td class="n">6</td><td>이후 constraints(PK·인덱스 532) → analyze(autovacuum 원복) → verify → summary</td><td>REBUILD 4절</td></tr>
+    </table>
+  </section>
+
   <footer>근거 : <code>pitel/bench/runs/9~12_*_newpc_20261121_report.md</code> · <code>_verify_count.log</code> · <code>_complete.log</code> 첫 줄, <code>mysql/MYSQL_LOG.md</code> · <code>mssql/MSSQL_LOG.md</code> 새 PC 절 (커밋 e2999d22) · 값은 스냅샷 · <a href="index.html">Restore 현황판</a></footer>
 </main>
 <script>
