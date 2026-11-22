@@ -202,7 +202,7 @@
   </section>
 
   <section>
-    <h2>8. Oracle 재적재 최적 시나리오 : 불리한 조건 제거 (NOLOGGING + APPEND 적재 진행 중)</h2>
+    <h2>8. Oracle 재적재 최적 시나리오 : 불리한 조건 제거 (NOLOGGING + APPEND 적재 완료 · 73분 30초)</h2>
     <p class="meta" style="margin:0 0 8px">작성 2026-11-22 · 근거 = 실행 12 로그(11-21) · 11-21 작업 이력의 Oracle 설정 · <code>TEST_RECORD.md</code> 7-1절 · TS-03/06/10/11/31/32 · Oracle Database 21c Reference <code>MAX_STRING_SIZE</code> · 상태 = 2026-11-22 12:15 기준</p>
     <h3 style="font-size:14px;margin:4px 0 6px">① 불리한 조건과 제거 방법</h3>
     <table>
@@ -247,23 +247,24 @@
       <tr><td class="n">6 · 7</td><td>적재 · 진행 보고 · COUNT 대조 · v$system_event 전후 기록(①-3 · 4 는 적재 때 적용)</td><td><span class="b warn">대기</span></td></tr>
     </table>
     <p class="meta" style="margin:6px 0 0">점검 중 발견 : <code>datagen.mjs</code> Oracle 실행부 주석에 'INSERT /*+ APPEND */' 라고 적혀 있으나 실제 INSERT 문에는 APPEND 가 없음(실행 12 로그 0건) · 적재는 일반 INSERT</p>
-    <h3 style="font-size:14px;margin:14px 0 6px">⑤ NOLOGGING + APPEND 적재 진행 (2026-11-22 18:01 시작, 18:06:49 실측 · 진행 중) · <a href="dbms_load_live.html" style="font-weight:400">실시간 현황(5분 갱신)</a></h3>
+    <h3 style="font-size:14px;margin:14px 0 6px">⑤ NOLOGGING + APPEND 적재 결과 (실행 14, 2026-11-22 18:01:02 ~ 19:14:32 · 완료) · <a href="dbms_load_live.html">실시간 현황 →</a></h3>
     <table>
       <tr><th>항목</th><th>내용</th></tr>
       <tr><td>목적</td><td>INSERT 의 redo 생성 최소화 : NOLOGGING + <code>INSERT /*+ APPEND */</code>(direct-path) — 마스터 지시</td></tr>
-      <tr><td>설정</td><td>ARCHIVELOG · FORCE LOGGING NO · 테이블스페이스 <code>PITEL_DATA</code> NOLOGGING 기본값(테이블 176 · 분할 2,306 · LOB 11 · LOB 분할 255 상속 확인) · EXTENDED · CLOB 0 · 볼륨 <code>oracle21c-data</code></td></tr>
+      <tr><td>설정</td><td>ARCHIVELOG · FORCE LOGGING NO · 테이블스페이스 <code>PITEL_DATA</code> NOLOGGING 기본값(테이블 · LOB 상속 확인) · EXTENDED · CLOB 0 · 볼륨 <code>oracle21c-data</code></td></tr>
       <tr><td>사전 점검</td><td>APPEND 기능 점검 214 테이블 성공 · 실패 0 · 403,700행 · redo +21MB</td></tr>
     </table>
     <table style="margin-top:8px">
-      <tr><th>경과 5분 46초</th><th class="r">실행 12 (일반 INSERT)</th><th class="r">이번 (NOLOGGING + APPEND)</th></tr>
-      <tr><td>완료 행</td><td class="r">96,780,662</td><td class="r">62,301,888</td></tr>
-      <tr><td>완료율</td><td class="r">8.8%</td><td class="r">5.7%</td></tr>
-      <tr><td>작업 단위 · 실패</td><td class="r">-</td><td class="r">121 / 2,086 · 0</td></tr>
-      <tr><td>적재 크기</td><td class="r">-</td><td class="r">13.8GB</td></tr>
-      <tr><td>redo 증가</td><td class="r">미측정</td><td class="r">+25MB (60 → 85MB)</td></tr>
-      <tr><td>활성 세션 대기</td><td class="r">-</td><td class="r"><code>enq: TM - contention</code> 10 · <code>direct path write</code> 4 · <code>write complete waits</code> 1 (15세션)</td></tr>
+      <tr><th>실측</th><th class="r">실행 12 (11-21, 일반 INSERT + CLOB)</th><th class="r">실행 14 (NOLOGGING + APPEND)</th></tr>
+      <tr><td>소요</td><td class="r">49분 54초</td><td class="r"><b>73분 30초</b> (4,410초)</td></tr>
+      <tr><td>작업 단위 · 실패 · exit</td><td class="r">2,086 · 0</td><td class="r">2,086 · 0 · exit 0</td></tr>
+      <tr><td>건수 대조</td><td class="r">214 일치</td><td class="r">214 일치 · 불일치 0 · 1,101,170,707행</td></tr>
+      <tr><td>크기</td><td class="r">172.6GB</td><td class="r">172.8GB</td></tr>
+      <tr><td>redo 증가</td><td class="r">미측정</td><td class="r"><b>+272.5MB</b> (<code>v$sysstat</code> 전후)</td></tr>
+      <tr><td><code>enq: TM - contention</code> 누적 대기</td><td class="r">미측정</td><td class="r">1,162회 · 41,191.6초</td></tr>
+      <tr><td>경과 10 · 20 · 30 · 40분 완료율</td><td class="r">20.1% · 37.8% · 60.9% · 75.8%</td><td class="r">14.2% · 29.3% · 42.0% · 58.5%</td></tr>
     </table>
-    <p class="meta" style="margin:6px 0 0">사실 : redo 생략은 동작(13.8GB 적재에 redo 25MB). 진행률은 같은 경과의 실행 12 보다 낮음 — 활성 15세션 중 10세션이 테이블 배타 잠금(TM) 대기. direct-path 는 테이블 배타 잠금을 잡음(Oracle Database Administrator's Guide, Locking Considerations with Direct-Path INSERT). 작업 큐 배치 변경(같은 테이블 동시 1세션)은 미적용.<br>경과 : 13:09 APPEND 1차 실행(NOARCHIVELOG) 559조각에서 중단 → 13:26 Docker Desktop 제거로 컨테이너 · 이미지 삭제(제거 실행 주체 미확인) → 17:27~17:50 재구축</p>
+    <p class="meta" style="margin:6px 0 0">사실 : redo 생략은 동작(172.8GB 적재에 redo 272.5MB). 소요는 실행 12 보다 23분 36초 김 — 5분 측정마다 활성 15세션 중 8~12세션이 테이블 배타 잠금(TM) 대기, direct-path 는 테이블 배타 잠금을 잡음(Oracle Database Administrator's Guide, Locking Considerations with Direct-Path INSERT), 작업 큐는 같은 테이블 조각을 연속 배정. 작업 큐 배치 변경(같은 테이블 동시 1세션)은 미적용. 실행 12 는 일반 INSERT · CLOB 13테이블 · NOARCHIVELOG 로 조건이 다름.<br>경과 : 13:09 APPEND 1차 실행(NOARCHIVELOG) 559조각에서 중단 → 13:26 Docker Desktop 제거로 컨테이너 · 이미지 삭제(제거 실행 주체 미확인) → 17:27~17:50 재구축 → 18:01 시작. 근거 <code>pitel/bench/runs/14_oracle_append_nolog_20261122_*</code></p>
 
   </section>
 

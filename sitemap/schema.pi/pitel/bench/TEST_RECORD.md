@@ -182,6 +182,21 @@ INV 행의 57% 를 차지하는 `ptl_inv_rcv_allc_d`(5,641만 행, 가중 선택
 | 비고 | 10분 시점 PC 여유 메모리 3,940MB(시작 16,437MB), 조건 유지 · 적재 뒤 단계(constraints · analyze · verify · summary) 미실행, autovacuum off 상태 |
 | 기록 | `bench/runs/13_pg_rerun_20261122_*`(complete · report · verify_count) |
 
+### 실행 14 : Oracle NOLOGGING + APPEND 재적재 (2026-11-22, 점검표 11번 적용 + direct-path)
+
+| 항목 | 값 |
+|---|---|
+| 목적 | INSERT 의 redo 생성 최소화 — NOLOGGING + `INSERT /*+ APPEND */`(direct-path), 마스터 지시 |
+| 조건 | Oracle 21c EE · 동시 15 · ARCHIVELOG · FORCE LOGGING NO · 테이블스페이스 `PITEL_DATA` NOLOGGING 기본값(테이블·분할·LOB 상속 확인) · MAX_STRING_SIZE=EXTENDED · CLOB 0 · SGA 8,192MB · PGA 목표 3,511MB · DBWR 4 · SETALL · redo 4GB×4 · 볼륨 `oracle21c-data` · Docker 16 CPU·16.4GB |
+| 결과 | 2026-11-22 18:01:02 ~ 19:14:32(KST) · **4,410초(73분 30초)** · 작업 단위 2,086 성공 · 실패 0 · exit 0 · 249,729행/초 · 크기 172.8GB |
+| 건수 | 테이블 214 · 일치 214 · 불일치 0 · 합계 1,101,170,707 |
+| redo | `v$sysstat` redo size(CDB 루트) 시작 전 62,418,080 → 끝 348,131,380 바이트 = **+272.5MB** |
+| 대기(누적, `v$system_event` 전후) | `enq: TM - contention` 1,162회 · **41,191.6초** · `log file parallel write` +600.0초 · `Data file init write` +561.4초 · `direct path write` +162.3초 |
+| 같은 DBMS 비교(실측) | 실행 12(11-21, 일반 INSERT + CLOB) 49분 54초 → 실행 14 73분 30초. 같은 경과 10분 20.1% → 14.2%, 40분 75.8% → 58.5% |
+| 사실 | redo 는 적재 크기 172.8GB 에 272.5MB. 활성 15세션 중 다수가 TM 배타 잠금 대기(측정 때마다 8~12세션) — direct-path 는 테이블 배타 잠금(Oracle Administrator's Guide, Locking Considerations with Direct-Path INSERT), 작업 큐는 같은 테이블 조각을 연속 배정. 작업 큐 배치 변경은 미적용 |
+| 경과 | 13:09 APPEND 1차(NOARCHIVELOG) 559조각에서 중단 → 13:26 Docker Desktop 제거로 컨테이너·이미지 삭제(제거 실행 주체 미확인) → 17:27~17:50 재구축 → 18:01 시작 |
+| 기록 | `bench/runs/14_oracle_append_nolog_20261122_*`(complete · report · verify_count · events_before · events_after), 실시간 DB `mon_load_hist`(exec_id `ora_append_nolog_20261122`, 5분 스냅숏 6행 — 18:55 1회는 크기 조회 10초 초과로 누락) |
+
 4종 실측 순위 표는 다른 DBMS 의 같은 조건 재측정(점검표 10~12번) 뒤 갱신한다.
 
 ## 8. 산출물 위치

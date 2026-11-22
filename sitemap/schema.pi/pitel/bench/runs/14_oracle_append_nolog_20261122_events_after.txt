@@ -1,0 +1,44 @@
+enq: TM - contention|1162|41191.6
+write complete waits|161163|1942.9
+enq: TT - contention|33|1402.5
+db file parallel write|207520|661.2
+log file parallel write|420805|638.5
+Data file init write|329492|625.8
+db file scattered read|172425|200.6
+enq: TX - contention|48|192.4
+direct path write|168422|165.4
+local write wait|8480|103.5
+control file parallel write|25246|53.2
+log file sync|6713|38.2
+control file sequential read|25296|28.3
+db file sequential read|31076|19.1
+oradebug request completion|362|14
+enq: CR - block range reuse ckpt|2225|12.9
+db file async I/O submit|205674|12.3
+Log file init write|16388|10.6
+enq: RO - fast object reuse|605|8.6
+Disk file operations I/O|7113|7
+PGA memory operation|334839|3.8
+LGWR any worker group|2012|3.3
+LGWR all worker groups|772|3.3
+DLM cross inst call completion|74|3.1
+latch free|9568|3.1
+Failed Logon Delay|2|2
+sort segment request|2|2
+oracle thread bootstrap|200|1.8
+enq: CF - contention|49|1.7
+library cache lock|40|1
+external table read|1|1
+reliable message|2858|.8
+cursor: pin S wait on X|145|.6
+direct path read|1316|.5
+row cache lock|20|.4
+ADR block file write|913|.4
+LGWR worker group ordering|333|.3
+read by other session|351|.3
+kksfbc child completion|6|.3
+library cache load lock|61|.2
+STAT|CPU used by this session|1868583
+STAT|db block changes|2093156
+STAT|physical writes direct|19661947
+STAT|redo size|348131380

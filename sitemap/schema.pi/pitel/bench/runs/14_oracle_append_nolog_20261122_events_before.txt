@@ -1,0 +1,44 @@
+enq: TT - contention|3|98.3
+local write wait|4692|77.7
+Data file init write|33412|64.4
+db file parallel write|7611|54.8
+log file parallel write|21574|38.5
+Log file init write|16388|10.6
+db file sequential read|23126|9.7
+enq: RO - fast object reuse|605|8.6
+log file sync|2277|4.8
+control file parallel write|3106|3.9
+LGWR all worker groups|735|3.3
+LGWR any worker group|1816|3.2
+direct path write|1213|3.1
+DLM cross inst call completion|30|3
+control file sequential read|4838|2.8
+Failed Logon Delay|2|2
+sort segment request|2|2
+db file scattered read|1962|1.8
+oracle thread bootstrap|175|1.5
+external table read|1|1
+Disk file operations I/O|1399|.8
+latch free|1574|.6
+db file async I/O submit|7453|.5
+cursor: pin S wait on X|124|.5
+row cache lock|4|.4
+ADR block file write|892|.4
+PGA memory operation|40810|.3
+enq: CF - contention|24|.3
+LGWR worker group ordering|290|.3
+enq: CR - block range reuse ckpt|40|.3
+read by other session|255|.3
+library cache lock|12|.2
+write complete waits|14|.2
+kksfbc child completion|5|.2
+enq: TX - contention|10|.2
+os thread creation|179|.2
+enq: PR - contention|16|.2
+library cache load lock|30|.2
+reliable message|651|.2
+rdbms ipc reply|49|.1
+STAT|CPU used by this session|5649
+STAT|db block changes|356157
+STAT|physical writes direct|6616
+STAT|redo size|62418080
