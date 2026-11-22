@@ -408,6 +408,8 @@ async function run() {
   const jobs = +arg('jobs', 6)
   // MS-SQL 문장별 메모리 상한(%) : 동시 문장 상한 합을 84%(2026-11-15 동시 7 × 12%)로 유지 → 동시 7 = 12, 동시 15 = 5
   const msGrant = Math.max(1, Math.floor(84 / jobs))
+  // Oracle --append : direct-path INSERT(/*+ APPEND */). 조각마다 COMMIT 하므로 같은 세션 재조회 제약(ORA-12838) 없음 — 2026-11-22 마스터 '최적화 = 모든 기술 동원'
+  const oraAppend = isOra && arg('append', false) === true
   const only = arg('only', null)
   const db = isOra ? 'ora' : isMs ? 'ms' : isMy ? 'my' : dbName(which)
   const head = isOra || isMs || isMy ? '' : `SET search_path = ${schema}, gen; SET synchronous_commit = off;\n`
@@ -453,7 +455,8 @@ async function run() {
   async function worker() {
     while (queue.length) {
       const c = queue.shift()
-      const body = c.p.sql.replaceAll('__KFROM__', `(${c.from})`).replaceAll('__KTO__', `(${c.to})`)
+      const body0 = c.p.sql.replaceAll('__KFROM__', `(${c.from})`).replaceAll('__KTO__', `(${c.to})`)
+      const body = oraAppend ? body0.replace(/^INSERT INTO /, 'INSERT /*+ APPEND */ INTO ') : body0
       // MS-SQL : sqlcmd 가 약 4,000자 넘는 줄을 잘라서 1,000자 단위로 나눈다(문자열 상수 밖 공백에서)
       const sql = head + (isOra ? inl.wrapLines(inl.inlineGen(body)) : isMs ? inl.wrapLines(msInl.inlineGen(body).replace('MAX_GRANT_PERCENT = 12', `MAX_GRANT_PERCENT = ${msGrant}`), 1000) : isMy ? myInl.inlineGen(body) : body) + ';\n'
       // 조각 시작·완료 시각 줄 — database/run-init.mjs 가 이 로그로 테이블별 시작·종료를 기록(완료 줄은 state 기록 뒤)
