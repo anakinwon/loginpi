@@ -140,6 +140,9 @@ node bench/analyze.mjs --log mssql/out/full_load.log > mssql/out/full_analysis.j
 | 7 | 진행 상태 파일 | `datagen/state/<db>_*` 없음 | 이어 넣기 방지 |
 | 8 | 외부 도구 접속 | DBeaver 등 끊김 | TS-09 |
 | 9 | 규모 | 배율 1 · 1,101,170,707행 | TS-01 |
+| 10 | 생성식 동일(PostgreSQL) | `gen.wpick`(plpgsql) 을 다른 3종처럼 CASE 로 인라인 — 그대로 두면 PostgreSQL 작업 시간의 36% 가 이 함수(7-1절) | 2026-11-21 순위 왜곡 ① |
+| 11 | 문자열 타입 동일(Oracle) | `MAX_STRING_SIZE=EXTENDED` 로 VARCHAR2(32767) 사용, CLOB 전환(n > 1,333) 없음 — CLOB 테이블 13개가 행 8.4% 로 Oracle 작업 시간의 35.9%(7-1절) | 2026-11-21 순위 왜곡 ② |
+| 12 | 로그 설정 동일 | MySQL 바이너리 로그 · MS-SQL 복구 모델 · PostgreSQL wal_level · Oracle 메모리를 같은 수준으로 맞추고 로그 첫 줄에 기록 | 2026-11-21 조건 차이 |
 
 ## 7. 분석 사례 : 수납(INV) 영역은 왜 PostgreSQL 이 빨랐나
 
@@ -154,6 +157,19 @@ node bench/analyze.mjs --log mssql/out/full_load.log > mssql/out/full_analysis.j
 | INV | 1.43 | 25.5 | 1.06 |
 
 INV 행의 57% 를 차지하는 `ptl_inv_rcv_allc_d`(5,641만 행, 가중 선택 1 · 그 밖의 함수 25, 1.33배) · `ptl_inv_rcv_m`(4,701만 행, 1 · 34, 1.35배)은 가중 선택이 적고 일반 함수가 많아 Oracle 의 큰 고정 비용과 함수 비용이 드러났다. 모형 계산(`ptl_inv_rcv_m`) : PostgreSQL ≈ 50µs, Oracle ≈ 60µs. 같은 INV 안에서도 가중 선택 3~4개 테이블은 Oracle 이 0.53~0.55배 시간에 끝냈다.
+
+## 7-1. 새 PC 4종 순위 해석과 보정 (2026-11-22, 실행 9~12 근거)
+
+실제 순위 MS-SQL 46분 44초 > Oracle 49분 54초 > MySQL 50분 15초 > PostgreSQL 70분 0초. 마스터 예상(Oracle > PostgreSQL > MS-SQL > MySQL)과 다른 원인은 엔진 차이보다 **DBMS별 생성·저장 조건 차이 2건**이다.
+
+| 원인 | 근거(새 PC 실행 로그 조각 시간 합) | 보정 추정 |
+|---|---|---|
+| ① PostgreSQL 만 가중 선택을 PL/pgSQL 함수 `gen.wpick` 으로 호출(다른 3종 = CASE 인라인, 호출마다 `SELECT sum(w) FROM unnest(weights)` 실행) | 테이블 149개 회귀(µs/행 = 고정 + 가중 선택 × 회수 + 그 밖의 함수 × 회수) : PostgreSQL 가중 선택 9.75µs/회(다른 3종 ≈ 0), 22.99억 회 = 22,406 작업초 = PostgreSQL 작업 시간 62,778초의 36%, 이 항을 넣으면 R² 0.857 → 0.930 | 40,372 작업초 → 약 45분 |
+| ② Oracle 만 14개 칼럼(테이블 13개, 9,198만 행 = 8.4%)을 CLOB 로(`MAX_STRING_SIZE=STANDARD` 의 4,000바이트 한도), 생성식 `NVL(memo, TO_CLOB(…))` 가 행마다 임시 LOB 생성 | LOB 테이블 13개 작업초 Oracle 15,621 · MS-SQL 3,783 · PostgreSQL 5,266 · MySQL 3,447(Oracle 4.13배), 나머지 201개는 Oracle 27,946 · MS-SQL 38,055 · PostgreSQL 57,512 · MySQL 41,715(Oracle 0.73배로 4종 중 가장 빠름). LOB 테이블이 Oracle 작업 시간의 35.9% | LOB 테이블을 MS-SQL 속도로 = 31,729 작업초 → 약 36분 |
+
+보정 추정 순위 : Oracle 약 36분 > PostgreSQL 약 45분 > MS-SQL 46분 44초 > MySQL 50분 15초 → 마스터 예상과 같다. 추정 방식 = 작업초 비율로 실제 시간을 비례 환산(동시 15 고정 가정), 2·3위 차이는 약 1분이라 재측정으로 확정한다.
+
+확인하지 못한 값 : 새 PC 의 Oracle 대기 이벤트(임시 LOB 원인 확정, 이전 PC 11-15 은 `direct path write` 1,926초가 1위) · 보정 뒤 실측. 재측정은 6절 점검표 10~12 번을 지킨 뒤 4종을 같은 순서로 다시 잰다.
 
 ## 8. 산출물 위치
 
