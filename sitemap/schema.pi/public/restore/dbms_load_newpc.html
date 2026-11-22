@@ -201,6 +201,41 @@
 
   </section>
 
+  <section>
+    <h2>8. Oracle 재적재 최적 시나리오 : 불리한 조건 제거</h2>
+    <p class="meta" style="margin:0 0 8px">작성 2026-11-22 · 근거 = 실행 12 로그(11-21) · 11-21 작업 이력의 Oracle 설정 · <code>TEST_RECORD.md</code> 7-1절 · TS-03/06/10/11/31/32 · Oracle Database 21c Reference <code>MAX_STRING_SIZE</code> · 상태 = 2026-11-22 12:15 기준</p>
+    <h3 style="font-size:14px;margin:4px 0 6px">① 불리한 조건과 제거 방법</h3>
+    <table>
+      <tr><th class="n">#</th><th>조건</th><th>근거(사실)</th><th>제거 방법</th><th>상태</th></tr>
+      <tr><td class="n">1</td><td>Oracle 판만 14개 칼럼(테이블 13개)을 CLOB 로 선언</td><td>원래 선언 VARCHAR(4000) 글자, STANDARD 한도 4,000바이트라 전환. LOB 테이블 13개 작업초 Oracle 15,621 · MS-SQL 3,783 = Oracle 작업초의 35.9%(실측 분해)</td><td>ORCLPDB <code>MAX_STRING_SIZE=EXTENDED</code>(32,767바이트) → <code>VARCHAR2(4000 CHAR)</code>, <code>ddl-oracle.mjs</code> CLOB 전환 규칙 끄기</td><td><span class="b warn">미적용</span></td></tr>
+      <tr><td class="n">2</td><td>생성식 <code>NVL(memo, TO_CLOB(…))</code> 가 행마다 임시 LOB 생성</td><td>CLOB 칼럼 생성식(<code>datagen.mjs</code> oracle 방언 memo_lob). 이전 PC(11-15) 대기 1위 <code>direct path write</code> 1,926초</td><td>1번과 함께 <code>memo</code>(VARCHAR2)로 생성, TO_CLOB 없음</td><td><span class="b warn">미적용</span></td></tr>
+      <tr><td class="n">3</td><td>실행 로그 첫 줄에 설정 기록 없음</td><td>실행 12 로그 첫 줄 = '조각 2086개 …'(설정 줄 없음), 설정은 작업 이력에만 남음</td><td>로그 첫 줄에 SGA · PGA · DBWR · I/O · redo · 로그 모드 · MAX_STRING_SIZE 기록</td><td><span class="b warn">미적용</span></td></tr>
+      <tr><td class="n">4</td><td>새 PC 대기 이벤트 미측정</td><td>11-21 실행 12 대기 기록 없음(이전 PC 는 <code>bench/runs/5_oracle_waits.txt</code>)</td><td>적재 전후 <code>v$system_event</code> 차이 저장, 첫 10분 대기 종류 확인</td><td><span class="b warn">미적용</span></td></tr>
+      <tr><td class="n">5</td><td>제3자 Docker 이미지 <code>nomhiro1204/oracle21c</code></td><td>실행 12 컨테이너 이미지</td><td>공식 이미지 사용 검토 <span class="tbd">[확인중 : Oracle 컨테이너 레지스트리의 21c EE 제공 여부 · 계정]</span></td><td><span class="b off">검토</span></td></tr>
+    </table>
+    <h3 style="font-size:14px;margin:14px 0 6px">② 그대로 유지하는 설정 (11-21 실행 12 와 같음)</h3>
+    <table>
+      <tr><th>항목</th><th>값</th><th>근거</th></tr>
+      <tr><td>메모리</td><td>SGA 8,192MB(버퍼 7,248MB) · PGA 목표 3,511MB(상한 7,022MB), PGA 는 CDB 루트에서 설정</td><td>11-21 작업 이력 · TS-10</td></tr>
+      <tr><td>쓰기</td><td><code>db_writer_processes</code> 4 · <code>filesystemio_options</code> SETALL</td><td>TS-11(free buffer waits)</td></tr>
+      <tr><td>redo · 로그 모드</td><td>4GB × 4개(기존 200MB × 3개 제거) · NOARCHIVELOG</td><td>11-21 작업 이력</td></tr>
+      <tr><td>생성 · 적재</td><td>내장 식 인라인 · 일반 INSERT · 배율 1 · 동시 15 · <code>bench/launch.mjs</code> 독립 프로세스</td><td>TS-06 · TS-03 · TS-19</td></tr>
+    </table>
+    <h3 style="font-size:14px;margin:14px 0 6px">③ 적재 시나리오</h3>
+    <table>
+      <tr><th class="n">단계</th><th>작업</th><th>근거</th></tr>
+      <tr><td class="n">0</td><td>Docker Desktop 설치(현재 없음) · 디스크 여유 · 다른 DB 컨테이너 없음 확인</td><td>TS-32 · 점검표 3 · 4</td></tr>
+      <tr><td class="n">1</td><td><code>oracle21c</code> 컨테이너 생성(포트 1521 · ORCLCDB · ORCLPDB) → <code>DATABASE IS READY TO USE!</code> 대기</td><td>도커 DB 설치 가이드 v3.1</td></tr>
+      <tr><td class="n">2</td><td>메모리 · DBWR · I/O 를 <code>SCOPE=SPFILE</code> 로 설정 후 재기동 → redo 4GB × 4 추가 · 200MB 그룹 제거</td><td>11-21 순서</td></tr>
+      <tr><td class="n">3</td><td>ORCLPDB 닫기 → <code>OPEN UPGRADE</code> → <code>ALTER SYSTEM SET max_string_size=EXTENDED</code> → <code>@?/rdbms/admin/utl32k.sql</code> → 일반 모드로 열기 → <code>@?/rdbms/admin/utlrp.sql</code> (STANDARD 로 되돌릴 수 없음)</td><td>Oracle 21c Reference</td></tr>
+      <tr><td class="n">4</td><td>코드 : <code>ddl-oracle.mjs</code> CLOB 전환 끄기(EXTENDED 한도 10,922 글자 이하 = VARCHAR2(n CHAR)) · <code>datagen.mjs</code> oracle 방언 memo_lob → memo, DDL 의 CLOB 0개 확인</td><td>①-1 · 2</td></tr>
+      <tr><td class="n">5</td><td><code>node oracle/s1.mjs setup tables --target oracle</code> → 기능 점검(테이블마다 키 2,000개) → DB 재생성</td><td>TEST_RECORD 5절</td></tr>
+      <tr><td class="n">6</td><td><code>v$system_event</code> 기준값 저장 → 로그 첫 줄 설정 기록 → <code>node bench/launch.mjs &lt;로그&gt; run --target oracle --scale 1 --jobs 15</code></td><td>①-3 · 4</td></tr>
+      <tr><td class="n">7</td><td>5분 진행 보고 · 첫 10분 대기 확인 → 끝 : 실패 0 · exit 0 → 테이블 214개 COUNT 대조 → <code>v$system_event</code> 차이 기록</td><td>TEST_RECORD 5절</td></tr>
+      <tr><td class="n">-</td><td>별도 트랙 : direct-path(APPEND) · NOLOGGING · 병렬 DML. 4종 같은 생성 방식 원칙이라 본 비교와 분리</td><td>TS-03</td></tr>
+    </table>
+  </section>
+
   <footer>근거 : <code>pitel/bench/runs/9~12_*_newpc_20261121_report.md</code> · <code>_verify_count.log</code> · <code>_complete.log</code> 첫 줄, <code>mysql/MYSQL_LOG.md</code> · <code>mssql/MSSQL_LOG.md</code> 새 PC 절 (커밋 e2999d22) · 값은 스냅샷 · <a href="index.html">Restore 현황판</a></footer>
 </main>
 <script>
