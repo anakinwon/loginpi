@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
   turbopack: { root: appRoot },
   // DDL 서버 직접 실행(src/lib/db-exec.ts) — Oracle 드라이버는 번들하지 않고 node_modules 에서 불러옴(동적 require·선택 바이너리)
   serverExternalPackages: ['oracledb'],
+  // 정적 HTML(public/restore/*)은 <link rel=icon> 이 없어 브라우저가 /favicon.ico 를 요청 → 404 — app/icon.svg 로 연결
+  rewrites: async () => [{ source: '/favicon.ico', destination: '/icon.svg' }],
   // 모니터링 AI 원인 분석(src/lib/mon-ai.ts)이 실행 중 소스를 읽어 Claude 에 근거로 보냄 — 배포 함수에 src 를 포함
   // messages/*.json 은 @pi/i18n/server 가 readFile 로 읽으므로 전 경로 번들에 포함(빠지면 운영에서 ko 로만 보임 — 표준 7절 L9)
   outputFileTracingIncludes: { '/api/mon/app/analyze': ['./src/**/*.ts', './src/**/*.tsx'], '/**/*': ['./messages/*.json'] },
