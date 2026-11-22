@@ -89,7 +89,7 @@
 
   <section>
     <h2>3. 주제영역별 생성 시간</h2>
-    <p class="meta" style="margin:0 0 8px">영역 첫 작업 단위 시작 ~ 마지막 완료 · 영역끼리 겹쳐 진행되므로 합은 전체보다 크다 · 굵은 값 = 영역별 가장 빠름</p>
+    <p class="meta" style="margin:0 0 8px">영역 첫 작업 단위 시작 ~ 마지막 완료 · 영역끼리 겹쳐 진행되므로 합은 전체보다 크다 · 굵은 값 = 영역별 가장 빠름 · 배수 기준 = 최신 실측 4열(PostgreSQL 11-21 은 이전 기록, 점선·흐림)</p>
     <div class="chart"><svg id="heat" viewBox="0 0 760 340" role="img" aria-label="주제영역별 생성 시간 히트맵 : 아래 표와 같은 값"></svg></div>
     <details class="fold"><summary>표로 보기</summary>
     <table>
@@ -210,7 +210,8 @@
   const S = [
     { name: 'MySQL', c: 'var(--s1)', p: [[0, 0], [10, 28.2], [20, 46.4], [30, 62.1], [40, 73.4], [50, 98.7], [50.25, 100]] },
     { name: 'MS-SQL', c: 'var(--s2)', p: [[0, 0], [10, 26.3], [20, 47.5], [30, 65.5], [40, 80.8], [46.73, 100]] },
-    { name: 'PostgreSQL', c: 'var(--s3)', p: [[0, 0], [10, 14.1], [20, 28.2], [30, 44.8], [40, 59.2], [50, 67.2], [60, 78.6], [70, 99.6]] },
+    { name: 'PostgreSQL 11-21', c: 'var(--s3)', dash: true, p: [[0, 0], [10, 14.1], [20, 28.2], [30, 44.8], [40, 59.2], [50, 67.2], [60, 78.6], [70, 99.6]] },
+    { name: 'PostgreSQL 11-22', c: 'var(--s3)', p: [[0, 0], [10, 26.6], [20, 46.2], [30, 63.3], [40, 80.9], [46.18, 100]] },   // 실행 13(CASE 인라인), 끝 = 2,771초
     { name: 'Oracle', c: 'var(--s4)', p: [[0, 0], [10, 20.1], [20, 37.8], [30, 60.9], [40, 75.8], [49.9, 100]] },
   ]
   const M = { t: 30, r: 160, b: 60, l: 70 }, W = 800, H = 340, L = M.l, R = W - M.r, T = M.t, B = H - M.b
@@ -230,19 +231,19 @@
   // 선·포인트(nivo pointSize 10 · pointColor 바탕 · pointBorderWidth 2)
   const G = S.map(s => {
     const g = el('g', {})
-    el('polyline', { points: s.p.map(([m, v]) => xs(m) + ',' + ys(v)).join(' '), fill: 'none', stroke: s.c, 'stroke-width': 2, 'stroke-linejoin': 'round' }, null, g)
-    for (const [m, v] of s.p) el('circle', { cx: xs(m), cy: ys(v), r: 5, fill: 'var(--card)', stroke: s.c, 'stroke-width': 2 }, null, g)
+    el('polyline', { points: s.p.map(([m, v]) => xs(m) + ',' + ys(v)).join(' '), fill: 'none', stroke: s.c, 'stroke-width': 2, 'stroke-linejoin': 'round', ...(s.dash ? { 'stroke-dasharray': '6 5', opacity: .7 } : {}) }, null, g)   // 이전 기록 = 점선
+    for (const [m, v] of s.p) el('circle', { cx: xs(m), cy: ys(v), r: s.dash ? 4 : 5, fill: 'var(--card)', stroke: s.c, 'stroke-width': 2, ...(s.dash ? { opacity: .7 } : {}) }, null, g)
     return g
   })
   const focus = i => G.forEach((g, j) => g.setAttribute('opacity', i == null || i === j ? 1 : .15))
   // 오른쪽 세로 범례(원형 기호 12px, 항목 간격 4px, 투명도 .75 → 올리면 1·해당 선 강조)
   S.forEach((s, i) => {
     const g = el('g', { class: 'lg', transform: `translate(${R + 24},${B - (S.length - i) * 24})` })
-    el('rect', { x: -4, y: -10, width: 120, height: 20, fill: 'transparent' }, null, g)
-    el('circle', { cx: 6, cy: 0, r: 6, fill: s.c }, null, g); el('text', { x: 20, y: 4, fill: 'var(--ink)' }, s.name, g)
+    el('rect', { x: -4, y: -10, width: 140, height: 20, fill: 'transparent' }, null, g)
+    if (s.dash) el('line', { x1: 0, x2: 12, y1: 0, y2: 0, stroke: s.c, 'stroke-width': 2, 'stroke-dasharray': '4 3' }, null, g); else el('circle', { cx: 6, cy: 0, r: 6, fill: s.c }, null, g); el('text', { x: 20, y: 4, fill: 'var(--ink)' }, s.name, g)
     g.addEventListener('mouseenter', () => focus(i)); g.addEventListener('mouseleave', () => focus(null))
   })
-  // 슬라이스 툴팁 : 마우스 x 에 가까운 10분 눈금의 4종 값
+  // 슬라이스 툴팁 : 마우스 x 에 가까운 10분 눈금의 값(PostgreSQL 은 11-21 · 11-22 두 실행)
   const at = (s, m) => { const q = s.p.find(([x]) => x === m); return q ? q[1] : m > s.p.at(-1)[0] ? 100 : null }
   const hit = el('rect', { x: L, y: T, width: R - L, height: B - T, fill: 'transparent' })
   hit.addEventListener('mousemove', e => {
@@ -259,8 +260,9 @@
   const P = [
     { n: 'MySQL', c: 'var(--s1)', t: 50.25, z: 198.3, lab: '50:15 · 198.3GB', rps: '365,177', ax: 'r' },
     { n: 'MS-SQL', c: 'var(--s2)', t: 46.733, z: 166.2, lab: '46:44 · 166.2GB', rps: '392,703', ax: 'r' },
-    { n: 'PostgreSQL', c: 'var(--s3)', t: 70, z: 174.9, lab: '70:00 · 174.9GB', rps: '262,212', ax: 'l' },
-    { n: 'Oracle', c: 'var(--s4)', t: 49.9, z: 172.6, lab: '49:54 · 172.6GB (LOB 3.8 포함)', rps: '367,819', ax: 'r' },
+    { n: 'PostgreSQL 11-21', c: 'var(--s3)', t: 70, z: 174.9, lab: '70:00 · 174.9GB (이전 기록)', rps: '262,212', ax: 'l', old: true },
+    { n: 'PostgreSQL 11-22', c: 'var(--s3)', t: 46.183, z: 174.9, lab: '46:11 · 174.9GB', rps: '397,416', ax: 'l' },   // 실행 13(CASE 인라인)
+    { n: 'Oracle', c: 'var(--s4)', t: 49.9, z: 172.6, lab: '49:54 · 172.6GB (LOB 3.8 포함)', rps: '367,819', ax: 'r', below: true },
   ]
   const svg = document.getElementById('scatter'), tip = svg.parentNode.querySelector('.tip'), NS = 'http://www.w3.org/2000/svg'
   const W = 800, L = 70, R = 770, T = 20, B = 280, X0 = 40, X1 = 75, Y0 = 160, Y1 = 205
@@ -272,11 +274,14 @@
   el('text', { x: (L + R) / 2, y: B + 44, 'text-anchor': 'middle', fill: 'var(--ink)' }, '생성 시간(분) · 왼쪽일수록 빠름')
   el('text', { transform: `translate(${L - 46},${(T + B) / 2}) rotate(-90)`, 'text-anchor': 'middle', fill: 'var(--ink)' }, '크기(GB) · 아래일수록 작음')
   el('text', { x: L + 10, y: B - 10, fill: 'var(--sub)' }, '↙ 빠르고 작음')
+  // 이전 기록 → 새 기록 점선 화살표(같은 DBMS 재측정)
+  el('defs', {}).innerHTML = '<marker id="sc-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--s3)"/></marker>'
+  el('line', { x1: xs(70) - 12, x2: xs(46.183) + 12, y1: ys(174.9), y2: ys(174.9), stroke: 'var(--s3)', 'stroke-width': 1.5, 'stroke-dasharray': '6 5', opacity: .7, 'marker-end': 'url(#sc-arrow)' })
   for (const p of P) {
-    const cx = xs(p.t), cy = ys(p.z), right = p.ax === 'r'
-    const c = el('circle', { cx, cy, r: 8, fill: p.c, stroke: 'var(--card)', 'stroke-width': 2 })
-    el('text', { x: right ? cx + 14 : cx - 14, y: cy - 2, 'text-anchor': right ? 'start' : 'end', fill: 'var(--ink)', 'font-weight': 600 }, p.n)
-    el('text', { x: right ? cx + 14 : cx - 14, y: cy + 13, 'text-anchor': right ? 'start' : 'end', fill: 'var(--sub)' }, p.lab)
+    const cx = xs(p.t), cy = ys(p.z), right = p.ax === 'r', dy = p.below ? 20 : 0
+    const c = el('circle', p.old ? { cx, cy, r: 7, fill: 'var(--card)', stroke: p.c, 'stroke-width': 2, 'stroke-dasharray': '3 2', opacity: .8 } : { cx, cy, r: 8, fill: p.c, stroke: 'var(--card)', 'stroke-width': 2 })
+    el('text', { x: right ? cx + 14 : cx - 14, y: cy - 2 + dy, 'text-anchor': right ? 'start' : 'end', fill: 'var(--ink)', 'font-weight': 600 }, p.n)
+    el('text', { x: right ? cx + 14 : cx - 14, y: cy + 13 + dy, 'text-anchor': right ? 'start' : 'end', fill: 'var(--sub)' }, p.lab)
     c.addEventListener('mousemove', e => {
       const b = svg.getBoundingClientRect()
       tip.innerHTML = `<b>${p.n}</b><div><i style="background:${p.c}"></i>생성 ${p.lab.split(' · ')[0]} · 크기 ${p.z} GB</div><div>처리량 ${p.rps} 행/초</div>`
@@ -287,19 +292,20 @@
 })()
 // 3절 히트맵(nivo HeatMap 모양 재현 : 칸 사이 간격·칸 안 값 라벨·위쪽 열 축·아래 범례 띠) — 색 = 영역 안 가장 빠른 DBMS 대비 배수(한 색상 밝음 → 진함, 진할수록 느림)
 ;(() => {
-  const D = ['MySQL', 'MS-SQL', 'PostgreSQL', 'Oracle'], A = [['PRD 상품', [33, 64, 54, 30]], ['CUS 고객', [212, 217, 410, 291]], ['ORD 가입', [507, 438, 782, 489]], ['PAY 청구', [1434, 1263, 1733, 1361]], ['INV 수납', [568, 518, 723, 863]], ['COL 미납', [457, 476, 933, 987]], ['PRM 파트너', [169, 172, 240, 257]]]
+  // 열 = MySQL · MS-SQL · PostgreSQL 11-21(이전 기록, 점선) · PostgreSQL 11-22(실행 13) · Oracle, 배수 기준 = 이전 기록을 뺀 최신 실측 4열의 영역 최소
+  const D = ['MySQL', 'MS-SQL', 'PostgreSQL 11-21', 'PostgreSQL 11-22', 'Oracle'], OLD = 2, A = [['PRD 상품', [33, 64, 54, 35, 30]], ['CUS 고객', [212, 217, 410, 249, 291]], ['ORD 가입', [507, 438, 782, 542, 489]], ['PAY 청구', [1434, 1263, 1733, 1195, 1361]], ['INV 수납', [568, 518, 723, 523, 863]], ['COL 미납', [457, 476, 933, 518, 987]], ['PRM 파트너', [169, 172, 240, 149, 257]]]
   const BIN = [[1.1, '#cde2fb', 'var(--ink)'], [1.3, '#9ec5f4', '#0b0b0b'], [1.6, '#6da7ec', '#0b0b0b'], [1.9, '#3987e5', '#fff'], [99, '#1c5cab', '#fff']]
-  const svg = document.getElementById('heat'), NS = 'http://www.w3.org/2000/svg', L = 110, T = 36, CW = 160, CH = 38, G = 3
+  const svg = document.getElementById('heat'), NS = 'http://www.w3.org/2000/svg', L = 110, T = 36, CW = 128, CH = 38, G = 3
   const el = (tag, a, txt) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; svg.appendChild(e); return e }
   const hms = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-  D.forEach((d, j) => el('text', { x: L + j * CW + CW / 2, y: T - 12, 'text-anchor': 'middle', fill: 'var(--ink)', 'font-weight': 600 }, d))
+  D.forEach((d, j) => el('text', { x: L + j * CW + CW / 2, y: T - 12, 'text-anchor': 'middle', fill: j === OLD ? 'var(--sub)' : 'var(--ink)', 'font-weight': 600 }, d))
   A.forEach(([a, v], i) => {
-    const y = T + i * CH, min = Math.min(...v)
+    const y = T + i * CH, min = Math.min(...v.filter((_, j) => j !== OLD))
     el('text', { x: L - 12, y: y + CH / 2 + 4, 'text-anchor': 'end', fill: 'var(--ink)' }, a)
     v.forEach((s, j) => {
       const r = s / min, [, bg, fg] = BIN.find(([lim]) => r < lim), x = L + j * CW
-      el('rect', { x: x + G / 2, y: y + G / 2, width: CW - G, height: CH - G, fill: bg, rx: 2 })
-      el('text', { x: x + CW / 2, y: y + CH / 2 + 4, 'text-anchor': 'middle', fill: fg, 'font-weight': r === 1 ? 700 : 400 }, `${hms(s)} · ${r.toFixed(2)}×`)
+      el('rect', { x: x + G / 2, y: y + G / 2, width: CW - G, height: CH - G, fill: bg, rx: 2, ...(j === OLD ? { opacity: .45, stroke: 'var(--axis)', 'stroke-dasharray': '4 3' } : {}) })
+      el('text', { x: x + CW / 2, y: y + CH / 2 + 4, 'text-anchor': 'middle', fill: j === OLD ? 'var(--sub)' : fg, 'font-weight': r === 1 && j !== OLD ? 700 : 400 }, `${hms(s)} · ${r.toFixed(2)}×`)
     })
   })
   const ly = T + A.length * CH + 22; el('text', { x: L, y: ly + 12, fill: 'var(--sub)' }, '영역 최고 대비')
