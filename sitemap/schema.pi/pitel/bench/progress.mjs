@@ -1,6 +1,6 @@
 // DBMS 별 초기 데이터 적재 진행 비교표 : 주제영역별(목표 행 · 완료 행 · 완료율 · 크기) + 시간대별(10분 누적) 두 표를 Markdown 으로 출력
 // 기준선 = PostgreSQL 2026-11-14 배율 1 실측 로그(같은 경과 시점 비교), 대상 = datagen run 로그. 실행마다 크기 기록을 <로그>.size.jsonl 에 남김(보고서 시계열 근거)
-// 실행 : node bench/progress.mjs --target oracle --log oracle/out/full_load.log [--base <기준 로그> --base-label PostgreSQL]   (PRD dbms.pi 11.7 보고 방식 정본)
+// 실행 : node bench/progress.mjs --target oracle --log oracle/out/full_load.log [--base <기준 로그> --base-label PostgreSQL] [--json] [--no-size-log] [--ora-timeout <ms>]   (PRD dbms.pi 11.7 보고 방식 정본)
 // --base 없음 = 대상 단독(2026-11-21 새 PC 조건 첫 측정 MySQL). 셋째 표 = 주제영역별 생성 시간(첫 작업 단위 시작 ~ 마지막 완료)
 import fs from 'node:fs'
 import path from 'node:path'
@@ -15,6 +15,8 @@ const TARGET = arg('--target') || 'oracle'
 const LOG = path.resolve(ROOT, arg('--log') || 'oracle/out/full_load.log')
 const BASE = arg('--base') ? path.resolve(ROOT, arg('--base')) : null
 const BL = arg('--base-label') || 'PostgreSQL'
+// --ora-timeout <ms> : Oracle 크기 조회 1회 상한(초과 시 docker exec 종료 후 실패), 없으면 무제한(기존 동작)
+const ORA_OPT = { sysdba: true, ...(arg('--ora-timeout') ? { timeoutMs: +arg('--ora-timeout') } : {}) }
 const STEP_MIN = 10
 const AREAS = ['PRD', 'CUS', 'ORD', 'PAY', 'INV', 'COL', 'PRM']
 const LABEL = { oracle: 'Oracle', mssql: 'MS-SQL', mysql: 'MySQL', pg: 'PostgreSQL' }
@@ -25,11 +27,11 @@ const SIZE = {
     const { ora, rows } = await import('../oracle/ora.mjs')
     const sz = Object.fromEntries(AREAS.map(a => [a, 0]))
     const q = "SELECT SUBSTR(segment_name, 5, 3) || '|' || SUM(bytes) FROM dba_segments WHERE owner = 'PITEL' AND segment_name LIKE 'PTL\\_%' ESCAPE '\\' GROUP BY SUBSTR(segment_name, 5, 3);"
-    for (const l of rows(await ora(q, { sysdba: true }))) {
+    for (const l of rows(await ora(q, ORA_OPT))) {
       const [a, b] = l.trim().split('|')
       if (a in sz) sz[a] = +b
     }
-    const lob = +rows(await ora("SELECT NVL(SUM(bytes), 0) FROM dba_segments WHERE owner = 'PITEL' AND segment_name NOT LIKE 'PTL\\_%' ESCAPE '\\';", { sysdba: true }))[0]
+    const lob = +rows(await ora("SELECT NVL(SUM(bytes), 0) FROM dba_segments WHERE owner = 'PITEL' AND segment_name NOT LIKE 'PTL\\_%' ESCAPE '\\';", ORA_OPT))[0]
     return { sz, lob }
   },
   // MS-SQL : 할당 페이지(8KB) 합, 테이블 이름 PTL_<영역>_, varchar(max) 넘침 데이터(LOB_DATA)는 lob 으로 따로
@@ -132,7 +134,13 @@ const oNow = sumBy(O.list, ended ? Infinity : el)
 const pNow = sumBy(P.list, el)
 const { sz, lob } = await SIZE[TARGET]()
 const SIZE_LOG = LOG.replace(/\.log$/, '') + '.size.jsonl'
-fs.appendFileSync(SIZE_LOG, JSON.stringify({ at: new Date().toISOString(), sec: Math.round(el), sz, lob, rows: oNow }) + '\n')
+// --no-size-log : 크기 이력을 남기지 않음(갱신기 dry-run 시험용), 기본 = 기록
+if (!process.argv.includes('--no-size-log')) fs.appendFileSync(SIZE_LOG, JSON.stringify({ at: new Date().toISOString(), sec: Math.round(el), sz, lob, rows: oNow }) + '\n')
+// --json : 같은 계산 결과를 JSON 한 줄로(bench/progress-push.mjs 가 DB 에 올림), Markdown 은 출력하지 않음
+if (process.argv.includes('--json')) {
+  console.log(JSON.stringify({ first: O.first?.toISOString() ?? null, sec: Math.round(el), ms: Math.round(el * 1000), ended: !!ended, units: { done: O.list.length, total: UNITS }, fail: O.fail, tgt, rows: oNow, base: BASE ? pNow : null, sz, lob }))
+  process.exit(0)
+}
 
 const f = x => x.toLocaleString('ko-KR')
 const pct = (a, b) => ((a / b) * 100).toFixed(1) + '%'
@@ -158,7 +166,7 @@ for (const a of AREAS) {
 }
 L.push(`| 합계 | ${f(T.t)} | ${bv(T.p, T.t)}${f(T.o)} | ${pct(T.o, T.t)} | ${gb(T.s)} (+LOB ${gb(lob)}) |`, '')
 L.push(`| 경과 | ${bh}${D} 완료 행 | ${D} 완료율 | ${D} 크기(GB) |`, `|---:|${bs}---:|---:|---:|`)
-const hist = fs.readFileSync(SIZE_LOG, 'utf8').trim().split('\n').map(JSON.parse)
+const hist = fs.existsSync(SIZE_LOG) ? fs.readFileSync(SIZE_LOG, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse) : []
 for (let m = STEP_MIN; m * 60 <= el + 1; m += STEP_MIN) {
   const p = total(sumBy(P.list, m * 60))
   const o = total(sumBy(O.list, m * 60))

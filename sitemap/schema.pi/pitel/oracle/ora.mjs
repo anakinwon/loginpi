@@ -31,8 +31,8 @@ export function oraPwd(create = false) {
 
 const SETS = 'SET HEADING OFF FEEDBACK OFF PAGESIZE 0 LINESIZE 32767 TRIMSPOOL ON TRIMOUT ON TAB OFF VERIFY OFF ECHO OFF DEFINE OFF SQLBLANKLINES ON LONG 2000000 LONGCHUNKSIZE 2000000'
 
-// sql 실행. sysdba = 관리 접속(PDB 로 전환), failOk = 오류가 나도 계속(DROP 등). 실패하면 출력 끝 40줄을 담아 reject
-export function ora(sql, { sysdba = false, failOk = false } = {}) {
+// sql 실행. sysdba = 관리 접속(PDB 로 전환), failOk = 오류가 나도 계속(DROP 등), timeoutMs = 초과 시 docker exec 자식을 종료하고 reject(기본 없음 = 무제한). 실패하면 출력 끝 40줄을 담아 reject
+export function ora(sql, { sysdba = false, failOk = false, timeoutMs } = {}) {
   const pwdNow = (() => {
     try {
       return oraPwd()
@@ -60,10 +60,11 @@ export function ora(sql, { sysdba = false, failOk = false } = {}) {
     p.stderr.setEncoding('utf8')
     p.stdout.on('data', d => (out += d))
     p.stderr.on('data', d => (out += d))
-    p.on('error', rej)
+    const t = timeoutMs ? setTimeout(() => { p.kill(); rej(new Error(`sqlplus ${timeoutMs}ms 초과`)) }, timeoutMs) : null
+    p.on('error', e => { clearTimeout(t); rej(e) })
     // 오류 출력에 문장이 되풀이될 수 있어(CREATE USER … IDENTIFIED BY) 비밀번호를 가린다
     const mask = s => (pwdNow ? s.split(pwdNow).join('***') : s)
-    p.on('close', code => (code === 0 ? res(mask(out)) : rej(new Error(mask(out.trim().split('\n').slice(-40).join('\n')) || `sqlplus 종료 코드 ${code}`))))
+    p.on('close', code => (clearTimeout(t), code === 0 ? res(mask(out)) : rej(new Error(mask(out.trim().split('\n').slice(-40).join('\n')) || `sqlplus 종료 코드 ${code}`))))
     p.stdin.end(input)
   })
 }

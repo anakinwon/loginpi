@@ -247,7 +247,7 @@
       <tr><td class="n">6 · 7</td><td>적재 · 진행 보고 · COUNT 대조 · v$system_event 전후 기록(①-3 · 4 는 적재 때 적용)</td><td><span class="b warn">대기</span></td></tr>
     </table>
     <p class="meta" style="margin:6px 0 0">점검 중 발견 : <code>datagen.mjs</code> Oracle 실행부 주석에 'INSERT /*+ APPEND */' 라고 적혀 있으나 실제 INSERT 문에는 APPEND 가 없음(실행 12 로그 0건) · 적재는 일반 INSERT</p>
-    <h3 style="font-size:14px;margin:14px 0 6px">⑤ NOLOGGING + APPEND 적재 진행 (2026-11-22 18:01 시작, 18:06:49 실측 · 진행 중)</h3>
+    <h3 style="font-size:14px;margin:14px 0 6px">⑤ NOLOGGING + APPEND 적재 진행 (2026-11-22 18:01 시작, 18:06:49 실측 · 진행 중) · <a href="dbms_load_live.html" style="font-weight:400">실시간 현황(5분 갱신)</a></h3>
     <table>
       <tr><th>항목</th><th>내용</th></tr>
       <tr><td>목적</td><td>INSERT 의 redo 생성 최소화 : NOLOGGING + <code>INSERT /*+ APPEND */</code>(direct-path) — 마스터 지시</td></tr>

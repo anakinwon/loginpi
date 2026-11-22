@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<!-- DBMS 적재 실시간 현황 : /api/mon/load?run=<실행ID> 를 60초마다 조회(값 = DB mon_load_hist, 로컬 갱신기 pitel/bench/progress-push.mjs 가 5분마다 기록) — 배포 없이 값만 바뀜. 실측값만 표시, 없는 값은 [확인중]. 공개 경로라 비밀번호·키·개인 경로 금지 -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DBMS 적재 실시간 현황</title>
+<style>
+  :root { --bg:#f7f7f5; --card:#fff; --ink:#1f2328; --sub:#59636e; --line:#e3e3df; --ok:#1a7f37; --okbg:#e6f4ea; --warn:#9a6700; --warnbg:#fff4d6; --off:#59636e; --offbg:#eef0f2; --bad:#c62828; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111315; --card:#1a1d21; --ink:#e6e8eb; --sub:#9aa3ad; --line:#2c3137; --ok:#4ac26b; --okbg:#12301c; --warn:#d4a72c; --warnbg:#33290d; --off:#9aa3ad; --offbg:#24282d; --bad:#ff6b6b; } }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.6 system-ui, 'Malgun Gothic', sans-serif }
+  main { max-width:1080px; margin:0 auto; padding:28px 16px 48px }
+  h1 { font-size:22px; margin:0 0 4px }
+  .meta { color:var(--sub); margin:0 0 20px }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:20px }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px 14px }
+  .kpi b { display:block; font-size:22px; font-variant-numeric:tabular-nums }
+  .kpi span { color:var(--sub); font-size:12px }
+  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 18px; margin-bottom:14px; overflow-x:auto }
+  h2 { font-size:16px; margin:0 0 10px; display:flex; gap:8px; align-items:center }
+  table { width:100%; border-collapse:collapse; font-size:13px }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top }
+  th { color:var(--sub); font-weight:600 }
+  td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap }
+  code { font:12px ui-monospace, Consolas, monospace; background:var(--offbg); padding:1px 4px; border-radius:4px }
+  .b { display:inline-block; font-size:12px; font-weight:600; padding:1px 8px; border-radius:10px; white-space:nowrap }
+  .ok { color:var(--ok); background:var(--okbg) } .warn { color:var(--warn); background:var(--warnbg) } .off { color:var(--off); background:var(--offbg) }
+  .tbd { color:var(--bad); font-weight:600 }
+  .bar { height:8px; background:var(--offbg); border-radius:4px; overflow:hidden; min-width:80px; margin-top:6px }
+  .bar i { display:block; height:100%; background:var(--ok) }
+  footer { color:var(--sub); font-size:12px; margin-top:18px }
+  :root { --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --grid:#ececea; --axis:#898781 }
+  @media (prefers-color-scheme: dark) { :root { --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --grid:#2c3137 } }
+  .chart { position:relative; margin:0 0 10px }
+  .chart svg { width:100%; height:auto; display:block; font:11px system-ui, 'Malgun Gothic', sans-serif }
+  .tip { position:absolute; pointer-events:none; background:var(--card); color:var(--ink); border-radius:2px; padding:5px 9px; font-size:12px; box-shadow:0 1px 2px rgba(0,0,0,.25); white-space:nowrap }
+  .tip b { display:block; margin-bottom:3px; font-weight:600 } .tip div { display:flex; align-items:center; gap:7px; padding:2px 0 }
+  .tip i { display:inline-block; width:12px; height:12px }
+  #err { display:none; color:var(--bad); background:var(--card); border:1px solid var(--bad); border-radius:8px; padding:8px 12px; margin-bottom:14px }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="ttl">DBMS 적재 실시간 현황</h1>
+  <p class="meta" id="meta">조회 중…</p>
+  <div id="err"></div>
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <h2>1. 경과별 누적 완료율</h2>
+    <div class="chart"><svg id="pace" viewBox="0 0 800 340" role="img" aria-label="경과 시간별 누적 완료율 : 이번 실행과 기준 실행"></svg><div class="tip" id="tip" hidden></div></div>
+    <p class="meta" style="margin:0" id="paceNote"></p>
+  </section>
+
+  <section>
+    <h2>2. 주제영역별 (최신 측정)</h2>
+    <table id="areas"></table>
+  </section>
+
+  <section>
+    <h2>3. 활성 세션 대기 (최신 측정)</h2>
+    <table id="waits"></table>
+  </section>
+
+  <section>
+    <h2>4. 측정 기록 (5분 주기)</h2>
+    <table id="snaps"></table>
+  </section>
+
+  <section>
+    <h2>5. 설정</h2>
+    <p style="margin:0" id="cfg"></p>
+  </section>
+
+  <footer>값 출처 : DB <code>mon_load_hist</code>(로컬 갱신기 <code>pitel/bench/progress-push.mjs</code> 5분 주기 기록 — 적재 로그 · Oracle <code>v$sysstat</code> · <code>v$session</code> · <code>dba_segments</code> 실측) · 이 화면은 60초마다 다시 조회 · 기준선 = 기준 실행 로그의 같은 경과 시점 · <a href="dbms_load_newpc.html">DBMS 4종 적재 현황판</a></footer>
+</main>
+<script>
+(() => {
+  const RUN = new URLSearchParams(location.search).get('run') || 'ora_append_nolog_20261122'
+  const POLL = 60000, AREAS = ['PRD', 'CUS', 'ORD', 'PAY', 'INV', 'COL', 'PRM'], TM = 'enq: TM - contention'
+  const $ = id => document.getElementById(id)
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+  const TBD = '<span class="tbd">[확인중]</span>'
+  const has = v => v !== null && v !== undefined
+  const f = v => (has(v) ? Number(v).toLocaleString('ko-KR') : TBD)
+  const pct = (a, b) => (has(a) && b ? ((a / b) * 100).toFixed(1) + '%' : TBD)
+  const gb = v => (has(v) ? (v / 1e9).toFixed(1) + 'GB' : TBD)
+  const mb = v => (has(v) ? '+' + Math.round(v / 1048576).toLocaleString('ko-KR') + 'MB' : TBD)
+  const hms = ms => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}분 ${s % 60}초` } // elps_val = 밀리초
+  const kst = iso => new Date(iso).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+  const tm = r => (r.dtl_val && r.dtl_val.waits ? `${r.dtl_val.waits[TM] ?? 0} / ${r.dtl_val.sess_cnt}` : TBD)
+  let last = null
+
+  function render(rows) {
+    if (!rows.length) {
+      $('meta').innerHTML = `실행 <code>${esc(RUN)}</code> · ${TBD} 아직 기록 없음(갱신기 첫 기록 전)`
+      $('kpis').innerHTML = ''
+      return
+    }
+    const r = rows.at(-1), d = r.dtl_val || {}, bl = d.bas_lbl || '기준 실행'
+    $('ttl').textContent = `${r.dbms_nm} 적재 실시간 현황`
+    const st = r.end_yn === 'Y' ? `<span class="b ok">끝${d.end_rsn === 'NO_PROCESS' ? ' (적재 프로세스 없음)' : ''}</span>` : '<span class="b warn">진행 중</span>'
+    $('meta').innerHTML = `실행 <code>${esc(RUN)}</code> · 시작 ${d.first_dtm ? kst(d.first_dtm) : TBD} (KST) · 최신 측정 ${kst(r.msrmt_dtm)} · 화면 조회 ${kst(new Date().toISOString())} ${st}`
+    const kpi = (label, val, sub, bar) => `<div class="kpi"><span>${label}</span><b>${val}</b><span>${sub}</span>${bar != null ? `<div class="bar"><i style="width:${Math.min(100, bar)}%"></i></div>` : ''}</div>`
+    const p = r.goal_row_cnt ? (r.cmptn_row_cnt / r.goal_row_cnt) * 100 : null
+    $('kpis').innerHTML = [
+      kpi('완료율', pct(r.cmptn_row_cnt, r.goal_row_cnt), `경과 ${hms(r.elps_val)}`, p),
+      kpi('완료 행', f(r.cmptn_row_cnt), `목표 ${f(r.goal_row_cnt)}행`),
+      kpi(`${esc(bl)} 같은 경과`, pct(r.crtr_cmptn_row_cnt, r.goal_row_cnt), `${f(r.crtr_cmptn_row_cnt)}행`),
+      kpi('작업 단위', `${f(r.cmptn_unit_cnt)} / ${f(r.tot_unit_cnt)}`, `실패 ${f(r.fail_cnt)}`),
+      kpi('적재 크기', gb(r.load_sz), `LOB ${gb(d.lob_sz)} 포함`),
+      kpi('redo 증가', mb(r.redo_sz), '시작 전 기준 대비'),
+      kpi('TM 대기 세션', tm(r), `<code>${TM}</code> / 활성 세션`),
+    ].join('')
+
+    // 주제영역
+    const A = d.area || {}
+    $('areas').innerHTML = `<tr><th>주제영역</th><th class="n">목표 행</th><th class="n">${esc(bl)} 완료 행</th><th class="n">${esc(bl)} 완료율</th><th class="n">완료 행</th><th class="n">완료율</th><th class="n">크기</th></tr>` +
+      AREAS.map(a => { const x = A[a] || {}; return `<tr><td>${a}</td><td class="n">${f(x.tgt)}</td><td class="n">${f(x.bas)}</td><td class="n">${pct(x.bas, x.tgt)}</td><td class="n">${f(x.rows)}</td><td class="n">${pct(x.rows, x.tgt)}</td><td class="n">${gb(x.sz)}</td></tr>` }).join('')
+
+    // 대기
+    const W = d.waits ? Object.entries(d.waits).sort((a, b) => b[1] - a[1]) : null
+    $('waits').innerHTML = '<tr><th>대기 이벤트(대기 중이 아니면 ON CPU)</th><th class="n">세션</th></tr>' + (W ? W.map(([e, n]) => `<tr><td><code>${esc(e)}</code></td><td class="n">${f(n)}</td></tr>`).join('') + `<tr><td>합계(PITEL 활성 세션)</td><td class="n">${f(d.sess_cnt)}</td></tr>` : `<tr><td colspan="2">${TBD} Oracle 조회 실패 또는 미측정</td></tr>`)
+
+    // 측정 기록(최신 위)
+    $('snaps').innerHTML = `<tr><th>측정(KST)</th><th class="n">경과</th><th class="n">완료 행</th><th class="n">완료율</th><th class="n">${esc(bl)} 완료율</th><th class="n">작업 단위</th><th class="n">실패</th><th class="n">크기</th><th class="n">redo 증가</th><th class="n">TM 대기 / 세션</th></tr>` +
+      rows.slice().reverse().map(x => `<tr><td>${kst(x.msrmt_dtm)}${x.end_yn === 'Y' ? ' <span class="b ok">끝</span>' : ''}</td><td class="n">${hms(x.elps_val)}</td><td class="n">${f(x.cmptn_row_cnt)}</td><td class="n">${pct(x.cmptn_row_cnt, x.goal_row_cnt)}</td><td class="n">${pct(x.crtr_cmptn_row_cnt, x.goal_row_cnt)}</td><td class="n">${f(x.cmptn_unit_cnt)} / ${f(x.tot_unit_cnt)}</td><td class="n">${f(x.fail_cnt)}</td><td class="n">${gb(x.load_sz)}</td><td class="n">${mb(x.redo_sz)}</td><td class="n">${tm(x)}</td></tr>`).join('')
+
+    $('cfg').innerHTML = r.stng_txt ? esc(r.stng_txt) : TBD
+    chart(rows, bl)
+  }
+
+  // 선그래프 : x = 경과(분), y = 누적 완료율(%) — 이번(실선) vs 기준 실행(점선), 점 = 측정 시점(실측만, 보간 없음)
+  function chart(rows, bl) {
+    const svg = $('pace'), tip = $('tip'), NS = 'http://www.w3.org/2000/svg'
+    svg.innerHTML = ''
+    const S = [
+      { name: '이번', c: 'var(--s4)', p: rows.filter(x => x.goal_row_cnt).map(x => [x.elps_val / 60000, (x.cmptn_row_cnt / x.goal_row_cnt) * 100]) },
+      { name: bl, c: 'var(--s1)', dash: true, p: rows.filter(x => x.goal_row_cnt && has(x.crtr_cmptn_row_cnt)).map(x => [x.elps_val / 60000, (x.crtr_cmptn_row_cnt / x.goal_row_cnt) * 100]) },
+    ]
+    const XM = Math.max(60, Math.ceil(Math.max(0, ...rows.map(x => x.elps_val / 60000)) / 10) * 10)
+    const M = { t: 30, r: 160, b: 60, l: 70 }, W = 800, H = 340, L = M.l, R = W - M.r, T = M.t, B = H - M.b
+    const xs = m => L + (R - L) * m / XM, ys = v => B - (B - T) * v / 100
+    const el = (tag, a, txt, parent = svg) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; parent.appendChild(e); return e }
+    for (const v of [0, 20, 40, 60, 80, 100]) {
+      el('line', { x1: L, x2: R, y1: ys(v), y2: ys(v), stroke: 'var(--grid)' })
+      el('line', { x1: L - 5, x2: L, y1: ys(v), y2: ys(v), stroke: 'var(--axis)' }); el('text', { x: L - 9, y: ys(v) + 4, 'text-anchor': 'end', fill: 'var(--sub)' }, v)
+    }
+    for (let m = 0; m <= XM; m += 10) { el('line', { x1: xs(m), x2: xs(m), y1: B, y2: B + 5, stroke: 'var(--axis)' }); el('text', { x: xs(m), y: B + 18, 'text-anchor': 'middle', fill: 'var(--sub)' }, m) }
+    el('line', { x1: L, x2: R, y1: B, y2: B, stroke: 'var(--axis)' }); el('line', { x1: L, x2: L, y1: T, y2: B, stroke: 'var(--axis)' })
+    el('text', { x: (L + R) / 2, y: B + 44, 'text-anchor': 'middle', fill: 'var(--ink)' }, '경과 시간(분)')
+    el('text', { transform: `translate(${L - 46},${(T + B) / 2}) rotate(-90)`, 'text-anchor': 'middle', fill: 'var(--ink)' }, '누적 완료율(%)')
+    for (const s of S) {
+      if (!s.p.length) continue
+      el('polyline', { points: s.p.map(([m, v]) => xs(m) + ',' + ys(v)).join(' '), fill: 'none', stroke: s.c, 'stroke-width': 2, 'stroke-linejoin': 'round', ...(s.dash ? { 'stroke-dasharray': '6 5', opacity: .8 } : {}) })
+      for (const [m, v] of s.p) el('circle', { cx: xs(m), cy: ys(v), r: s.dash ? 4 : 5, fill: 'var(--card)', stroke: s.c, 'stroke-width': 2 })
+    }
+    S.forEach((s, i) => {
+      const g = el('g', { transform: `translate(${R + 24},${B - (S.length - i) * 24})` })
+      if (s.dash) el('line', { x1: 0, x2: 12, y1: 0, y2: 0, stroke: s.c, 'stroke-width': 2, 'stroke-dasharray': '4 3' }, null, g); else el('circle', { cx: 6, cy: 0, r: 6, fill: s.c }, null, g)
+      el('text', { x: 20, y: 4, fill: 'var(--ink)' }, s.name + (s.p.length ? '' : ' (기록 없음)'), g)
+    })
+    // 툴팁 : 마우스 x 에 가장 가까운 측정 시점
+    const cross = el('line', { y1: T, y2: B, stroke: 'var(--ink)', 'stroke-width': 1, 'stroke-dasharray': '6 6', opacity: .6, visibility: 'hidden' })
+    const hit = el('rect', { x: L, y: T, width: R - L, height: B - T, fill: 'transparent' })
+    hit.addEventListener('mousemove', e => {
+      const b = svg.getBoundingClientRect(), k = W / b.width, mx = ((e.clientX - b.left) * k - L) / (R - L) * XM
+      const i = rows.reduce((bi, x, j) => (Math.abs(x.elps_val / 60000 - mx) < Math.abs(rows[bi].elps_val / 60000 - mx) ? j : bi), 0), x = rows[i]
+      cross.setAttribute('x1', xs(x.elps_val / 60000)); cross.setAttribute('x2', xs(x.elps_val / 60000)); cross.setAttribute('visibility', 'visible')
+      tip.innerHTML = `<b>${hms(x.elps_val)} · ${kst(x.msrmt_dtm)}</b><div><i style="background:${S[0].c}"></i>이번 <b style="margin:0 0 0 auto;padding-left:10px">${pct(x.cmptn_row_cnt, x.goal_row_cnt)}</b></div><div><i style="background:${S[1].c}"></i>${esc(bl)} <b style="margin:0 0 0 auto;padding-left:10px">${pct(x.crtr_cmptn_row_cnt, x.goal_row_cnt)}</b></div>`
+      tip.hidden = false; const px = xs(x.elps_val / 60000) / k; tip.style.left = (px > b.width / 2 ? px - tip.offsetWidth - 14 : px + 14) + 'px'; tip.style.top = (T / k) + 'px'
+    })
+    hit.addEventListener('mouseleave', () => { cross.setAttribute('visibility', 'hidden'); tip.hidden = true })
+    $('paceNote').textContent = `측정 ${rows.length}회 · 점 = 실제 측정 시점(5분 주기), 선은 측정점을 이은 것 · ${bl} = 기준 로그의 같은 경과 시점 완료 행`
+  }
+
+  async function load() {
+    try {
+      const r = await fetch(`/api/mon/load?run=${encodeURIComponent(RUN)}`, { cache: 'no-store' })
+      const j = await r.json()
+      if (!r.ok || !j.ok) throw new Error(j.error || j.code || `HTTP ${r.status}`)
+      last = j.rows
+      $('err').style.display = 'none'
+      render(last)
+    } catch (e) {
+      $('err').textContent = `조회 실패 (${e.message}) — ${POLL / 1000}초 뒤 다시 조회${last ? ' · 아래는 직전 조회 값' : ''}`
+      $('err').style.display = 'block'
+      if (!last) $('meta').innerHTML = `실행 <code>${esc(RUN)}</code> · ${TBD}`
+    }
+  }
+  load()
+  setInterval(() => { if (!document.hidden) load() }, POLL)
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load() })
+})()
+</script>
+</body>
+</html>
