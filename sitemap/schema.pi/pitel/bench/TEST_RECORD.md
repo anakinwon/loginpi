@@ -140,7 +140,7 @@ node bench/analyze.mjs --log mssql/out/full_load.log > mssql/out/full_analysis.j
 | 7 | 진행 상태 파일 | `datagen/state/<db>_*` 없음 | 이어 넣기 방지 |
 | 8 | 외부 도구 접속 | DBeaver 등 끊김 | TS-09 |
 | 9 | 규모 | 배율 1 · 1,101,170,707행 | TS-01 |
-| 10 | 생성식 동일(PostgreSQL) | `gen.wpick`(plpgsql) 을 다른 3종처럼 CASE 로 인라인 — 그대로 두면 PostgreSQL 만 함수 호출 비용을 진다(7-1절 참고 지표) | 2026-11-21 조건 차이 ① |
+| 10 | 생성식 동일(PostgreSQL) | `gen.wpick`(plpgsql) 을 다른 3종처럼 CASE 로 인라인 — 그대로 두면 PostgreSQL 만 함수 호출 비용을 진다(7-1절 참고 지표) | 2026-11-21 조건 차이 ① · **2026-11-22 적용**(datagen.mjs pg 방언 CASE, 실측 1회 2.96µs → 0.09µs, 214 테이블 앞·끝 키 5,000개 생성값 대조 394건 불일치 0) |
 | 11 | 문자열 타입 동일(Oracle) | `MAX_STRING_SIZE=EXTENDED` 로 VARCHAR2(32767) 사용, CLOB 전환(n > 1,333) 없음 — CLOB 테이블 13개가 행 8.4% 로 Oracle 작업초의 35.9%(7-1절 실측 분해) | 2026-11-21 조건 차이 ② |
 | 12 | 로그 설정 동일 | MySQL 바이너리 로그 · MS-SQL 복구 모델 · PostgreSQL wal_level · Oracle 메모리를 같은 수준으로 맞추고 로그 첫 줄에 기록 | 2026-11-21 조건 차이 |
 
