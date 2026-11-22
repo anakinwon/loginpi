@@ -1,4 +1,4 @@
--- 20_cus_tables.sql : CUS(고객) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 20_cus_tables.sql : CUS(고객) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs tables --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 -- CUS-001 undefined · 예상 5,000,000행
@@ -591,7 +591,7 @@ CREATE TABLE PTL_CUS_AGRE_ITM_C (
   AGRE_ITM_VER_NO                VARCHAR2(20) NOT NULL,
   AGRE_ITM_NM                    VARCHAR2(100) NOT NULL,
   ESNTL_AGRE_YN                  CHAR(1) NOT NULL,
-  AGRE_ITM_CN                    CLOB,
+  AGRE_ITM_CN                    VARCHAR2(4000),
   AGRE_VLD_MCNT                  NUMBER(10),
   APLCN_BGNG_DT                  CHAR(8) NOT NULL,
   APLCN_END_DT                   CHAR(8),
@@ -758,7 +758,7 @@ CREATE TABLE PTL_CUS_CUST_CNSL_L (
   CNSL_TY_CD                     VARCHAR2(10) NOT NULL,
   CNSL_RSLT_TY_CD                VARCHAR2(10) NOT NULL,
   CNSL_SCNT                      NUMBER(10),
-  CNSL_CN                        CLOB,
+  CNSL_CN                        VARCHAR2(4000),
   CVLCPT_CNVR_YN                 CHAR(1) NOT NULL,
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
@@ -802,10 +802,10 @@ CREATE TABLE PTL_CUS_CUST_CVLCPT_L (
   CVLCPT_TY_CD                   VARCHAR2(10) NOT NULL,
   CVLCPT_ACPT_CHNL_TY_CD         VARCHAR2(10) NOT NULL,
   CVLCPT_PRCS_STTS_TY_CD         VARCHAR2(10) NOT NULL,
-  CVLCPT_CN                      CLOB,
+  CVLCPT_CN                      VARCHAR2(4000),
   PRCS_TMLMT_DT                  CHAR(8),
   PRCS_CMPTN_DTM                 TIMESTAMP,
-  PRCS_RSLT_CN                   CLOB,
+  PRCS_RSLT_CN                   VARCHAR2(4000),
   CMPNS_AMT                      NUMBER(15),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,

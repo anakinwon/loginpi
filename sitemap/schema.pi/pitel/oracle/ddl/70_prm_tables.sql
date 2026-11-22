@@ -1,4 +1,4 @@
--- 70_prm_tables.sql : PRM(파트너) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 70_prm_tables.sql : PRM(파트너) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs tables --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 -- PRM-001 파트너기본 · 예상 60,000행
@@ -426,7 +426,7 @@ CREATE TABLE PTL_PRM_FEE_PLCY_M (
   FEE_PLCY_STTS_TY_CD            VARCHAR2(10) NOT NULL,
   APLCN_BGNG_DT                  CHAR(8) NOT NULL,
   APLCN_END_DT                   CHAR(8),
-  FEE_PLCY_CN                    CLOB,
+  FEE_PLCY_CN                    VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
@@ -719,7 +719,7 @@ CREATE TABLE PTL_PRM_STLM_CFMTN_H (
   STLM_STTS_TY_CD                VARCHAR2(10) NOT NULL,
   PRCS_DTM                       TIMESTAMP NOT NULL,
   STLM_TRGT_AMT                  NUMBER(15) NOT NULL,
-  OBJC_CN                        CLOB,
+  OBJC_CN                        VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,

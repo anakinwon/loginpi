@@ -1,4 +1,4 @@
--- 60_col_tables.sql : COL(미납) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 60_col_tables.sql : COL(미납) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs tables --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 -- COL-001 undefined · 예상 20,000,000행
@@ -155,7 +155,7 @@ CREATE TABLE PTL_COL_DUN_L (
   DUN_MDM_TY_CD                  VARCHAR2(10) NOT NULL,
   DUN_TRGT_AMT                   NUMBER(15) NOT NULL,
   RCPTN_TELNO_ENCPT_VL           VARCHAR2(256),
-  DUN_CN                         CLOB,
+  DUN_CN                         VARCHAR2(4000),
   SNDNG_RSLT_RCPTN_DTM           TIMESTAMP,
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
@@ -603,7 +603,7 @@ CREATE TABLE PTL_COL_EXOFTRMN_PRNTC_L (
   DUN_MDM_TY_CD                  VARCHAR2(10) NOT NULL,
   PRNTC_SNDNG_STTS_TY_CD         VARCHAR2(10) NOT NULL,
   RCPTN_TELNO_ENCPT_VL           VARCHAR2(256),
-  PRNTC_CN                       CLOB,
+  PRNTC_CN                       VARCHAR2(4000),
   SNDNG_RSLT_RCPTN_DTM           TIMESTAMP,
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,

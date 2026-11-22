@@ -1,4 +1,4 @@
--- 30_ord_tables.sql : ORD(가입) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 30_ord_tables.sql : ORD(가입) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs tables --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 -- ORD-001 가입신청기본 · 예상 13,000,000행
@@ -337,7 +337,7 @@ CREATE TABLE PTL_ORD_OPNG_PRCS_L (
   OPNG_PRCS_TY_CD                VARCHAR2(10) NOT NULL,
   NTWK_LNK_RSLT_TY_CD            VARCHAR2(10) NOT NULL,
   OPNG_PRCS_CMPTN_DTM            TIMESTAMP,
-  OPNG_ERR_CN                    CLOB,
+  OPNG_ERR_CN                    VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,

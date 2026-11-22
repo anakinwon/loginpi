@@ -1,4 +1,4 @@
--- 40_pay_tables.sql : PAY(청구) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 40_pay_tables.sql : PAY(청구) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs tables --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 -- PAY-001 원시사용내역 · 예상 100,000,000행 · 월 RANGE CLCT_DTM 조각 217개
@@ -17,7 +17,7 @@ CREATE TABLE PTL_PAY_RAW_USE_L (
   USE_END_DTM                    TIMESTAMP,
   USE_HR_SCNT                    NUMBER(10),
   DATA_USE_BYTE_CNT              NUMBER(18),
-  RAW_RCRD_CN                    CLOB,
+  RAW_RCRD_CN                    VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
@@ -1153,7 +1153,7 @@ CREATE TABLE PTL_PAY_BILL_ADJ_L (
   ADJ_VAT_AMT                    NUMBER(15) NOT NULL,
   RFLT_BILL_YM                   CHAR(6),
   ADJ_APRV_DTM                   TIMESTAMP,
-  ADJ_CN                         CLOB,
+  ADJ_CN                         VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
@@ -1244,7 +1244,7 @@ CREATE TABLE PTL_PAY_USE_QTY_ERR_L (
   ERR_PRCS_STTS_TY_CD            VARCHAR2(10) NOT NULL,
   RE_PRCS_NMTM                   NUMBER(10) NOT NULL,
   LAST_RE_PRCS_DTM               TIMESTAMP,
-  ERR_CN                         CLOB,
+  ERR_CN                         VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
@@ -1977,7 +1977,7 @@ CREATE TABLE PTL_PAY_BILL_JOB_STEP_H (
   BILL_JOB_STEP_STTS_TY_CD       VARCHAR2(10) NOT NULL,
   PRCS_NOCS                      NUMBER(10) NOT NULL,
   ERR_NOCS                       NUMBER(10) NOT NULL,
-  ERR_CN                         CLOB,
+  ERR_CN                         VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,

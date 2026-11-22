@@ -1,4 +1,4 @@
--- 10_prd_tables.sql : PRD(상품) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 10_prd_tables.sql : PRD(상품) 테이블·주석(PK·인덱스 없음) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs tables --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 -- PRD-001 상품기본 · 예상 20,000행
@@ -15,7 +15,7 @@ CREATE TABLE PTL_PRD_PROD_M (
   SALE_END_DT                    CHAR(8),
   MM_FXAMT_AMT                   NUMBER(15),
   VAT_INCL_YN                    CHAR(1) NOT NULL,
-  PROD_CN                        CLOB,
+  PROD_CN                        VARCHAR2(4000),
   LST_MDDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
   LST_MDFR_ID                    VARCHAR2(50) DEFAULT 'ADMIN' NOT NULL,
   LST_RGDTM                      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,

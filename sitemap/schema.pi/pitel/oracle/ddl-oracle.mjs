@@ -14,8 +14,9 @@ const OUT = path.join(HERE, 'ddl')
 const DBMS = '0001' // ORACLE
 // 타입 대응 : schema.pi std_tp_map(2026-11-15 조회) — 논리타입 0003 character varying→VARCHAR2, 0001 character→CHAR, 0015 numeric→NUMBER, 0020 timestamp→TIMESTAMP, 0008 text→CLOB
 const TP = { VARCHAR: 'VARCHAR2', CHAR: 'CHAR', NUMERIC: 'NUMBER', TIMESTAMP: 'TIMESTAMP' }
-// VARCHAR2 상한 4,000바이트(MAX_STRING_SIZE=STANDARD). 한글 3바이트라 n > 1333 글자는 넘칠 수 있어 CLOB(datagen.mjs LOB_CHARS 와 같은 값)
-const LOB_CHARS = 1333
+// VARCHAR2 상한 = MAX_STRING_SIZE=EXTENDED 32,767바이트(2026-11-22 현황판 8절 ①-1 : ORCLPDB EXTENDED 필수). 한글 3바이트라 n > 10922 글자만 CLOB(datagen.mjs LOB_CHARS 와 같은 값)
+//  이전 STANDARD 기준 1333(4,000바이트 ÷ 3) 은 VARCHAR(4000) 14칼럼을 CLOB 로 만들어 Oracle 작업초 35.9% 를 차지했다
+const LOB_CHARS = 10922
 const AREA = { PRD: '10_prd', CUS: '20_cus', ORD: '30_ord', PAY: '40_pay', INV: '50_inv', COL: '60_col', PRM: '70_prm' }
 
 const typeOf = dataTp => {

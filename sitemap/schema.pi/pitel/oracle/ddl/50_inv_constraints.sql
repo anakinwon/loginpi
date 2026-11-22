@@ -1,4 +1,4 @@
--- 50_inv_constraints.sql : INV(수납) PK·인덱스(적재 뒤) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 50_inv_constraints.sql : INV(수납) PK·인덱스(적재 뒤) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs constraints --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 CREATE UNIQUE INDEX PK_PTL_INV_RCV_M ON PTL_INV_RCV_M (RCV_NO, RCV_DT) LOCAL;

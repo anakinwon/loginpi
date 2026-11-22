@@ -1,4 +1,4 @@
--- 60_col_constraints.sql : COL(미납) PK·인덱스(적재 뒤) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-15, 직접 수정 금지)
+-- 60_col_constraints.sql : COL(미납) PK·인덱스(적재 뒤) — Oracle 판, ModelPi genDdl(Oracle 0001) + pitel 조각·인덱스 규칙(oracle/ddl-oracle.mjs 생성 2026-11-22, 직접 수정 금지)
 -- 실행 : node oracle/s1.mjs constraints --target oracle (세션 NLS_LENGTH_SEMANTICS = CHAR)
 
 CREATE UNIQUE INDEX PK_PTL_COL_UNPD_M ON PTL_COL_UNPD_M (UNPD_NO);

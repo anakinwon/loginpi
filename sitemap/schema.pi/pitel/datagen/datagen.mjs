@@ -42,7 +42,7 @@ const q = s => "'" + String(s).replace(/'/g, "''") + "'"
 // SQL 방언 : pg = 기존 출력(글자 단위로 같음), oracle = oracle/gen_pkg.sql 의 GEN 패키지(--target oracle, PRD dbms.pi 11.6 ORA-R05)
 //  Oracle 차이 : 정수 나눗셈 TRUNC·나머지 MOD, 배열 → '|' 구분 문자열·CASE, null_p(다형) → CASE, generate_series → 파이프라인 gen.series,
 //  VARCHAR(n) 가 4,000바이트를 넘을 수 있는 칼럼(n > 1333, 한글 3바이트) = CLOB(oracle/ddl-oracle.mjs 와 같은 규칙)
-const LOB_CHARS = 1333
+const LOB_CHARS = 10922 // Oracle EXTENDED 기준(oracle/ddl-oracle.mjs 와 같은 값, 2026-11-22) : 이전 STANDARD 1333
 // gen.dtm_to_k 의 JS 계산(조각 경계용) : 일시 → 키 번호 근사, recent_dtm 의 역함수
 function dtmToK(y, n) {
   const t0 = Date.UTC(2010, 0, 1), t1 = Date.UTC(2026, 9, 31, 23, 59, 59)
