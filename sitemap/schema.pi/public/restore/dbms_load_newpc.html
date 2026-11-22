@@ -133,23 +133,22 @@
   </section>
 
   <section>
-    <h2>6. 순위 해석 : 예상과 다른 이유와 보정</h2>
-    <p class="meta" style="margin:0 0 8px">예상 Oracle &gt; PostgreSQL &gt; MS-SQL &gt; MySQL · 실제 MS-SQL &gt; Oracle &gt; MySQL &gt; PostgreSQL · 근거 = 실행 로그 조각 시간 합, 테이블 149개 행당 비용 회귀(R² PostgreSQL 0.93) · 기록 = <code>pitel/bench/TEST_RECORD.md</code> 7-1절</p>
-    <p style="margin:0 0 10px;padding:8px 12px;border-left:3px solid var(--warn);background:var(--warnbg)"><b>결론</b> : 순위를 가른 것은 엔진 성능보다 <b>DBMS별 생성·저장 조건 차이 2건</b>이다. 두 조건을 보정하면 순위가 <b>마스터 예상과 같아진다</b>(추정)</p>
+    <h2>6. 순위 해석 : 실측 순위와 재측정 참고 지표</h2>
+    <p class="meta" style="margin:0 0 8px">순위는 실측값만 쓴다 · 기록 = <code>pitel/bench/TEST_RECORD.md</code> 7-1절</p>
     <table>
-      <tr><th>왜곡 원인</th><th>근거</th><th>영향</th></tr>
-      <tr><td>① PostgreSQL 판만 가중 선택을 PL/pgSQL 함수 <code>gen.wpick</code> 으로 호출(다른 3종 = CASE 인라인)</td><td>22.99억 회 × 9.75µs = 22,406 작업초</td><td class="n">PostgreSQL 작업 시간의 36%</td></tr>
-      <tr><td>② Oracle 판만 14개 칼럼을 CLOB 로(<code>MAX_STRING_SIZE=STANDARD</code> 4,000바이트 한도), 행마다 임시 LOB 생성</td><td>LOB 테이블 13개(행 8.4%) Oracle 15,621 · MS-SQL 3,783 작업초(4.13배). 나머지 201개는 Oracle 이 4종 중 가장 빠름(MS-SQL 대비 0.73배)</td><td class="n">Oracle 작업 시간의 35.9%</td></tr>
+      <tr><th class="n">실측 순위</th><th>DBMS</th><th class="n">생성 시간(실측)</th><th class="n">마스터 예상 순위</th></tr>
+      <tr><td class="n best">1</td><td>MS-SQL 2022 CU28</td><td class="n best">46분 44초</td><td class="n">3</td></tr>
+      <tr><td class="n">2</td><td>Oracle 21c EE</td><td class="n">49분 54초</td><td class="n">1</td></tr>
+      <tr><td class="n">3</td><td>MySQL 26.10.0</td><td class="n">50분 15초</td><td class="n">4</td></tr>
+      <tr><td class="n">4</td><td>PostgreSQL 17.12</td><td class="n">70분 0초</td><td class="n">2</td></tr>
     </table>
-    <h3 style="font-size:14px;margin:14px 0 6px">보정 추정 순위</h3>
+    <p class="meta" style="margin:6px 0 0">2위와 3위 차이 21초(0.7%), 1위와 2위 차이 6.8%</p>
+    <p style="margin:14px 0 10px;padding:8px 12px;border-left:3px solid var(--warn);background:var(--warnbg)"><b>참고 지표 (순위·결과 아님)</b> : 아래는 4종의 생성·저장 조건이 서로 달랐던 점을 찾은 재측정용 자료다. 추정값으로 순위를 매기거나 결과로 인용하지 않는다. 마스터 예상 순위의 검증은 아래 재측정 조건을 지킨 실측으로만 한다</p>
     <table>
-      <tr><th class="n">순위</th><th>DBMS</th><th>보정</th><th class="n">실측</th><th class="n">보정 추정</th></tr>
-      <tr><td class="n">1</td><td>Oracle</td><td>LOB 테이블을 MS-SQL 속도로(31,729 작업초)</td><td class="n">49분 54초</td><td class="n best">약 36분</td></tr>
-      <tr><td class="n">2</td><td>PostgreSQL</td><td>wpick 비용 제거(40,372 작업초)</td><td class="n">70분 0초</td><td class="n">약 45분</td></tr>
-      <tr><td class="n">3</td><td>MS-SQL</td><td>없음</td><td class="n">46분 44초</td><td class="n">46분 44초</td></tr>
-      <tr><td class="n">4</td><td>MySQL</td><td>없음(바이너리 로그 끔 조건은 유리)</td><td class="n">50분 15초</td><td class="n">50분 15초</td></tr>
+      <tr><th>조건 차이</th><th>실측 분해(로그 조각 시간 합)</th><th>추정(모형, 참고)</th></tr>
+      <tr><td>① PostgreSQL 판만 가중 선택을 PL/pgSQL 함수 <code>gen.wpick</code> 으로 호출(다른 3종 = CASE 인라인)</td><td>행당 가중 선택이 많은 CUS · COL · ORD 에서 PostgreSQL ÷ MS-SQL 1.79~1.96배, 적은 INV · PRM 에서 1.40배</td><td>회귀 추정 9.75µs/회, PostgreSQL 작업 시간의 약 36%</td></tr>
+      <tr><td>② Oracle 판만 14개 칼럼을 CLOB 로(<code>MAX_STRING_SIZE=STANDARD</code> 4,000바이트 한도), 행마다 임시 LOB 생성</td><td>LOB 테이블 13개(행 8.4%) 작업초 Oracle 15,621 · MS-SQL 3,783 = Oracle 작업초의 35.9%</td><td>임시 LOB 원인은 이전 PC 대기 분석 기준 추정, 새 PC 대기 미측정</td></tr>
     </table>
-    <p class="meta" style="margin:6px 0 0">추정 = 작업초 비율로 실제 시간을 비례 환산 · 2·3위 차이 약 1분이라 재측정으로 확정</p>
     <h3 style="font-size:14px;margin:14px 0 6px">재측정 조건(<code>TEST_RECORD.md</code> 6절 점검표 10~12번)</h3>
     <table>
       <tr><th class="n">#</th><th>조건</th><th>대상</th></tr>
