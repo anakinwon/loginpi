@@ -174,7 +174,7 @@
       <tr><td class="n">7</td><td>진행 기록 파일</td><td>완료 조각 기록 없음(남으면 건너뜀)</td><td>빈 실패 기록 1개(완료 기록 0)</td><td><span class="b ok">통과</span></td></tr>
       <tr><td class="n">8</td><td>외부 도구 접속</td><td>DBeaver 등 끊김(TS-09) · 다른 도구가 컨테이너를 건드리지 않음(TS-30)</td><td>DBeaver 프로세스 0</td><td><span class="b ok">통과</span></td></tr>
       <tr><td class="n">9</td><td>규모 · plan 방언</td><td>배율 1 · 1,101,170,707행, plan.json = PostgreSQL 방언(TS-26)</td><td><code>generate_series</code> 214 · 다른 방언 0</td><td><span class="b ok">통과</span></td></tr>
-      <tr><td class="n">10</td><td>생성식 동일(<code>gen.wpick</code> CASE 인라인)</td><td>재측정 조건(6절)</td><td>미적용(코드 그대로)</td><td><span class="b warn">마스터 결정</span></td></tr>
+      <tr><td class="n">10</td><td>생성식 동일(<code>gen.wpick</code> CASE 인라인)</td><td>재측정 조건(6절)</td><td>적용(마스터 결정 B) · 1회 2.96µs → 0.09µs 실측 · 214 테이블 생성값 대조 394건 불일치 0</td><td><span class="b ok">통과</span></td></tr>
       <tr><td class="n">11</td><td>Oracle 문자열 타입</td><td>Oracle 재측정 조건</td><td>이번 PostgreSQL 적재와 무관</td><td><span class="b off">해당 없음</span></td></tr>
       <tr><td class="n">12</td><td>로그 설정 동일</td><td>어제 PostgreSQL 측정과 같은 설정</td><td>shared_buffers 8GB · max_wal_size 16GB · synchronous_commit off · wal_level logical · /dev/shm 1GB</td><td><span class="b ok">통과</span></td></tr>
     </table>
@@ -183,7 +183,7 @@
     <h3 style="font-size:14px;margin:14px 0 6px">③ 적재 시나리오 (마스터 "시작" 지시 후)</h3>
     <table>
       <tr><th class="n">단계</th><th>작업</th><th>근거</th></tr>
-      <tr><td class="n">1</td><td>점검표 10번 결정 반영(인라인 적용 시 코드 수정 · 기능 점검 뒤 시작)</td><td>마스터 결정</td></tr>
+      <tr><td class="n">1</td><td>점검표 10번 반영 완료(CASE 인라인 · 생성값 대조 통과)</td><td>마스터 결정 B (2026-11-22)</td></tr>
       <tr><td class="n">2</td><td><code>ALTER SYSTEM SET autovacuum = off</code> + 설정 다시 읽기 (현재 on)</td><td>rebuild data 단계 · 어제 로그 첫 줄 autovacuum off</td></tr>
       <tr><td class="n">3</td><td>로그 첫 줄에 설정 기록 → <code>bench/launch.mjs &lt;로그&gt; run --db prod --yes --schema public --scale 1 --jobs 15</code></td><td>TEST_RECORD 5절 · rebuild data 단계 인자</td></tr>
       <tr><td class="n">4</td><td>5분마다 진행 보고 <code>bench/progress.mjs --target pg</code>, 첫 10분 대기 종류 확인(#6)</td><td>TEST_RECORD 5절</td></tr>
