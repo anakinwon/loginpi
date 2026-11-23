@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 환경변수 금고(scripts/env-vault.mjs) — 공개 저장소라 암호문도 커밋 금지, 비공개 저장소 loginpi-secrets 에만
+env-vault.enc
+*.vault.enc
 
 # vercel
 .vercel
@@ -123,3 +126,6 @@ mypoplist/videos/
 
 # VPS 접속 메모(루트 비밀번호 포함) — 커밋 금지(2026-10-31)
 sitemap/seminar.pi/docs/vultr.com.md
+
+# 새 PC 복원용 백업 폴더 — .env 원본·대화 이력 포함, 공개 저장소 커밋 금지
+/BACKUP*/

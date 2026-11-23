@@ -349,7 +349,12 @@ Git Bash 에서 `loginpi` 폴더 기준으로 실행한다.
 
 - [ ] **이 가이드 파일 복사** — `.claude/setup/.pgm_list.md` 는 `.gitignore` 의 `.claude/*` 규칙에 걸려 clone 으로 따라오지 않는다. USB·클라우드로 함께 옮겨 새 PC 의 같은 경로에 둔다
 - [ ] **미커밋 변경 처리** — G-3. 다른 저장소도 `git -C <폴더> status --short` 로 확인
-- [ ] **`.env*` 10개 백업**(마스터가 직접, `E:` = USB 예시)
+- [ ] **`.env*` 금고 갱신(권장, 2026-11-17 신설)** — USB 복사 대신 암호문 1개로 비공개 저장소에 보관한다
+  - 옛 PC : `node scripts/env-vault.mjs pack` → 암호문구 입력(12자 이상, 저장하지 않음) → `$WORKSPACE_ROOT/loginpi-secrets/env-vault.enc` → 그 폴더에서 commit·push
+  - 새 PC : `git clone https://github.com/anakinwon/loginpi-secrets.git`(비공개, `$WORKSPACE_ROOT` 아래) → loginpi 에서 `pnpm install` 뒤 `node scripts/env-vault.mjs unpack` → 암호문구 입력 → `.env*` 전부 원래 경로로 복원
+  - 확인만 : `node scripts/env-vault.mjs list`(키 개수만) · 미리보기 `unpack --dry-run` · 내용이 다른 기존 파일은 `--force` 때만 덮어씀
+  - ⚠ loginpi 는 **공개** 저장소 — 금고 파일을 loginpi 에 커밋 금지(`.gitignore` 로 차단). `.env*` 를 바꿀 때마다 pack 다시 실행
+- [ ] **`.env*` 10개 백업**(금고를 안 쓸 때만, 마스터가 직접, `E:` = USB 예시)
 
 ```powershell
 cd C:\Users\anaki\workspace\loginpi
