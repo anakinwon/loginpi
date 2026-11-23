@@ -20,7 +20,7 @@
       "command": "uvx",
       "args": [
         "--python",
-        "C:\\Users\\anaki\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "C:\\Users\\WonYoungRok\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
         "--from",
         "git+https://github.com/oraios/serena",
         "serena",

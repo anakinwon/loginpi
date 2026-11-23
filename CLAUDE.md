@@ -331,7 +331,7 @@ sitemap/cafe.pi/src/
 
 **트리거 (필수):** **매 세션 첫 도구 호출 전, 그리고 계획을 세우거나 제안하기 전에** `task-observer` 스킬을 호출하라. 도구를 한 번이라도 쓸 턴이면 아무리 단순해 보여도 해당한다. 이 스킬은 description 매칭만으로는 활성화가 보장되지 않으므로 이 지시문이 유일한 강제 수단이다.
 
-**관찰 로그 위치:** `~/.claude/projects/C--Users-anaki-workspace-loginpi/skill-observations/`
+**관찰 로그 위치:** `~/.claude/projects/C--Users-WonYoungRok-workspace-loginpi/skill-observations/`
 (cwd가 아니라 세션을 가로질러 유지되는 **고정 절대경로**를 쓴다. git worktree 등 임시 체크아웃 안이면 안 된다.)
 
 **출처:** `rebelytics/one-skill-to-rule-them-all` (CC BY 4.0) — 실체는 `.agents/skills/task-observer/`
@@ -390,6 +390,6 @@ sitemap/cafe.pi/src/
 
 ## 워크스페이스 루트 전역변수 + 작업 이력 로그 (2026-09-20 마스터 지시)
 
-- **`WORKSPACE_ROOT` = `C:/Users/anaki/workspace`** — 정의처 2곳: Windows 사용자 환경변수(`setx`, 새 프로세스부터 적용) + `.claude/settings.json`의 `env`. 프로젝트 루트는 `$WORKSPACE_ROOT/loginpi`.
+- **`WORKSPACE_ROOT` = `C:/Users/WonYoungRok/workspace`** — 정의처 2곳: Windows 사용자 환경변수(`setx`, 새 프로세스부터 적용) + `.claude/settings.json`의 `env`. 프로젝트 루트는 `$WORKSPACE_ROOT/loginpi`.
 - **절대경로 하드코딩 금지** — 참조 형식: bash/훅/statusLine `$WORKSPACE_ROOT`, `.mcp.json` 등 Claude JSON `${WORKSPACE_ROOT}`(공식 확장 지원), Node `process.env.WORKSPACE_ROOT`, 에이전트 프롬프트(.md) `${WORKSPACE_ROOT}/loginpi/...`(에이전트가 이 정의로 해석). 구 폴더명 `cafe-pi-claude` 경로는 전부 사문 — `loginpi`로 교정 완료.
 - **작업 이력 로그 (v2, 2026-09-20 10인 평가 반영)**: `work-history/YYYY/MM/YYYY-MM-DD.log`(사람용) + `.jsonl`(통계용, 턴당 1레코드 `id=<session>:<turn>.<part>`, part>1은 구간 델타, `fix` 레코드로 늦게 도착한 훅·턴 소요 보정) — `.claude/hooks/work-history-logger.mjs`가 Stop·SessionEnd 훅에서 세션 기록을 바이트 오프셋 증분으로 읽어 생성. **Stop 훅은 `로거 && work-stats-refresh.mjs`를 동기로 실행**(갱신 본체는 분리 프로세스라 훅은 0.2초에 반환, SessionEnd 로거와 직렬화) → 매 응답마다 `work-statistics/`(일·주·월·년 통계·main-dashboard HTML)와 `work-statistics/mywork/`(요청별 모델·effort 변경이력·모델 운용 대시보드) 자동 갱신, 오류는 `%TEMP%/work-stats-refresh.err`. 하위 앱 `sitemap/sitemap.pi/.claude/settings.json`도 같은 훅을 호출하고 env `WORK_HISTORY_PROJECT=sitemap.pi`로 project만 구분(같은 work-history에 기록). 공용 정의(카테고리 점수제·단가·마스킹·포맷)는 `scripts/work-history-core.mjs` 단일 소스. **`work-history/`·`work-statistics/`는 gitignore**(대화 전문 포함 — 저장소에 올리지 말 것). 회귀 테스트 `pnpm test`(node:test, test/work-history.test.mjs). 상태 파일 `.omc/state/work-history/`. **지표 정의 레지스트리** `core.METRICS`(+`KPI_TREE`, 보고서가 `<stem>.metrics.json` 동봉) — North Star는 `cost_per_request`(서브에이전트 비용 포함 ÷ distinct 요청), 후행 지표 첫 응답 대기·교정률, 선행 지표 컨텍스트 팽창률·재작업률·무검증률·오류 회복 배수. `cache_hit`·레코드 수·출력 토큰은 허영 지표. 서브에이전트 기록(`<transcript dir>/<sid>/subagents/`)은 로거가 Stop마다 스캔해 디스패치 턴에 `agent` 레코드로 귀속. **통계 파일·차트 보고서** (기간 4종 — 일별 `YYYY/MM/<날짜>`, 주별 `YYYY/weekly/<YYYY-Www>`(ISO 월~일), 월별 `YYYY/MM/<YYYY-MM>`, 년도별 `YYYY/<YYYY>`, 각각 이전 기간 대비 증감 포함): `pnpm work:report [--period day|week|month|year|all] [--date YYYY-MM-DD]` → `work-statistics/…/<stem>.{summary,tokens,usage,performance}.{json,csv,md}` + `turns.csv` + `report.html`(①토큰 ②agent/mcp/skill/plugin/hook ③성능 섹션) + 스크린샷 `charts.png`(agent-browser). 터미널 통계: `pnpm work:stats --type kpi|summary|tokens|usage|performance|all`(kpi = KPI 트리·경보·질문 판정). **지표 체계 문서 `docs/WORK_METRICS.md`는 `pnpm work:metrics-doc`로 레지스트리에서 생성** — 손으로 고치지 말고 `core.METRICS`를 고칠 것 [--month 2026-09] [--by category|tool|day|hour|weekday|session|skill|mcp|agent] [--csv] [--json] [--list]`. 카테고리는 요청문 키워드로 자동 판정(GIT·DEPLOY·INSTALL·FIX·TEST·DATA·REFACTOR·CONFIG·DOCS·FEATURE·QUERY·OTHER), 요청문에 `#cat:NAME`으로 강제 가능.
