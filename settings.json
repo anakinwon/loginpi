@@ -6,7 +6,7 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "MAX_THINKING_TOKENS": "8000",
     "OTEL_METRICS_EXPORTER": "otlp",
-    "BASH_ENV": "/c/Users/WonYoungRok/.claude/bash-env.sh"
+    "BASH_ENV": "/c/Users/anaki/.claude/bash-env.sh"
   },
   "permissions": {
     "allow": [
