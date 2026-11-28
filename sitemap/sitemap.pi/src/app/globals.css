@@ -1301,6 +1301,76 @@
   .admin-table tr.admin-table-detail td {
     @apply bg-neutral-50 dark:bg-neutral-900/40;
   }
+  /* PC 도구 현황(/admin/tools, src/tools) — 다크 단일 테마 표면·테두리, 종류 색은 KPI 상단 띠·점에만(src/tools/types.ts KIND_COLOR) */
+  .tool-panel {
+    @apply rounded-xl border border-neutral-800 bg-neutral-950/60 p-4;
+  }
+  .tool-panel-title {
+    @apply mb-2 text-sm font-semibold text-neutral-200;
+  }
+  .tool-status {
+    @apply flex flex-col gap-3 rounded-xl border border-neutral-800 bg-neutral-950/60 px-4 py-3 md:flex-row md:items-center md:justify-between;
+  }
+  .tool-status-meta {
+    @apply grid grid-cols-2 gap-x-6 gap-y-1 text-sm md:flex md:gap-8;
+  }
+  .tool-status-meta dt {
+    @apply text-xs text-neutral-500;
+  }
+  .tool-live {
+    @apply inline-block size-2.5 rounded-full bg-emerald-500;
+  }
+  .tool-live-off {
+    @apply bg-red-500;
+  }
+  .tool-kpi {
+    @apply rounded-xl border border-t-2 border-neutral-800 bg-neutral-950/60 p-4;
+  }
+  .tool-kpi-label {
+    @apply text-xs font-medium tracking-wide text-neutral-400;
+  }
+  .tool-kpi-value {
+    @apply mt-1 text-3xl font-bold text-neutral-50 tabular-nums;
+  }
+  .tool-kpi-sub {
+    @apply text-xs text-neutral-500;
+  }
+  .tool-kpi-grid {
+    @apply mt-3 grid grid-cols-2 gap-2 border-t border-neutral-800 pt-2 text-sm;
+  }
+  .tool-kpi-grid dt {
+    @apply text-xs text-neutral-500;
+  }
+  .tool-kpi-grid dd {
+    @apply font-semibold text-neutral-200 tabular-nums;
+  }
+  .tool-tabs {
+    @apply flex flex-wrap gap-1;
+  }
+  .tool-tab {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-transparent px-2.5 py-1 text-sm text-neutral-400 hover:text-neutral-100;
+  }
+  .tool-tab[aria-selected='true'] {
+    @apply border-neutral-700 bg-neutral-900 text-neutral-50;
+  }
+  .tool-tab-n {
+    @apply text-xs text-neutral-500 tabular-nums;
+  }
+  .tool-dot {
+    @apply mr-1.5 inline-block size-2 rounded-full align-middle;
+  }
+  .tool-tab .tool-dot {
+    @apply mr-0;
+  }
+  .tool-sort {
+    @apply inline-flex items-center gap-1 font-medium;
+  }
+  .tool-badge-on {
+    @apply rounded px-1.5 py-0.5 text-xs text-emerald-300 ring-1 ring-emerald-800;
+  }
+  .tool-badge-off {
+    @apply rounded px-1.5 py-0.5 text-xs text-neutral-400 ring-1 ring-neutral-700;
+  }
 }
 
 /* 홈 배경 은하수(bubble-home <img>) — 시간에 따라 천천히 흐르는 켄 번즈 : 확대 1 → 1.18 + 좌우·상하 드리프트, 120초 왕복.

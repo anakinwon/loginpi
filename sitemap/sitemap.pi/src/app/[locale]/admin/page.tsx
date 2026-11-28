@@ -1,6 +1,7 @@
 // 관리 — 신청 관리(사용 시작·반려·정지·복구)·신고 처리. 서버 redirect 없이 클라이언트 게이트, 권한은 API(isAdmin)가 401/403 으로 판정
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { AdminPanel } from '@/components/admin-panel'
+import { Link } from '@/i18n/navigation'
 
 export default async function AdminPage({
   params,
@@ -12,7 +13,12 @@ export default async function AdminPage({
   const t = await getTranslations('admin')
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t('title')}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
+        <Link href="/admin/tools" className="btn">
+          {t('toolsLink')}
+        </Link>
+      </div>
       <AdminPanel />
     </div>
   )

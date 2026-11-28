@@ -339,7 +339,8 @@
     "colPayDtm": "Paid at",
     "colAply": "Applied at",
     "colUse": "Usage period",
-    "tabCfg": "Settings"
+    "tabCfg": "Settings",
+    "toolsLink": "PC tools"
   },
   "apiErrors": {
     "AUTH_REQUIRED": "Sign-in required",
@@ -432,5 +433,65 @@
       "plan": "Plan",
       "owner": "Owner"
     }
+  },
+  "tools": {
+    "title": "PC tools",
+    "subtitle": "Install and usage status of Claude Code tools (skills, agents, plugins, hooks, MCP) on this PC, from snapshots pushed periodically by the local uploader",
+    "back": "Site admin",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "loading": "Loading",
+    "noData": "No snapshot has been uploaded yet. Run the uploader on this PC.",
+    "uploaderOk": "Uploader live",
+    "uploaderStale": "Uploader not responding",
+    "lastMsrmt": "Last measured",
+    "pc": "PC",
+    "cycle": "Interval",
+    "cycleSec": "{sec}s",
+    "period": "Usage period",
+    "turns": "{n} turns",
+    "installed": "installed",
+    "active": "Active",
+    "used": "Used",
+    "usedEvents": "Events run",
+    "kind": {
+      "skill": "Skills",
+      "agent": "Agents",
+      "plugin": "Plugins",
+      "hook": "Hooks",
+      "mcp": "MCP"
+    },
+    "src": {
+      "user": "User",
+      "project": "Project",
+      "plugin": "Plugin",
+      "local": "Local",
+      "none": "Not in install list"
+    },
+    "chartInstalled": "Installed by type",
+    "chartTop": "Top {n} by usage",
+    "chartDaily": "Daily usage (calls, hooks excluded)",
+    "chartHooks": "Hook runs by event",
+    "chartEmpty": "No data to show",
+    "tabAll": "All",
+    "search": "Search name",
+    "colName": "Name",
+    "colType": "Type",
+    "colSrc": "Source",
+    "colVer": "Version",
+    "colOn": "Active",
+    "colTurns": "Turns",
+    "colCalls": "Calls",
+    "colErrors": "Errors",
+    "colAvgMs": "Avg ms",
+    "on": "On",
+    "off": "Off",
+    "emptyRows": "Nothing here.",
+    "hookUsageNote": "Hook usage is recorded per event only, so individual hook rows show no usage. See the \"Hook runs by event\" chart. Usage figures come from the work history in the usage period.",
+    "deltaHours": "(vs {n}h ago)",
+    "deltaMinutes": "(vs {n}m ago)",
+    "fetchFailed": "Fetch failed",
+    "statusUnknown": "Status unknown (fetch failed)",
+    "detailMissing": "No detail record matches the latest measurement. It will appear after the next upload."
   }
 }

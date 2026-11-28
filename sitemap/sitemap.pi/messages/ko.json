@@ -339,7 +339,8 @@
     "colPayDtm": "결제일시",
     "colAply": "신청일시",
     "colUse": "사용기간",
-    "tabCfg": "운영 설정"
+    "tabCfg": "운영 설정",
+    "toolsLink": "도구 현황"
   },
   "apiErrors": {
     "AUTH_REQUIRED": "로그인이 필요합니다",
@@ -432,5 +433,65 @@
       "plan": "요금제",
       "owner": "소유자"
     }
+  },
+  "tools": {
+    "title": "PC 도구 현황",
+    "subtitle": "이 PC 에 설치된 Claude Code 도구(스킬·에이전트·플러그인·훅·MCP)의 설치·사용 현황 — 로컬 업로더가 주기적으로 올린 스냅숏",
+    "back": "사이트 관리",
+    "refresh": "새로고침",
+    "retry": "다시 시도",
+    "loading": "불러오는 중",
+    "noData": "아직 올라온 스냅숏이 없습니다. 이 PC 에서 업로더를 실행하세요.",
+    "uploaderOk": "업로더 정상",
+    "uploaderStale": "업로더 응답 없음",
+    "lastMsrmt": "마지막 측정",
+    "pc": "PC",
+    "cycle": "수집 주기",
+    "cycleSec": "{sec}초",
+    "period": "사용 집계 기간",
+    "turns": "턴 {n}",
+    "installed": "설치",
+    "active": "활성",
+    "used": "사용",
+    "usedEvents": "실행 이벤트",
+    "kind": {
+      "skill": "스킬",
+      "agent": "에이전트",
+      "plugin": "플러그인",
+      "hook": "훅",
+      "mcp": "MCP"
+    },
+    "src": {
+      "user": "사용자",
+      "project": "프로젝트",
+      "plugin": "플러그인",
+      "local": "로컬",
+      "none": "설치 목록 없음"
+    },
+    "chartInstalled": "종류별 설치",
+    "chartTop": "사용 상위 {n}",
+    "chartDaily": "일별 사용 추이(호출, 훅 제외)",
+    "chartHooks": "훅 이벤트별 실행",
+    "chartEmpty": "표시할 데이터가 없습니다",
+    "tabAll": "전체",
+    "search": "이름 검색",
+    "colName": "이름",
+    "colType": "종류",
+    "colSrc": "출처",
+    "colVer": "버전",
+    "colOn": "활성",
+    "colTurns": "사용 턴",
+    "colCalls": "호출",
+    "colErrors": "오류",
+    "colAvgMs": "평균 ms",
+    "on": "켜짐",
+    "off": "꺼짐",
+    "emptyRows": "대상이 없습니다.",
+    "hookUsageNote": "훅 사용은 이벤트 단위로만 기록되어 개별 훅 행에는 표시하지 않습니다 — 위 「훅 이벤트별 실행」 그래프를 보세요. 사용 수치는 집계 기간 작업 이력(work-history) 기준입니다.",
+    "deltaHours": "(최근 {n}시간 대비)",
+    "deltaMinutes": "(최근 {n}분 대비)",
+    "fetchFailed": "조회 실패",
+    "statusUnknown": "상태 확인 불가(조회 실패)",
+    "detailMissing": "최신 측정과 같은 내용의 상세 기록이 없습니다. 다음 업로드 뒤 다시 표시됩니다."
   }
 }
